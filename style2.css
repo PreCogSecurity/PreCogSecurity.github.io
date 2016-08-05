@@ -1,0 +1,202 @@
+
+/***/
+section.commentsfb > .container{
+	background: white;
+	border: 1px solid #c3c4ca;
+	margin-top: 10px;
+	border-radius:  5px;
+	padding-bottom: 10px;
+}
+section.commentsfb .title{
+	display: inline-block;
+	margin-top: 20px;
+	margin-bottom: 26px;
+}
+section.commentsfb .comment {
+	margin-bottom: 20px;
+}
+section.commentsfb .comment .pic{
+	float: left;
+	display: table-cell;
+}
+section.commentsfb .comment .contentcoment{
+	display: table-cell;
+	padding-left: 10px;
+}
+section.commentsfb .comment .content{
+	margin-top: 3px;
+	margin-bottom: 7px;
+}
+section.commentsfb .comment .date{
+	color: #9298a4;
+	font-size: 12px;
+}
+section.commentsfb .comment .date span{
+	color: #8391b1;
+}
+
+/****/
+
+/* COMMENTS */
+
+.fbcoms2.container {
+	font-family: Tahoma, Verdana, sans-serif;
+	background-color: #fff;
+	border: 1px solid #c3c4ca;
+	margin-top: 10px;
+	border-radius:  5px;
+	overflow: hidden;
+	/*width: 100%;*/
+	/*margin: 0 auto;*/
+	/*padding: 5px 10px;*/
+	padding: 0;
+	font-size: 12px;
+	text-align: left;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.comments {
+	font-weight: bold;
+	text-align: center;
+	padding: 0 5px 10px 5px;
+}
+
+.totlikes {
+	margin-top: 3px;
+	background-color: #eeeff4;
+	padding: 5px 10px 5px 10px;
+	background-image: url(http://8ebfa1c2339fb653e2ac-12362a04c3831bec06bc02c773aca5a8.r52.cf5.rackcdn.com/camp6/en/img/new/like.png);
+	background-repeat: no-repeat;
+	background-position: 5px center;
+}
+
+.fbblue {
+	color: #3c5a96;
+}
+
+.buttons {
+	padding-bottom: 0px;
+	margin-bottom: 7px;
+	margin-top: 7px;
+	padding-left: 10px;
+	font-family: Arial, sans-serif;
+	color: #7d7d7f;
+}
+
+.buttons span {
+	cursor: pointer;
+}
+
+.buttons span:hover {
+	text-decoration: underline;
+}
+
+.viewmore {
+	margin-top: 3px;
+	background-color: #eeeff4;
+	padding: 5px 10px 5px 10px;
+	background-image: url(http://8ebfa1c2339fb653e2ac-12362a04c3831bec06bc02c773aca5a8.r52.cf5.rackcdn.com/camp6/en/img/new/bubble.png);
+	background-position: 5px center;
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
+
+.left {
+	cursor: pointer;
+	float: left;
+	color: #3c5a96;
+}
+
+.left:hover {
+	text-decoration: underline;
+}
+
+.right {
+	color: #7d7d7f;
+	float: right;
+}
+
+.item {
+	position: relative;
+	margin-top: 3px;
+	background-color: #eeeff4;
+	padding: 5px 5px 5px 65px;
+	min-height: 60px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 100% !important;
+}
+
+.item .profileimg {
+	position: absolute;
+	top: 5px;
+	left: 10px;
+}
+
+.comtxt {
+	line-height: 16px;
+	margin-top: 0px;
+}
+
+.name {
+	color: #3c5a96;
+	font-weight: bold;
+}
+
+.ago {
+	color: #86878c;
+	font-size: 0.95em;
+}
+
+.fblike {
+	color: #3c5a96;
+	font-size: 0.95em;
+	cursor: pointer;
+}
+
+.fblike:hover {
+	text-decoration: underline;
+}
+
+.combot {
+	padding-top: 5px;
+}
+
+.clickhere {
+	font-weight: bold;
+	padding: 30px 10px 5px;
+	line-height: 18px;
+}
+
+.likes {
+	color: #3c5a96;
+	font-size: 0.95em;
+	cursor: pointer;
+}
+
+.fbimg {
+	background-color: #fff;
+	border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	max-width: 210px;
+	width: 100%;
+	padding: 3px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	border: 1px solid #808080;
+	margin: 10px 0 5px;
+}
+
+.hidden {
+	display: none;
+	opacity: 0;
+}
+
+.hidden .comtxt, .hidden .combot, .comments {
+	display: none;
+}
