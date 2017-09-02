@@ -1,0 +1,283 @@
+*{
+margin: 0;}
+
+body  
+{  
+    font-family: "lucida grande", tahoma, verdana, arial, sans-serif;  
+  background-color:#f7f7f7;
+}  
+
+header{
+background-color:#3b5998;
+color:white;
+padding:6px;
+width:97%;
+font-size: 0.6em;
+}
+
+#fblogo{
+margin-left:5px;
+position: absolute;}
+
+header > h1{
+margin-left:40px;
+}
+
+body > center > p{
+font-size: 0.4em;
+background-color: white;
+width:90%;
+}
+
+body > header > h1 > img{
+margin-right: 15px;
+margin-top: px;
+position:absolute;}
+
+
+body > p > img{
+width:26px;
+background-color: white;
+margin-left:10px;
+position: absolute;
+}
+
+#clicker, #clicker2{
+display:none;
+}
+
+.comments{
+margin-top:10px;
+background-color:white;
+padding:5px;
+}
+
+
+
+
+#fbalert > div{
+margin-left: 25px;}
+
+#fbalert{
+background-color:white;
+padding:5px;
+}
+
+#spinner{
+margin-top:1em;
+margin-left:10px;
+}
+ 
+ #spinBG{
+ z-index:1;
+width: 340px;
+ }
+ 
+ #spin{
+ z-index:2;
+ position:absolute;
+  top: 123px;
+  left: 19px;
+  width: 325px;
+ }
+ 
+ #win,  #win2 , #win3 , #winP, #winP1, #winP2{
+  position:absolute;
+ z-index:3;
+width: 90px;
+  left: 135px;
+  top: 232px;
+ }
+ 
+ #win2 , #win3 , #winP, #winP1, #winP2{
+ display:none;}
+ 
+ .spinAround{
+  -webkit-animation: spin 6.6s ;
+  animation-timing-function: ease;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+   -webkit-animation-fill-mode:forwards; /*Chrome 16+, Safari 4+*/
+   -moz-animation-fill-mode:forwards; /*FF 5+*/
+   -o-animation-fill-mode:forwards; /*Not implemented yet*/
+   -ms-animation-fill-mode:forwards; /*IE 10+*/
+   animation-fill-mode:forwards; /*when the spec is finished*/
+
+}
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  -ms-transform: rotate(0deg);
+  transform: rotate(0deg);
+  }
+ 
+  90% {
+    -webkit-transform: rotate(3110deg);
+  -ms-transform: rotate(3110deg);
+  transform: rotate(3110deg);
+  }
+  
+   95% {
+    -webkit-transform: rotate(3108deg);
+  -ms-transform: rotate(3108deg);
+  transform: rotate(3108deg);
+  }
+  
+  100% {
+    -webkit-transform: rotate(3109deg);
+  -ms-transform: rotate(3109deg);
+  transform: rotate(3109deg); 
+  }
+  
+}
+.spinAround2{
+  -webkit-animation: spin2 6.6s ;
+  animation-timing-function: ease;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+   -webkit-animation-fill-mode:forwards; /*Chrome 16+, Safari 4+*/
+   -moz-animation-fill-mode:forwards; /*FF 5+*/
+   -o-animation-fill-mode:forwards; /*Not implemented yet*/
+   -ms-animation-fill-mode:forwards; /*IE 10+*/
+   animation-fill-mode:forwards; /*when the spec is finished*/
+
+}
+@-webkit-keyframes spin2 {
+  0% {
+    -webkit-transform: rotate(3109deg);
+  -ms-transform: rotate(3109deg);
+  transform: rotate(3109deg);
+  }
+ 
+ 90% {
+    -webkit-transform: rotate(6449deg);
+  -ms-transform: rotate(6449deg);
+  transform: rotate(6449deg);
+  }
+  
+   95% {
+    -webkit-transform: rotate(6447deg);
+  -ms-transform: rotate(6447deg);
+  transform: rotate(6447deg);
+  }
+  
+  100% {
+    -webkit-transform: rotate(6448deg);
+  -ms-transform: rotate(6448deg);
+  transform: rotate(6448deg); 
+  }
+}
+
+
+
+@media (min-width: 614px){
+
+#spin{
+ z-index:2;
+ position:absolute;
+  top: 103px;
+  left: 19px;
+  width: 325px;
+ }
+ 
+ #win,  #win2 , #win3 , #winP, #winP1, #winP2{
+  position:absolute;
+ z-index:3;
+width: 90px;
+  left: 135px;
+  top: 215px;
+ }
+}
+
+@media (max-width: 363px){
+
+#spin{
+ z-index:2;
+ position:absolute;
+  top: 124px;
+  left: 19px;
+  width: 325px;
+ }
+ 
+ #win,  #win2 , #win3 , #winP, #winP1, #winP2{
+  position:absolute;
+ z-index:3;
+width: 90px;
+  left: 135px;
+  top: 234px;
+ }
+}
+
+@media (max-width: 338px){
+
+#spinner{
+width:140px;}
+
+ #spinBG{
+ z-index:1;
+width: 330px;
+margin-left:-5px;
+ }
+
+#spin{
+ z-index:2;
+ position:absolute;
+  top: 140px;
+  left: 19px;
+  width: 315px;
+  margin-left:-5px;
+ }
+ 
+ #win,  #win2 , #win3 , #winP, #winP1, #winP2{
+  position:absolute;
+ z-index:3;
+width: 90px;
+  left: 135px;
+  top: 254px;
+  margin-left:-5px;
+ }
+}
+
+@media (max-width: 325px){
+
+ #spinBG{
+ z-index:1;
+width: 310px;
+margin-left:-5px;
+ }
+
+#spin{
+ z-index:2;
+ position:absolute;
+  top: 140px;
+  left: 19px;
+  width: 295px;
+  margin-left:-5px;
+ }
+ 
+ #win,  #win2 , #win3 , #winP, #winP1, #winP2{
+  position:absolute;
+ z-index:3;
+width: 90px;
+    left: 122px;
+  top: 235px;
+  margin-left:-5px;
+ }
+}
+
+@media (min-width: 700px){
+ #spinBG, #spin,   #win,  #win2 , #win3 , #winP, #winP1, #winP2{
+margin-left: 100px;
+ }
+}
+
+@media (min-width: 800px){
+ #spinBG, #spin,  #win,  #win2 , #win3 , #winP, #winP1, #winP2{
+margin-left: 200px;
+ }
+}
+
+@media (min-width: 800px){
+ #spinBG, #spin,  #win,  #win2 , #winP, #winP1{
+margin-left: 200px;
+ }
