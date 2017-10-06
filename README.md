@@ -1,5 +1,5 @@
 ## Precog Security
 
-... An Innovative Data Analysis Tooldesigned to assist your quest for Truth, Information or Guidance ...
+... An Innovative Data Analysis Tool designed to assist your quest for Truth, Information or Guidance ...
 
 
