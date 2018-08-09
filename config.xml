@@ -2,13 +2,8 @@
 <widget id="io.precog.precog" version="0.0.1"
 	xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
 	<name>Precog</name>
-	<description>
-		A sample Apache Cordova application that responds to the deviceready
-		event.
-	</description>
-	<author href="http://www.eclipse.org/thym" email="thym-dev@eclipse.org">
-		Eclipse.org - Thym
-	</author>
+	<description>An Innovative Security Analyzer</description>
+	<author href="http://www.precogsecurity.github.io" email="timlangeveldt@gmail.com">tim</author>
 
 	<content src="index.html" />
 	<!-- Whitelist configuration. Refer to https://cordova.apache.org/docs/en/edge/guide_appdev_whitelist_index.md.html -->

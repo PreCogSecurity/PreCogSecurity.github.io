@@ -20,7 +20,7 @@
   display: block;
   overflow: hidden;
   visibility: hidden;
-  width: 0;
+  width: auto;
   height: 0;
 }
 
@@ -61,6 +61,7 @@ body {
 	font-weight:normal;
 	color:#0080ff;
 	margin:0;
+	width: auto;
 }
 h2{
 	font-size:34px;
