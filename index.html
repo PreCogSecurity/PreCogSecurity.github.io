@@ -1,1018 +1,852 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BlueHound · Decentralized AI Security Oracle</title>
-  <!-- Web5/Web6 inspired design with neural aesthetics -->
-  <style>
-    /* Cyberpunk meets Web3 - full spec implemented */
-    :root {
-      --bg-deep: #0a0718;
-      --bg-panel: #14102c;
-      --neon-cyan: #0ff;
-      --neon-purple: #b388ff;
-      --neon-pink: #ff3b7f;
-      --ai-glow: #7c4dff;
-      --grid-color: rgba(123, 31, 162, 0.2);
-      --success: #00e676;
-      --warning: #ffea00;
-      --critical: #ff1744;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      background: var(--bg-deep);
-      color: #e0e0ff;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.6;
-      position: relative;
-      overflow-x: hidden;
-    }
-    
-    /* Animated neural grid background */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: 
-        linear-gradient(var(--grid-color) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 50px 50px;
-      pointer-events: none;
-      z-index: 0;
-      animation: gridPulse 4s infinite;
-    }
-    
-    @keyframes gridPulse {
-      0% { opacity: 0.3; }
-      50% { opacity: 0.6; }
-      100% { opacity: 0.3; }
-    }
-    
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 20px;
-      position: relative;
-      z-index: 1;
-    }
-    
-    /* Header with holographic effect */
-    .header {
-      background: rgba(20, 16, 44, 0.8);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(123, 31, 162, 0.5);
-      border-radius: 30px;
-      padding: 30px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 40px rgba(124, 77, 255, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .header::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: linear-gradient(
-        45deg,
-        transparent 30%,
-        rgba(124, 77, 255, 0.1) 50%,
-        transparent 70%
-      );
-      animation: shimmer 8s infinite;
-    }
-    
-    @keyframes shimmer {
-      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
-    }
-    
-    .title {
-      font-size: 4rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      position: relative;
-    }
-    
-    .subtitle {
-      font-size: 1.2rem;
-      color: #9f9fff;
-      display: flex;
-      gap: 20px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    
-    .badge {
-      background: rgba(124, 77, 255, 0.2);
-      border: 1px solid var(--neon-purple);
-      border-radius: 50px;
-      padding: 8px 20px;
-      font-size: 0.9rem;
-      color: white;
-      backdrop-filter: blur(5px);
-    }
-    
-    .badge-new {
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-      border: none;
-      color: white;
-      font-weight: 600;
-    }
-    
-    /* Main dashboard grid */
-    .dashboard {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 30px;
-      margin-bottom: 30px;
-    }
-    
-    /* AI Agent Panel */
-    .agent-panel {
-      background: rgba(20, 16, 44, 0.7);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--neon-purple);
-      border-radius: 30px;
-      padding: 25px;
-      box-shadow: 0 0 30px rgba(124, 77, 255, 0.2);
-    }
-    
-    .agent-header {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      margin-bottom: 25px;
-      border-bottom: 1px solid rgba(124, 77, 255, 0.3);
-      padding-bottom: 15px;
-    }
-    
-    .agent-avatar {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 30px;
-      animation: pulseGlow 3s infinite;
-    }
-    
-    @keyframes pulseGlow {
-      0% { box-shadow: 0 0 20px var(--neon-cyan); }
-      50% { box-shadow: 0 0 40px var(--neon-purple); }
-      100% { box-shadow: 0 0 20px var(--neon-cyan); }
-    }
-    
-    .agent-status {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .status-indicator {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--success);
-      box-shadow: 0 0 15px var(--success);
-      animation: blink 2s infinite;
-    }
-    
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
-    }
-    
-    /* Chat interface with neural styling */
-    .chat-container {
-      height: 400px;
-      overflow-y: auto;
-      padding: 15px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 20px;
-      margin-bottom: 20px;
-      border: 1px solid rgba(124, 77, 255, 0.2);
-    }
-    
-    .message {
-      margin-bottom: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .message.user {
-      align-items: flex-end;
-    }
-    
-    .message-content {
-      max-width: 80%;
-      padding: 12px 18px;
-      border-radius: 20px;
-      position: relative;
-    }
-    
-    .message.user .message-content {
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-      color: white;
-      border-bottom-right-radius: 5px;
-    }
-    
-    .message.assistant .message-content {
-      background: rgba(124, 77, 255, 0.15);
-      border: 1px solid var(--neon-purple);
-      border-bottom-left-radius: 5px;
-      backdrop-filter: blur(5px);
-    }
-    
-    .message.metadata {
-      font-size: 0.75rem;
-      color: #9f9fff;
-      margin-top: 5px;
-    }
-    
-    /* AI model selector */
-    .model-selector {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    
-    .model-btn {
-      background: rgba(124, 77, 255, 0.1);
-      border: 1px solid rgba(124, 77, 255, 0.3);
-      border-radius: 30px;
-      padding: 8px 16px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-size: 0.9rem;
-    }
-    
-    .model-btn:hover, .model-btn.active {
-      background: var(--neon-purple);
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 20px var(--neon-purple);
-    }
-    
-    .model-badge {
-      font-size: 0.7rem;
-      background: rgba(255,255,255,0.1);
-      padding: 2px 6px;
-      border-radius: 10px;
-      margin-left: 5px;
-    }
-    
-    /* Input area */
-    .input-area {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .input-area input {
-      flex: 1;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid var(--neon-purple);
-      border-radius: 40px;
-      padding: 15px 20px;
-      color: white;
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.3s;
-    }
-    
-    .input-area input:focus {
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 30px rgba(124, 77, 255, 0.5);
-    }
-    
-    .input-area button {
-      background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-      border: none;
-      border-radius: 40px;
-      padding: 0 30px;
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    
-    .input-area button:hover {
-      box-shadow: 0 0 30px var(--neon-pink);
-      transform: scale(1.05);
-    }
-    
-    /* Intelligence Panel - right side */
-    .intel-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-    
-    .intel-card {
-      background: rgba(20, 16, 44, 0.7);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--neon-purple);
-      border-radius: 30px;
-      padding: 20px;
-    }
-    
-    .card-title {
-      font-size: 1.3rem;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--neon-cyan);
-    }
-    
-    /* Vulnerability feed */
-    .vuln-feed {
-      max-height: 250px;
-      overflow-y: auto;
-    }
-    
-    .vuln-item {
-      background: rgba(0, 0, 0, 0.3);
-      border-left: 3px solid;
-      padding: 12px;
-      margin-bottom: 10px;
-      border-radius: 10px;
-      font-size: 0.9rem;
-    }
-    
-    .vuln-item.critical { border-left-color: var(--critical); }
-    .vuln-item.high { border-left-color: #ff9100; }
-    .vuln-item.medium { border-left-color: var(--warning); }
-    .vuln-item.low { border-left-color: var(--success); }
-    
-    /* Mempool visualization */
-    .mempool-stats {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    
-    .stat {
-      text-align: center;
-      padding: 15px;
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 15px;
-    }
-    
-    .stat-value {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--neon-cyan);
-    }
-    
-    .stat-label {
-      font-size: 0.8rem;
-      color: #9f9fff;
-    }
-    
-    /* Agent network visualization */
-    .agent-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 15px;
-    }
-    
-    .agent-node {
-      background: rgba(124, 77, 255, 0.1);
-      border: 1px solid var(--neon-purple);
-      border-radius: 15px;
-      padding: 10px;
-      text-align: center;
-      font-size: 0.8rem;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .agent-node::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-      animation: scan 3s infinite;
-    }
-    
-    @keyframes scan {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-    
-    .agent-node.leader {
-      border-color: var(--neon-cyan);
-      box-shadow: 0 0 20px var(--neon-cyan);
-    }
-    
-    /* Governance section */
-    .proposal {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 10px;
-    }
-    
-    .vote-bar {
-      height: 8px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 4px;
-      margin: 10px 0;
-      overflow: hidden;
-    }
-    
-    .vote-progress {
-      height: 100%;
-      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
-      width: 0%;
-    }
-    
-    /* Footer */
-    .footer {
-      text-align: center;
-      padding: 30px;
-      color: #6f6faf;
-      font-size: 0.9rem;
-      border-top: 1px solid rgba(124, 77, 255, 0.2);
-      margin-top: 50px;
-    }
-  </style>
-  <!-- Load libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlueHound · Cyber Intelligence Mission Control</title>
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <!-- Speech Recognition & Synthesis -->
+    <script src="https://cdn.jsdelivr.net/npm/speech-kit@0.1.4/dist/speech-kit.min.js"></script>
+    <!-- D3 for visualizations -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <!-- Three.js for 3D biometrics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts: Orbitron for cyber feel -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            background: #0a0c14;
+            color: #e0f2fe;
+            overflow: hidden;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 50%, #1a1f2e, #0b0d15);
+        }
+
+        #mission-control {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+            padding: 12px;
+            gap: 12px;
+            position: relative;
+        }
+
+        /* ===== HEADER WITH HOLOGRAPHIC STATUS ===== */
+        .command-header {
+            background: rgba(10, 20, 40, 0.7);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .command-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+            animation: scan 8s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hound-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 0 15px cyan);
+            animation: breathe 3s infinite;
+        }
+
+        @keyframes breathe {
+            0% { filter: drop-shadow(0 0 10px cyan); }
+            50% { filter: drop-shadow(0 0 30px cyan) drop-shadow(0 0 30px blue); }
+            100% { filter: drop-shadow(0 0 10px cyan); }
+        }
+
+        .status-panel {
+            display: flex;
+            gap: 30px;
+            font-size: 0.9rem;
+            color: #88ffff;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pulse {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ffaa;
+            box-shadow: 0 0 20px #00ffaa;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* ===== MAIN GRID - SELF-ORGANIZING CARDS ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-auto-rows: minmax(300px, auto);
+            gap: 12px;
+            overflow-y: auto;
+            padding: 4px;
+            scrollbar-width: thin;
+            scrollbar-color: #00ccff #0a1420;
+        }
+
+        .card {
+            background: rgba(15, 25, 45, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 200, 255, 0.3);
+            border-radius: 20px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: #00ffff;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: 700;
+            color: #aaffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .card-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .card-controls i {
+            cursor: pointer;
+            opacity: 0.6;
+            transition: 0.2s;
+        }
+
+        .card-controls i:hover {
+            opacity: 1;
+            color: cyan;
+            transform: scale(1.1);
+        }
+
+        /* Card content area */
+        .card-content {
+            flex: 1;
+            overflow: auto;
+            min-height: 0;
+        }
+
+        /* Webb iframe card special */
+        .iframe-card {
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .iframe-card iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #0a0e1a;
+        }
+
+        /* ===== CHAT MODAL (FLOATING) ===== */
+        .chat-modal {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 400px;
+            height: 600px;
+            background: rgba(8, 12, 25, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid #00ffff;
+            border-radius: 25px;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            box-shadow: 0 0 60px rgba(0, 255, 255, 0.5);
+            transition: all 0.3s;
+            resize: both;
+            overflow: auto;
+            min-width: 300px;
+            min-height: 400px;
+        }
+
+        .chat-header {
+            padding: 16px;
+            background: linear-gradient(90deg, #003366, #001122);
+            border-radius: 25px 25px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-bottom: 1px solid cyan;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            animation: fadeIn 0.3s;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #0066aa, #003366);
+            border-bottom-right-radius: 4px;
+        }
+
+        .hound-message {
+            align-self: flex-start;
+            background: rgba(20, 40, 70, 0.9);
+            border: 1px solid #00aaff;
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input-area {
+            display: flex;
+            padding: 16px;
+            gap: 10px;
+            border-top: 1px solid #336699;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            background: #112233;
+            border: 1px solid #00aaff;
+            border-radius: 30px;
+            padding: 12px 20px;
+            color: white;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .chat-input-area button {
+            background: transparent;
+            border: 1px solid cyan;
+            color: cyan;
+            width: 50px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .chat-input-area button:hover {
+            background: cyan;
+            color: black;
+        }
+
+        .voice-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.8rem;
+            color: #88ffff;
+        }
+
+        .listening {
+            animation: pulseText 1.5s infinite;
+        }
+
+        @keyframes pulseText {
+            0% { color: #88ffff; }
+            50% { color: #00ffff; text-shadow: 0 0 10px cyan; }
+            100% { color: #88ffff; }
+        }
+
+        /* ===== BIOMETRIC VISUALIZATION ===== */
+        #biometric-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            opacity: 0.2;
+        }
+
+        /* ===== MODAL WINDOW ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            width: 90%;
+            height: 90%;
+            background: #0a1428;
+            border: 2px solid cyan;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid cyan;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <h1 class="title">🐾 BLUEHOUND</h1>
-      <div class="subtitle">
-        <span>Decentralized AI Security Oracle · Web6 Ready</span>
-        <span class="badge badge-new">⚡ AGENTIC AI</span>
-        <span class="badge">🔮 THRESHOLD ORACLE [citation:10]</span>
-        <span class="badge">🤖 uAGENTS NETWORK [citation:2]</span>
-      </div>
+    <div id="mission-control">
+        <!-- Holographic Header -->
+        <header class="command-header">
+            <div class="logo-area">
+                <i class="fas fa-dog hound-icon"></i>
+                <h1 style="font-family: 'Orbitron', sans-serif;">BLUEHOUND · CYBER MISSION CONTROL</h1>
+            </div>
+            <div class="status-panel">
+                <div class="status-item"><span class="pulse"></span> ACTIVE AGENTS: 7</div>
+                <div class="status-item"><i class="fas fa-satellite-dish"></i> TELEMETRY: 100%</div>
+                <div class="status-item"><i class="fas fa-brain"></i> QUANTUM AI: ONLINE</div>
+            </div>
+        </header>
+
+        <!-- Self-Organizing Card Grid -->
+        <main class="card-grid" id="cardGrid">
+            <!-- Card 1: Webb.io Investigation (with iframe) -->
+            <div class="card iframe-card" data-card="webb" data-width="2" data-height="1">
+                <div class="card-header">
+                    <span><i class="fas fa-search"></i> WEBB.IO · DOCUMENT INTELLIGENCE</span>
+                    <div class="card-controls">
+                        <i class="fas fa-expand" onclick="expandCard('webb')"></i>
+                        <i class="fas fa-sync-alt" onclick="reloadIframe('webbFrame')"></i>
+                        <i class="fas fa-grip-lines" style="cursor: move;"></i>
+                    </div>
+                </div>
+                <iframe id="webbFrame" src="about:blank" title="Webb.io Investigation"></iframe>
+                <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
+                    Beta Access Required
+                </div>
+            </div>
+
+            <!-- Card 2: Real-Time Telemetry -->
+            <div class="card" data-card="telemetry">
+                <div class="card-header">
+                    <span><i class="fas fa-chart-line"></i> LIVE TELEMETRY · GLOBAL THREAT MAP</span>
+                    <div class="card-controls">
+                        <i class="fas fa-expand" onclick="expandCard('telemetry')"></i>
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                </div>
+                <div class="card-content" id="telemetryViz">
+                    <!-- D3 visualization will be injected -->
+                    <svg width="100%" height="100%"></svg>
+                </div>
+            </div>
+
+            <!-- Card 3: Biometric Sensors -->
+            <div class="card" data-card="biometric">
+                <div class="card-header">
+                    <span><i class="fas fa-heartbeat"></i> BIOMETRIC FEED · OPERATOR STATUS</span>
+                    <div class="card-controls">
+                        <i class="fas fa-expand" onclick="expandCard('biometric')"></i>
+                        <i class="fas fa-wave-square"></i>
+                    </div>
+                </div>
+                <div class="card-content" id="biometricViz">
+                    <canvas id="bioCanvas" width="400" height="200"></canvas>
+                </div>
+            </div>
+
+            <!-- Card 4: Crypto Crime Feed -->
+            <div class="card" data-card="crimes">
+                <div class="card-header">
+                    <span><i class="fas fa-skull"></i> DARK WEB INTELLIGENCE</span>
+                    <div class="card-controls">
+                        <i class="fas fa-expand"></i>
+                        <i class="fas fa-filter"></i>
+                    </div>
+                </div>
+                <div class="card-content" id="crimeFeed">
+                    <div class="crime-item">🚨 Ransomware gang 'BlackCat' moves 500 BTC</div>
+                    <div class="crime-item">⚠️ Phishing campaign targeting DeFi protocols</div>
+                    <div class="crime-item">🔴 Lazarus group linked to new bridge attack</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Chat Modal -->
+        <div class="chat-modal" id="chatModal">
+            <div class="chat-header" id="chatHeader">
+                <span><i class="fas fa-comment-dots"></i> BLUEHOUND · CONVERSATIONAL AI</span>
+                <div>
+                    <i class="fas fa-microphone" id="micToggle" style="margin-right: 15px;"></i>
+                    <i class="fas fa-times" onclick="toggleChat()"></i>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message hound-message">
+                    Hello, Director. BlueHound online. All telemetry nominal. How may I assist with today's investigations?
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="chatInput" placeholder="Voice or text command..." />
+                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+            <div class="voice-indicator" id="voiceIndicator">
+                <i class="fas fa-circle"></i> Voice: Standby
+            </div>
+        </div>
     </div>
 
-    <!-- Main Dashboard -->
-    <div class="dashboard">
-      <!-- Left: AI Agent Interface -->
-      <div class="agent-panel">
-        <div class="agent-header">
-          <div class="agent-avatar">🧠</div>
-          <div class="agent-status">
-            <h2>BlueHound · Security Agent</h2>
-            <div class="status-indicator">
-              <span class="dot"></span>
-              <span>Active · Connected to Agentverse</span>
+    <!-- Modal Overlay (Hidden by default) -->
+    <div class="modal-overlay hidden" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Expanded View</h2>
+                <i class="fas fa-times" onclick="closeModal()" style="font-size: 24px; cursor: pointer;"></i>
             </div>
-          </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be moved here -->
+            </div>
         </div>
-
-        <!-- Multi-Model AI Selector -->
-        <div class="model-selector">
-          <button class="model-btn active" data-model="solodit">
-            🛡️ Solodit (50k vulns) <span class="model-badge">FREE</span>
-          </button>
-          <button class="model-btn" data-model="openai">
-            🧠 GPT-4 (Analysis)
-          </button>
-          <button class="model-btn" data-model="metta">
-            ⚙️ MeTTa Logic <span class="model-badge">DECENTRALIZED</span>
-          </button>
-          <button class="model-btn" data-model="ensemble">
-            🔮 Ensemble (Threshold)
-          </button>
-        </div>
-
-        <!-- Chat Window -->
-        <div class="chat-container" id="chatWindow">
-          <div class="message assistant">
-            <div class="message-content">
-              🐾 I'm BlueHound, your decentralized AI security agent. I leverage:
-              <br>• <strong>Solodit API</strong> - 50,000+ real vulnerabilities [citation:1][citation:6]
-              <br>• <strong>uAgents Network</strong> - Decentralized agent coordination [citation:2]
-              <br>• <strong>Mempool.space</strong> - Live Bitcoin/EVm transaction monitoring [citation:8]
-              <br>• <strong>Threshold Consensus</strong> - Multi-AI verification [citation:10]
-              <br><br>Try: "analyze 0x742d35Cc6634C0532925a3b844Bc454e4438f44e" or "check mempool"
-            </div>
-            <div class="message metadata">via ensemble · threshold signature ✓ [citation:5]</div>
-          </div>
-        </div>
-
-        <!-- Input Area -->
-        <div class="input-area">
-          <input type="text" id="userInput" placeholder="Query the decentralized AI network...">
-          <button id="sendBtn">SEND</button>
-        </div>
-      </div>
-
-      <!-- Right: Intelligence Panel -->
-      <div class="intel-panel">
-        <!-- Live Vulnerability Feed (from Solodit API) -->
-        <div class="intel-card">
-          <div class="card-title">
-            <span>📡 LIVE VULNERABILITY FEED</span>
-            <span class="badge">Solodit API · 50k+ findings</span>
-          </div>
-          <div class="vuln-feed" id="vulnFeed">
-            <div class="vuln-item critical">
-              <strong>🔴 REENTRANCY</strong> · UniswapV3 pool manipulation
-              <div style="font-size:0.7rem; color:#9f9fff;">via Curve · 2 mins ago</div>
-            </div>
-            <div class="vuln-item high">
-              <strong>🟠 DELEGATECALL</strong> · Proxy pattern vulnerability
-              <div style="font-size:0.7rem;">via OpenZeppelin · 15 mins ago</div>
-            </div>
-            <div class="vuln-item medium">
-              <strong>🟡 ACCESS CONTROL</strong> · Missing onlyOwner modifier
-              <div style="font-size:0.7rem;">via Compound · 1 hour ago</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mempool Intelligence -->
-        <div class="intel-card">
-          <div class="card-title">
-            <span>🌊 MEMPOOL · LIVE</span>
-            <span class="badge">mempool.space API [citation:8]</span>
-          </div>
-          <div class="mempool-stats" id="mempoolStats">
-            <div class="stat">
-              <div class="stat-value">3,247</div>
-              <div class="stat-label">Pending TXs</div>
-            </div>
-            <div class="stat">
-              <div class="stat-value">47</div>
-              <div class="stat-label">Suspicious</div>
-            </div>
-            <div class="stat">
-              <div class="stat-value">82</div>
-              <div class="stat-label">High Gas</div>
-            </div>
-            <div class="stat">
-              <div class="stat-value">12</div>
-              <div class="stat-label">Sandwich Risk</div>
-            </div>
-          </div>
-          <div style="font-size:0.8rem; color:#9f9fff; margin-top:10px;">
-            ⚡ Real-time from mempool.space (no API key required)
-          </div>
-        </div>
-
-        <!-- Decentralized Agent Network -->
-        <div class="intel-card">
-          <div class="card-title">
-            <span>🤖 uAGENTS NETWORK</span>
-            <span class="badge">Fetch.ai · Decentralized</span>
-          </div>
-          <div class="agent-grid" id="agentGrid">
-            <div class="agent-node leader">🛡️ BlueHound (leader)</div>
-            <div class="agent-node">🔍 Solodit Scanner</div>
-            <div class="agent-node">📊 Mempool Monitor</div>
-            <div class="agent-node">⚖️ Governance Agent</div>
-            <div class="agent-node">🧠 GPT Analyst</div>
-            <div class="agent-node">🔮 Threshold Validator</div>
-          </div>
-          <div style="margin-top:15px;">
-            <div class="proposal">
-              <strong>⚖️ Active Governance Proposal #42</strong>
-              <div>Update risk thresholds for flash loan detection</div>
-              <div class="vote-bar">
-                <div class="vote-progress" style="width:78%"></div>
-              </div>
-              <div style="display:flex; justify-content:space-between; font-size:0.8rem;">
-                <span>For: 78%</span>
-                <span>Against: 22%</span>
-                <span>⏳ 2d left</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Threshold Oracle Status -->
-        <div class="intel-card">
-          <div class="card-title">
-            <span>🔮 THRESHOLD ORACLE [citation:10]</span>
-            <span class="badge">Supra · Verifiable AI</span>
-          </div>
-          <div style="display:flex; justify-content:space-between;">
-            <div>
-              <div>Consensus: 7/11 agents</div>
-              <div>BLS Signature: ✓ verified</div>
-              <div>Round: #1,234,567</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="color:var(--success);">Confidence: 98.7%</div>
-              <div>Latency: 2.3s</div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-      <p>BlueHound · Decentralized AI Security Oracle · Web3/Web4/Web5/Web6 Ready</p>
-      <p style="font-size:0.8rem;">Powered by: Solodit API [citation:1][citation:6] · uAgents Network [citation:2] · Mempool.space [citation:8] · Supra Threshold Oracles [citation:10] · Optimistic Proof of Computation [citation:5]</p>
-    </div>
-  </div>
+    <!-- Background Biometric Canvas (Three.js) -->
+    <canvas id="biometric-canvas"></canvas>
 
-  <script>
-    // ============================================
-    // BLUEHOUND · DECENTRALIZED AI SECURITY AGENT
-    // ============================================
-    
-    class BlueHoundAgent {
-      constructor() {
-        this.provider = null;
-        this.signer = null;
-        this.userAddress = null;
-        this.currentModel = 'solodit';
-        this.soloditApiKey = null; // User would input their free key
-        this.vulnCache = [];
-        this.agentNetwork = [];
+    <script>
+        // ==============================
+        // BLUEHOUND MISSION CONTROL v2.0
+        // ==============================
         
-        // Initialize components
-        this.initEventListeners();
-        this.initMempoolPolling();
-        this.initVulnFeed();
-        this.checkWalletConnection();
-      }
-
-      initEventListeners() {
-        document.getElementById('sendBtn').addEventListener('click', () => this.handleQuery());
-        document.getElementById('userInput').addEventListener('keypress', (e) => {
-          if (e.key === 'Enter') this.handleQuery();
-        });
-
-        // Model selector
-        document.querySelectorAll('.model-btn').forEach(btn => {
-          btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            this.currentModel = btn.dataset.model;
-            this.addMessage(`🔄 Switched to ${btn.textContent.trim()}`, 'assistant');
-          });
-        });
-      }
-
-      // ========== FREE APIS INTEGRATION ==========
-      
-      /**
-       * Solodit API - Free access to 50,000+ vulnerabilities [citation:1][citation:6]
-       * Register at solodit.cyfrin.io for free API key
-       */
-      async querySolodit(address) {
-        // In production, user would input their free API key
-        const apiKey = this.soloditApiKey || 'demo_key'; // User provides their free key
-        
-        try {
-          // Simulate API call - in production, this would be:
-          // const response = await axios.get(`https://api.solodit.cyfrin.io/v1/contracts/${address}/findings`, {
-          //   headers: { 'Authorization': `Bearer ${apiKey}` }
-          // });
-          
-          // Simulated response based on real Solodit data
-          return {
-            findings: [
-              { type: 'reentrancy', severity: 'critical', description: 'Unprotected ETH withdrawal', line: 142 },
-              { type: 'unchecked-call', severity: 'high', description: 'External call without gas limit', line: 89 },
-              { type: 'timestamp-dependency', severity: 'medium', description: 'Block timestamp used for randomness', line: 231 }
-            ],
-            source: 'Solodit API · 50k vulnerability dataset'
-          };
-        } catch (error) {
-          console.error('Solodit API error:', error);
-          return null;
-        }
-      }
-
-      /**
-       * Mempool.space API - Free, no API key required [citation:8]
-       */
-      async getMempoolData() {
-        try {
-          // Real free API - no key needed
-          const mempoolResponse = await axios.get('https://mempool.space/api/mempool');
-          const feesResponse = await axios.get('https://mempool.space/api/v1/fees/recommended');
-          
-          return {
-            count: mempoolResponse.data.count,
-            vsize: mempoolResponse.data.vsize,
-            total_fee: mempoolResponse.data.total_fee,
-            fees: feesResponse.data
-          };
-        } catch (error) {
-          console.warn('Mempool API error, using fallback data:', error);
-          // Fallback to simulated data
-          return {
-            count: 3247,
-            fees: { fastestFee: 42, halfHourFee: 18, hourFee: 8 }
-          };
-        }
-      }
-
-      /**
-       * OpenAI-compatible API (can be self-hosted or any provider)
-       * This supports any OpenAI-compatible endpoint (local LLMs, etc.)
-       */
-      async queryLLM(prompt, model = 'gpt-4') {
-        // In production, user configures their API endpoint
-        const apiEndpoint = localStorage.getItem('llm_endpoint') || 'https://api.openai.com/v1/chat/completions';
-        const apiKey = localStorage.getItem('llm_key') || 'demo';
-        
-        try {
-          // Simulate - in production, actual API call
-          return {
-            analysis: "Contract shows potential reentrancy vulnerability in withdraw() function. Consider using checks-effects-interactions pattern.",
-            confidence: 0.94,
-            recommendations: ["Add reentrancy guard", "Implement pull-over-push pattern"]
-          };
-        } catch (error) {
-          console.error('LLM API error:', error);
-          return null;
-        }
-      }
-
-      /**
-       * MeTTa Logic Engine (from SingularityNET/Fetch.ai) [citation:2]
-       * For declarative policy reasoning
-       */
-      async queryMeTTa(contractData) {
-        // MeTTa is a logic programming language for AGI
-        // This simulates integration with the MeTTa engine
-        
-        return {
-          inference: "(defrule dangerous-pattern (and (delegatecall ?addr) (untrusted ?addr)) => (risk high))",
-          riskLevel: 'high',
-          reasoning: 'Delegatecall to untrusted address detected'
+        // Configuration
+        const WEBB_APP_URL = 'https://app.thewebb.io'; // Requires beta code
+        const config = {
+            webbAccessCode: localStorage.getItem('webbCode') || prompt('Enter your Webb.io beta access code:'),
+            voiceEnabled: true,
+            telemetryInterval: 2000
         };
-      }
 
-      /**
-       * Threshold Oracle Consensus [citation:10]
-       * Multiple AI agents reach consensus with BLS signatures
-       */
-      async thresholdConsensus(query, data) {
-        // Simulate multiple agents voting
-        const agents = 11;
-        const votesFor = Math.floor(Math.random() * 3) + 9; // 9-11 votes
-        
-        return {
-          consensus: votesFor >= 8, // 2/3 majority
-          votes: { for: votesFor, against: agents - votesFor },
-          signature: '0x' + Math.random().toString(36).substring(2, 30),
-          confidence: votesFor / agents
-        };
-      }
-
-      // ========== CORE ANALYSIS ENGINE ==========
-      
-      async analyzeContract(address) {
-        this.addMessage(`🔍 Analyzing contract ${address}...`, 'assistant');
-        
-        // Parallel queries to multiple AI sources
-        const [soloditFindings, llmAnalysis, mettaResult, consensus] = await Promise.all([
-          this.querySolodit(address).catch(() => null),
-          this.queryLLM(`Analyze smart contract at ${address} for security vulnerabilities`).catch(() => null),
-          this.queryMeTTa({ address }).catch(() => null),
-          this.thresholdConsensus('contract_analysis', { address }).catch(() => null)
-        ]);
-
-        // Build comprehensive response
-        let response = `📊 **Multi-AI Analysis Report**\n\n`;
-        
-        if (soloditFindings) {
-          response += `🔴 **Solodit Vulnerability Database** [citation:1][citation:6]\n`;
-          soloditFindings.findings.forEach(f => {
-            response += `• ${f.severity.toUpperCase()}: ${f.description} (line ${f.line})\n`;
-          });
+        // Initialize iframe with access code
+        if (config.webbAccessCode) {
+            localStorage.setItem('webbCode', config.webbAccessCode);
+            document.getElementById('webbFrame').src = `${WEBB_APP_URL}?code=${config.webbAccessCode}`;
+        } else {
+            document.getElementById('webbFrame').src = 'about:blank';
         }
-        
-        if (llmAnalysis) {
-          response += `\n🧠 **LLM Analysis**\n${llmAnalysis.analysis}\n`;
-        }
-        
-        if (mettaResult) {
-          response += `\n⚙️ **MeTTa Logic Inference** [citation:2]\nRisk: ${mettaResult.riskLevel}\n${mettaResult.reasoning}\n`;
-        }
-        
-        if (consensus) {
-          response += `\n🔮 **Threshold Consensus** [citation:10]\n`;
-          response += `Confidence: ${(consensus.confidence * 100).toFixed(1)}%\n`;
-          response += `BLS Signature: ${consensus.signature.substring(0, 20)}...\n`;
-        }
-        
-        this.addMessage(response, 'assistant');
-        
-        // Update UI with findings
-        this.updateVulnFeed(soloditFindings?.findings || []);
-      }
 
-      async checkMempool() {
-        this.addMessage('🌊 Querying decentralized mempool...', 'assistant');
-        
-        const mempoolData = await this.getMempoolData();
-        
-        // Update UI
-        document.getElementById('mempoolStats').innerHTML = `
-          <div class="stat">
-            <div class="stat-value">${mempoolData.count}</div>
-            <div class="stat-label">Pending TXs</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">${Math.floor(mempoolData.count * 0.015)}</div>
-            <div class="stat-label">Suspicious</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">${mempoolData.fees?.fastestFee || 42}</div>
-            <div class="stat-label">Fast Fee (sat/vB)</div>
-          </div>
-          <div class="stat">
-            <div class="stat-value">${Math.floor(mempoolData.count * 0.004)}</div>
-            <div class="stat-label">Sandwich Risk</div>
-          </div>
-        `;
-        
-        this.addMessage(`📊 Mempool snapshot: ${mempoolData.count} pending transactions. Fast fee: ${mempoolData.fees?.fastestFee || 42} sat/vB`, 'assistant');
-      }
-
-      // ========== UI HELPERS ==========
-      
-      addMessage(text, sender = 'assistant') {
-        const chatWindow = document.getElementById('chatWindow');
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${sender}`;
-        
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'message-content';
-        contentDiv.innerHTML = text.replace(/\n/g, '<br>');
-        
-        const metaDiv = document.createElement('div');
-        metaDiv.className = 'message metadata';
-        metaDiv.textContent = `via ${this.currentModel} · ${new Date().toLocaleTimeString()}`;
-        
-        msgDiv.appendChild(contentDiv);
-        msgDiv.appendChild(metaDiv);
-        chatWindow.appendChild(msgDiv);
-        chatWindow.scrollTop = chatWindow.scrollHeight;
-      }
-
-      updateVulnFeed(findings) {
-        const feed = document.getElementById('vulnFeed');
-        findings.forEach(f => {
-          const item = document.createElement('div');
-          item.className = `vuln-item ${f.severity}`;
-          item.innerHTML = `
-            <strong>${f.severity.toUpperCase()}</strong> · ${f.description}
-            <div style="font-size:0.7rem; color:#9f9fff;">via Solodit · just now</div>
-          `;
-          feed.insertBefore(item, feed.firstChild);
-        });
-      }
-
-      initMempoolPolling() {
-        // Update mempool every 30 seconds
-        setInterval(() => this.getMempoolData().then(data => {
-          if (data) {
-            document.getElementById('mempoolStats').innerHTML = `
-              <div class="stat">
-                <div class="stat-value">${data.count}</div>
-                <div class="stat-label">Pending TXs</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">${Math.floor(data.count * 0.015)}</div>
-                <div class="stat-label">Suspicious</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">${data.fees?.fastestFee || 42}</div>
-                <div class="stat-label">Fast Fee</div>
-              </div>
-              <div class="stat">
-                <div class="stat-value">${Math.floor(data.count * 0.004)}</div>
-                <div class="stat-label">Sandwich Risk</div>
-              </div>
-            `;
-          }
-        }), 30000);
-      }
-
-      initVulnFeed() {
-        // Simulate live vulnerability feed from Solodit
-        const vulns = [
-          { severity: 'critical', desc: 'UniswapV3 pool manipulation' },
-          { severity: 'high', desc: 'Delegatecall proxy vulnerability' },
-          { severity: 'medium', desc: 'Missing access control modifier' },
-          { severity: 'low', desc: 'Unused return value' }
-        ];
-        
-        setInterval(() => {
-          const random = vulns[Math.floor(Math.random() * vulns.length)];
-          this.updateVulnFeed([random]);
-        }, 45000);
-      }
-
-      async checkWalletConnection() {
-        if (typeof window.ethereum !== 'undefined') {
-          try {
-            this.provider = new ethers.providers.Web3Provider(window.ethereum);
-            const accounts = await this.provider.listAccounts();
-            if (accounts.length > 0) {
-              this.userAddress = accounts[0];
-              this.signer = this.provider.getSigner();
+        // ========== SELF-ORGANIZING CARDS ==========
+        class CardOrganizer {
+            constructor(gridId) {
+                this.grid = document.getElementById(gridId);
+                this.cards = Array.from(this.grid.children);
+                this.makeCardsDraggable();
+                this.loadLayout();
             }
-          } catch (e) {
-            console.log('Not connected');
-          }
-        }
-      }
 
-      async handleQuery() {
-        const input = document.getElementById('userInput');
-        const query = input.value.trim();
-        
-        if (!query) return;
-        
-        this.addMessage(query, 'user');
-        input.value = '';
-        
-        // Parse query
-        const lower = query.toLowerCase();
-        
-        if (lower.includes('analyze 0x') || lower.includes('scan 0x')) {
-          const address = query.match(/0x[a-fA-F0-9]{40}/)?.[0];
-          if (address) {
-            await this.analyzeContract(address);
-          } else {
-            this.addMessage('❌ Please provide a valid Ethereum address', 'assistant');
-          }
-        }
-        else if (lower.includes('mempool') || lower.includes('pending')) {
-          await this.checkMempool();
-        }
-        else if (lower.includes('vulnerability') || lower.includes('findings')) {
-          this.addMessage('📚 Querying Solodit vulnerability database [citation:1][citation:6]...', 'assistant');
-          setTimeout(() => {
-            this.addMessage('Found 47 recent vulnerabilities matching your criteria. Displaying top 3...', 'assistant');
-            this.updateVulnFeed([
-              { severity: 'critical', desc: 'Reentrancy in LendingPool' },
-              { severity: 'high', desc: 'Flash loan attack vector' },
-              { severity: 'high', desc: 'Price oracle manipulation' }
-            ]);
-          }, 1500);
-        }
-        else if (lower.includes('agent') || lower.includes('network')) {
-          this.addMessage('🤖 **Decentralized Agent Network Status** [citation:2]\n\n• BlueHound (leader) - active\n• Solodit Scanner - synced (50k vulns)\n• Mempool Monitor - live\n• Governance Agent - 3 proposals\n• Threshold Validators - 11/11 online', 'assistant');
-        }
-        else if (lower.includes('governance') || lower.includes('vote')) {
-          this.addMessage('⚖️ **Active Governance Proposals**\n\n#42: Update risk thresholds (78% for, ends in 2d)\n#41: Add new chain support (passed, executing)\n#40: Agent staking parameters (voting now)', 'assistant');
-        }
-        else {
-          this.addMessage('I can help with:\n• Contract analysis (using Solodit + multiple AIs)\n• Mempool monitoring (mempool.space)\n• Vulnerability lookup (50k+ findings)\n• Agent network status\n• Governance proposals', 'assistant');
-        }
-      }
-    }
+            makeCardsDraggable() {
+                this.cards.forEach(card => {
+                    const header = card.querySelector('.card-header');
+                    let isDragging = false;
+                    
+                    header.addEventListener('mousedown', (e) => {
+                        if (e.target.classList.contains('fa-expand')) return;
+                        isDragging = true;
+                        card.style.opacity = '0.8';
+                    });
 
-    // Initialize BlueHound when page loads
-    window.addEventListener('load', () => {
-      window.bluehound = new BlueHoundAgent();
-    });
-  </script>
+                    document.addEventListener('mousemove', (e) => {
+                        if (!isDragging) return;
+                        // Simplified - in production use proper drag-drop
+                    });
+
+                    document.addEventListener('mouseup', () => {
+                        isDragging = false;
+                        card.style.opacity = '1';
+                        this.saveLayout();
+                    });
+                });
+            }
+
+            saveLayout() {
+                const layout = this.cards.map(card => ({
+                    id: card.dataset.card,
+                    width: card.style.gridColumn || 'span 1',
+                    height: card.style.gridRow || 'span 1'
+                }));
+                localStorage.setItem('houndLayout', JSON.stringify(layout));
+            }
+
+            loadLayout() {
+                const saved = localStorage.getItem('houndLayout');
+                if (saved) {
+                    const layout = JSON.parse(saved);
+                    layout.forEach(item => {
+                        const card = document.querySelector(`[data-card="${item.id}"]`);
+                        if (card) {
+                            card.style.gridColumn = item.width;
+                            card.style.gridRow = item.height;
+                        }
+                    });
+                }
+            }
+        }
+
+        new CardOrganizer('cardGrid');
+
+        // ========== MODAL WINDOW ==========
+        function expandCard(cardId) {
+            const card = document.querySelector(`[data-card="${cardId}"]`);
+            const modalBody = document.getElementById('modalBody');
+            const modalTitle = document.getElementById('modalTitle');
+            
+            // Clone card content
+            const clone = card.cloneNode(true);
+            clone.classList.remove('iframe-card'); // Adjust if needed
+            modalBody.innerHTML = '';
+            modalBody.appendChild(clone);
+            
+            modalTitle.innerText = card.querySelector('.card-header span').innerText;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+        }
+
+        function reloadIframe(iframeId) {
+            const iframe = document.getElementById(iframeId);
+            iframe.src = iframe.src; // Reload
+        }
+
+        // ========== TELEMETRY VISUALIZATION (D3) ==========
+        function initTelemetry() {
+            const svg = d3.select("#telemetryViz svg");
+            const width = svg.node().parentElement.clientWidth;
+            const height = svg.node().parentElement.clientHeight;
+            
+            // Simulate real-time data
+            const data = Array(20).fill().map((_, i) => ({ x: i, y: Math.random() * 100 }));
+            
+            const xScale = d3.scaleLinear().domain([0, 19]).range([0, width]);
+            const yScale = d3.scaleLinear().domain([0, 100]).range([height, 0]);
+            
+            const line = d3.line()
+                .x(d => xScale(d.x))
+                .y(d => yScale(d.y));
+            
+            svg.append("path")
+                .datum(data)
+                .attr("fill", "none")
+                .attr("stroke", "#00ffff")
+                .attr("stroke-width", 2)
+                .attr("d", line);
+        }
+
+        // ========== BIOMETRICS (Canvas + Three.js) ==========
+        function initBiometrics() {
+            const canvas = document.getElementById('biometric-canvas');
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Create a neural network visualization
+            const geometry = new THREE.SphereGeometry(0.1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+            
+            for (let i = 0; i < 50; i++) {
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.x = (Math.random() - 0.5) * 10;
+                sphere.position.y = (Math.random() - 0.5) * 10;
+                sphere.position.z = (Math.random() - 0.5) * 10;
+                scene.add(sphere);
+            }
+            
+            function animate() {
+                requestAnimationFrame(animate);
+                scene.rotation.y += 0.001;
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        // ========== CHAT + VOICE AI ==========
+        class HoundChat {
+            constructor() {
+                this.messages = document.getElementById('chatMessages');
+                this.input = document.getElementById('chatInput');
+                this.sendBtn = document.getElementById('sendBtn');
+                this.micToggle = document.getElementById('micToggle');
+                this.voiceIndicator = document.getElementById('voiceIndicator');
+                
+                this.recognition = null;
+                this.synthesis = window.speechSynthesis;
+                this.isListening = false;
+                
+                this.initSpeech();
+                this.initEvents();
+            }
+
+            initSpeech() {
+                if ('webkitSpeechRecognition' in window) {
+                    this.recognition = new webkitSpeechRecognition();
+                    this.recognition.continuous = true;
+                    this.recognition.interimResults = true;
+                    this.recognition.lang = 'en-US';
+                    
+                    this.recognition.onresult = (event) => {
+                        const transcript = Array.from(event.results)
+                            .map(result => result[0].transcript)
+                            .join('');
+                        this.input.value = transcript;
+                        this.voiceIndicator.innerHTML = '<i class="fas fa-circle" style="color: #00ff00;"></i> Listening...';
+                    };
+                    
+                    this.recognition.onend = () => {
+                        this.isListening = false;
+                        this.micToggle.style.color = '';
+                        this.voiceIndicator.innerHTML = '<i class="fas fa-circle"></i> Voice: Standby';
+                    };
+                }
+            }
+
+            initEvents() {
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.sendMessage();
+                });
+                
+                this.micToggle.addEventListener('click', () => {
+                    if (this.isListening) {
+                        this.recognition.stop();
+                    } else {
+                        this.recognition.start();
+                        this.isListening = true;
+                        this.micToggle.style.color = '#00ff00';
+                    }
+                });
+            }
+
+            sendMessage() {
+                const text = this.input.value.trim();
+                if (!text) return;
+                
+                this.addMessage(text, 'user');
+                this.input.value = '';
+                
+                // Process command
+                this.processCommand(text);
+            }
+
+            addMessage(text, sender) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message ${sender}-message`;
+                msgDiv.textContent = text;
+                this.messages.appendChild(msgDiv);
+                this.messages.scrollTop = this.messages.scrollHeight;
+                
+                // Speak if from hound
+                if (sender === 'hound') {
+                    this.speak(text);
+                }
+            }
+
+            speak(text) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = this.synthesis.getVoices().find(v => v.name.includes('Google UK'));
+                utterance.rate = 0.9;
+                this.synthesis.speak(utterance);
+            }
+
+            processCommand(cmd) {
+                cmd = cmd.toLowerCase();
+                
+                if (cmd.includes('webb') || cmd.includes('investigate')) {
+                    this.addMessage('Accessing Webb.io document intelligence...', 'hound');
+                    expandCard('webb');
+                }
+                else if (cmd.includes('telemetry') || cmd.includes('threat')) {
+                    this.addMessage('Displaying global threat telemetry. Visualizing live data.', 'hound');
+                }
+                else if (cmd.includes('biometric') || cmd.includes('operator')) {
+                    this.addMessage('Operator biometrics: Heart rate 72bpm, Galvanic response nominal, Focus level 94%.', 'hound');
+                }
+                else if (cmd.includes('crime') || cmd.includes('dark web')) {
+                    this.addMessage('Pulling latest dark web intelligence...', 'hound');
+                }
+                else if (cmd.includes('hello') || cmd.includes('hi')) {
+                    this.addMessage('Greetings, Director. All systems fully operational.', 'hound');
+                }
+                else {
+                    this.addMessage(`Command received: "${cmd}". Processing through quantum AI mesh...`, 'hound');
+                }
+            }
+        }
+
+        // ========== CRIME FEED SIMULATION ==========
+        function updateCrimeFeed() {
+            const crimes = [
+                '🚨 North Korean IT workers infiltrate 3 crypto firms',
+                '⚠️ New quantum-resistant ransomware strain detected',
+                '🔴 Bybit exchange reports suspicious wallet activity',
+                '🟡 Phishing kit targeting Ledger users in the wild',
+                '📡 Interpol issues alert on new money laundering technique'
+            ];
+            
+            setInterval(() => {
+                const feed = document.getElementById('crimeFeed');
+                const newItem = document.createElement('div');
+                newItem.className = 'crime-item';
+                newItem.textContent = crimes[Math.floor(Math.random() * crimes.length)];
+                feed.insertBefore(newItem, feed.firstChild);
+                
+                if (feed.children.length > 5) {
+                    feed.removeChild(feed.lastChild);
+                }
+            }, 15000);
+        }
+
+        // ========== INITIALIZE EVERYTHING ==========
+        window.onload = function() {
+            initTelemetry();
+            initBiometrics();
+            updateCrimeFeed();
+            
+            // Start chat
+            window.houndChat = new HoundChat();
+            
+            // Real-time telemetry update
+            setInterval(() => {
+                document.querySelector('#telemetryViz svg').innerHTML = '';
+                initTelemetry();
+            }, 5000);
+            
+            // Webb.io iframe access prompt if needed
+            if (!config.webbAccessCode) {
+                houndChat.addMessage('⚠️ Webb.io beta access code required for document investigation features.', 'hound');
+            }
+        };
+
+        // Make chat draggable
+        dragElement(document.getElementById('chatModal'));
+
+        function dragElement(el) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = document.getElementById('chatHeader');
+            
+            header.onmousedown = dragMouseDown;
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                el.style.top = (el.offsetTop - pos2) + 'px';
+                el.style.left = (el.offsetLeft - pos1) + 'px';
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+
+        function toggleChat() {
+            const chat = document.getElementById('chatModal');
+            chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
+        }
+    </script>
 </body>
 </html>
