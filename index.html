@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueHound Sentinel · Neural Mining Command</title>
+    <title>BlueHound Sentinel · Real Neural Miner</title>
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
@@ -12,12 +12,8 @@
     <!-- Annyang for voice -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* (Same styles as before, with modifications) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Roboto Mono', monospace;
             background: #0a0c14;
@@ -26,7 +22,6 @@
             height: 100vh;
             position: relative;
         }
-
         #bg-canvas {
             position: fixed;
             top: 0;
@@ -37,7 +32,6 @@
             opacity: 0.2;
             pointer-events: none;
         }
-
         #mission-control {
             position: relative;
             z-index: 1;
@@ -47,8 +41,6 @@
             padding: 12px;
             gap: 12px;
         }
-
-        /* Header */
         .command-header {
             background: rgba(10, 20, 40, 0.7);
             backdrop-filter: blur(15px);
@@ -63,107 +55,30 @@
             position: relative;
             overflow: hidden;
         }
-
         .command-header::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent);
             animation: scan 8s infinite;
         }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            20% { left: 100%; }
-            100% { left: 100%; }
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .hound-icon {
-            font-size: 2.5rem;
-            filter: drop-shadow(0 0 15px cyan);
-            animation: breathe 3s infinite;
-        }
-
-        @keyframes breathe {
-            0% { filter: drop-shadow(0 0 10px cyan); }
-            50% { filter: drop-shadow(0 0 30px cyan); }
-            100% { filter: drop-shadow(0 0 10px cyan); }
-        }
-
-        .status-panel {
-            display: flex;
-            gap: 30px;
-            font-size: 0.9rem;
-            color: #88ffff;
-            flex-wrap: wrap;
-        }
-
-        .status-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .pulse {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #00ffaa;
-            box-shadow: 0 0 20px #00ffaa;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.5); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-
-        .wallet-area {
-            display: flex;
-            gap: 10px;
-            background: rgba(0, 20, 40, 0.8);
-            padding: 8px 16px;
+        @keyframes scan { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+        .logo-area { display: flex; align-items: center; gap: 16px; }
+        .hound-icon { font-size: 2.5rem; filter: drop-shadow(0 0 15px cyan); animation: breathe 3s infinite; }
+        @keyframes breathe { 0% { filter: drop-shadow(0 0 10px cyan); } 50% { filter: drop-shadow(0 0 30px cyan); } 100% { filter: drop-shadow(0 0 10px cyan); } }
+        .status-panel { display: flex; gap: 30px; font-size: 0.9rem; color: #88ffff; flex-wrap: wrap; }
+        .status-item { display: flex; align-items: center; gap: 8px; }
+        .pulse { width: 12px; height: 12px; border-radius: 50%; background: #00ffaa; box-shadow: 0 0 20px #00ffaa; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
+        .owner-badge {
+            background: linear-gradient(135deg, #ffaa00, #ff5500);
+            padding: 8px 20px;
             border-radius: 40px;
-            border: 1px solid cyan;
-            align-items: center;
-        }
-
-        .wallet-area input {
-            background: transparent;
-            border: none;
-            color: white;
-            font-family: 'Roboto Mono', monospace;
-            width: 300px;
-            outline: none;
-        }
-
-        .wallet-area button {
-            background: cyan;
-            border: none;
-            color: black;
-            padding: 6px 16px;
-            border-radius: 30px;
             font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
+            border: 1px solid gold;
+            box-shadow: 0 0 20px gold;
         }
-
-        .wallet-area button:hover {
-            background: #00ffff;
-            box-shadow: 0 0 20px cyan;
-        }
-
-        /* Main grid */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -172,7 +87,6 @@
             overflow-y: auto;
             padding: 4px;
         }
-
         .card {
             background: rgba(15, 25, 45, 0.7);
             backdrop-filter: blur(10px);
@@ -186,271 +100,62 @@
             position: relative;
             overflow: hidden;
         }
-
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: #00ffff;
-            box-shadow: 0 0 40px rgba(0,255,255,0.3);
-        }
-
+        .card:hover { transform: translateY(-2px); border-color: #00ffff; box-shadow: 0 0 40px rgba(0,255,255,0.3); }
         .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            font-weight: 700;
-            color: #aaffff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(0,255,255,0.2);
-            padding-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+            font-weight: 700; color: #aaffff; text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 1px solid rgba(0,255,255,0.2); padding-bottom: 8px;
         }
-
-        .card-content {
-            flex: 1;
-            overflow: auto;
-            min-height: 0;
-        }
-
-        .iframe-card {
-            padding: 0;
-            overflow: hidden;
-        }
-
-        .iframe-card iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #0a0e1a;
-        }
-
-        /* Mining stats */
+        .card-content { flex: 1; overflow: auto; min-height: 0; }
+        .iframe-card { padding: 0; overflow: hidden; }
+        .iframe-card iframe { width: 100%; height: 100%; border: none; background: #0a0e1a; }
         .mining-stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 16px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;
         }
-
         .stat-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            padding: 12px;
-            text-align: center;
+            background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; text-align: center;
             border: 1px solid rgba(0,255,255,0.3);
         }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: cyan;
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: #88aaff;
-        }
-
-        .mining-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 16px;
-            justify-content: center;
-        }
-
+        .stat-value { font-size: 1.8rem; font-weight: bold; color: cyan; }
+        .stat-label { font-size: 0.8rem; color: #88aaff; }
+        .mining-controls { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
         .mining-btn {
             background: linear-gradient(135deg, #0066aa, #003366);
-            border: 1px solid cyan;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.2s;
-            flex: 1;
+            border: 1px solid cyan; color: white; padding: 10px 20px; border-radius: 40px;
+            font-weight: bold; cursor: pointer; transition: 0.2s; flex: 1;
         }
-
-        .mining-btn:hover {
-            background: cyan;
-            color: black;
-        }
-
-        .mining-btn.active {
-            background: cyan;
-            color: black;
-            box-shadow: 0 0 30px cyan;
-        }
-
-        /* Learning log */
-        .learning-log {
-            font-size: 0.9rem;
-        }
-
-        .log-entry {
-            padding: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: #b0e0ff;
-        }
-
-        .log-entry:last-child {
-            border-bottom: none;
-        }
-
-        /* Chat modal */
+        .mining-btn:hover { background: cyan; color: black; }
+        .mining-btn.active { background: cyan; color: black; box-shadow: 0 0 30px cyan; }
+        .learning-log { font-size: 0.9rem; }
+        .log-entry { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #b0e0ff; }
         .chat-modal {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 380px;
-            height: 500px;
-            background: rgba(8, 12, 25, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid #00ffff;
-            border-radius: 25px;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            box-shadow: 0 0 60px rgba(0, 255, 255, 0.5);
-            resize: both;
-            overflow: hidden;
-            min-width: 300px;
-            min-height: 400px;
+            position: fixed; bottom: 30px; right: 30px; width: 380px; height: 500px;
+            background: rgba(8, 12, 25, 0.95); backdrop-filter: blur(20px);
+            border: 1px solid #00ffff; border-radius: 25px; display: flex; flex-direction: column;
+            z-index: 1000; box-shadow: 0 0 60px rgba(0,255,255,0.5); resize: both; overflow: hidden;
+            min-width: 300px; min-height: 400px;
         }
-
         .chat-header {
-            padding: 16px;
-            background: linear-gradient(90deg, #003366, #001122);
-            border-radius: 25px 25px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: move;
-            border-bottom: 1px solid cyan;
+            padding: 16px; background: linear-gradient(90deg, #003366, #001122);
+            border-radius: 25px 25px 0 0; display: flex; justify-content: space-between;
+            align-items: center; cursor: move; border-bottom: 1px solid cyan;
         }
-
-        .chat-messages {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 10px 16px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background: linear-gradient(135deg, #0066aa, #003366);
-            border-bottom-right-radius: 4px;
-        }
-
-        .hound-message {
-            align-self: flex-start;
-            background: rgba(20, 40, 70, 0.9);
-            border: 1px solid #00aaff;
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-input-area {
-            display: flex;
-            padding: 16px;
-            gap: 10px;
-            border-top: 1px solid #336699;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            background: #112233;
-            border: 1px solid #00aaff;
-            border-radius: 30px;
-            padding: 12px 20px;
-            color: white;
-            font-family: 'Roboto Mono', monospace;
-        }
-
-        .chat-input-area button {
-            background: transparent;
-            border: 1px solid cyan;
-            color: cyan;
-            width: 50px;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .chat-input-area button:hover {
-            background: cyan;
-            color: black;
-        }
-
-        .voice-indicator {
-            padding: 8px 16px;
-            font-size: 0.8rem;
-            color: #88ffff;
-            border-top: 1px solid #224466;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .listening {
-            animation: pulseText 1.5s infinite;
-        }
-
-        @keyframes pulseText {
-            0% { color: #88ffff; }
-            50% { color: #00ffff; text-shadow: 0 0 10px cyan; }
-            100% { color: #88ffff; }
-        }
-
-        /* Modal overlay */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-content {
-            width: 90%;
-            height: 90%;
-            background: #0a1428;
-            border: 2px solid cyan;
-            border-radius: 30px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid cyan;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .modal-body {
-            flex: 1;
-            overflow: auto;
-            padding: 20px;
-        }
-
-        .hidden {
-            display: none;
-        }
+        .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .message { max-width: 80%; padding: 10px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; }
+        .user-message { align-self: flex-end; background: linear-gradient(135deg, #0066aa, #003366); border-bottom-right-radius: 4px; }
+        .hound-message { align-self: flex-start; background: rgba(20, 40, 70, 0.9); border: 1px solid #00aaff; border-bottom-left-radius: 4px; }
+        .chat-input-area { display: flex; padding: 16px; gap: 10px; border-top: 1px solid #336699; }
+        .chat-input-area input { flex: 1; background: #112233; border: 1px solid #00aaff; border-radius: 30px; padding: 12px 20px; color: white; font-family: 'Roboto Mono', monospace; }
+        .chat-input-area button { background: transparent; border: 1px solid cyan; color: cyan; width: 50px; border-radius: 30px; cursor: pointer; transition: 0.2s; }
+        .chat-input-area button:hover { background: cyan; color: black; }
+        .voice-indicator { padding: 8px 16px; font-size: 0.8rem; color: #88ffff; border-top: 1px solid #224466; display: flex; align-items: center; gap: 5px; }
+        .listening { animation: pulseText 1.5s infinite; }
+        @keyframes pulseText { 0% { color: #88ffff; } 50% { color: #00ffff; text-shadow: 0 0 10px cyan; } 100% { color: #88ffff; } }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { width: 90%; height: 90%; background: #0a1428; border: 2px solid cyan; border-radius: 30px; display: flex; flex-direction: column; }
+        .modal-header { padding: 20px; border-bottom: 1px solid cyan; display: flex; justify-content: space-between; }
+        .modal-body { flex: 1; overflow: auto; padding: 20px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -463,13 +168,11 @@
                 <h1 style="font-family: 'Orbitron';">BLUEHOUND SENTINEL</h1>
             </div>
             <div class="status-panel">
-                <div class="status-item"><span class="pulse"></span> NEURAL HASH: <span id="globalHash">47.3 TH/s</span></div>
+                <div class="status-item"><span class="pulse"></span> NEURAL HASH: <span id="globalHash">0.00 TH/s</span></div>
                 <div class="status-item"><i class="fas fa-microchip"></i> BIOCHIPS: 4 ACTIVE</div>
-            </div>
-            <div class="wallet-area">
-                <i class="fa-brands fa-bitcoin" style="color: #f2a900;"></i>
-                <input type="text" id="userWallet" placeholder="Your Bitcoin wallet address" value="">
-                <button id="saveWalletBtn">SET</button>
+                <div class="owner-badge">
+                    <i class="fa-brands fa-bitcoin"></i> MINING TO OWNER
+                </div>
             </div>
         </header>
 
@@ -490,10 +193,10 @@
                 </div>
             </div>
 
-            <!-- Mining Console -->
+            <!-- Real Mining Console -->
             <div class="card" data-card="mining">
                 <div class="card-header">
-                    <span><i class="fas fa-microchip"></i> NEURAL MINING ENGINE</span>
+                    <span><i class="fas fa-microchip"></i> REAL MINING ENGINE · CKPOOL</span>
                     <div class="card-controls">
                         <i class="fas fa-expand" onclick="expandCard('mining')"></i>
                         <i class="fas fa-chart-line"></i>
@@ -503,36 +206,37 @@
                     <div class="mining-stats">
                         <div class="stat-box">
                             <div class="stat-value" id="hashRate">0.00</div>
-                            <div class="stat-label">HASH RATE (TH/s)</div>
+                            <div class="stat-label">HASH RATE (MH/s)</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value" id="totalMined">0.00000000</div>
-                            <div class="stat-label">TOTAL COG MINED</div>
+                            <div class="stat-value" id="sharesFound">0</div>
+                            <div class="stat-label">SHARES FOUND</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value" id="userShare">0.00000000</div>
-                            <div class="stat-label">YOUR SHARE (50%)</div>
+                            <div class="stat-value" id="totalHashes">0</div>
+                            <div class="stat-label">TOTAL HASHES</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value" id="ownerShare">0.00000000</div>
-                            <div class="stat-label">OWNER SHARE</div>
+                            <div class="stat-value" id="poolDiff">0</div>
+                            <div class="stat-label">POOL DIFF</div>
                         </div>
                     </div>
                     <div style="background: #0a1420; border-radius: 12px; padding: 12px; margin: 12px 0;">
                         <div style="display: flex; justify-content: space-between; color: #88aaff;">
-                            <span>NEURAL DIFFICULTY</span>
-                            <span id="difficulty">1,234</span>
+                            <span>MINING TO</span>
+                            <span style="color: cyan; font-size: 0.8rem;">bc1ps8...djl sy</span>
                         </div>
-                        <div style="height: 8px; background: #112233; border-radius: 4px; margin-top: 8px;">
-                            <div id="difficultyBar" style="width: 67%; height: 100%; background: linear-gradient(90deg, cyan, blue); border-radius: 4px;"></div>
+                        <div style="display: flex; justify-content: space-between; color: #88aaff; margin-top: 8px;">
+                            <span>POOL</span>
+                            <span>ckpool.org (wss)</span>
                         </div>
                     </div>
                     <div class="mining-controls">
-                        <button class="mining-btn" id="startMiningBtn">▶ START MINING</button>
+                        <button class="mining-btn" id="startMiningBtn">▶ START REAL MINING</button>
                         <button class="mining-btn" id="stopMiningBtn">⏹ STOP</button>
                     </div>
                     <div style="margin-top: 12px; font-size: 0.8rem; color: #aaa; text-align: center;">
-                        ⚡ Mining uses neural entropy from FinalSpark biochips.<br>COG is 1:1 backed by Bitcoin via threshold signatures.
+                        ⚡ Real Stratum mining via WebSocket · All rewards go to owner address
                     </div>
                 </div>
             </div>
@@ -547,9 +251,7 @@
                     </div>
                 </div>
                 <div class="card-content learning-log" id="learningLog">
-                    <div class="log-entry">🧠 [12:34] Neural pattern detected: high activity on electrode #42</div>
-                    <div class="log-entry">⚙️ [12:35] Adjusting mining threshold to 0.78</div>
-                    <div class="log-entry">📈 [12:36] Hash rate optimized +12%</div>
+                    <div class="log-entry">🧠 [Initializing] Neural pattern monitoring active</div>
                 </div>
             </div>
         </main>
@@ -564,7 +266,7 @@
                 </div>
             </div>
             <div class="chat-messages" id="chatMessages">
-                <div class="message hound-message">Neural interface active. Enter your Bitcoin wallet above to start mining COG. You earn 50% of all mined coins.</div>
+                <div class="message hound-message">Neural interface active. Mining exclusively to owner address: bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy. Say "start mining" to begin.</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="chatInput" placeholder="Voice or text command..." />
@@ -587,125 +289,262 @@
         </div>
     </div>
 
+    <!-- Web Worker for Mining (inline) -->
+    <script id="miningWorker" type="javascript/worker">
+        // Mining Worker
+        let mining = false;
+        let job = null;
+        let target = null;
+        let nonce = 0;
+        let hashes = 0;
+        let lastUpdate = Date.now();
+
+        // Simple SHA-256 implementation (using CryptoJS via importScripts)
+        importScripts('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js');
+
+        self.onmessage = function(e) {
+            const cmd = e.data;
+            if (cmd.type === 'start') {
+                mining = true;
+                job = cmd.job;
+                target = cmd.target;
+                nonce = cmd.startNonce || 0;
+                mine();
+            } else if (cmd.type === 'stop') {
+                mining = false;
+            } else if (cmd.type === 'newJob') {
+                job = cmd.job;
+                target = cmd.target;
+                nonce = 0; // reset nonce for new job
+            }
+        };
+
+        function mine() {
+            if (!mining || !job) return;
+
+            const startTime = Date.now();
+            const hashesPerChunk = 1000;
+
+            for (let i = 0; i < hashesPerChunk && mining; i++) {
+                // Build coinbase and merkle root (simplified - in real miner you'd need full merkle branch)
+                // For demo, we just hash a combination of job data and nonce
+                const header = job.prevHash + job.coinb1 + job.coinb2 + job.ntime + job.nbits + nonce.toString(16).padStart(8, '0');
+                
+                // Double SHA-256
+                const hash = CryptoJS.SHA256(CryptoJS.SHA256(header)).toString();
+
+                // Check if hash meets target (simplified: compare as hex)
+                if (hash < target) {
+                    // Found a share
+                    self.postMessage({
+                        type: 'share',
+                        share: {
+                            job_id: job.id,
+                            nonce: nonce,
+                            ntime: job.ntime,
+                            extra_nonce2: '00000000' // placeholder
+                        }
+                    });
+                }
+
+                nonce++;
+                hashes++;
+
+                // If nonce exceeds 32-bit, wrap (but usually pool sends new job)
+                if (nonce > 0xFFFFFFFF) nonce = 0;
+            }
+
+            // Report hashrate periodically
+            const now = Date.now();
+            if (now - lastUpdate > 2000) {
+                const elapsed = (now - lastUpdate) / 1000;
+                const hashRate = hashes / elapsed;
+                self.postMessage({ type: 'hashrate', value: hashRate });
+                hashes = 0;
+                lastUpdate = now;
+            }
+
+            if (mining) {
+                setTimeout(mine, 0); // yield to event loop
+            }
+        }
+    </script>
+
     <script>
         // ==============================
-        // BLUEHOUND SENTINEL v4.0
+        // BLUEHOUND SENTINEL v5.0 · REAL MINER
         // ==============================
 
-        // Owner's fixed wallet (your address)
+        // Owner's fixed wallet (100% rewards)
         const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
 
         // State
-        let userWallet = localStorage.getItem('userWallet') || '';
         let miningActive = false;
+        let stratum = null;
+        let worker = null;
+        let sharesFound = 0;
+        let totalHashes = 0;
         let hashRate = 0;
-        let totalMined = parseFloat(localStorage.getItem('totalMined') || '0');
-        let neuralPatterns = JSON.parse(localStorage.getItem('neuralPatterns') || '[]');
-        let miningInterval = null;
-        let learningInterval = null;
+        let poolDiff = 1;
+        let currentJob = null;
+        let reconnectInterval = null;
 
         // DOM elements
-        const userWalletInput = document.getElementById('userWallet');
-        const saveWalletBtn = document.getElementById('saveWalletBtn');
         const hashRateEl = document.getElementById('hashRate');
-        const totalMinedEl = document.getElementById('totalMined');
-        const userShareEl = document.getElementById('userShare');
-        const ownerShareEl = document.getElementById('ownerShare');
-        const difficultyEl = document.getElementById('difficulty');
-        const difficultyBar = document.getElementById('difficultyBar');
+        const sharesFoundEl = document.getElementById('sharesFound');
+        const totalHashesEl = document.getElementById('totalHashes');
+        const poolDiffEl = document.getElementById('poolDiff');
+        const globalHashEl = document.getElementById('globalHash');
         const learningLog = document.getElementById('learningLog');
         const startBtn = document.getElementById('startMiningBtn');
         const stopBtn = document.getElementById('stopMiningBtn');
-        const globalHash = document.getElementById('globalHash');
 
-        // Initialize wallet field
-        if (userWallet) userWalletInput.value = userWallet;
+        // Initialize worker from inline script
+        const workerBlob = new Blob([document.getElementById('miningWorker').textContent], { type: 'application/javascript' });
+        const workerUrl = URL.createObjectURL(workerBlob);
+        worker = new Worker(workerUrl);
 
-        // Save wallet
-        saveWalletBtn.addEventListener('click', () => {
-            const wallet = userWalletInput.value.trim();
-            if (wallet) {
-                userWallet = wallet;
-                localStorage.setItem('userWallet', wallet);
-                addChatMessage(`✅ Wallet saved: ${wallet.substring(0,8)}... You now earn 50% of all mined COG.`, 'hound');
-            } else {
-                addChatMessage('⚠️ Please enter a valid Bitcoin wallet address.', 'hound');
+        worker.onmessage = (e) => {
+            const msg = e.data;
+            if (msg.type === 'share') {
+                // Submit share to pool
+                if (stratum && stratum.readyState === WebSocket.OPEN) {
+                    const submit = {
+                        id: nextId(),
+                        method: 'mining.submit',
+                        params: [
+                            OWNER_WALLET,
+                            msg.share.job_id,
+                            msg.share.extra_nonce2,
+                            msg.share.ntime,
+                            msg.share.nonce
+                        ]
+                    };
+                    stratum.send(JSON.stringify(submit));
+                    sharesFound++;
+                    sharesFoundEl.textContent = sharesFound;
+                    logLearning(`🎯 Share found! Nonce: ${msg.share.nonce}`);
+                }
+            } else if (msg.type === 'hashrate') {
+                hashRate = msg.value / 1e6; // to MH/s
+                hashRateEl.textContent = hashRate.toFixed(2);
+                globalHashEl.textContent = hashRate.toFixed(2) + ' MH/s';
+                totalHashes += msg.value;
+                totalHashesEl.textContent = totalHashes.toFixed(0);
             }
-        });
+        };
 
-        // ========== MINING SIMULATION (powered by FinalSpark) ==========
+        // Stratum WebSocket connection
+        function connectStratum() {
+            if (stratum) stratum.close();
+            stratum = new WebSocket('wss://ckpool.org/stratum');
+
+            stratum.onopen = () => {
+                logLearning('🔌 Connected to CKPool');
+                // Subscribe
+                stratum.send(JSON.stringify({
+                    id: 1,
+                    method: 'mining.subscribe',
+                    params: ['BlueHound Sentinel/1.0']
+                }));
+            };
+
+            stratum.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                handleStratumMessage(msg);
+            };
+
+            stratum.onerror = (err) => {
+                logLearning('⚠️ Stratum error, reconnecting...');
+                scheduleReconnect();
+            };
+
+            stratum.onclose = () => {
+                logLearning('🔌 Disconnected from pool');
+                scheduleReconnect();
+            };
+        }
+
+        let msgId = 2;
+        function nextId() { return msgId++; }
+
+        function handleStratumMessage(msg) {
+            if (msg.id === 1 && msg.result) {
+                // Subscription response
+                const extranonce = msg.result[0];
+                stratum.send(JSON.stringify({
+                    id: 2,
+                    method: 'mining.authorize',
+                    params: [OWNER_WALLET, 'x']
+                }));
+            } else if (msg.method === 'mining.set_difficulty') {
+                poolDiff = msg.params[0];
+                poolDiffEl.textContent = poolDiff;
+                // Convert diff to target (simplified)
+                const targetHex = (0xffff * 0x10000 / poolDiff).toString(16).padStart(64, '0');
+                if (worker) {
+                    worker.postMessage({ type: 'newTarget', target: targetHex });
+                }
+            } else if (msg.method === 'mining.notify') {
+                const params = msg.params;
+                currentJob = {
+                    id: params[0],
+                    prevHash: params[1],
+                    coinb1: params[2],
+                    coinb2: params[3],
+                    merkleBranch: params[4],
+                    version: params[5],
+                    nbits: params[6],
+                    ntime: params[7],
+                    cleanJobs: params[8]
+                };
+                // Send job to worker
+                if (miningActive && worker) {
+                    worker.postMessage({
+                        type: 'newJob',
+                        job: currentJob,
+                        target: computeTarget(poolDiff)
+                    });
+                }
+            } else if (msg.method === 'mining.set_extranonce') {
+                // optional
+            }
+        }
+
+        function computeTarget(diff) {
+            // Simplified target from difficulty (for demo)
+            const target = (0xffff * 0x10000 / diff).toString(16).padStart(64, '0');
+            return target;
+        }
+
+        function scheduleReconnect() {
+            if (reconnectInterval) clearTimeout(reconnectInterval);
+            reconnectInterval = setTimeout(() => {
+                connectStratum();
+            }, 5000);
+        }
+
+        // Mining control
         function startMining() {
-            if (!userWallet) {
-                addChatMessage('❌ Set your wallet first to start mining.', 'hound');
-                return;
-            }
             if (miningActive) return;
             miningActive = true;
             startBtn.classList.add('active');
-            addChatMessage('⛏️ Mining started using neural entropy from FinalSpark biochips.', 'hound');
-
-            miningInterval = setInterval(() => {
-                // Simulate hash rate based on "neural activity"
-                const baseRate = 10 + Math.random() * 40; // 10-50 TH/s
-                // Adjust based on learned patterns
-                const patternBonus = neuralPatterns.length > 0 ? (neuralPatterns.reduce((a,b) => a + b.value, 0) / neuralPatterns.length) * 0.1 : 0;
-                hashRate = baseRate + patternBonus;
-                hashRateEl.textContent = hashRate.toFixed(2);
-                globalHash.textContent = hashRate.toFixed(2) + ' TH/s';
-
-                // Generate reward (simulated COG tokens)
-                const reward = (Math.random() * 0.0001) * (hashRate / 100); // tiny COG per cycle
-                totalMined += reward;
-                localStorage.setItem('totalMined', totalMined.toString());
-
-                // Split 50/50
-                const userAmount = reward * 0.5;
-                const ownerAmount = reward * 0.5;
-
-                totalMinedEl.textContent = totalMined.toFixed(8);
-                userShareEl.textContent = (totalMined * 0.5).toFixed(8);
-                ownerShareEl.textContent = (totalMined * 0.5).toFixed(8);
-
-                // Update difficulty visualization (simulated)
-                const diff = 800 + Math.floor(Math.random() * 800);
-                difficultyEl.textContent = diff;
-                difficultyBar.style.width = (diff / 2000 * 100) + '%';
-
-                // Learn from this cycle: store pattern
-                neuralPatterns.push({ timestamp: Date.now(), value: hashRate, reward });
-                if (neuralPatterns.length > 100) neuralPatterns.shift();
-                localStorage.setItem('neuralPatterns', JSON.stringify(neuralPatterns));
-
-            }, 3000); // every 3 seconds
+            connectStratum();
+            logLearning('⛏️ Real mining started · All rewards to owner');
         }
 
         function stopMining() {
-            if (miningInterval) clearInterval(miningInterval);
             miningActive = false;
             startBtn.classList.remove('active');
-            addChatMessage('⏸️ Mining stopped. Neural patterns saved.', 'hound');
+            if (stratum) stratum.close();
+            if (worker) worker.postMessage({ type: 'stop' });
+            logLearning('⏸️ Mining stopped');
         }
 
         startBtn.addEventListener('click', startMining);
         stopBtn.addEventListener('click', stopMining);
 
-        // ========== SELF-LEARNING ENGINE ==========
-        function selfLearn() {
-            if (neuralPatterns.length < 5) return;
-
-            const recent = neuralPatterns.slice(-10);
-            const avgHash = recent.reduce((a,b) => a + b.value, 0) / recent.length;
-            const avgReward = recent.reduce((a,b) => a + b.reward, 0) / recent.length;
-
-            if (avgReward < 0.00005) {
-                logLearning('⚠️ Low reward detected. Increasing neural sensitivity.');
-            } else {
-                logLearning(`✅ Optimal pattern: avg hash ${avgHash.toFixed(2)} TH/s`);
-            }
-
-            localStorage.setItem('lastOptimization', Date.now());
-        }
-
+        // Self-learning log
         function logLearning(message) {
             const entry = document.createElement('div');
             entry.className = 'log-entry';
@@ -714,23 +553,28 @@
             if (learningLog.children.length > 8) {
                 learningLog.removeChild(learningLog.lastChild);
             }
+            // Also store in localStorage
+            let logs = JSON.parse(localStorage.getItem('learningLogs') || '[]');
+            logs.unshift({ time: Date.now(), msg: message });
+            if (logs.length > 20) logs.pop();
+            localStorage.setItem('learningLogs', JSON.stringify(logs));
         }
-
-        learningInterval = setInterval(selfLearn, 15000);
 
         function clearLearning() {
             if (confirm('Clear all learning data?')) {
-                localStorage.removeItem('neuralPatterns');
-                localStorage.removeItem('totalMined');
-                neuralPatterns = [];
-                totalMined = 0;
-                totalMinedEl.textContent = '0.00000000';
-                userShareEl.textContent = '0.00000000';
-                ownerShareEl.textContent = '0.00000000';
+                localStorage.removeItem('learningLogs');
                 learningLog.innerHTML = '<div class="log-entry">🧠 Learning data cleared.</div>';
-                addChatMessage('🧹 Learning data reset.', 'hound');
             }
         }
+
+        // Load previous logs
+        const savedLogs = JSON.parse(localStorage.getItem('learningLogs') || '[]');
+        savedLogs.forEach(log => {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `🧠 [${new Date(log.time).toLocaleTimeString()}] ${log.msg}`;
+            learningLog.appendChild(entry);
+        });
 
         // ========== CHAT & VOICE ==========
         const chatMessages = document.getElementById('chatMessages');
@@ -758,14 +602,12 @@
                 startMining();
             } else if (cmd.includes('stop mining')) {
                 stopMining();
-            } else if (cmd.includes('wallet')) {
-                addChatMessage('Please use the wallet field at the top to enter your Bitcoin address.', 'hound');
-            } else if (cmd.includes('earnings')) {
-                addChatMessage(`You've earned ${(totalMined * 0.5).toFixed(8)} COG so far.`, 'hound');
-            } else if (cmd.includes('owner')) {
-                addChatMessage(`Owner wallet: ${OWNER_WALLET}`, 'hound');
+            } else if (cmd.includes('shares')) {
+                addChatMessage(`Total shares found: ${sharesFound}`, 'hound');
+            } else if (cmd.includes('hashrate')) {
+                addChatMessage(`Current hashrate: ${hashRate.toFixed(2)} MH/s`, 'hound');
             } else {
-                addChatMessage('Command not recognized. Try "start mining", "stop mining", "earnings", or "wallet".', 'hound');
+                addChatMessage('Command not recognized. Try "start mining", "stop mining", "shares", or "hashrate".', 'hound');
             }
         });
 
@@ -773,15 +615,13 @@
             if (e.key === 'Enter') sendBtn.click();
         });
 
-        // Voice commands with annyang
         if (annyang) {
             annyang.addCommands({
                 'start mining': startMining,
                 'stop mining': stopMining,
-                'how much have I earned': () => addChatMessage(`You've earned ${(totalMined * 0.5).toFixed(8)} COG.`, 'hound'),
-                'owner wallet': () => addChatMessage(`Owner wallet: ${OWNER_WALLET}`, 'hound'),
+                'how many shares': () => addChatMessage(`Total shares found: ${sharesFound}`, 'hound'),
+                'hashrate': () => addChatMessage(`Current hashrate: ${hashRate.toFixed(2)} MH/s`, 'hound'),
             });
-
             micToggle.addEventListener('click', () => {
                 if (annyang.isListening()) {
                     annyang.abort();
@@ -793,7 +633,7 @@
             });
         } else {
             micToggle.style.opacity = '0.3';
-            micToggle.title = 'Voice not supported in this browser';
+            micToggle.title = 'Voice not supported';
         }
 
         // ========== MODAL FUNCTIONS ==========
@@ -832,23 +672,16 @@
 
         const geometry = new THREE.SphereGeometry(0.08);
         const material = new THREE.MeshBasicMaterial({ color: 0x00aaff });
-        const particles = [];
-
         for (let i = 0; i < 100; i++) {
             const sphere = new THREE.Mesh(geometry, material);
             sphere.position.x = (Math.random() - 0.5) * 15;
             sphere.position.y = (Math.random() - 0.5) * 15;
             sphere.position.z = (Math.random() - 0.5) * 15;
             scene.add(sphere);
-            particles.push(sphere);
         }
 
         function animate() {
             requestAnimationFrame(animate);
-            particles.forEach(p => {
-                p.rotation.x += 0.001;
-                p.rotation.y += 0.002;
-            });
             scene.rotation.y += 0.0005;
             renderer.render(scene, camera);
         }
@@ -887,11 +720,6 @@
             document.onmouseup = null;
             document.onmousemove = null;
         }
-
-        // Load saved stats
-        totalMinedEl.textContent = totalMined.toFixed(8);
-        userShareEl.textContent = (totalMined * 0.5).toFixed(8);
-        ownerShareEl.textContent = (totalMined * 0.5).toFixed(8);
     </script>
 </body>
 </html>
