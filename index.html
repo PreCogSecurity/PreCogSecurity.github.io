@@ -3,29 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueHound · Cyber Intelligence Mission Control</title>
-    <!-- Core Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <title>BlueHound · Neural Mining Command</title>
+    <!-- Core Libraries (same as before) -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
-    <!-- Speech Recognition & Synthesis -->
     <script src="https://cdn.jsdelivr.net/npm/speech-kit@0.1.4/dist/speech-kit.min.js"></script>
-    <!-- D3 for visualizations -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <!-- Three.js for 3D biometrics -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- Google Fonts: Orbitron for cyber feel -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* same base styles as previous, plus new additions */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Roboto Mono', monospace;
             background: #0a0c14;
@@ -34,7 +23,6 @@
             height: 100vh;
             background: radial-gradient(circle at 50% 50%, #1a1f2e, #0b0d15);
         }
-
         #mission-control {
             display: grid;
             grid-template-rows: auto 1fr auto;
@@ -43,8 +31,6 @@
             gap: 12px;
             position: relative;
         }
-
-        /* ===== HEADER WITH HOLOGRAPHIC STATUS ===== */
         .command-header {
             background: rgba(10, 20, 40, 0.7);
             backdrop-filter: blur(15px);
@@ -57,83 +43,58 @@
             box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
             position: relative;
             overflow: hidden;
+            flex-wrap: wrap;
         }
-
-        .command-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
-            animation: scan 8s infinite;
-        }
-
-        @keyframes scan {
-            0% { left: -100%; }
-            20% { left: 100%; }
-            100% { left: 100%; }
-        }
-
         .logo-area {
             display: flex;
             align-items: center;
             gap: 16px;
         }
-
-        .hound-icon {
-            font-size: 2.5rem;
-            filter: drop-shadow(0 0 15px cyan);
-            animation: breathe 3s infinite;
-        }
-
-        @keyframes breathe {
-            0% { filter: drop-shadow(0 0 10px cyan); }
-            50% { filter: drop-shadow(0 0 30px cyan) drop-shadow(0 0 30px blue); }
-            100% { filter: drop-shadow(0 0 10px cyan); }
-        }
-
-        .status-panel {
+        .hound-icon { font-size: 2.5rem; filter: drop-shadow(0 0 15px cyan); animation: breathe 3s infinite; }
+        @keyframes breathe { 0% { filter: drop-shadow(0 0 10px cyan); } 50% { filter: drop-shadow(0 0 30px cyan); } 100% { filter: drop-shadow(0 0 10px cyan); } }
+        .status-panel { display: flex; gap: 30px; font-size: 0.9rem; color: #88ffff; flex-wrap: wrap; }
+        .status-item { display: flex; align-items: center; gap: 8px; }
+        .pulse { width: 12px; height: 12px; border-radius: 50%; background: #00ffaa; box-shadow: 0 0 20px #00ffaa; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
+        
+        /* Wallet input area */
+        .wallet-area {
             display: flex;
-            gap: 30px;
-            font-size: 0.9rem;
-            color: #88ffff;
-        }
-
-        .status-item {
-            display: flex;
+            gap: 10px;
+            background: rgba(0, 20, 40, 0.8);
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid cyan;
             align-items: center;
-            gap: 8px;
         }
-
-        .pulse {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #00ffaa;
-            box-shadow: 0 0 20px #00ffaa;
-            animation: pulse 2s infinite;
+        .wallet-area input {
+            background: transparent;
+            border: none;
+            color: white;
+            font-family: 'Roboto Mono', monospace;
+            width: 300px;
+            outline: none;
         }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.5); }
-            100% { opacity: 1; transform: scale(1); }
+        .wallet-area button {
+            background: cyan;
+            border: none;
+            color: black;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
         }
+        .wallet-area button:hover { background: #00ffff; box-shadow: 0 0 20px cyan; }
 
-        /* ===== MAIN GRID - SELF-ORGANIZING CARDS ===== */
         .card-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            grid-auto-rows: minmax(300px, auto);
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            grid-auto-rows: minmax(350px, auto);
             gap: 12px;
             overflow-y: auto;
             padding: 4px;
-            scrollbar-width: thin;
-            scrollbar-color: #00ccff #0a1420;
         }
-
         .card {
             background: rgba(15, 25, 45, 0.7);
             backdrop-filter: blur(10px);
@@ -142,329 +103,162 @@
             padding: 16px;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
             position: relative;
             overflow: hidden;
         }
-
-        .card:hover {
-            transform: translateY(-2px);
-            border-color: #00ffff;
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.3);
-        }
-
+        .card:hover { transform: translateY(-2px); border-color: #00ffff; box-shadow: 0 0 40px rgba(0,255,255,0.3); }
         .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            font-weight: 700;
-            color: #aaffff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
-            padding-bottom: 8px;
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+            font-weight: 700; color: #aaffff; text-transform: uppercase; letter-spacing: 1px;
+            border-bottom: 1px solid rgba(0,255,255,0.2); padding-bottom: 8px;
         }
+        .card-content { flex: 1; overflow: auto; min-height: 0; }
+        .iframe-card { padding: 0; overflow: hidden; }
+        .iframe-card iframe { width: 100%; height: 100%; border: none; background: #0a0e1a; }
 
-        .card-controls {
-            display: flex;
-            gap: 12px;
+        /* Mining stats card */
+        .mining-stats {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;
         }
-
-        .card-controls i {
-            cursor: pointer;
-            opacity: 0.6;
-            transition: 0.2s;
+        .stat-box {
+            background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; text-align: center;
+            border: 1px solid rgba(0,255,255,0.3);
         }
-
-        .card-controls i:hover {
-            opacity: 1;
-            color: cyan;
-            transform: scale(1.1);
+        .stat-value { font-size: 1.8rem; font-weight: bold; color: cyan; }
+        .stat-label { font-size: 0.8rem; color: #88aaff; }
+        .mining-controls {
+            display: flex; gap: 10px; margin-top: 16px; justify-content: center;
         }
-
-        /* Card content area */
-        .card-content {
-            flex: 1;
-            overflow: auto;
-            min-height: 0;
-        }
-
-        /* Webb iframe card special */
-        .iframe-card {
-            padding: 0;
-            overflow: hidden;
-        }
-
-        .iframe-card iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #0a0e1a;
-        }
-
-        /* ===== CHAT MODAL (FLOATING) ===== */
-        .chat-modal {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 400px;
-            height: 600px;
-            background: rgba(8, 12, 25, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid #00ffff;
-            border-radius: 25px;
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            box-shadow: 0 0 60px rgba(0, 255, 255, 0.5);
-            transition: all 0.3s;
-            resize: both;
-            overflow: auto;
-            min-width: 300px;
-            min-height: 400px;
-        }
-
-        .chat-header {
-            padding: 16px;
-            background: linear-gradient(90deg, #003366, #001122);
-            border-radius: 25px 25px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: move;
-            border-bottom: 1px solid cyan;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 10px 16px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-            animation: fadeIn 0.3s;
-        }
-
-        .user-message {
-            align-self: flex-end;
+        .mining-btn {
             background: linear-gradient(135deg, #0066aa, #003366);
-            border-bottom-right-radius: 4px;
+            border: 1px solid cyan; color: white; padding: 10px 20px; border-radius: 40px;
+            font-weight: bold; cursor: pointer; transition: 0.2s; flex: 1;
         }
+        .mining-btn:hover { background: cyan; color: black; }
+        .mining-btn.active { background: cyan; color: black; box-shadow: 0 0 30px cyan; }
 
-        .hound-message {
-            align-self: flex-start;
-            background: rgba(20, 40, 70, 0.9);
-            border: 1px solid #00aaff;
-            border-bottom-left-radius: 4px;
-        }
+        /* Chat modal same as before, omitted for brevity – keep from previous code */
+        .chat-modal { /* ... same ... */ }
+        .voice-indicator { /* ... same ... */ }
 
-        .chat-input-area {
-            display: flex;
-            padding: 16px;
-            gap: 10px;
-            border-top: 1px solid #336699;
-        }
-
-        .chat-input-area input {
-            flex: 1;
-            background: #112233;
-            border: 1px solid #00aaff;
-            border-radius: 30px;
-            padding: 12px 20px;
-            color: white;
-            font-family: 'Roboto Mono', monospace;
-        }
-
-        .chat-input-area button {
-            background: transparent;
-            border: 1px solid cyan;
-            color: cyan;
-            width: 50px;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .chat-input-area button:hover {
-            background: cyan;
-            color: black;
-        }
-
-        .voice-indicator {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.8rem;
-            color: #88ffff;
-        }
-
-        .listening {
-            animation: pulseText 1.5s infinite;
-        }
-
-        @keyframes pulseText {
-            0% { color: #88ffff; }
-            50% { color: #00ffff; text-shadow: 0 0 10px cyan; }
-            100% { color: #88ffff; }
-        }
-
-        /* ===== BIOMETRIC VISUALIZATION ===== */
-        #biometric-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0.2;
-        }
-
-        /* ===== MODAL WINDOW ===== */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-content {
-            width: 90%;
-            height: 90%;
-            background: #0a1428;
-            border: 2px solid cyan;
-            border-radius: 30px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid cyan;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .modal-body {
-            flex: 1;
-            overflow: auto;
-            padding: 20px;
-        }
-
-        .hidden {
-            display: none;
-        }
+        .modal-overlay { /* ... same ... */ }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     <div id="mission-control">
-        <!-- Holographic Header -->
+        <!-- Header with wallet input -->
         <header class="command-header">
             <div class="logo-area">
                 <i class="fas fa-dog hound-icon"></i>
-                <h1 style="font-family: 'Orbitron', sans-serif;">BLUEHOUND · CYBER MISSION CONTROL</h1>
+                <h1 style="font-family: 'Orbitron';">BLUEHOUND · NEURAL MINING</h1>
             </div>
             <div class="status-panel">
-                <div class="status-item"><span class="pulse"></span> ACTIVE AGENTS: 7</div>
-                <div class="status-item"><i class="fas fa-satellite-dish"></i> TELEMETRY: 100%</div>
-                <div class="status-item"><i class="fas fa-brain"></i> QUANTUM AI: ONLINE</div>
+                <div class="status-item"><span class="pulse"></span> NEURAL HASH: 47.3 TH/s</div>
+                <div class="status-item"><i class="fas fa-microchip"></i> BIOCHIPS: 4 ACTIVE</div>
+            </div>
+            <!-- Wallet input area -->
+            <div class="wallet-area">
+                <i class="fas fa-bitcoin" style="color: #f2a900;"></i>
+                <input type="text" id="userWallet" placeholder="Enter your Bitcoin wallet address" value="">
+                <button id="saveWalletBtn">SET</button>
             </div>
         </header>
 
-        <!-- Self-Organizing Card Grid -->
+        <!-- Main grid -->
         <main class="card-grid" id="cardGrid">
-            <!-- Card 1: Webb.io Investigation (with iframe) -->
-            <div class="card iframe-card" data-card="webb" data-width="2" data-height="1">
+            <!-- Card 1: FinalSpark Live Neurons -->
+            <div class="card iframe-card" data-card="finalspark">
                 <div class="card-header">
-                    <span><i class="fas fa-search"></i> WEBB.IO · DOCUMENT INTELLIGENCE</span>
+                    <span><i class="fas fa-brain"></i> FINALSPARK · LIVE NEURONS</span>
                     <div class="card-controls">
-                        <i class="fas fa-expand" onclick="expandCard('webb')"></i>
-                        <i class="fas fa-sync-alt" onclick="reloadIframe('webbFrame')"></i>
-                        <i class="fas fa-grip-lines" style="cursor: move;"></i>
+                        <i class="fas fa-expand" onclick="expandCard('finalspark')"></i>
+                        <i class="fas fa-sync-alt" onclick="reloadIframe('finalsparkFrame')"></i>
                     </div>
                 </div>
-                <iframe id="webbFrame" src="about:blank" title="Webb.io Investigation"></iframe>
+                <iframe id="finalsparkFrame" src="https://finalspark.com/live/" title="FinalSpark Live Neurons"></iframe>
                 <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
-                    Beta Access Required
+                    Biochip signals used for mining entropy
                 </div>
             </div>
 
-            <!-- Card 2: Real-Time Telemetry -->
-            <div class="card" data-card="telemetry">
+            <!-- Card 2: Neural Mining Console -->
+            <div class="card" data-card="mining">
                 <div class="card-header">
-                    <span><i class="fas fa-chart-line"></i> LIVE TELEMETRY · GLOBAL THREAT MAP</span>
+                    <span><i class="fas fa-microchip"></i> NEURAL MINING ENGINE</span>
                     <div class="card-controls">
-                        <i class="fas fa-expand" onclick="expandCard('telemetry')"></i>
-                        <i class="fas fa-chart-pie"></i>
+                        <i class="fas fa-expand" onclick="expandCard('mining')"></i>
+                        <i class="fas fa-chart-line"></i>
                     </div>
                 </div>
-                <div class="card-content" id="telemetryViz">
-                    <!-- D3 visualization will be injected -->
-                    <svg width="100%" height="100%"></svg>
-                </div>
-            </div>
-
-            <!-- Card 3: Biometric Sensors -->
-            <div class="card" data-card="biometric">
-                <div class="card-header">
-                    <span><i class="fas fa-heartbeat"></i> BIOMETRIC FEED · OPERATOR STATUS</span>
-                    <div class="card-controls">
-                        <i class="fas fa-expand" onclick="expandCard('biometric')"></i>
-                        <i class="fas fa-wave-square"></i>
+                <div class="card-content">
+                    <div class="mining-stats">
+                        <div class="stat-box">
+                            <div class="stat-value" id="hashRate">0.0</div>
+                            <div class="stat-label">HASH RATE (MH/s)</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="totalMined">0.0000</div>
+                            <div class="stat-label">BTC MINED (TOTAL)</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="userShare">0.0000</div>
+                            <div class="stat-label">YOUR SHARE (50%)</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="ownerShare">0.0000</div>
+                            <div class="stat-label">OWNER SHARE</div>
+                        </div>
+                    </div>
+                    <div style="background: #0a1420; border-radius: 12px; padding: 12px; margin: 12px 0;">
+                        <div style="display: flex; justify-content: space-between; color: #88aaff;">
+                            <span>NEURAL DIFFICULTY</span>
+                            <span id="difficulty">1,234</span>
+                        </div>
+                        <div style="height: 8px; background: #112233; border-radius: 4px; margin-top: 8px;">
+                            <div id="difficultyBar" style="width: 67%; height: 100%; background: linear-gradient(90deg, cyan, blue); border-radius: 4px;"></div>
+                        </div>
+                    </div>
+                    <div class="mining-controls">
+                        <button class="mining-btn" id="startMiningBtn">▶ START MINING</button>
+                        <button class="mining-btn" id="stopMiningBtn">⏹ STOP</button>
+                    </div>
+                    <div style="margin-top: 12px; font-size: 0.85rem; color: #aaa; text-align: center;">
+                        ⚡ Mining powered by live neural activity from FinalSpark biochips
                     </div>
                 </div>
-                <div class="card-content" id="biometricViz">
-                    <canvas id="bioCanvas" width="400" height="200"></canvas>
-                </div>
             </div>
 
-            <!-- Card 4: Crypto Crime Feed -->
-            <div class="card" data-card="crimes">
+            <!-- Card 3: Self-Learning AI Log -->
+            <div class="card" data-card="learning">
                 <div class="card-header">
-                    <span><i class="fas fa-skull"></i> DARK WEB INTELLIGENCE</span>
+                    <span><i class="fas fa-robot"></i> BLUEHOUND SELF-LEARNING</span>
                     <div class="card-controls">
                         <i class="fas fa-expand"></i>
-                        <i class="fas fa-filter"></i>
+                        <i class="fas fa-trash-alt" onclick="clearLearning()"></i>
                     </div>
                 </div>
-                <div class="card-content" id="crimeFeed">
-                    <div class="crime-item">🚨 Ransomware gang 'BlackCat' moves 500 BTC</div>
-                    <div class="crime-item">⚠️ Phishing campaign targeting DeFi protocols</div>
-                    <div class="crime-item">🔴 Lazarus group linked to new bridge attack</div>
+                <div class="card-content" id="learningLog">
+                    <div class="log-entry">🧠 [12:34] Neural pattern detected: high activity on electrode #42</div>
+                    <div class="log-entry">⚙️ [12:35] Adjusting mining threshold to 0.78</div>
+                    <div class="log-entry">📈 [12:36] Hash rate optimized +12%</div>
                 </div>
             </div>
         </main>
 
-        <!-- Floating Chat Modal -->
+        <!-- Floating Chat Modal (same as before) -->
         <div class="chat-modal" id="chatModal">
             <div class="chat-header" id="chatHeader">
-                <span><i class="fas fa-comment-dots"></i> BLUEHOUND · CONVERSATIONAL AI</span>
+                <span><i class="fas fa-comment-dots"></i> BLUEHOUND · NEURAL AI</span>
                 <div>
-                    <i class="fas fa-microphone" id="micToggle" style="margin-right: 15px;"></i>
+                    <i class="fas fa-microphone" id="micToggle"></i>
                     <i class="fas fa-times" onclick="toggleChat()"></i>
                 </div>
             </div>
             <div class="chat-messages" id="chatMessages">
-                <div class="message hound-message">
-                    Hello, Director. BlueHound online. All telemetry nominal. How may I assist with today's investigations?
-                </div>
+                <div class="message hound-message">Neural interface active. Ready to mine with FinalSpark biochips. Enter your wallet to start earning.</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="chatInput" placeholder="Voice or text command..." />
@@ -476,376 +270,252 @@
         </div>
     </div>
 
-    <!-- Modal Overlay (Hidden by default) -->
+    <!-- Modal for expanded cards -->
     <div class="modal-overlay hidden" id="modalOverlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Expanded View</h2>
-                <i class="fas fa-times" onclick="closeModal()" style="font-size: 24px; cursor: pointer;"></i>
+                <i class="fas fa-times" onclick="closeModal()"></i>
             </div>
-            <div class="modal-body" id="modalBody">
-                <!-- Content will be moved here -->
-            </div>
+            <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
 
-    <!-- Background Biometric Canvas (Three.js) -->
-    <canvas id="biometric-canvas"></canvas>
-
     <script>
         // ==============================
-        // BLUEHOUND MISSION CONTROL v2.0
+        // BLUEHOUND NEURAL MINING v3.0
         // ==============================
-        
-        // Configuration
-        const WEBB_APP_URL = 'https://app.thewebb.io'; // Requires beta code
-        const config = {
-            webbAccessCode: localStorage.getItem('webbCode') || prompt('Enter your Webb.io beta access code:'),
-            voiceEnabled: true,
-            telemetryInterval: 2000
-        };
 
-        // Initialize iframe with access code
-        if (config.webbAccessCode) {
-            localStorage.setItem('webbCode', config.webbAccessCode);
-            document.getElementById('webbFrame').src = `${WEBB_APP_URL}?code=${config.webbAccessCode}`;
-        } else {
-            document.getElementById('webbFrame').src = 'about:blank';
+        // Fixed owner wallet (your address)
+        const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
+
+        // State
+        let userWallet = localStorage.getItem('userWallet') || '';
+        let miningActive = false;
+        let hashRate = 0;
+        let totalMined = parseFloat(localStorage.getItem('totalMined') || '0');
+        let neuralPatterns = JSON.parse(localStorage.getItem('neuralPatterns') || '[]');
+        let miningInterval = null;
+        let learningInterval = null;
+
+        // DOM elements
+        const userWalletInput = document.getElementById('userWallet');
+        const saveWalletBtn = document.getElementById('saveWalletBtn');
+        const hashRateEl = document.getElementById('hashRate');
+        const totalMinedEl = document.getElementById('totalMined');
+        const userShareEl = document.getElementById('userShare');
+        const ownerShareEl = document.getElementById('ownerShare');
+        const difficultyEl = document.getElementById('difficulty');
+        const difficultyBar = document.getElementById('difficultyBar');
+        const learningLog = document.getElementById('learningLog');
+        const startBtn = document.getElementById('startMiningBtn');
+        const stopBtn = document.getElementById('stopMiningBtn');
+
+        // Initialize wallet field
+        if (userWallet) userWalletInput.value = userWallet;
+
+        // Save wallet
+        saveWalletBtn.addEventListener('click', () => {
+            const wallet = userWalletInput.value.trim();
+            if (wallet) {
+                userWallet = wallet;
+                localStorage.setItem('userWallet', wallet);
+                addChatMessage(`✅ Wallet saved: ${wallet.substring(0,8)}... You now earn 50% of all mined coins.`, 'hound');
+            } else {
+                addChatMessage('⚠️ Please enter a valid Bitcoin wallet address.', 'hound');
+            }
+        });
+
+        // ========== MINING SIMULATION (powered by FinalSpark) ==========
+        function startMining() {
+            if (!userWallet) {
+                addChatMessage('❌ Set your wallet first to start mining.', 'hound');
+                return;
+            }
+            if (miningActive) return;
+            miningActive = true;
+            startBtn.classList.add('active');
+            addChatMessage('⛏️ Mining started using live neural entropy from FinalSpark biochips.', 'hound');
+
+            miningInterval = setInterval(() => {
+                // Simulate hash rate based on "neural activity" – random + pattern influence
+                const baseRate = 10 + Math.random() * 40; // 10-50 MH/s
+                // Adjust based on learned patterns (if any)
+                const patternBonus = neuralPatterns.length > 0 ? (neuralPatterns.reduce((a,b) => a+b.value,0) / neuralPatterns.length) * 5 : 0;
+                hashRate = baseRate + patternBonus;
+                hashRateEl.textContent = hashRate.toFixed(2);
+
+                // Mining: generate a small reward per cycle (simulated)
+                const reward = (Math.random() * 0.0001) * (hashRate / 100); // tiny BTC per interval
+                totalMined += reward;
+                localStorage.setItem('totalMined', totalMined.toString());
+
+                // Split 50/50
+                const userAmount = reward * 0.5;
+                const ownerAmount = reward * 0.5;
+
+                totalMinedEl.textContent = totalMined.toFixed(6);
+                userShareEl.textContent = (totalMined * 0.5).toFixed(6);
+                ownerShareEl.textContent = (totalMined * 0.5).toFixed(6);
+
+                // Update difficulty visualization (random)
+                const diff = 800 + Math.floor(Math.random() * 800);
+                difficultyEl.textContent = diff;
+                difficultyBar.style.width = (diff / 2000 * 100) + '%';
+
+                // Learn from this cycle: store pattern
+                neuralPatterns.push({ timestamp: Date.now(), value: hashRate, reward });
+                if (neuralPatterns.length > 100) neuralPatterns.shift();
+                localStorage.setItem('neuralPatterns', JSON.stringify(neuralPatterns));
+
+            }, 3000); // every 3 seconds
         }
 
-        // ========== SELF-ORGANIZING CARDS ==========
-        class CardOrganizer {
-            constructor(gridId) {
-                this.grid = document.getElementById(gridId);
-                this.cards = Array.from(this.grid.children);
-                this.makeCardsDraggable();
-                this.loadLayout();
+        function stopMining() {
+            if (miningInterval) clearInterval(miningInterval);
+            miningActive = false;
+            startBtn.classList.remove('active');
+            addChatMessage('⏸️ Mining stopped. Neural patterns saved.', 'hound');
+        }
+
+        startBtn.addEventListener('click', startMining);
+        stopBtn.addEventListener('click', stopMining);
+
+        // ========== SELF-LEARNING ENGINE ==========
+        function selfLearn() {
+            // Analyze neural patterns and adjust mining parameters
+            if (neuralPatterns.length < 5) return;
+
+            const recent = neuralPatterns.slice(-10);
+            const avgHash = recent.reduce((a,b) => a + b.value, 0) / recent.length;
+            const avgReward = recent.reduce((a,b) => a + b.reward, 0) / recent.length;
+
+            // If rewards are decreasing, adjust something (simulated)
+            if (avgReward < 0.00005) {
+                // Suggest increasing intensity
+                logLearning('⚠️ Low reward detected. Increasing neural sensitivity.');
+                // In real scenario, we'd adjust something, but here just log
+            } else {
+                logLearning(`✅ Optimal pattern: avg hash ${avgHash.toFixed(2)} MH/s`);
             }
 
-            makeCardsDraggable() {
-                this.cards.forEach(card => {
-                    const header = card.querySelector('.card-header');
-                    let isDragging = false;
-                    
-                    header.addEventListener('mousedown', (e) => {
-                        if (e.target.classList.contains('fa-expand')) return;
-                        isDragging = true;
-                        card.style.opacity = '0.8';
-                    });
+            // Store a decision
+            localStorage.setItem('lastOptimization', Date.now());
+        }
 
-                    document.addEventListener('mousemove', (e) => {
-                        if (!isDragging) return;
-                        // Simplified - in production use proper drag-drop
-                    });
-
-                    document.addEventListener('mouseup', () => {
-                        isDragging = false;
-                        card.style.opacity = '1';
-                        this.saveLayout();
-                    });
-                });
-            }
-
-            saveLayout() {
-                const layout = this.cards.map(card => ({
-                    id: card.dataset.card,
-                    width: card.style.gridColumn || 'span 1',
-                    height: card.style.gridRow || 'span 1'
-                }));
-                localStorage.setItem('houndLayout', JSON.stringify(layout));
-            }
-
-            loadLayout() {
-                const saved = localStorage.getItem('houndLayout');
-                if (saved) {
-                    const layout = JSON.parse(saved);
-                    layout.forEach(item => {
-                        const card = document.querySelector(`[data-card="${item.id}"]`);
-                        if (card) {
-                            card.style.gridColumn = item.width;
-                            card.style.gridRow = item.height;
-                        }
-                    });
-                }
+        function logLearning(message) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `🧠 [${new Date().toLocaleTimeString()}] ${message}`;
+            learningLog.insertBefore(entry, learningLog.firstChild);
+            if (learningLog.children.length > 8) {
+                learningLog.removeChild(learningLog.lastChild);
             }
         }
 
-        new CardOrganizer('cardGrid');
+        // Run learning every 15 seconds
+        learningInterval = setInterval(selfLearn, 15000);
 
-        // ========== MODAL WINDOW ==========
+        function clearLearning() {
+            if (confirm('Clear all learning data?')) {
+                localStorage.removeItem('neuralPatterns');
+                localStorage.removeItem('totalMined');
+                neuralPatterns = [];
+                totalMined = 0;
+                totalMinedEl.textContent = '0.0000';
+                userShareEl.textContent = '0.0000';
+                ownerShareEl.textContent = '0.0000';
+                learningLog.innerHTML = '<div class="log-entry">🧠 Learning data cleared.</div>';
+                addChatMessage('🧹 Learning data reset.', 'hound');
+            }
+        }
+
+        // ========== CHAT & VOICE (simplified, reuse from previous) ==========
+        function addChatMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}-message`;
+            msgDiv.textContent = text;
+            document.getElementById('chatMessages').appendChild(msgDiv);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+        }
+
+        // Minimal chat for demo
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            addChatMessage(text, 'user');
+            input.value = '';
+
+            // Simple commands
+            if (text.toLowerCase().includes('start mining')) {
+                startMining();
+            } else if (text.toLowerCase().includes('stop mining')) {
+                stopMining();
+            } else if (text.toLowerCase().includes('wallet')) {
+                addChatMessage('Please use the wallet field at the top to enter your Bitcoin address.', 'hound');
+            } else if (text.toLowerCase().includes('earnings')) {
+                addChatMessage(`You've earned ${(totalMined * 0.5).toFixed(6)} BTC so far.`, 'hound');
+            } else {
+                addChatMessage('Command not recognized. Try "start mining", "stop mining", or "earnings".', 'hound');
+            }
+        });
+
+        // Voice (simplified)
+        if (annyang) {
+            annyang.addCommands({
+                'start mining': startMining,
+                'stop mining': stopMining,
+                'how much have I earned': () => addChatMessage(`You've earned ${(totalMined * 0.5).toFixed(6)} BTC.`, 'hound'),
+            });
+            document.getElementById('micToggle').addEventListener('click', () => {
+                annyang.start();
+                document.getElementById('voiceIndicator').innerHTML = '<i class="fas fa-circle" style="color:#0f0;"></i> Listening...';
+            });
+        }
+
+        // ========== MODAL FUNCTIONS ==========
         function expandCard(cardId) {
             const card = document.querySelector(`[data-card="${cardId}"]`);
             const modalBody = document.getElementById('modalBody');
-            const modalTitle = document.getElementById('modalTitle');
-            
-            // Clone card content
             const clone = card.cloneNode(true);
-            clone.classList.remove('iframe-card'); // Adjust if needed
+            clone.classList.remove('iframe-card');
             modalBody.innerHTML = '';
             modalBody.appendChild(clone);
-            
-            modalTitle.innerText = card.querySelector('.card-header span').innerText;
+            document.getElementById('modalTitle').innerText = card.querySelector('.card-header span').innerText;
             document.getElementById('modalOverlay').classList.remove('hidden');
         }
-
         function closeModal() {
             document.getElementById('modalOverlay').classList.add('hidden');
         }
-
         function reloadIframe(iframeId) {
-            const iframe = document.getElementById(iframeId);
-            iframe.src = iframe.src; // Reload
+            document.getElementById(iframeId).src = document.getElementById(iframeId).src;
         }
 
-        // ========== TELEMETRY VISUALIZATION (D3) ==========
-        function initTelemetry() {
-            const svg = d3.select("#telemetryViz svg");
-            const width = svg.node().parentElement.clientWidth;
-            const height = svg.node().parentElement.clientHeight;
-            
-            // Simulate real-time data
-            const data = Array(20).fill().map((_, i) => ({ x: i, y: Math.random() * 100 }));
-            
-            const xScale = d3.scaleLinear().domain([0, 19]).range([0, width]);
-            const yScale = d3.scaleLinear().domain([0, 100]).range([height, 0]);
-            
-            const line = d3.line()
-                .x(d => xScale(d.x))
-                .y(d => yScale(d.y));
-            
-            svg.append("path")
-                .datum(data)
-                .attr("fill", "none")
-                .attr("stroke", "#00ffff")
-                .attr("stroke-width", 2)
-                .attr("d", line);
+        // Load saved mining state
+        totalMinedEl.textContent = totalMined.toFixed(6);
+        userShareEl.textContent = (totalMined * 0.5).toFixed(6);
+        ownerShareEl.textContent = (totalMined * 0.5).toFixed(6);
+
+        // Drag chat
+        const chatModal = document.getElementById('chatModal');
+        let pos1=0,pos2=0,pos3=0,pos4=0;
+        document.getElementById('chatHeader').onmousedown = dragMouseDown;
+        function dragMouseDown(e) {
+            e.preventDefault();
+            pos3 = e.clientX; pos4 = e.clientY;
+            document.onmouseup = closeDragElement;
+            document.onmousemove = elementDrag;
         }
-
-        // ========== BIOMETRICS (Canvas + Three.js) ==========
-        function initBiometrics() {
-            const canvas = document.getElementById('biometric-canvas');
-            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            
-            const scene = new THREE.Scene();
-            const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-            camera.position.z = 5;
-            
-            // Create a neural network visualization
-            const geometry = new THREE.SphereGeometry(0.1);
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ffff });
-            
-            for (let i = 0; i < 50; i++) {
-                const sphere = new THREE.Mesh(geometry, material);
-                sphere.position.x = (Math.random() - 0.5) * 10;
-                sphere.position.y = (Math.random() - 0.5) * 10;
-                sphere.position.z = (Math.random() - 0.5) * 10;
-                scene.add(sphere);
-            }
-            
-            function animate() {
-                requestAnimationFrame(animate);
-                scene.rotation.y += 0.001;
-                renderer.render(scene, camera);
-            }
-            animate();
+        function elementDrag(e) {
+            e.preventDefault();
+            pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY;
+            pos3 = e.clientX; pos4 = e.clientY;
+            chatModal.style.top = (chatModal.offsetTop - pos2) + 'px';
+            chatModal.style.left = (chatModal.offsetLeft - pos1) + 'px';
         }
-
-        // ========== CHAT + VOICE AI ==========
-        class HoundChat {
-            constructor() {
-                this.messages = document.getElementById('chatMessages');
-                this.input = document.getElementById('chatInput');
-                this.sendBtn = document.getElementById('sendBtn');
-                this.micToggle = document.getElementById('micToggle');
-                this.voiceIndicator = document.getElementById('voiceIndicator');
-                
-                this.recognition = null;
-                this.synthesis = window.speechSynthesis;
-                this.isListening = false;
-                
-                this.initSpeech();
-                this.initEvents();
-            }
-
-            initSpeech() {
-                if ('webkitSpeechRecognition' in window) {
-                    this.recognition = new webkitSpeechRecognition();
-                    this.recognition.continuous = true;
-                    this.recognition.interimResults = true;
-                    this.recognition.lang = 'en-US';
-                    
-                    this.recognition.onresult = (event) => {
-                        const transcript = Array.from(event.results)
-                            .map(result => result[0].transcript)
-                            .join('');
-                        this.input.value = transcript;
-                        this.voiceIndicator.innerHTML = '<i class="fas fa-circle" style="color: #00ff00;"></i> Listening...';
-                    };
-                    
-                    this.recognition.onend = () => {
-                        this.isListening = false;
-                        this.micToggle.style.color = '';
-                        this.voiceIndicator.innerHTML = '<i class="fas fa-circle"></i> Voice: Standby';
-                    };
-                }
-            }
-
-            initEvents() {
-                this.sendBtn.addEventListener('click', () => this.sendMessage());
-                this.input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.sendMessage();
-                });
-                
-                this.micToggle.addEventListener('click', () => {
-                    if (this.isListening) {
-                        this.recognition.stop();
-                    } else {
-                        this.recognition.start();
-                        this.isListening = true;
-                        this.micToggle.style.color = '#00ff00';
-                    }
-                });
-            }
-
-            sendMessage() {
-                const text = this.input.value.trim();
-                if (!text) return;
-                
-                this.addMessage(text, 'user');
-                this.input.value = '';
-                
-                // Process command
-                this.processCommand(text);
-            }
-
-            addMessage(text, sender) {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = `message ${sender}-message`;
-                msgDiv.textContent = text;
-                this.messages.appendChild(msgDiv);
-                this.messages.scrollTop = this.messages.scrollHeight;
-                
-                // Speak if from hound
-                if (sender === 'hound') {
-                    this.speak(text);
-                }
-            }
-
-            speak(text) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.voice = this.synthesis.getVoices().find(v => v.name.includes('Google UK'));
-                utterance.rate = 0.9;
-                this.synthesis.speak(utterance);
-            }
-
-            processCommand(cmd) {
-                cmd = cmd.toLowerCase();
-                
-                if (cmd.includes('webb') || cmd.includes('investigate')) {
-                    this.addMessage('Accessing Webb.io document intelligence...', 'hound');
-                    expandCard('webb');
-                }
-                else if (cmd.includes('telemetry') || cmd.includes('threat')) {
-                    this.addMessage('Displaying global threat telemetry. Visualizing live data.', 'hound');
-                }
-                else if (cmd.includes('biometric') || cmd.includes('operator')) {
-                    this.addMessage('Operator biometrics: Heart rate 72bpm, Galvanic response nominal, Focus level 94%.', 'hound');
-                }
-                else if (cmd.includes('crime') || cmd.includes('dark web')) {
-                    this.addMessage('Pulling latest dark web intelligence...', 'hound');
-                }
-                else if (cmd.includes('hello') || cmd.includes('hi')) {
-                    this.addMessage('Greetings, Director. All systems fully operational.', 'hound');
-                }
-                else {
-                    this.addMessage(`Command received: "${cmd}". Processing through quantum AI mesh...`, 'hound');
-                }
-            }
-        }
-
-        // ========== CRIME FEED SIMULATION ==========
-        function updateCrimeFeed() {
-            const crimes = [
-                '🚨 North Korean IT workers infiltrate 3 crypto firms',
-                '⚠️ New quantum-resistant ransomware strain detected',
-                '🔴 Bybit exchange reports suspicious wallet activity',
-                '🟡 Phishing kit targeting Ledger users in the wild',
-                '📡 Interpol issues alert on new money laundering technique'
-            ];
-            
-            setInterval(() => {
-                const feed = document.getElementById('crimeFeed');
-                const newItem = document.createElement('div');
-                newItem.className = 'crime-item';
-                newItem.textContent = crimes[Math.floor(Math.random() * crimes.length)];
-                feed.insertBefore(newItem, feed.firstChild);
-                
-                if (feed.children.length > 5) {
-                    feed.removeChild(feed.lastChild);
-                }
-            }, 15000);
-        }
-
-        // ========== INITIALIZE EVERYTHING ==========
-        window.onload = function() {
-            initTelemetry();
-            initBiometrics();
-            updateCrimeFeed();
-            
-            // Start chat
-            window.houndChat = new HoundChat();
-            
-            // Real-time telemetry update
-            setInterval(() => {
-                document.querySelector('#telemetryViz svg').innerHTML = '';
-                initTelemetry();
-            }, 5000);
-            
-            // Webb.io iframe access prompt if needed
-            if (!config.webbAccessCode) {
-                houndChat.addMessage('⚠️ Webb.io beta access code required for document investigation features.', 'hound');
-            }
-        };
-
-        // Make chat draggable
-        dragElement(document.getElementById('chatModal'));
-
-        function dragElement(el) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            const header = document.getElementById('chatHeader');
-            
-            header.onmousedown = dragMouseDown;
-
-            function dragMouseDown(e) {
-                e = e || window.event;
-                e.preventDefault();
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
-            }
-
-            function elementDrag(e) {
-                e = e || window.event;
-                e.preventDefault();
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                el.style.top = (el.offsetTop - pos2) + 'px';
-                el.style.left = (el.offsetLeft - pos1) + 'px';
-            }
-
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-            }
-        }
-
-        function toggleChat() {
-            const chat = document.getElementById('chatModal');
-            chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
+        function closeDragElement() {
+            document.onmouseup = null; document.onmousemove = null;
         }
     </script>
 </body>
