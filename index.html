@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueHound · Neural Entropy Multi-Pool Miner</title>
+    <title>BlueHound · Neural Multi-Core CPU Miner</title>
     <!-- Fonts, Icons & Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* [Same comprehensive styles as before, omitted for brevity - keep exactly as in previous response] */
+        /* [Same comprehensive styles as before - keep unchanged for brevity] */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto Mono', monospace; background: #0a0c14; color: #e0f2fe; overflow: hidden; height: 100vh; position: relative; }
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.15; pointer-events: none; }
@@ -47,6 +47,11 @@
         .pool-btn.active { background: cyan; color: black; border-color: cyan; font-weight: bold; box-shadow: 0 0 20px cyan; }
         .pool-btn.failover { border-color: #ffaa00; color: #ffaa00; }
         .pool-btn.failover.active { background: #ffaa00; color: black; border-color: gold; box-shadow: 0 0 20px gold; }
+        /* Thread control */
+        .thread-control { display: flex; align-items: center; gap: 10px; margin: 16px 0; background: rgba(0,20,40,0.5); padding: 12px; border-radius: 40px; }
+        .thread-control label { color: cyan; }
+        .thread-control input { width: 60px; background: #112233; border: 1px solid cyan; color: white; text-align: center; border-radius: 20px; padding: 6px; }
+        .thread-control span { color: #88aaff; }
         .payment-section { background: rgba(0,20,40,0.8); border-radius: 16px; padding: 16px; margin: 16px 0; border: 1px solid gold; }
         .split-display { display: flex; justify-content: space-around; text-align: center; }
         .split-box { padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.3); }
@@ -78,7 +83,6 @@
         .modal-header { padding: 20px; border-bottom: 1px solid cyan; display: flex; justify-content: space-between; }
         .modal-body { flex: 1; overflow: auto; padding: 20px; }
         .hidden { display: none; }
-        .failover-badge { background: #ffaa00; color: black; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-left: 10px; }
         .neural-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff00ff; margin-right: 5px; animation: neuralPulse 1s infinite; }
         @keyframes neuralPulse { 0% { opacity: 0.2; box-shadow: 0 0 5px magenta; } 50% { opacity: 1; box-shadow: 0 0 20px magenta; } 100% { opacity: 0.2; box-shadow: 0 0 5px magenta; } }
     </style>
@@ -89,17 +93,17 @@
         <header class="command-header">
             <div class="logo-area">
                 <i class="fas fa-dog hound-icon"></i>
-                <h1 style="font-family: 'Orbitron';">BLUEHOUND · NEURAL ENTROPY MINER</h1>
+                <h1 style="font-family: 'Orbitron';">BLUEHOUND · NEURAL MULTI-CORE MINER</h1>
             </div>
             <div class="status-panel">
                 <div class="status-item"><span class="neural-indicator"></span> ENTROPY: <span id="entropySource">FinalSpark LIVE</span></div>
-                <div class="status-item"><i class="fas fa-network-wired"></i> POOL: <span id="activePoolName">Nerdminers</span></div>
+                <div class="status-item"><i class="fas fa-microchip"></i> CORES: <span id="activeThreads">0</span>/<span id="totalThreads">4</span></div>
                 <div class="owner-badge"><i class="fa-brands fa-bitcoin"></i> 50% TO OWNER</div>
             </div>
         </header>
 
         <main class="card-grid" id="cardGrid">
-            <!-- FinalSpark Live Neural Feed (Entropy Source) -->
+            <!-- FinalSpark Live Neural Feed -->
             <div class="card iframe-card" data-card="finalspark">
                 <div class="card-header">
                     <span><i class="fas fa-brain"></i> FINALSPARK · NEURAL ENTROPY SOURCE</span>
@@ -114,10 +118,10 @@
                 </div>
             </div>
 
-            <!-- Mining Console with Neural Entropy & Smart Pool Selection -->
+            <!-- Mining Console with Multi-Core CPU Control -->
             <div class="card" data-card="mining">
                 <div class="card-header">
-                    <span><i class="fas fa-microchip"></i> NEURAL MINING · INTELLIGENT POOL SELECTION</span>
+                    <span><i class="fas fa-microchip"></i> CPU MINING · MULTI-THREADED</span>
                     <div class="card-controls">
                         <i class="fas fa-expand" onclick="expandCard('mining')"></i>
                         <i class="fas fa-chart-line"></i>
@@ -130,7 +134,7 @@
                         <button id="saveWalletBtn">SET</button>
                     </div>
                     
-                    <!-- Pool Selection with Performance Metrics -->
+                    <!-- Pool Selection with Latency -->
                     <div class="pool-selector" id="poolSelector">
                         <button class="pool-btn" data-pool="nerdminers">NERDMINERS <span class="pool-latency" id="lat-nerdminers">?</span></button>
                         <button class="pool-btn" data-pool="ckpool">CKPOOL <span class="pool-latency" id="lat-ckpool">?</span></button>
@@ -138,20 +142,20 @@
                         <button class="pool-btn" data-pool="f2pool">F2POOL <span class="pool-latency" id="lat-f2pool">?</span></button>
                         <button class="pool-btn" data-pool="public-pool">PUBLIC-POOL <span class="pool-latency" id="lat-public-pool">?</span></button>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin: 8px 0;">
-                        <span><i class="fas fa-tachometer-alt"></i> Auto-select: <span id="strategyDesc">Latency optimized</span></span>
-                        <span><i class="fas fa-microchip"></i> Neural nonce: <span id="neuralNonce">0x0000</span></span>
+                    
+                    <!-- CPU Thread Control -->
+                    <div class="thread-control">
+                        <label><i class="fas fa-tachometer-alt"></i> CPU Threads:</label>
+                        <input type="number" id="threadCount" min="1" max="16" value="4">
+                        <span>(auto <i class="fas fa-sync-alt" id="detectCores" style="cursor:pointer;"></i>)</span>
+                        <span style="margin-left: auto;">Total Hash: <span id="totalHashRate">0.00 KH/s</span></span>
                     </div>
                     
-                    <!-- Mining stats -->
+                    <!-- Mining stats (per-thread summary) -->
                     <div class="mining-stats">
                         <div class="stat-box">
-                            <div class="stat-value" id="hashRate">0.00</div>
-                            <div class="stat-label">HASH RATE (KH/s)</div>
-                        </div>
-                        <div class="stat-box">
                             <div class="stat-value" id="sharesFound">0</div>
-                            <div class="stat-label">SHARES</div>
+                            <div class="stat-label">TOTAL SHARES</div>
                         </div>
                         <div class="stat-box">
                             <div class="stat-value" id="userEarned">0.00000000</div>
@@ -160,6 +164,10 @@
                         <div class="stat-box">
                             <div class="stat-value" id="ownerEarned">0.00000000</div>
                             <div class="stat-label">OWNER 50% (BTC)</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="threadStats">0</div>
+                            <div class="stat-label">ACTIVE THREADS</div>
                         </div>
                     </div>
                     
@@ -185,7 +193,7 @@
                     
                     <!-- Mining controls -->
                     <div class="mining-controls">
-                        <button class="mining-btn" id="startMiningBtn">▶ START NEURAL MINING</button>
+                        <button class="mining-btn" id="startMiningBtn">▶ START MINING</button>
                         <button class="mining-btn" id="stopMiningBtn">⏹ STOP</button>
                     </div>
                 </div>
@@ -217,7 +225,7 @@
                 </div>
             </div>
             <div class="chat-messages" id="chatMessages">
-                <div class="message hound-message">⚡ Neural entropy source active. Mining with intelligent pool selection.</div>
+                <div class="message hound-message">⚡ Neural entropy + multi-core CPU mining ready. Set threads and start!</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="chatInput" placeholder="Voice or text command..." />
@@ -240,7 +248,7 @@
         </div>
     </div>
 
-    <!-- Mining Worker with Neural Entropy -->
+    <!-- Mining Worker Template (now with thread ID support) -->
     <script id="miningWorker" type="javascript/worker">
         let mining = false;
         let job = null;
@@ -249,6 +257,8 @@
         let hashes = 0;
         let lastUpdate = Date.now();
         let neuralEntropy = 0;
+        let threadId = 0;
+        let nonceStep = 1; // will be set to number of threads
 
         importScripts('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js');
 
@@ -260,13 +270,16 @@
                 target = cmd.target;
                 nonce = cmd.startNonce || 0;
                 neuralEntropy = cmd.neuralEntropy || 0;
+                threadId = cmd.threadId || 0;
+                nonceStep = cmd.nonceStep || 1;
                 mine();
             } else if (cmd.type === 'stop') {
                 mining = false;
             } else if (cmd.type === 'newJob') {
                 job = cmd.job;
                 target = cmd.target;
-                nonce = 0;
+                // For new job, reset nonce to threadId offset
+                nonce = threadId;
                 neuralEntropy = cmd.neuralEntropy || 0;
             } else if (cmd.type === 'entropy') {
                 neuralEntropy = cmd.value;
@@ -277,7 +290,7 @@
             if (!mining || !job) return;
 
             for (let i = 0; i < 1000 && mining; i++) {
-                // Incorporate neural entropy into nonce generation
+                // Incorporate neural entropy and thread-specific nonce
                 const mixedNonce = (nonce + neuralEntropy) & 0xFFFFFFFF;
                 const header = job.prevHash + job.coinb1 + job.coinb2 + mixedNonce.toString(16).padStart(8,'0') + job.ntime;
                 const hash = CryptoJS.SHA256(CryptoJS.SHA256(header)).toString();
@@ -290,21 +303,26 @@
                             nonce: mixedNonce,
                             ntime: job.ntime,
                             extra_nonce2: '00000000'
-                        }
+                        },
+                        threadId: threadId
                     });
                 }
 
-                nonce++;
+                nonce += nonceStep;
                 hashes++;
 
-                if (nonce > 0xFFFFFFFF) nonce = 0;
+                if (nonce > 0xFFFFFFFF) nonce = threadId; // wrap around
             }
 
             const now = Date.now();
             if (now - lastUpdate > 2000) {
                 const elapsed = (now - lastUpdate) / 1000;
                 const hashRate = hashes / elapsed;
-                self.postMessage({ type: 'hashrate', value: hashRate });
+                self.postMessage({ 
+                    type: 'hashrate', 
+                    value: hashRate,
+                    threadId: threadId 
+                });
                 hashes = 0;
                 lastUpdate = now;
             }
@@ -315,18 +333,17 @@
 
     <script>
         // ==============================
-        // BLUEHOUND NEURAL ENTROPY MINER v8.0
+        // BLUEHOUND MULTI-CORE NEURAL MINER v9.0
         // ==============================
 
         const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
         
-        // Pool definitions with URLs and metadata
         const POOLS = {
-            nerdminers: { name: 'Nerdminers', url: 'wss://pool.nerdminers.org:3333', primary: true, weight: 1 },
-            ckpool: { name: 'CKPool', url: 'wss://ckpool.org/stratum', primary: false, weight: 2 },
-            viabtc: { name: 'ViaBTC', url: 'wss://viabtc.com:3333', primary: false, weight: 3 },
-            f2pool: { name: 'F2Pool', url: 'wss://f2pool.com:3333', primary: false, weight: 4 },
-            'public-pool': { name: 'Public-Pool', url: 'wss://public-pool.io:3333', primary: false, weight: 5 }
+            nerdminers: { name: 'Nerdminers', url: 'wss://pool.nerdminers.org:3333', primary: true },
+            ckpool: { name: 'CKPool', url: 'wss://ckpool.org/stratum', primary: false },
+            viabtc: { name: 'ViaBTC', url: 'wss://viabtc.com:3333', primary: false },
+            f2pool: { name: 'F2Pool', url: 'wss://f2pool.com:3333', primary: false },
+            'public-pool': { name: 'Public-Pool', url: 'wss://public-pool.io:3333', primary: false }
         };
 
         // State
@@ -334,12 +351,12 @@
         let miningActive = false;
         let currentPool = 'nerdminers';
         let poolLatencies = {};
-        let poolScores = {};
         let stratum = null;
-        let worker = null;
+        let workers = []; // array of worker instances
+        let workerCount = 4; // default threads
         let sharesFound = 0;
         let totalHashes = 0;
-        let hashRate = 0;
+        let hashRates = {}; // per thread
         let estimatedBtc = parseFloat(localStorage.getItem('estimatedBtc') || '0');
         let neuralEntropy = 0;
         let entropyInterval = null;
@@ -347,7 +364,6 @@
         // DOM elements
         const userWalletInput = document.getElementById('userWallet');
         const saveWalletBtn = document.getElementById('saveWalletBtn');
-        const hashRateEl = document.getElementById('hashRate');
         const sharesFoundEl = document.getElementById('sharesFound');
         const userEarnedEl = document.getElementById('userEarned');
         const ownerEarnedEl = document.getElementById('ownerEarned');
@@ -358,7 +374,12 @@
         const learningLog = document.getElementById('learningLog');
         const qrContainer = document.getElementById('qrContainer');
         const activePoolName = document.getElementById('activePoolName');
-        const neuralNonceSpan = document.getElementById('neuralNonce');
+        const threadCountInput = document.getElementById('threadCount');
+        const totalThreadsSpan = document.getElementById('totalThreads');
+        const activeThreadsSpan = document.getElementById('activeThreads');
+        const totalHashRateSpan = document.getElementById('totalHashRate');
+        const threadStatsSpan = document.getElementById('threadStats');
+        const detectCoresBtn = document.getElementById('detectCores');
         const poolButtons = document.querySelectorAll('.pool-btn');
         const latencySpans = {
             nerdminers: document.getElementById('lat-nerdminers'),
@@ -368,32 +389,47 @@
             'public-pool': document.getElementById('lat-public-pool')
         };
 
-        // --- Neural Entropy from FinalSpark (simulated via iframe events) ---
+        // --- CPU core detection ---
+        detectCoresBtn.addEventListener('click', () => {
+            const cores = navigator.hardwareConcurrency || 4;
+            threadCountInput.value = cores;
+            workerCount = cores;
+            totalThreadsSpan.textContent = cores;
+            logLearning(`🖥️ Detected ${cores} CPU cores`);
+        });
+        // Initialize
+        const initialCores = navigator.hardwareConcurrency || 4;
+        threadCountInput.value = initialCores;
+        workerCount = initialCores;
+        totalThreadsSpan.textContent = initialCores;
+
+        threadCountInput.addEventListener('change', () => {
+            let val = parseInt(threadCountInput.value);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > 16) val = 16;
+            workerCount = val;
+            totalThreadsSpan.textContent = val;
+            if (miningActive) {
+                // Restart workers with new count
+                stopMiningWorkers();
+                startMiningWorkers();
+            }
+        });
+
+        // --- Neural Entropy from FinalSpark (simulated) ---
         function captureNeuralEntropy() {
-            // In a real implementation, we would extract data from the finalspark iframe.
-            // Since cross-origin restrictions prevent that, we simulate by generating
-            // entropy based on the fact that the page updates visually.
-            // We use a combination of time and random to mimic neural variability.
             const timeComponent = Date.now() & 0xFF;
             const randomComponent = Math.floor(Math.random() * 256);
-            // Also mix in the current second's micro-fluctuations
             const neural = (timeComponent ^ randomComponent) & 0xFF;
             
-            // Update display
-            neuralNonceSpan.textContent = '0x' + neural.toString(16).padStart(2,'0');
-            
-            // Send to worker
-            if (worker) {
-                worker.postMessage({ type: 'entropy', value: neural });
-            }
+            // Send to all workers
+            workers.forEach(w => w.postMessage({ type: 'entropy', value: neural }));
             
             return neural;
         }
 
-        // Start entropy capture
         function startEntropyCapture() {
             if (entropyInterval) clearInterval(entropyInterval);
-            // Capture every 500ms to simulate neural spike rate
             entropyInterval = setInterval(captureNeuralEntropy, 500);
         }
 
@@ -404,7 +440,6 @@
             
             const start = Date.now();
             try {
-                // Attempt a WebSocket connection and immediately close
                 const ws = new WebSocket(pool.url);
                 await new Promise((resolve, reject) => {
                     ws.onopen = () => {
@@ -416,7 +451,6 @@
                         ws.close();
                         reject(Infinity);
                     };
-                    // Timeout after 5 seconds
                     setTimeout(() => {
                         ws.close();
                         reject(Infinity);
@@ -438,13 +472,11 @@
             }
         }
 
-        // Measure all pools
         async function measureAllLatencies() {
             logLearning('📡 Measuring pool latencies...');
             const promises = Object.keys(POOLS).map(id => measureLatency(id));
             await Promise.allSettled(promises);
             
-            // Find best pool
             let bestPool = null;
             let bestLatency = Infinity;
             for (const [id, lat] of Object.entries(poolLatencies)) {
@@ -458,19 +490,14 @@
                 logLearning(`⚡ Auto-switching to fastest pool: ${POOLS[bestPool].name} (${bestLatency}ms)`, 'success');
                 switchPool(bestPool);
             }
-            
-            // Update strategy description
-            document.getElementById('strategyDesc').textContent = `Latency optimized (best: ${POOLS[bestPool]?.name || 'none'})`;
         }
 
-        // --- Pool switching logic ---
         function switchPool(newPoolId) {
             if (!POOLS[newPoolId]) return;
             
             currentPool = newPoolId;
             activePoolName.textContent = POOLS[newPoolId].name;
             
-            // Update UI buttons
             poolButtons.forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.dataset.pool === newPoolId) {
@@ -484,7 +511,7 @@
             }
         }
 
-        // --- Wallet and payment (same as before) ---
+        // --- Wallet and payment ---
         if (userWallet) {
             userWalletInput.value = userWallet;
             userAddrDisplay.textContent = userWallet.substring(0,10) + '...';
@@ -503,7 +530,7 @@
             }
         });
 
-        // --- Stratum connection (modified to use currentPool) ---
+        // --- Stratum connection (single connection, job broadcast to all workers) ---
         function connectStratum() {
             if (!userWallet) {
                 addChatMessage('❌ Set wallet first.', 'hound');
@@ -524,7 +551,6 @@
             stratum.onopen = () => {
                 logLearning(`✅ Connected to ${pool.name}`);
                 
-                // Subscribe
                 stratum.send(JSON.stringify({
                     id: 1,
                     method: 'mining.subscribe',
@@ -537,16 +563,14 @@
                     const msg = JSON.parse(event.data);
                     
                     if (msg.id === 1 && msg.result) {
-                        // Authorize
                         stratum.send(JSON.stringify({
                             id: 2,
                             method: 'mining.authorize',
                             params: [userWallet, 'x']
                         }));
                     } else if (msg.method === 'mining.set_difficulty') {
-                        // Target for ultra-low diff (simplified)
                         const target = '00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
-                        if (worker) worker.postMessage({ type: 'newTarget', target: target });
+                        workers.forEach(w => w.postMessage({ type: 'newTarget', target: target }));
                     } else if (msg.method === 'mining.notify') {
                         const params = msg.params;
                         const job = {
@@ -560,12 +584,14 @@
                             ntime: params[7],
                             cleanJobs: params[8]
                         };
-                        if (miningActive && worker) {
-                            worker.postMessage({ 
-                                type: 'newJob', 
-                                job: job, 
-                                target: '00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
-                                neuralEntropy: neuralEntropy
+                        if (miningActive && workers.length > 0) {
+                            workers.forEach(w => {
+                                w.postMessage({ 
+                                    type: 'newJob', 
+                                    job: job, 
+                                    target: '00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+                                    neuralEntropy: neuralEntropy
+                                });
                             });
                         }
                     }
@@ -576,7 +602,6 @@
 
             stratum.onerror = (err) => {
                 logLearning(`⚠️ ${pool.name} connection error`, 'warning');
-                // Trigger latency remeasure and possible failover
                 measureAllLatencies();
             };
 
@@ -595,46 +620,84 @@
             }
         }
 
-        // --- Initialize worker ---
-        const workerBlob = new Blob([document.getElementById('miningWorker').textContent], { type: 'application/javascript' });
-        const workerUrl = URL.createObjectURL(workerBlob);
-        worker = new Worker(workerUrl);
-
-        worker.onmessage = (e) => {
-            const msg = e.data;
-            if (msg.type === 'share') {
-                if (stratum && stratum.readyState === WebSocket.OPEN) {
-                    const submit = {
-                        id: Math.floor(Math.random() * 10000) + 3,
-                        method: 'mining.submit',
-                        params: [
-                            userWallet,
-                            msg.share.job_id,
-                            msg.share.extra_nonce2,
-                            msg.share.ntime,
-                            msg.share.nonce
-                        ]
-                    };
-                    stratum.send(JSON.stringify(submit));
-                    sharesFound++;
-                    sharesFoundEl.textContent = sharesFound;
-                    
-                    const btcPerShare = 0.00000001;
-                    estimatedBtc += btcPerShare;
-                    localStorage.setItem('estimatedBtc', estimatedBtc.toString());
-                    
-                    userEarnedEl.textContent = (estimatedBtc * 0.5).toFixed(8);
-                    ownerEarnedEl.textContent = (estimatedBtc * 0.5).toFixed(8);
-                    
-                    logLearning(`🎯 Share #${sharesFound} submitted to ${POOLS[currentPool].name}`);
-                    updatePaymentButton();
-                }
-            } else if (msg.type === 'hashrate') {
-                hashRate = msg.value / 1000;
-                hashRateEl.textContent = hashRate.toFixed(2);
-                totalHashes += msg.value;
+        // --- Worker management ---
+        function startMiningWorkers() {
+            const workerBlob = new Blob([document.getElementById('miningWorker').textContent], { type: 'application/javascript' });
+            const workerUrl = URL.createObjectURL(workerBlob);
+            
+            // Clear any existing workers
+            stopMiningWorkers();
+            
+            for (let i = 0; i < workerCount; i++) {
+                const w = new Worker(workerUrl);
+                w.threadId = i;
+                
+                w.onmessage = (e) => {
+                    const msg = e.data;
+                    if (msg.type === 'share') {
+                        // Submit share to pool
+                        if (stratum && stratum.readyState === WebSocket.OPEN) {
+                            const submit = {
+                                id: Math.floor(Math.random() * 10000) + 3,
+                                method: 'mining.submit',
+                                params: [
+                                    userWallet,
+                                    msg.share.job_id,
+                                    msg.share.extra_nonce2,
+                                    msg.share.ntime,
+                                    msg.share.nonce
+                                ]
+                            };
+                            stratum.send(JSON.stringify(submit));
+                            sharesFound++;
+                            sharesFoundEl.textContent = sharesFound;
+                            
+                            const btcPerShare = 0.00000001;
+                            estimatedBtc += btcPerShare;
+                            localStorage.setItem('estimatedBtc', estimatedBtc.toString());
+                            
+                            userEarnedEl.textContent = (estimatedBtc * 0.5).toFixed(8);
+                            ownerEarnedEl.textContent = (estimatedBtc * 0.5).toFixed(8);
+                            
+                            logLearning(`🎯 Share #${sharesFound} from thread ${msg.threadId}`, 'success');
+                            updatePaymentButton();
+                        }
+                    } else if (msg.type === 'hashrate') {
+                        hashRates[msg.threadId] = msg.value;
+                        // Update total hash rate
+                        let total = 0;
+                        for (let tid in hashRates) total += hashRates[tid];
+                        total = total / 1000; // to KH/s
+                        totalHashRateSpan.textContent = total.toFixed(2) + ' KH/s';
+                        
+                        // Count active threads
+                        const active = Object.keys(hashRates).length;
+                        activeThreadsSpan.textContent = active;
+                        threadStatsSpan.textContent = active + '/' + workerCount;
+                    }
+                };
+                
+                workers.push(w);
             }
-        };
+            
+            activeThreadsSpan.textContent = workers.length;
+            threadStatsSpan.textContent = workers.length + '/' + workerCount;
+            
+            // If we already have a job, send it to all workers
+            // (Job will be sent when stratum sends mining.notify)
+        }
+
+        function stopMiningWorkers() {
+            workers.forEach(w => {
+                w.postMessage({ type: 'stop' });
+                w.terminate();
+            });
+            workers = [];
+            hashRates = {};
+            activeThreadsSpan.textContent = '0';
+            threadStatsSpan.textContent = '0/' + workerCount;
+            totalHashRateSpan.textContent = '0.00 KH/s';
+        }
 
         // --- Mining control ---
         function startMining() {
@@ -650,13 +713,16 @@
             // Start neural entropy capture
             startEntropyCapture();
             
+            // Start workers
+            startMiningWorkers();
+            
             // Measure latencies and connect to best pool
             measureAllLatencies().then(() => {
                 connectStratum();
             });
             
-            logLearning('⛏️ Neural mining started');
-            addChatMessage('⛏️ Mining active with neural entropy and smart pool selection.', 'hound');
+            logLearning('⛏️ Mining started with ' + workerCount + ' CPU threads');
+            addChatMessage(`⛏️ Mining active with ${workerCount} threads and neural entropy.`, 'hound');
             
             // Periodic latency re-measurement (every 5 minutes)
             setInterval(() => {
@@ -668,7 +734,7 @@
             miningActive = false;
             startBtn.classList.remove('active');
             disconnectPool();
-            if (worker) worker.postMessage({ type: 'stop' });
+            stopMiningWorkers();
             if (entropyInterval) clearInterval(entropyInterval);
             logLearning('⏸️ Mining stopped');
         }
@@ -755,7 +821,8 @@
             else if (cmd.includes('stop')) stopMining();
             else if (cmd.includes('pool')) addChatMessage(`Current pool: ${POOLS[currentPool].name}`, 'hound');
             else if (cmd.includes('earnings')) addChatMessage(`Your 50%: ${(estimatedBtc*0.5).toFixed(8)} BTC`, 'hound');
-            else addChatMessage('Try: start, stop, pool, earnings', 'hound');
+            else if (cmd.includes('threads')) addChatMessage(`Using ${workerCount} CPU threads`, 'hound');
+            else addChatMessage('Try: start, stop, pool, earnings, threads', 'hound');
         });
 
         // Voice commands
@@ -764,6 +831,7 @@
                 'start mining': startMining,
                 'stop mining': stopMining,
                 'current pool': () => addChatMessage(`Active pool: ${POOLS[currentPool].name}`, 'hound'),
+                'thread count': () => addChatMessage(`Using ${workerCount} threads`, 'hound'),
             });
             document.getElementById('micToggle').addEventListener('click', () => {
                 if (annyang.isListening()) annyang.abort();
@@ -786,7 +854,7 @@
         function reloadIframe(iframeId) { document.getElementById(iframeId).src = document.getElementById(iframeId).src; }
         function toggleChat() { document.getElementById('chatModal').style.display = document.getElementById('chatModal').style.display === 'none' ? 'flex' : 'none'; }
 
-        // --- Three.js background (same) ---
+        // --- Three.js background ---
         const canvas = document.getElementById('bg-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
