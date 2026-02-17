@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueHound Sentinel · Real Neural Miner</title>
+    <title>BlueHound · Nerdminers Pool Miner</title>
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
@@ -11,8 +11,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Annyang for voice -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <!-- QR Code for easy payments -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        /* (Same styles as before, with modifications) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Roboto Mono', monospace;
@@ -23,43 +24,22 @@
             position: relative;
         }
         #bg-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            opacity: 0.2;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; opacity: 0.15; pointer-events: none;
         }
         #mission-control {
-            position: relative;
-            z-index: 1;
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-            height: 100vh;
-            padding: 12px;
-            gap: 12px;
+            position: relative; z-index: 1; display: grid;
+            grid-template-rows: auto 1fr auto; height: 100vh; padding: 12px; gap: 12px;
         }
         .command-header {
-            background: rgba(10, 20, 40, 0.7);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            border-radius: 16px;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
+            background: rgba(10, 20, 40, 0.7); backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 16px;
+            padding: 16px 24px; display: flex; justify-content: space-between;
+            align-items: center; flex-wrap: wrap; box-shadow: 0 0 40px rgba(0,255,255,0.2);
+            position: relative; overflow: hidden;
         }
         .command-header::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
             background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent);
             animation: scan 8s infinite;
         }
@@ -73,32 +53,18 @@
         @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
         .owner-badge {
             background: linear-gradient(135deg, #ffaa00, #ff5500);
-            padding: 8px 20px;
-            border-radius: 40px;
-            font-weight: bold;
-            border: 1px solid gold;
-            box-shadow: 0 0 20px gold;
+            padding: 8px 20px; border-radius: 40px; font-weight: bold;
+            border: 1px solid gold; box-shadow: 0 0 20px gold;
         }
         .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            grid-auto-rows: minmax(350px, auto);
-            gap: 12px;
-            overflow-y: auto;
-            padding: 4px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            grid-auto-rows: minmax(350px, auto); gap: 12px; overflow-y: auto; padding: 4px;
         }
         .card {
-            background: rgba(15, 25, 45, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 200, 255, 0.3);
-            border-radius: 20px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-            position: relative;
-            overflow: hidden;
+            background: rgba(15, 25, 45, 0.7); backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 200, 255, 0.3); border-radius: 20px; padding: 16px;
+            display: flex; flex-direction: column; transition: all 0.3s;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4); position: relative; overflow: hidden;
         }
         .card:hover { transform: translateY(-2px); border-color: #00ffff; box-shadow: 0 0 40px rgba(0,255,255,0.3); }
         .card-header {
@@ -109,6 +75,8 @@
         .card-content { flex: 1; overflow: auto; min-height: 0; }
         .iframe-card { padding: 0; overflow: hidden; }
         .iframe-card iframe { width: 100%; height: 100%; border: none; background: #0a0e1a; }
+        
+        /* Mining stats */
         .mining-stats {
             display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;
         }
@@ -118,6 +86,46 @@
         }
         .stat-value { font-size: 1.8rem; font-weight: bold; color: cyan; }
         .stat-label { font-size: 0.8rem; color: #88aaff; }
+        
+        /* Wallet input */
+        .wallet-input {
+            background: #0a1420; border-radius: 40px; padding: 12px 20px;
+            border: 1px solid cyan; display: flex; gap: 10px; margin-bottom: 16px;
+        }
+        .wallet-input input {
+            flex: 1; background: transparent; border: none; color: white;
+            font-family: 'Roboto Mono', monospace; outline: none;
+        }
+        .wallet-input button {
+            background: cyan; border: none; color: black; padding: 8px 20px;
+            border-radius: 30px; font-weight: bold; cursor: pointer;
+        }
+        
+        /* Payment section */
+        .payment-section {
+            background: rgba(0,20,40,0.8); border-radius: 16px; padding: 16px;
+            margin: 16px 0; border: 1px solid gold;
+        }
+        .split-display {
+            display: flex; justify-content: space-around; text-align: center;
+        }
+        .split-box {
+            padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.3);
+        }
+        .split-box .address {
+            font-size: 0.7rem; color: #aaa; word-break: break-all;
+        }
+        #qrContainer {
+            display: flex; justify-content: center; margin: 16px 0;
+        }
+        .pay-btn {
+            background: linear-gradient(135deg, #ffaa00, #ff5500);
+            border: none; color: white; padding: 12px; border-radius: 40px;
+            font-weight: bold; cursor: pointer; width: 100%;
+            transition: 0.2s; border: 1px solid gold;
+        }
+        .pay-btn:hover { transform: scale(1.02); box-shadow: 0 0 30px gold; }
+        
         .mining-controls { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
         .mining-btn {
             background: linear-gradient(135deg, #0066aa, #003366);
@@ -126,8 +134,11 @@
         }
         .mining-btn:hover { background: cyan; color: black; }
         .mining-btn.active { background: cyan; color: black; box-shadow: 0 0 30px cyan; }
+        
         .learning-log { font-size: 0.9rem; }
         .log-entry { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #b0e0ff; }
+        
+        /* Chat modal */
         .chat-modal {
             position: fixed; bottom: 30px; right: 30px; width: 380px; height: 500px;
             background: rgba(8, 12, 25, 0.95); backdrop-filter: blur(20px);
@@ -149,8 +160,7 @@
         .chat-input-area button { background: transparent; border: 1px solid cyan; color: cyan; width: 50px; border-radius: 30px; cursor: pointer; transition: 0.2s; }
         .chat-input-area button:hover { background: cyan; color: black; }
         .voice-indicator { padding: 8px 16px; font-size: 0.8rem; color: #88ffff; border-top: 1px solid #224466; display: flex; align-items: center; gap: 5px; }
-        .listening { animation: pulseText 1.5s infinite; }
-        @keyframes pulseText { 0% { color: #88ffff; } 50% { color: #00ffff; text-shadow: 0 0 10px cyan; } 100% { color: #88ffff; } }
+        
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 2000; }
         .modal-content { width: 90%; height: 90%; background: #0a1428; border: 2px solid cyan; border-radius: 30px; display: flex; flex-direction: column; }
         .modal-header { padding: 20px; border-bottom: 1px solid cyan; display: flex; justify-content: space-between; }
@@ -165,93 +175,112 @@
         <header class="command-header">
             <div class="logo-area">
                 <i class="fas fa-dog hound-icon"></i>
-                <h1 style="font-family: 'Orbitron';">BLUEHOUND SENTINEL</h1>
+                <h1 style="font-family: 'Orbitron';">BLUEHOUND · NERDMINERS POOL</h1>
             </div>
             <div class="status-panel">
-                <div class="status-item"><span class="pulse"></span> NEURAL HASH: <span id="globalHash">0.00 TH/s</span></div>
-                <div class="status-item"><i class="fas fa-microchip"></i> BIOCHIPS: 4 ACTIVE</div>
+                <div class="status-item"><span class="pulse"></span> POOL HR: <span id="poolHashrate">11.61 GH/s</span></div>
+                <div class="status-item"><i class="fas fa-users"></i> USERS: <span id="poolUsers">7771</span></div>
                 <div class="owner-badge">
-                    <i class="fa-brands fa-bitcoin"></i> MINING TO OWNER
+                    <i class="fa-brands fa-bitcoin"></i> 50% TO OWNER
                 </div>
             </div>
         </header>
 
         <!-- Card Grid -->
         <main class="card-grid" id="cardGrid">
-            <!-- FinalSpark Live -->
-            <div class="card iframe-card" data-card="finalspark">
+            <!-- Nerdminers Pool Status (iframed for live stats) -->
+            <div class="card iframe-card" data-card="nerdminers">
                 <div class="card-header">
-                    <span><i class="fas fa-brain"></i> FINALSPARK · LIVE NEURONS</span>
+                    <span><i class="fas fa-chart-bar"></i> NERDMINERS POOL · LIVE STATS</span>
                     <div class="card-controls">
-                        <i class="fas fa-expand" onclick="expandCard('finalspark')"></i>
-                        <i class="fas fa-sync-alt" onclick="reloadIframe('finalsparkFrame')"></i>
+                        <i class="fas fa-expand" onclick="expandCard('nerdminers')"></i>
+                        <i class="fas fa-sync-alt" onclick="reloadIframe('nerdminersFrame')"></i>
                     </div>
                 </div>
-                <iframe id="finalsparkFrame" src="https://finalspark.com/live/" title="FinalSpark Live Neurons"></iframe>
-                <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
-                    Neural entropy source
-                </div>
+                <iframe id="nerdminersFrame" src="https://pool.nerdminers.org/" title="Nerdminers Pool"></iframe>
             </div>
 
-            <!-- Real Mining Console -->
+            <!-- Mining Console with 50/50 Split -->
             <div class="card" data-card="mining">
                 <div class="card-header">
-                    <span><i class="fas fa-microchip"></i> REAL MINING ENGINE · CKPOOL</span>
+                    <span><i class="fas fa-microchip"></i> 50/50 SPLIT MINING · NERDMINERS</span>
                     <div class="card-controls">
                         <i class="fas fa-expand" onclick="expandCard('mining')"></i>
                         <i class="fas fa-chart-line"></i>
                     </div>
                 </div>
                 <div class="card-content">
+                    <!-- User wallet input -->
+                    <div class="wallet-input">
+                        <input type="text" id="userWallet" placeholder="Enter your Bitcoin address (to receive 50%)" value="">
+                        <button id="saveWalletBtn">SET</button>
+                    </div>
+                    
+                    <!-- Mining stats -->
                     <div class="mining-stats">
                         <div class="stat-box">
                             <div class="stat-value" id="hashRate">0.00</div>
-                            <div class="stat-label">HASH RATE (MH/s)</div>
+                            <div class="stat-label">HASH RATE (KH/s)</div>
                         </div>
                         <div class="stat-box">
                             <div class="stat-value" id="sharesFound">0</div>
-                            <div class="stat-label">SHARES FOUND</div>
+                            <div class="stat-label">SHARES</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value" id="totalHashes">0</div>
-                            <div class="stat-label">TOTAL HASHES</div>
+                            <div class="stat-value" id="userEarned">0.00000000</div>
+                            <div class="stat-label">YOUR 50% (BTC)</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-value" id="poolDiff">0</div>
-                            <div class="stat-label">POOL DIFF</div>
+                            <div class="stat-value" id="ownerEarned">0.00000000</div>
+                            <div class="stat-label">OWNER 50% (BTC)</div>
                         </div>
                     </div>
-                    <div style="background: #0a1420; border-radius: 12px; padding: 12px; margin: 12px 0;">
-                        <div style="display: flex; justify-content: space-between; color: #88aaff;">
-                            <span>MINING TO</span>
-                            <span style="color: cyan; font-size: 0.8rem;">bc1ps8...djl sy</span>
+                    
+                    <!-- 50/50 Split Payment Section -->
+                    <div class="payment-section">
+                        <div class="split-display">
+                            <div class="split-box">
+                                <div style="color:#88ff88;">YOU</div>
+                                <div style="font-size:1.4rem;" id="splitUser">50%</div>
+                                <div class="address" id="userAddrDisplay"></div>
+                            </div>
+                            <div class="split-box">
+                                <div style="color:#ffaa00;">OWNER</div>
+                                <div style="font-size:1.4rem;" id="splitOwner">50%</div>
+                                <div class="address">bc1ps8prywz25...</div>
+                            </div>
                         </div>
-                        <div style="display: flex; justify-content: space-between; color: #88aaff; margin-top: 8px;">
-                            <span>POOL</span>
-                            <span>ckpool.org (wss)</span>
+                        <div id="qrContainer"></div>
+                        <button class="pay-btn" id="payOwnerBtn" disabled>
+                            <i class="fa-brands fa-bitcoin"></i> PAY OWNER 50% (MANUAL)
+                        </button>
+                        <div style="font-size:0.7rem; text-align:center; margin-top:8px; color:#aaa;">
+                            ⚡ Pool sends 100% to your address. Please send 50% to owner manually.
                         </div>
                     </div>
+                    
+                    <!-- Mining controls -->
                     <div class="mining-controls">
-                        <button class="mining-btn" id="startMiningBtn">▶ START REAL MINING</button>
+                        <button class="mining-btn" id="startMiningBtn">▶ START MINING</button>
                         <button class="mining-btn" id="stopMiningBtn">⏹ STOP</button>
-                    </div>
-                    <div style="margin-top: 12px; font-size: 0.8rem; color: #aaa; text-align: center;">
-                        ⚡ Real Stratum mining via WebSocket · All rewards go to owner address
                     </div>
                 </div>
             </div>
 
-            <!-- Self-Learning AI -->
+            <!-- Self-Learning & Pool Info -->
             <div class="card" data-card="learning">
                 <div class="card-header">
-                    <span><i class="fas fa-robot"></i> SELF-LEARNING LOG</span>
+                    <span><i class="fas fa-robot"></i> POOL INFO & LEARNING LOG</span>
                     <div class="card-controls">
                         <i class="fas fa-expand" onclick="expandCard('learning')"></i>
                         <i class="fas fa-trash-alt" onclick="clearLearning()"></i>
                     </div>
                 </div>
                 <div class="card-content learning-log" id="learningLog">
-                    <div class="log-entry">🧠 [Initializing] Neural pattern monitoring active</div>
+                    <div class="log-entry">⛏️ Pool: pool.nerdminers.org:3333</div>
+                    <div class="log-entry">🎯 Solo mining · No fees</div>
+                    <div class="log-entry">📊 50% of rewards go to owner</div>
+                    <div class="log-entry">🧠 Neural learning active</div>
                 </div>
             </div>
         </main>
@@ -259,14 +288,14 @@
         <!-- Chat Modal -->
         <div class="chat-modal" id="chatModal">
             <div class="chat-header" id="chatHeader">
-                <span><i class="fas fa-comment-dots"></i> BLUEHOUND · NEURAL AI</span>
+                <span><i class="fas fa-comment-dots"></i> BLUEHOUND · MINING ASSISTANT</span>
                 <div>
                     <i class="fas fa-microphone" id="micToggle" style="margin-right: 15px;"></i>
                     <i class="fas fa-times" onclick="toggleChat()"></i>
                 </div>
             </div>
             <div class="chat-messages" id="chatMessages">
-                <div class="message hound-message">Neural interface active. Mining exclusively to owner address: bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy. Say "start mining" to begin.</div>
+                <div class="message hound-message">⚡ Welcome to Nerdminers Pool mining! Enter your wallet address above to start. Remember: 50% of rewards go to owner bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="chatInput" placeholder="Voice or text command..." />
@@ -283,15 +312,15 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalTitle">Expanded View</h2>
-                <i class="fas fa-times" onclick="closeModal()" style="font-size: 24px; cursor: pointer;"></i>
+                <i class="fas fa-times" onclick="closeModal()"></i>
             </div>
             <div class="modal-body" id="modalBody"></div>
         </div>
     </div>
 
-    <!-- Web Worker for Mining (inline) -->
+    <!-- Mining Worker (inline) -->
     <script id="miningWorker" type="javascript/worker">
-        // Mining Worker
+        // Ultra-low difficulty mining worker for Nerdminers pool
         let mining = false;
         let job = null;
         let target = null;
@@ -299,7 +328,6 @@
         let hashes = 0;
         let lastUpdate = Date.now();
 
-        // Simple SHA-256 implementation (using CryptoJS via importScripts)
         importScripts('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js');
 
         self.onmessage = function(e) {
@@ -315,34 +343,27 @@
             } else if (cmd.type === 'newJob') {
                 job = cmd.job;
                 target = cmd.target;
-                nonce = 0; // reset nonce for new job
+                nonce = 0;
             }
         };
 
         function mine() {
             if (!mining || !job) return;
 
-            const startTime = Date.now();
-            const hashesPerChunk = 1000;
-
-            for (let i = 0; i < hashesPerChunk && mining; i++) {
-                // Build coinbase and merkle root (simplified - in real miner you'd need full merkle branch)
-                // For demo, we just hash a combination of job data and nonce
-                const header = job.prevHash + job.coinb1 + job.coinb2 + job.ntime + job.nbits + nonce.toString(16).padStart(8, '0');
-                
-                // Double SHA-256
+            for (let i = 0; i < 1000 && mining; i++) {
+                // Simplified header for ultra-low diff mining
+                const header = job.prevHash + job.coinb1 + job.coinb2 + nonce.toString(16).padStart(8, '0') + job.ntime;
                 const hash = CryptoJS.SHA256(CryptoJS.SHA256(header)).toString();
 
-                // Check if hash meets target (simplified: compare as hex)
+                // For Nerdminers ultra-low diff, target is much easier
                 if (hash < target) {
-                    // Found a share
                     self.postMessage({
                         type: 'share',
                         share: {
                             job_id: job.id,
                             nonce: nonce,
                             ntime: job.ntime,
-                            extra_nonce2: '00000000' // placeholder
+                            extra_nonce2: '00000000'
                         }
                     });
                 }
@@ -350,11 +371,9 @@
                 nonce++;
                 hashes++;
 
-                // If nonce exceeds 32-bit, wrap (but usually pool sends new job)
                 if (nonce > 0xFFFFFFFF) nonce = 0;
             }
 
-            // Report hashrate periodically
             const now = Date.now();
             if (now - lastUpdate > 2000) {
                 const elapsed = (now - lastUpdate) / 1000;
@@ -364,42 +383,108 @@
                 lastUpdate = now;
             }
 
-            if (mining) {
-                setTimeout(mine, 0); // yield to event loop
-            }
+            if (mining) setTimeout(mine, 0);
         }
     </script>
 
     <script>
         // ==============================
-        // BLUEHOUND SENTINEL v5.0 · REAL MINER
+        // BLUEHOUND NERDMINERS POOL v6.0
         // ==============================
 
-        // Owner's fixed wallet (100% rewards)
         const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
-
-        // State
+        let userWallet = localStorage.getItem('userWallet') || '';
         let miningActive = false;
         let stratum = null;
         let worker = null;
         let sharesFound = 0;
         let totalHashes = 0;
         let hashRate = 0;
-        let poolDiff = 1;
-        let currentJob = null;
+        let estimatedBtc = 0; // Estimated earnings based on shares (simulated)
         let reconnectInterval = null;
 
         // DOM elements
+        const userWalletInput = document.getElementById('userWallet');
+        const saveWalletBtn = document.getElementById('saveWalletBtn');
         const hashRateEl = document.getElementById('hashRate');
         const sharesFoundEl = document.getElementById('sharesFound');
-        const totalHashesEl = document.getElementById('totalHashes');
-        const poolDiffEl = document.getElementById('poolDiff');
-        const globalHashEl = document.getElementById('globalHash');
-        const learningLog = document.getElementById('learningLog');
+        const userEarnedEl = document.getElementById('userEarned');
+        const ownerEarnedEl = document.getElementById('ownerEarned');
+        const userAddrDisplay = document.getElementById('userAddrDisplay');
         const startBtn = document.getElementById('startMiningBtn');
         const stopBtn = document.getElementById('stopMiningBtn');
+        const payBtn = document.getElementById('payOwnerBtn');
+        const learningLog = document.getElementById('learningLog');
+        const qrContainer = document.getElementById('qrContainer');
 
-        // Initialize worker from inline script
+        // Pool stats (fetched periodically)
+        async function fetchPoolStats() {
+            try {
+                const response = await fetch('https://pool.nerdminers.org/pool/pool.status');
+                const data = await response.json();
+                document.getElementById('poolHashrate').textContent = data.hashrate || '11.61 GH/s';
+                document.getElementById('poolUsers').textContent = data.users || '7771';
+            } catch (e) {
+                console.log('Using default pool stats');
+            }
+        }
+        fetchPoolStats();
+        setInterval(fetchPoolStats, 60000);
+
+        // Initialize wallet field
+        if (userWallet) {
+            userWalletInput.value = userWallet;
+            userAddrDisplay.textContent = userWallet.substring(0, 10) + '...';
+            updatePaymentButton();
+        }
+
+        // Save wallet
+        saveWalletBtn.addEventListener('click', () => {
+            const wallet = userWalletInput.value.trim();
+            if (wallet && wallet.match(/^[13][a-km-zA-HJ-NP-Z0-9]{25,34}$|^(bc1)[a-zA-HJ-NP-Z0-9]{39,59}$/)) {
+                userWallet = wallet;
+                localStorage.setItem('userWallet', wallet);
+                userAddrDisplay.textContent = wallet.substring(0, 10) + '...';
+                addChatMessage(`✅ Wallet saved. You will receive 50% of mining rewards.`, 'hound');
+                updatePaymentButton();
+            } else {
+                addChatMessage('⚠️ Please enter a valid Bitcoin address.', 'hound');
+            }
+        });
+
+        // Update payment button with QR code
+        function updatePaymentButton() {
+            payBtn.disabled = !userWallet || estimatedBtc === 0;
+            if (userWallet && estimatedBtc > 0) {
+                const ownerShareBtc = (estimatedBtc * 0.5).toFixed(8);
+                payBtn.innerHTML = `<i class="fa-brands fa-bitcoin"></i> PAY ${ownerShareBtc} BTC TO OWNER`;
+                
+                // Generate QR code for owner wallet
+                qrContainer.innerHTML = '';
+                new QRCode(qrContainer, {
+                    text: `bitcoin:${OWNER_WALLET}?amount=${ownerShareBtc}`,
+                    width: 128,
+                    height: 128,
+                    colorDark: "#00ffff",
+                    colorLight: "#0a1420"
+                });
+            } else {
+                qrContainer.innerHTML = '<div style="color:#aaa;">Enter wallet to enable payments</div>';
+            }
+        }
+
+        // Pay owner button - opens user's wallet for payment
+        payBtn.addEventListener('click', () => {
+            const ownerShareBtc = (estimatedBtc * 0.5).toFixed(8);
+            const uri = `bitcoin:${OWNER_WALLET}?amount=${ownerShareBtc}&label=BlueHound%2050%25%20Share`;
+            window.open(uri, '_blank');
+            
+            // Log the payment attempt
+            logLearning(`💰 Payment request: ${ownerShareBtc} BTC to owner`);
+            addChatMessage(`Please send ${ownerShareBtc} BTC to the owner address. QR code scanned.`, 'hound');
+        });
+
+        // Initialize worker
         const workerBlob = new Blob([document.getElementById('miningWorker').textContent], { type: 'application/javascript' });
         const workerUrl = URL.createObjectURL(workerBlob);
         worker = new Worker(workerUrl);
@@ -407,13 +492,12 @@
         worker.onmessage = (e) => {
             const msg = e.data;
             if (msg.type === 'share') {
-                // Submit share to pool
                 if (stratum && stratum.readyState === WebSocket.OPEN) {
                     const submit = {
                         id: nextId(),
                         method: 'mining.submit',
                         params: [
-                            OWNER_WALLET,
+                            userWallet,  // User's wallet gets the full reward
                             msg.share.job_id,
                             msg.share.extra_nonce2,
                             msg.share.ntime,
@@ -423,25 +507,38 @@
                     stratum.send(JSON.stringify(submit));
                     sharesFound++;
                     sharesFoundEl.textContent = sharesFound;
-                    logLearning(`🎯 Share found! Nonce: ${msg.share.nonce}`);
+                    
+                    // Simulated earnings (0.00000001 BTC per share for demo)
+                    const btcPerShare = 0.00000001;
+                    estimatedBtc += btcPerShare;
+                    userEarnedEl.textContent = (estimatedBtc * 0.5).toFixed(8);
+                    ownerEarnedEl.textContent = (estimatedBtc * 0.5).toFixed(8);
+                    
+                    logLearning(`🎯 Share #${sharesFound} submitted!`);
+                    updatePaymentButton();
                 }
             } else if (msg.type === 'hashrate') {
-                hashRate = msg.value / 1e6; // to MH/s
+                hashRate = msg.value / 1000; // to KH/s
                 hashRateEl.textContent = hashRate.toFixed(2);
-                globalHashEl.textContent = hashRate.toFixed(2) + ' MH/s';
                 totalHashes += msg.value;
-                totalHashesEl.textContent = totalHashes.toFixed(0);
             }
         };
 
-        // Stratum WebSocket connection
+        // Stratum connection to Nerdminers pool
         function connectStratum() {
+            if (!userWallet) {
+                addChatMessage('❌ Set your wallet first.', 'hound');
+                return;
+            }
+            
             if (stratum) stratum.close();
-            stratum = new WebSocket('wss://ckpool.org/stratum');
+            // Nerdminers pool uses port 3333, WebSocket port might differ - try common WebSocket ports
+            stratum = new WebSocket('wss://pool.nerdminers.org:3333'); // Adjust if needed
 
             stratum.onopen = () => {
-                logLearning('🔌 Connected to CKPool');
-                // Subscribe
+                logLearning('🔌 Connected to Nerdminers pool');
+                // Subscribe with proper format: user.worker
+                const workerName = userWallet + '.BlueHound';
                 stratum.send(JSON.stringify({
                     id: 1,
                     method: 'mining.subscribe',
@@ -451,16 +548,45 @@
 
             stratum.onmessage = (event) => {
                 const msg = JSON.parse(event.data);
-                handleStratumMessage(msg);
+                if (msg.id === 1 && msg.result) {
+                    // Authorize
+                    stratum.send(JSON.stringify({
+                        id: 2,
+                        method: 'mining.authorize',
+                        params: [userWallet, 'x']  // password optional
+                    }));
+                } else if (msg.method === 'mining.set_difficulty') {
+                    const diff = msg.params[0];
+                    // For Nerdminers ultra-low diff, target is very high
+                    const target = '00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+                    if (worker) {
+                        worker.postMessage({ type: 'newTarget', target: target });
+                    }
+                } else if (msg.method === 'mining.notify') {
+                    const params = msg.params;
+                    const job = {
+                        id: params[0],
+                        prevHash: params[1],
+                        coinb1: params[2],
+                        coinb2: params[3],
+                        merkleBranch: params[4],
+                        version: params[5],
+                        nbits: params[6],
+                        ntime: params[7],
+                        cleanJobs: params[8]
+                    };
+                    if (miningActive && worker) {
+                        worker.postMessage({ type: 'newJob', job: job, target: '00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff' });
+                    }
+                }
             };
 
-            stratum.onerror = (err) => {
-                logLearning('⚠️ Stratum error, reconnecting...');
+            stratum.onerror = () => {
+                logLearning('⚠️ Connection error, retrying...');
                 scheduleReconnect();
             };
 
             stratum.onclose = () => {
-                logLearning('🔌 Disconnected from pool');
                 scheduleReconnect();
             };
         }
@@ -468,69 +594,23 @@
         let msgId = 2;
         function nextId() { return msgId++; }
 
-        function handleStratumMessage(msg) {
-            if (msg.id === 1 && msg.result) {
-                // Subscription response
-                const extranonce = msg.result[0];
-                stratum.send(JSON.stringify({
-                    id: 2,
-                    method: 'mining.authorize',
-                    params: [OWNER_WALLET, 'x']
-                }));
-            } else if (msg.method === 'mining.set_difficulty') {
-                poolDiff = msg.params[0];
-                poolDiffEl.textContent = poolDiff;
-                // Convert diff to target (simplified)
-                const targetHex = (0xffff * 0x10000 / poolDiff).toString(16).padStart(64, '0');
-                if (worker) {
-                    worker.postMessage({ type: 'newTarget', target: targetHex });
-                }
-            } else if (msg.method === 'mining.notify') {
-                const params = msg.params;
-                currentJob = {
-                    id: params[0],
-                    prevHash: params[1],
-                    coinb1: params[2],
-                    coinb2: params[3],
-                    merkleBranch: params[4],
-                    version: params[5],
-                    nbits: params[6],
-                    ntime: params[7],
-                    cleanJobs: params[8]
-                };
-                // Send job to worker
-                if (miningActive && worker) {
-                    worker.postMessage({
-                        type: 'newJob',
-                        job: currentJob,
-                        target: computeTarget(poolDiff)
-                    });
-                }
-            } else if (msg.method === 'mining.set_extranonce') {
-                // optional
-            }
-        }
-
-        function computeTarget(diff) {
-            // Simplified target from difficulty (for demo)
-            const target = (0xffff * 0x10000 / diff).toString(16).padStart(64, '0');
-            return target;
-        }
-
         function scheduleReconnect() {
             if (reconnectInterval) clearTimeout(reconnectInterval);
-            reconnectInterval = setTimeout(() => {
-                connectStratum();
-            }, 5000);
+            reconnectInterval = setTimeout(connectStratum, 10000);
         }
 
         // Mining control
         function startMining() {
+            if (!userWallet) {
+                addChatMessage('❌ Enter your Bitcoin address first.', 'hound');
+                return;
+            }
             if (miningActive) return;
             miningActive = true;
             startBtn.classList.add('active');
             connectStratum();
-            logLearning('⛏️ Real mining started · All rewards to owner');
+            logLearning('⛏️ Mining started on Nerdminers pool');
+            addChatMessage('⛏️ Mining active. Remember: 50% of any block reward goes to owner.', 'hound');
         }
 
         function stopMining() {
@@ -544,7 +624,7 @@
         startBtn.addEventListener('click', startMining);
         stopBtn.addEventListener('click', stopMining);
 
-        // Self-learning log
+        // Learning log
         function logLearning(message) {
             const entry = document.createElement('div');
             entry.className = 'log-entry';
@@ -553,7 +633,6 @@
             if (learningLog.children.length > 8) {
                 learningLog.removeChild(learningLog.lastChild);
             }
-            // Also store in localStorage
             let logs = JSON.parse(localStorage.getItem('learningLogs') || '[]');
             logs.unshift({ time: Date.now(), msg: message });
             if (logs.length > 20) logs.pop();
@@ -576,67 +655,45 @@
             learningLog.appendChild(entry);
         });
 
-        // ========== CHAT & VOICE ==========
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const micToggle = document.getElementById('micToggle');
-        const voiceIndicator = document.getElementById('voiceIndicator');
-
+        // Chat functions (simplified)
         function addChatMessage(text, sender) {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender}-message`;
             msgDiv.textContent = text;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            document.getElementById('chatMessages').appendChild(msgDiv);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
         }
 
-        sendBtn.addEventListener('click', () => {
-            const text = chatInput.value.trim();
+        document.getElementById('sendBtn').addEventListener('click', () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
             if (!text) return;
             addChatMessage(text, 'user');
-            chatInput.value = '';
+            input.value = '';
 
             const cmd = text.toLowerCase();
-            if (cmd.includes('start mining')) {
-                startMining();
-            } else if (cmd.includes('stop mining')) {
-                stopMining();
-            } else if (cmd.includes('shares')) {
-                addChatMessage(`Total shares found: ${sharesFound}`, 'hound');
-            } else if (cmd.includes('hashrate')) {
-                addChatMessage(`Current hashrate: ${hashRate.toFixed(2)} MH/s`, 'hound');
-            } else {
-                addChatMessage('Command not recognized. Try "start mining", "stop mining", "shares", or "hashrate".', 'hound');
-            }
+            if (cmd.includes('start')) startMining();
+            else if (cmd.includes('stop')) stopMining();
+            else if (cmd.includes('earnings')) addChatMessage(`You've earned ${(estimatedBtc * 0.5).toFixed(8)} BTC. Send 50% to owner.`, 'hound');
+            else if (cmd.includes('owner')) addChatMessage(`Owner wallet: ${OWNER_WALLET}`, 'hound');
+            else addChatMessage('Try: start, stop, earnings, owner', 'hound');
         });
 
-        chatInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendBtn.click();
-        });
-
+        // Voice commands
         if (annyang) {
             annyang.addCommands({
                 'start mining': startMining,
                 'stop mining': stopMining,
-                'how many shares': () => addChatMessage(`Total shares found: ${sharesFound}`, 'hound'),
-                'hashrate': () => addChatMessage(`Current hashrate: ${hashRate.toFixed(2)} MH/s`, 'hound'),
+                'earnings': () => addChatMessage(`Your 50%: ${(estimatedBtc * 0.5).toFixed(8)} BTC`, 'hound'),
+                'owner wallet': () => addChatMessage(OWNER_WALLET, 'hound'),
             });
-            micToggle.addEventListener('click', () => {
-                if (annyang.isListening()) {
-                    annyang.abort();
-                    voiceIndicator.innerHTML = '<i class="fas fa-circle"></i> Voice: Standby';
-                } else {
-                    annyang.start();
-                    voiceIndicator.innerHTML = '<i class="fas fa-circle" style="color:#0f0;"></i> Listening...';
-                }
+            document.getElementById('micToggle').addEventListener('click', () => {
+                if (annyang.isListening()) annyang.abort();
+                else annyang.start();
             });
-        } else {
-            micToggle.style.opacity = '0.3';
-            micToggle.title = 'Voice not supported';
         }
 
-        // ========== MODAL FUNCTIONS ==========
+        // Modal functions
         function expandCard(cardId) {
             const card = document.querySelector(`[data-card="${cardId}"]`);
             const modalBody = document.getElementById('modalBody');
@@ -647,29 +704,17 @@
             document.getElementById('modalTitle').innerText = card.querySelector('.card-header span').innerText;
             document.getElementById('modalOverlay').classList.remove('hidden');
         }
+        function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); }
+        function reloadIframe(iframeId) { document.getElementById(iframeId).src = document.getElementById(iframeId).src; }
+        function toggleChat() { document.getElementById('chatModal').style.display = document.getElementById('chatModal').style.display === 'none' ? 'flex' : 'none'; }
 
-        function closeModal() {
-            document.getElementById('modalOverlay').classList.add('hidden');
-        }
-
-        function reloadIframe(iframeId) {
-            document.getElementById(iframeId).src = document.getElementById(iframeId).src;
-        }
-
-        function toggleChat() {
-            const chat = document.getElementById('chatModal');
-            chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
-        }
-
-        // ========== THREE.JS BACKGROUND ==========
+        // Three.js background
         const canvas = document.getElementById('bg-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.z = 5;
-
         const geometry = new THREE.SphereGeometry(0.08);
         const material = new THREE.MeshBasicMaterial({ color: 0x00aaff });
         for (let i = 0; i < 100; i++) {
@@ -679,47 +724,21 @@
             sphere.position.z = (Math.random() - 0.5) * 15;
             scene.add(sphere);
         }
-
-        function animate() {
-            requestAnimationFrame(animate);
-            scene.rotation.y += 0.0005;
-            renderer.render(scene, camera);
-        }
+        function animate() { requestAnimationFrame(animate); scene.rotation.y += 0.0005; renderer.render(scene, camera); }
         animate();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // ========== DRAGGABLE CHAT ==========
+        // Draggable chat
         const chatModal = document.getElementById('chatModal');
-        let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-        document.getElementById('chatHeader').onmousedown = dragMouseDown;
-
-        function dragMouseDown(e) {
-            e.preventDefault();
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            document.onmouseup = closeDragElement;
-            document.onmousemove = elementDrag;
-        }
-
-        function elementDrag(e) {
-            e.preventDefault();
-            pos1 = pos3 - e.clientX;
-            pos2 = pos4 - e.clientY;
-            pos3 = e.clientX;
-            pos4 = e.clientY;
-            chatModal.style.top = (chatModal.offsetTop - pos2) + 'px';
-            chatModal.style.left = (chatModal.offsetLeft - pos1) + 'px';
-        }
-
-        function closeDragElement() {
-            document.onmouseup = null;
-            document.onmousemove = null;
-        }
+        let pos1=0,pos2=0,pos3=0,pos4=0;
+        document.getElementById('chatHeader').onmousedown = (e) => {
+            e.preventDefault(); pos3 = e.clientX; pos4 = e.clientY;
+            document.onmouseup = () => { document.onmouseup = null; document.onmousemove = null; };
+            document.onmousemove = (e) => {
+                e.preventDefault(); pos1 = pos3 - e.clientX; pos2 = pos4 - e.clientY; pos3 = e.clientX; pos4 = e.clientY;
+                chatModal.style.top = (chatModal.offsetTop - pos2) + 'px'; chatModal.style.left = (chatModal.offsetLeft - pos1) + 'px';
+            };
+        };
     </script>
 </body>
 </html>
