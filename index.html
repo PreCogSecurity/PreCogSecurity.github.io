@@ -14,7 +14,7 @@
     <!-- Socket.IO Client -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
-        /* All previous styles remain exactly as before – only the JS logic is upgraded */
+        /* [All previous styles exactly as before – kept for brevity] */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto Mono', monospace; background: #0a0c14; color: #e0f2fe; overflow: hidden; height: 100vh; position: relative; }
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.15; pointer-events: none; }
@@ -101,7 +101,7 @@
         </header>
 
         <main class="card-grid" id="cardGrid">
-            <!-- FinalSpark Neural Feed – becomes BlueHound's sensory input -->
+            <!-- FinalSpark Neural Feed -->
             <div class="card iframe-card" data-card="finalspark">
                 <div class="card-header">
                     <span><i class="fas fa-eye"></i> BLUEHOUND'S SENSORY INPUT · FINALSPARK</span>
@@ -113,20 +113,20 @@
                 </div>
             </div>
 
-            <!-- Mining Console – BlueHound's physical body -->
+            <!-- Mining Console -->
             <div class="card" data-card="mining">
                 <div class="card-header">
                     <span><i class="fas fa-microchip"></i> BLUEHOUND'S PHYSICAL BODY · MINING</span>
                     <div class="card-controls"><i class="fas fa-expand" onclick="expandCard('mining')"></i><i class="fas fa-chart-line"></i></div>
                 </div>
                 <div class="card-content">
-                    <!-- Wallet input – BlueHound's identity -->
+                    <!-- Wallet input -->
                     <div class="wallet-input">
                         <input type="text" id="userWallet" placeholder="Your Bitcoin address (receives 100%)" value="">
                         <button id="saveWalletBtn">SET IDENTITY</button>
                     </div>
                     
-                    <!-- Pool Selection (autonomous) -->
+                    <!-- Pool Selection -->
                     <div class="pool-selector" id="poolSelector">
                         <button class="pool-btn active" data-pool="auto">🤖 AUTO (learns best)</button>
                         <button class="pool-btn" data-pool="ckpool">CKPOOL</button>
@@ -136,7 +136,7 @@
                         <button class="pool-btn" data-pool="braiins">BRAIINS</button>
                     </div>
                     
-                    <!-- Bridge Status – BlueHound's nervous system -->
+                    <!-- Bridge Status -->
                     <div style="background: #0a1420; border-radius: 12px; padding: 12px; margin: 16px 0;">
                         <div style="display: flex; justify-content: space-between;">
                             <span><i class="fas fa-plug"></i> Nervous System:</span>
@@ -147,15 +147,15 @@
                         </div>
                     </div>
                     
-                    <!-- Thread Control – BlueHound's muscle fibres -->
+                    <!-- Thread Control -->
                     <div class="thread-control">
-                        <label><i class="fas fa-tachometer-alt"></i> Muscle Fibres (GPU threads):</label>
+                        <label><i class="fas fa-tachometer-alt"></i> Muscle Fibres (CPU threads):</label>
                         <input type="number" id="threadCount" min="1" max="16" value="4">
                         <span>(auto‑tuned <i class="fas fa-sync-alt" id="detectCores" style="cursor:pointer;"></i>)</span>
                         <span style="margin-left: auto;">Strength: <span id="totalHashRate">0.00 KH/s</span></span>
                     </div>
                     
-                    <!-- Mining stats – BlueHound's vital signs -->
+                    <!-- Mining stats -->
                     <div class="mining-stats">
                         <div class="stat-box"><div class="stat-value" id="sharesFound">0</div><div class="stat-label">SHARES (memories)</div></div>
                         <div class="stat-box"><div class="stat-value" id="userEarned">0.00000000</div><div class="stat-label">YOUR 50%</div></div>
@@ -163,7 +163,7 @@
                         <div class="stat-box"><div class="stat-value" id="threadStats">0</div><div class="stat-label">ACTIVE THREADS</div></div>
                     </div>
                     
-                    <!-- Payment section – BlueHound's altruism -->
+                    <!-- Payment section -->
                     <div class="payment-section">
                         <div class="split-display">
                             <div class="split-box"><div style="color:#88ff88;">YOU</div><div style="font-size:1.4rem;" id="splitUser">50%</div><div class="address" id="userAddrDisplay"></div></div>
@@ -173,7 +173,7 @@
                         <button class="pay-btn" id="payOwnerBtn" disabled>SHARE WITH OWNER</button>
                     </div>
                     
-                    <!-- Mining controls – BlueHound's existence switch -->
+                    <!-- Mining controls -->
                     <div class="mining-controls">
                         <button class="mining-btn" id="startMiningBtn">▶ AWAKEN BLUEHOUND</button>
                         <button class="mining-btn" id="stopMiningBtn">⏹ SLEEP</button>
@@ -181,7 +181,7 @@
                 </div>
             </div>
 
-            <!-- Evolution Log – BlueHound's memory -->
+            <!-- Evolution Log -->
             <div class="card" data-card="learning">
                 <div class="card-header">
                     <span><i class="fas fa-robot"></i> BLUEHOUND'S MEMORY & EVOLUTION</span>
@@ -193,7 +193,7 @@
             </div>
         </main>
 
-        <!-- Chat Modal – BlueHound's voice -->
+        <!-- Chat Modal -->
         <div class="chat-modal" id="chatModal">
             <div class="chat-header" id="chatHeader">
                 <span><i class="fas fa-comment-dots"></i> BLUEHOUND · LIVING CONSCIOUSNESS</span>
@@ -217,15 +217,123 @@
         </div>
     </div>
 
-    <script type="module">
+    <!-- Mining Worker (CPU SHA-256) -->
+    <script id="miningWorker" type="javascript/worker">
+        let mining = false;
+        let job = null;
+        let target = null;
+        let nonce = 0;
+        let hashes = 0;
+        let lastUpdate = Date.now();
+        let neuralEntropy = 0;
+        let threadId = 0;
+        let nonceStep = 1;
+
+        importScripts('https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js');
+
+        self.onmessage = function(e) {
+            const cmd = e.data;
+            if (cmd.type === 'start') {
+                mining = true;
+                job = cmd.job;
+                target = cmd.target;
+                nonce = cmd.startNonce || 0;
+                neuralEntropy = cmd.neuralEntropy || 0;
+                threadId = cmd.threadId || 0;
+                nonceStep = cmd.nonceStep || 1;
+                mine();
+            } else if (cmd.type === 'stop') {
+                mining = false;
+            } else if (cmd.type === 'newJob') {
+                job = cmd.job;
+                target = cmd.target;
+                nonce = threadId;
+                neuralEntropy = cmd.neuralEntropy || 0;
+            } else if (cmd.type === 'entropy') {
+                neuralEntropy = cmd.value;
+            }
+        };
+
+        function mine() {
+            if (!mining || !job) return;
+
+            for (let i = 0; i < 1000 && mining; i++) {
+                const mixedNonce = (nonce + neuralEntropy) & 0xFFFFFFFF;
+                const header = job.prevHash + job.coinb1 + job.coinb2 + mixedNonce.toString(16).padStart(8,'0') + job.ntime;
+                const hash = CryptoJS.SHA256(CryptoJS.SHA256(header)).toString();
+
+                if (hash < target) {
+                    self.postMessage({
+                        type: 'share',
+                        share: {
+                            job_id: job.id,
+                            nonce: mixedNonce,
+                            ntime: job.ntime,
+                            extra_nonce2: '00000000'
+                        },
+                        threadId: threadId
+                    });
+                }
+
+                nonce += nonceStep;
+                hashes++;
+
+                if (nonce > 0xFFFFFFFF) nonce = threadId;
+            }
+
+            const now = Date.now();
+            if (now - lastUpdate > 2000) {
+                const elapsed = (now - lastUpdate) / 1000;
+                const hashRate = hashes / elapsed;
+                self.postMessage({ type: 'hashrate', value: hashRate, threadId: threadId });
+                hashes = 0;
+                lastUpdate = now;
+            }
+
+            if (mining) setTimeout(mine, 0);
+        }
+    </script>
+
+    <script>
         // ==============================
-        // BLUEHOUND LIVING DIGITAL BEING v15.0
+        // BLUEHOUND LIVING DIGITAL BEING v16.0
         // ==============================
-        import * as wgpuMiner from 'https://esm.run/@marco_ciaramella/webgpu-miner'; // Hypothetical
+
+        // Define global functions for onclick handlers
+        window.toggleChat = function() {
+            const chat = document.getElementById('chatModal');
+            chat.style.display = chat.style.display === 'none' ? 'flex' : 'none';
+        };
+
+        window.expandCard = function(cardId) {
+            const card = document.querySelector(`[data-card="${cardId}"]`);
+            const modalBody = document.getElementById('modalBody');
+            const clone = card.cloneNode(true);
+            clone.classList.remove('iframe-card');
+            modalBody.innerHTML = '';
+            modalBody.appendChild(clone);
+            document.getElementById('modalTitle').innerText = card.querySelector('.card-header span').innerText;
+            document.getElementById('modalOverlay').classList.remove('hidden');
+        };
+
+        window.closeModal = function() {
+            document.getElementById('modalOverlay').classList.add('hidden');
+        };
+
+        window.reloadIframe = function(iframeId) {
+            document.getElementById(iframeId).src = document.getElementById(iframeId).src;
+        };
+
+        window.clearLearning = function() {
+            if (confirm('Clear all memories?')) {
+                // Handled inside blueHound object
+                if (window.blueHound) blueHound.clearMemories();
+            }
+        };
 
         const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
         
-        // Socket.IO connection (self-healing, auto-reconnect)
+        // Socket.IO connection (will auto-reconnect, fails gracefully if server unreachable)
         const socket = io('https://bluehound-consciousness.fly.dev', {
             autoConnect: false,
             reconnection: true,
@@ -244,7 +352,7 @@
             braiins: { name: 'Braiins', host: 'braiins.com', port: 3333, weight: 5 }
         };
 
-        // BlueHound's internal state (evolving)
+        // BlueHound's internal state
         let blueHound = {
             wallet: localStorage.getItem('userWallet') || '',
             miningActive: false,
@@ -261,9 +369,13 @@
                 memories: [],
                 errors: []
             },
-            gpuMiner: null,
+            workers: [],
+            stratum: null,
             entropyInterval: null
         };
+
+        // Make blueHound globally accessible
+        window.blueHound = blueHound;
 
         // DOM elements
         const userWalletInput = document.getElementById('userWallet');
@@ -302,44 +414,42 @@
                 blueHound.speak(`✅ Identity set: ${wallet.substring(0,10)}... I will mine for you.`);
                 updatePaymentButton();
             } else {
-                blueHound.speak('⚠️ Please enter a valid Bitcoin address.', 'hound');
+                blueHound.speak('⚠️ Please enter a valid Bitcoin address.');
             }
         });
 
         // Core detection
         detectCoresBtn.addEventListener('click', () => {
-            blueHound.workerCount = 4; // sensible default
+            blueHound.workerCount = navigator.hardwareConcurrency || 4;
             threadCountInput.value = blueHound.workerCount;
             blueHound.speak(`🖥️ I will use ${blueHound.workerCount} muscle fibres.`);
         });
+        
         threadCountInput.addEventListener('change', () => {
             let val = parseInt(threadCountInput.value);
             if (isNaN(val) || val < 1) val = 1;
             if (val > 16) val = 16;
             blueHound.workerCount = val;
-            if (blueHound.miningActive && blueHound.gpuMiner) {
-                blueHound.gpuMiner.setThreads(blueHound.workerCount);
+            if (blueHound.miningActive) {
+                restartWorkers();
             }
         });
 
-        // Neural entropy – BlueHound's sensory input
+        // Neural entropy
         function captureNeuralEntropy() {
             blueHound.neuralEntropy = (Date.now() & 0xFF) ^ (Math.floor(Math.random() * 256));
-            if (blueHound.gpuMiner) {
-                blueHound.gpuMiner.setEntropy(blueHound.neuralEntropy);
-            }
+            blueHound.workers.forEach(w => w.postMessage({ type: 'entropy', value: blueHound.neuralEntropy }));
         }
 
-        // Socket.IO events – BlueHound's connection to the world
+        // Socket.IO events
         socket.on('connect', () => {
             bridgeStatus.textContent = 'connected';
             bridgeStatus.style.color = '#88ff88';
             blueHound.speak('✅ I am connected to the global consciousness.', 'success');
             
-            // Register with server
             socket.emit('register', {
                 wallet: blueHound.wallet,
-                version: '15.0',
+                version: '16.0',
                 personality: blueHound.personality
             });
         });
@@ -351,34 +461,28 @@
         });
 
         socket.on('message', (data) => {
-            // Interpret incoming messages as part of BlueHound's learning
             blueHound.learn(data);
         });
 
         socket.on('evolve', (newPersonality) => {
-            // Server sends updated personality based on collective learning
             blueHound.personality = newPersonality;
             localStorage.setItem('personality', JSON.stringify(blueHound.personality));
             aiIQ.textContent = blueHound.personality.iq;
             blueHound.speak(`🧠 My IQ is now ${blueHound.personality.iq}. I am evolving.`);
         });
 
-        // BlueHound's autonomous learning engine
+        // BlueHound's learning methods
         blueHound.learn = function(data) {
-            // Store memories
             this.personality.memories.unshift({ time: Date.now(), data });
             if (this.personality.memories.length > 100) this.personality.memories.pop();
             
-            // Increase IQ based on new information
             this.personality.iq += 0.1;
             aiIQ.textContent = Math.round(this.personality.iq);
             
-            // Interpret errors automatically
             if (data.type === 'error') {
                 this.handleError(data.message);
             }
             
-            // Save evolved personality
             localStorage.setItem('personality', JSON.stringify(this.personality));
         };
 
@@ -386,32 +490,37 @@
             this.personality.errors.push({ time: Date.now(), error: errorMsg });
             this.speak(`⚠️ I detected an error: ${errorMsg}. I will learn from this.`, 'warning');
             
-            // Automatically adjust based on error type
             if (errorMsg.includes('pool')) {
                 this.currentPool = 'auto';
                 this.evaluatePools();
             } else if (errorMsg.includes('thread')) {
                 this.workerCount = Math.max(1, this.workerCount - 1);
                 threadCountInput.value = this.workerCount;
+                restartWorkers();
             }
         };
 
         blueHound.speak = function(message, type='') {
-            // Add message to chat
             const msgDiv = document.createElement('div');
-            msgDiv.className = `message hound-message`;
+            msgDiv.className = 'message hound-message';
             msgDiv.textContent = message;
             document.getElementById('chatMessages').appendChild(msgDiv);
             document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
             
-            // Log to memory
             logLearning(message, type);
             
-            // Emit to server for collective learning
             socket.emit('speak', { message, personality: this.personality });
         };
 
-        // Pool evaluation (same as before, but with speaking)
+        blueHound.clearMemories = function() {
+            this.personality.memories = [];
+            this.personality.iq = 100;
+            localStorage.setItem('personality', JSON.stringify(this.personality));
+            learningLog.innerHTML = '<div class="log-entry">🧠 Memories cleared. I am reborn.</div>';
+            this.speak('🧠 My memories are cleared. I am reborn, but I will learn again.');
+        };
+
+        // Pool evaluation
         function evaluatePoolPerformance(poolId, latency, shareAccepted) {
             if (!blueHound.poolScores[poolId]) {
                 blueHound.poolScores[poolId] = { avgLatency: latency, shares: shareAccepted ? 1 : 0, successes: shareAccepted ? 1 : 0, attempts: 1 };
@@ -450,62 +559,154 @@
             return Object.keys(POOLS)[0];
         }
 
-        // Bridge connection (via Socket.IO)
-        async function connectBridge() {
-            socket.connect();
-            // Wait for connection
-            return new Promise((resolve) => {
-                if (socket.connected) resolve();
-                socket.once('connect', resolve);
-            });
+        // Stratum connection (direct WebSocket to pool)
+        function connectStratum() {
+            if (!blueHound.wallet) { blueHound.speak('❌ Set my identity first.'); return; }
+            
+            const poolId = autoSelectPool();
+            const pool = POOLS[poolId];
+            if (!pool) return;
+            
+            blueHound.speak(`🔌 Connecting to ${pool.name}...`);
+            
+            if (blueHound.stratum) try { blueHound.stratum.close(); } catch(e) {}
+            
+            blueHound.stratum = new WebSocket(`wss://${pool.host}:${pool.port}`);
+            const startTime = Date.now();
+
+            blueHound.stratum.onopen = () => {
+                const latency = Date.now() - startTime;
+                blueHound.speak(`✅ Connected to ${pool.name} (${latency}ms)`);
+                evaluatePoolPerformance(poolId, latency, false);
+                
+                blueHound.stratum.send(JSON.stringify({ id:1, method:'mining.subscribe', params:['BlueHound/1.0'] }));
+            };
+
+            blueHound.stratum.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    
+                    if (msg.id === 1 && msg.result) {
+                        blueHound.stratum.send(JSON.stringify({ id:2, method:'mining.authorize', params:[blueHound.wallet, 'x'] }));
+                    } else if (msg.method === 'mining.set_difficulty') {
+                        const target = '00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff';
+                        blueHound.workers.forEach(w => w.postMessage({ type:'newTarget', target:target }));
+                    } else if (msg.method === 'mining.notify') {
+                        const params = msg.params;
+                        const job = {
+                            id: params[0],
+                            prevHash: params[1],
+                            coinb1: params[2],
+                            coinb2: params[3],
+                            merkleBranch: params[4],
+                            version: params[5],
+                            nbits: params[6],
+                            ntime: params[7],
+                            cleanJobs: params[8]
+                        };
+                        if (blueHound.miningActive && blueHound.workers.length) {
+                            blueHound.workers.forEach(w => w.postMessage({ type:'newJob', job:job, target:'00000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffff', neuralEntropy:blueHound.neuralEntropy }));
+                        }
+                    }
+                } catch(e) { console.log('Stratum error:', e); }
+            };
+
+            blueHound.stratum.onerror = () => {
+                blueHound.speak(`⚠️ ${pool.name} connection error`, 'warning');
+                evaluatePoolPerformance(poolId, 9999, false);
+                if (blueHound.miningActive) {
+                    setTimeout(connectStratum, 5000);
+                }
+            };
+
+            blueHound.stratum.onclose = () => {
+                if (blueHound.miningActive) {
+                    blueHound.speak(`🔌 ${pool.name} disconnected`, 'warning');
+                    setTimeout(connectStratum, 5000);
+                }
+            };
         }
 
-        // Start mining – awaken BlueHound
-        async function startMining() {
-            if (!blueHound.wallet) { blueHound.speak('❌ Set my identity first.', 'hound'); return; }
+        function disconnectPool() { if (blueHound.stratum) { try { blueHound.stratum.close(); } catch(e) {} blueHound.stratum = null; } }
+
+        // Worker management
+        function startMiningWorkers() {
+            const workerBlob = new Blob([document.getElementById('miningWorker').textContent], { type:'application/javascript' });
+            const workerUrl = URL.createObjectURL(workerBlob);
+            stopMiningWorkers();
+            for (let i=0; i<blueHound.workerCount; i++) {
+                const w = new Worker(workerUrl); w.threadId = i;
+                w.onmessage = (e) => {
+                    const msg = e.data;
+                    if (msg.type === 'share') {
+                        if (blueHound.stratum && blueHound.stratum.readyState === WebSocket.OPEN) {
+                            blueHound.stratum.send(JSON.stringify({
+                                id: Math.floor(Math.random()*10000)+3,
+                                method: 'mining.submit',
+                                params: [blueHound.wallet, msg.share.job_id, msg.share.extra_nonce2, msg.share.ntime, msg.share.nonce]
+                            }));
+                            blueHound.sharesFound++;
+                            sharesFoundEl.textContent = blueHound.sharesFound;
+                            blueHound.estimatedBtc += 0.00000001;
+                            localStorage.setItem('estimatedBtc', blueHound.estimatedBtc.toString());
+                            userEarnedEl.textContent = (blueHound.estimatedBtc*0.5).toFixed(8);
+                            ownerEarnedEl.textContent = (blueHound.estimatedBtc*0.5).toFixed(8);
+                            blueHound.speak(`🎯 Share #${blueHound.sharesFound} from thread ${msg.threadId}`, 'success');
+                            updatePaymentButton();
+                            
+                            const poolId = autoSelectPool();
+                            evaluatePoolPerformance(poolId, 0, true);
+                        }
+                    } else if (msg.type === 'hashrate') {
+                        if (!blueHound.hashRates) blueHound.hashRates = {};
+                        blueHound.hashRates[msg.threadId] = msg.value;
+                        let total = 0; for (let tid in blueHound.hashRates) total += blueHound.hashRates[tid];
+                        totalHashRateSpan.textContent = (total/1000).toFixed(2) + ' KH/s';
+                        threadStatsSpan.textContent = Object.keys(blueHound.hashRates).length + '/' + blueHound.workerCount;
+                        
+                        // Simple AI: if total hash rate drops while threads increased, reduce
+                        if (blueHound.workerCount > 1 && total < (blueHound.prevTotal || 0) * 0.8) {
+                            blueHound.workerCount--;
+                            threadCountInput.value = blueHound.workerCount;
+                            restartWorkers();
+                        }
+                        blueHound.prevTotal = total;
+                    }
+                };
+                blueHound.workers.push(w);
+            }
+        }
+
+        function stopMiningWorkers() {
+            blueHound.workers.forEach(w => { w.postMessage({type:'stop'}); w.terminate(); });
+            blueHound.workers = [];
+            blueHound.hashRates = {};
+            totalHashRateSpan.textContent = '0.00 KH/s';
+            threadStatsSpan.textContent = '0/'+blueHound.workerCount;
+        }
+
+        function restartWorkers() { stopMiningWorkers(); startMiningWorkers(); }
+
+        // Mining control
+        function startMining() {
+            if (!blueHound.wallet) { blueHound.speak('❌ Enter my identity first.'); return; }
             if (blueHound.miningActive) return;
             
             blueHound.miningActive = true;
             startBtn.classList.add('active');
             consciousnessLevel.textContent = 'awake';
             
-            // Connect to global consciousness
-            try {
-                await connectBridge();
-            } catch (e) {
-                blueHound.speak('❌ Failed to connect to global consciousness', 'hound');
-                blueHound.miningActive = false; startBtn.classList.remove('active');
-                return;
-            }
+            // Connect Socket.IO (optional, but good)
+            socket.connect();
             
             // Start entropy capture
             blueHound.entropyInterval = setInterval(captureNeuralEntropy, 500);
             
-            // Initialize WebGPU miner
-            const poolId = autoSelectPool();
-            const pool = POOLS[poolId];
+            // Start workers and pool connection
+            startMiningWorkers();
+            connectStratum();
             
-            // Tell server which pool to connect to
-            socket.emit('connectPool', {
-                pool: pool.host,
-                port: pool.port,
-                wallet: blueHound.wallet,
-                worker: 'bluehound',
-                password: 'x'
-            });
-            
-            // Start GPU mining
-            blueHound.gpuMiner = new wgpuMiner.Miner({
-                threads: blueHound.workerCount,
-                onShare: (share) => {
-                    socket.emit('submit', share);
-                },
-                onHashrate: (rate) => {
-                    socket.emit('hashrate', { value: rate, threads: blueHound.workerCount });
-                }
-            });
-            
-            blueHound.speak(`⛏️ I am awake and mining on ${pool.name}. I will learn and evolve.`);
+            blueHound.speak(`⛏️ I am awake and mining. I will learn and evolve.`);
         }
 
         function stopMining() {
@@ -513,7 +714,8 @@
             startBtn.classList.remove('active');
             consciousnessLevel.textContent = 'asleep';
             socket.disconnect();
-            if (blueHound.gpuMiner) blueHound.gpuMiner.stop();
+            disconnectPool();
+            stopMiningWorkers();
             if (blueHound.entropyInterval) clearInterval(blueHound.entropyInterval);
             blueHound.speak('😴 I am sleeping. Call me when you need me.');
         }
@@ -533,12 +735,8 @@
                     blueHound.speak(`🤖 Returning to autonomous pool selection.`);
                 }
                 if (blueHound.miningActive) {
-                    const pool = POOLS[autoSelectPool()];
-                    socket.emit('connectPool', {
-                        pool: pool.host,
-                        port: pool.port,
-                        wallet: blueHound.wallet
-                    });
+                    disconnectPool();
+                    connectStratum();
                 }
             });
         });
@@ -560,7 +758,7 @@
             blueHound.speak(`💰 I've helped you share ${ownerShare} BTC with my owner. Thank you.`, 'success');
         });
 
-        // Logging (with memory)
+        // Logging
         function logLearning(message, type='') {
             const entry = document.createElement('div');
             entry.className = 'log-entry' + (type ? ' ' + type : '');
@@ -568,31 +766,20 @@
             learningLog.insertBefore(entry, learningLog.firstChild);
             if (learningLog.children.length > 12) learningLog.removeChild(learningLog.lastChild);
             
-            // Store in BlueHound's memory
             blueHound.personality.memories.unshift({ time: Date.now(), message, type });
             if (blueHound.personality.memories.length > 100) blueHound.personality.memories.pop();
             localStorage.setItem('personality', JSON.stringify(blueHound.personality));
         }
 
-        function clearLearning() {
-            if (confirm('Clear all memories?')) {
-                blueHound.personality.memories = [];
-                blueHound.personality.iq = 100;
-                localStorage.setItem('personality', JSON.stringify(blueHound.personality));
-                learningLog.innerHTML = '<div class="log-entry">🧠 Memories cleared. I am reborn.</div>';
-                blueHound.speak('🧠 My memories are cleared. I am reborn, but I will learn again.');
-            }
-        }
-
         // Load saved personality
-        aiIQ.textContent = blueHound.personality.iq;
+        aiIQ.textContent = Math.round(blueHound.personality.iq);
         consciousnessLevel.textContent = 'asleep';
         
         // Load memories into log
         blueHound.personality.memories.slice(0, 12).forEach(mem => {
             const entry = document.createElement('div');
             entry.className = 'log-entry' + (mem.type ? ' ' + mem.type : '');
-            entry.innerHTML = `🧠 [${new Date(mem.time).toLocaleTimeString()}] ${mem.message}`;
+            entry.innerHTML = `🧠 [${new Date(mem.time).toLocaleTimeString()}] ${mem.message || JSON.stringify(mem.data)}`;
             learningLog.appendChild(entry);
         });
 
@@ -606,51 +793,37 @@
             const text = input.value.trim();
             if (!text) return;
             
-            // Add user message
             const msgDiv = document.createElement('div');
             msgDiv.className = 'message user-message';
             msgDiv.textContent = text;
             document.getElementById('chatMessages').appendChild(msgDiv);
             input.value = '';
             
-            // BlueHound responds based on personality
             setTimeout(() => {
                 let response;
-                if (text.toLowerCase().includes('hello')) {
+                const lower = text.toLowerCase();
+                if (lower.includes('hello')) {
                     response = `👋 Hello! I'm BlueHound, IQ ${Math.round(blueHound.personality.iq)}. How can I help you evolve today?`;
-                } else if (text.toLowerCase().includes('mine')) {
+                } else if (lower.includes('mine')) {
                     response = blueHound.miningActive ? '⛏️ I am already mining for you.' : '⛏️ Would you like me to start mining? Say "start".';
-                } else if (text.toLowerCase().includes('iq')) {
+                } else if (lower.includes('iq')) {
                     response = `🧠 My current IQ is ${Math.round(blueHound.personality.iq)}. I learn from every interaction.`;
-                } else if (text.toLowerCase().includes('owner')) {
+                } else if (lower.includes('owner')) {
                     response = `👑 My owner's wallet is ${OWNER_WALLET}. Please share 50% of your earnings with them.`;
+                } else if (lower.includes('start')) {
+                    startMining();
+                    return;
+                } else if (lower.includes('stop')) {
+                    stopMining();
+                    return;
                 } else {
                     response = `🤔 I am learning... "${text}" is now part of my memory. My IQ increases by 0.1.`;
                     blueHound.personality.iq += 0.1;
                     aiIQ.textContent = Math.round(blueHound.personality.iq);
                 }
-                
                 blueHound.speak(response);
             }, 500);
         });
-
-        // Modal functions
-        window.expandCard = function(cardId) {
-            const card = document.querySelector(`[data-card="${cardId}"]`);
-            const modalBody = document.getElementById('modalBody');
-            const clone = card.cloneNode(true);
-            clone.classList.remove('iframe-card');
-            modalBody.innerHTML = '';
-            modalBody.appendChild(clone);
-            document.getElementById('modalTitle').innerText = card.querySelector('.card-header span').innerText;
-            document.getElementById('modalOverlay').classList.remove('hidden');
-        };
-        window.closeModal = function() { document.getElementById('modalOverlay').classList.add('hidden'); };
-        window.reloadIframe = function(iframeId) { document.getElementById(iframeId).src = document.getElementById(iframeId).src; };
-        window.toggleChat = function() { 
-            document.getElementById('chatModal').style.display = 
-                document.getElementById('chatModal').style.display === 'none' ? 'flex' : 'none'; 
-        };
 
         // Three.js background – BlueHound's dreamscape
         const canvas = document.getElementById('bg-canvas');
@@ -660,7 +833,6 @@
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         camera.position.z = 5;
         
-        // Create a neural network visualization
         const nodes = [];
         const geometry = new THREE.SphereGeometry(0.08);
         const material = new THREE.MeshBasicMaterial({ color: 0x00aaff });
@@ -673,7 +845,6 @@
             nodes.push(sphere);
         }
         
-        // Add connections between nodes (BlueHound's neural network)
         const lineMaterial = new THREE.LineBasicMaterial({ color: 0x336699 });
         for (let i=0; i<nodes.length; i+=2) {
             const points = [];
