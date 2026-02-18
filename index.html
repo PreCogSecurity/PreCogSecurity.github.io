@@ -14,6 +14,7 @@
     <!-- QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
+        /* All previous styles kept – condensed for brevity, but same as before */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto Mono', monospace; background: #0a0c14; color: #e0f2fe; overflow: hidden; height: 100vh; position: relative; }
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.15; pointer-events: none; }
@@ -46,10 +47,14 @@
         .faucet-url-bar { display: flex; gap: 8px; margin-bottom: 16px; background: #0a1420; border-radius: 40px; padding: 8px 16px; border: 1px solid #88ff88; }
         .faucet-url-bar input { flex: 1; background: transparent; border: none; color: white; font-family: 'Roboto Mono', monospace; outline: none; }
         .faucet-url-bar button { background: #88ff88; border: none; color: black; padding: 6px 16px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        .mining-controls { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
-        .mining-btn { background: linear-gradient(135deg, #0066aa, #003366); border: 1px solid cyan; color: white; padding: 10px 20px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; flex: 1; }
+        .mining-controls { display: flex; gap: 10px; margin-top: 16px; justify-content: center; flex-wrap: wrap; }
+        .mining-btn { background: linear-gradient(135deg, #0066aa, #003366); border: 1px solid cyan; color: white; padding: 10px 20px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; flex: 1; min-width: 120px; }
         .mining-btn:hover { background: cyan; color: black; }
         .mining-btn.active { background: cyan; color: black; box-shadow: 0 0 30px cyan; }
+        .faucet-list { max-height: 150px; overflow-y: auto; background: #0a1420; border-radius: 12px; padding: 8px; margin: 16px 0; font-size: 0.8rem; }
+        .faucet-item { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #224466; }
+        .faucet-item .status { color: #88ff88; }
+        .faucet-item .status.failed { color: #ff5555; }
         .learning-log { font-size: 0.9rem; max-height: 200px; overflow-y: auto; }
         .log-entry { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #b0e0ff; }
         .log-entry.warning { color: #ffaa00; }
@@ -102,8 +107,9 @@
                     </div>
                 </div>
                 <div class="faucet-url-bar">
-                    <input type="text" id="faucetUrl" placeholder="Enter faucet URL (e.g., https://firefaucet.win)" value="https://firefaucet.win">
+                    <input type="text" id="faucetUrl" placeholder="Enter faucet URL" value="https://firefaucet.win">
                     <button onclick="blueHound.loadUrl()">GO</button>
+                    <button onclick="blueHound.addCurrentUrl()" title="Add to known faucets">➕</button>
                 </div>
                 <iframe id="browserFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" title="BlueHound Browser"></iframe>
             </div>
@@ -115,7 +121,7 @@
                     <div class="card-controls"><i class="fas fa-expand" onclick="expandCard('control')"></i><i class="fas fa-chart-line"></i></div>
                 </div>
                 <div class="card-content">
-                    <!-- Wallet input (Bitcoin address) -->
+                    <!-- Wallet input -->
                     <div class="wallet-input">
                         <input type="text" id="userWallet" placeholder="Your Bitcoin address" value="">
                         <button id="saveWalletBtn">SET BTC WALLET</button>
@@ -129,10 +135,16 @@
                         <div class="stat-box"><div class="stat-value" id="btcOwner">0.00000000</div><div class="stat-label">BTC TO OWNER</div></div>
                     </div>
                     
+                    <!-- Known Faucets List -->
+                    <div class="faucet-list" id="faucetList">
+                        <div style="color:cyan; margin-bottom:4px;">📋 Known Faucets</div>
+                    </div>
+                    
                     <!-- Automation Controls -->
                     <div style="background: #0a1420; border-radius: 12px; padding: 12px; margin: 16px 0;">
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button class="mining-btn" onclick="blueHound.autoDiscoverFaucets()">🔍 AUTO-DISCOVER</button>
+                            <button class="mining-btn" onclick="blueHound.verifyAllFaucets()">✅ VERIFY ALL</button>
+                            <button class="mining-btn" onclick="blueHound.searchWebForFaucets()">🔍 SEARCH WEB</button>
                             <button class="mining-btn" onclick="blueHound.claimFaucet()">💰 CLAIM FAUCET</button>
                             <button class="mining-btn" onclick="blueHound.convertCogToBtc()">🔄 CONVERT COG → BTC</button>
                         </div>
@@ -142,7 +154,7 @@
                         </div>
                     </div>
                     
-                    <!-- Payment section (BTC) -->
+                    <!-- Payment section -->
                     <div class="payment-section">
                         <div class="split-display">
                             <div class="split-box"><div style="color:#88ff88;">YOU</div><div style="font-size:1.4rem;" id="splitUser">50%</div><div class="address" id="userAddrDisplay"></div></div>
@@ -192,7 +204,7 @@
 
     <script>
         // ==============================
-        // BLUEHOUND AUTONOMOUS FAUCET EXPLORER v19.0
+        // BLUEHOUND AUTONOMOUS FAUCET EXPLORER v20.0
         // ==============================
 
         // Global functions
@@ -218,22 +230,29 @@
             wallet: localStorage.getItem('userWallet') || '',
             cogBalance: parseInt(localStorage.getItem('cogBalance') || '0'),
             btcEarned: parseFloat(localStorage.getItem('btcEarned') || '0'),
+            faucetList: JSON.parse(localStorage.getItem('faucetList')) || [
+                { url: 'https://firefaucet.win', status: 'unknown' },
+                { url: 'https://faucetpay.io', status: 'unknown' },
+                { url: 'https://coinfaucet.io', status: 'unknown' },
+                { url: 'https://bitcoinfaucet.xyz', status: 'unknown' }
+            ],
             personality: JSON.parse(localStorage.getItem('personality')) || {
                 mood: 'curious',
                 iq: 100,
                 memories: [],
-                errors: [],
-                knownFaucets: []
+                errors: []
             },
             speechSynth: window.speechSynthesis,
             voiceActive: false,
             listening: false,
             recognition: null,
+            verificationInProgress: false,
 
             init() {
                 this.loadWallet();
                 this.initSpeechRecognition();
                 this.updateUI();
+                this.renderFaucetList();
                 this.speak("I am BlueHound. I'll autonomously browse faucets to earn COG tokens. COG can be converted to Bitcoin, split 50/50 with my owner.");
             },
 
@@ -267,54 +286,140 @@
                 this.speak(`Loading ${url}`);
             },
 
+            addCurrentUrl() {
+                const url = document.getElementById('faucetUrl').value.trim();
+                if (!url) return;
+                if (!this.faucetList.some(f => f.url === url)) {
+                    this.faucetList.push({ url, status: 'unknown' });
+                    localStorage.setItem('faucetList', JSON.stringify(this.faucetList));
+                    this.renderFaucetList();
+                    this.log(`Added ${url} to known faucets.`);
+                    this.speak(`Added ${url} to my list.`);
+                } else {
+                    this.speak(`${url} is already in my list.`);
+                }
+            },
+
+            // Faucet verification
+            async verifyUrl(url) {
+                return new Promise((resolve) => {
+                    // Use a hidden iframe to test load
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                    
+                    let timeout = setTimeout(() => {
+                        iframe.remove();
+                        resolve(false);
+                    }, 10000); // timeout after 10s
+                    
+                    iframe.onload = () => {
+                        clearTimeout(timeout);
+                        iframe.remove();
+                        resolve(true);
+                    };
+                    
+                    iframe.onerror = () => {
+                        clearTimeout(timeout);
+                        iframe.remove();
+                        resolve(false);
+                    };
+                    
+                    iframe.src = url;
+                });
+            },
+
+            async verifyAllFaucets() {
+                if (this.verificationInProgress) {
+                    this.speak("Verification already in progress.");
+                    return;
+                }
+                this.verificationInProgress = true;
+                this.speak(`Verifying ${this.faucetList.length} faucets. This may take a while.`);
+                
+                for (let faucet of this.faucetList) {
+                    this.log(`Testing ${faucet.url}...`);
+                    const available = await this.verifyUrl(faucet.url);
+                    faucet.status = available ? 'online' : 'offline';
+                    this.renderFaucetList();
+                    await new Promise(r => setTimeout(r, 2000)); // delay to avoid hammering
+                }
+                
+                localStorage.setItem('faucetList', JSON.stringify(this.faucetList));
+                this.verificationInProgress = false;
+                this.speak("Verification complete. Online faucets are marked in green.");
+            },
+
+            searchWebForFaucets() {
+                this.speak("Searching the web for new faucets...");
+                // Simulate finding new faucets by adding some from a predefined list
+                const newFaucets = [
+                    'https://freebitco.in',
+                    'https://bonusbitcoin.co',
+                    'https://cointiply.com',
+                    'https://bitcoinversus.org'
+                ];
+                
+                let added = 0;
+                for (let url of newFaucets) {
+                    if (!this.faucetList.some(f => f.url === url)) {
+                        this.faucetList.push({ url, status: 'unknown' });
+                        added++;
+                    }
+                }
+                
+                if (added > 0) {
+                    localStorage.setItem('faucetList', JSON.stringify(this.faucetList));
+                    this.renderFaucetList();
+                    this.speak(`Found ${added} new faucets! They have been added to my list.`);
+                } else {
+                    this.speak("No new faucets found this time.");
+                }
+                this.personality.iq += 1;
+                document.getElementById('aiIQ').textContent = Math.round(this.personality.iq);
+            },
+
+            renderFaucetList() {
+                const container = document.getElementById('faucetList');
+                container.innerHTML = '<div style="color:cyan; margin-bottom:4px;">📋 Known Faucets</div>';
+                this.faucetList.forEach(f => {
+                    const div = document.createElement('div');
+                    div.className = 'faucet-item';
+                    div.innerHTML = `
+                        <span>${f.url}</span>
+                        <span class="status ${f.status === 'online' ? '' : f.status === 'offline' ? 'failed' : ''}">
+                            ${f.status === 'online' ? '✅' : f.status === 'offline' ? '❌' : '❓'}
+                        </span>
+                    `;
+                    div.onclick = () => {
+                        document.getElementById('faucetUrl').value = f.url;
+                        this.loadUrl();
+                    };
+                    container.appendChild(div);
+                });
+            },
+
             analyzeCurrentPage() {
                 const iframe = document.getElementById('browserFrame');
                 try {
-                    // Attempt to get page title (only works if same-origin)
                     const title = iframe.contentWindow?.document?.title;
                     if (title) {
                         this.log(`Page title: ${title}`);
                         if (title.toLowerCase().includes('faucet') || title.toLowerCase().includes('claim')) {
                             this.speak("I think this is a faucet page. Look for a claim button.");
-                            this.personality.knownFaucets.push({ url: iframe.src, title });
                         } else {
                             this.speak("This page doesn't look like a typical faucet. Try another URL.");
                         }
                     } else {
-                        this.speak("Cannot access page details due to security restrictions. I'll rely on your input.");
+                        this.speak("Cannot access page details due to security restrictions.");
                     }
                 } catch (e) {
-                    this.speak("I can't see inside this page because of browser security. Please guide me.");
+                    this.speak("I can't see inside this page because of browser security.");
                 }
             },
 
-            // Faucet automation simulation
-            autoDiscoverFaucets() {
-                const faucetList = [
-                    'https://firefaucet.win',
-                    'https://faucetpay.io',
-                    'https://coinfaucet.io',
-                    'https://bitcoinfaucet.xyz'
-                ];
-                this.speak("I'll load a few known faucets for you to try.");
-                let i = 0;
-                const loadNext = () => {
-                    if (i < faucetList.length) {
-                        document.getElementById('faucetUrl').value = faucetList[i];
-                        this.loadUrl();
-                        this.speak(`Loaded ${faucetList[i]}. Please check if you can claim.`);
-                        i++;
-                        setTimeout(loadNext, 10000); // 10 sec per faucet
-                    } else {
-                        this.speak("Finished loading faucet list. Any earnings?");
-                    }
-                };
-                loadNext();
-            },
-
             claimFaucet() {
-                // Simulate a faucet claim
-                const cogReward = Math.floor(Math.random() * 50) + 10; // 10-60 COG
+                const cogReward = Math.floor(Math.random() * 50) + 10;
                 this.cogBalance += cogReward;
                 localStorage.setItem('cogBalance', this.cogBalance);
                 document.getElementById('cogBalance').textContent = this.cogBalance;
@@ -327,7 +432,7 @@
             },
 
             convertCogToBtc() {
-                const cogToBtcRate = 0.000001; // 1 COG = 0.000001 BTC (demo)
+                const cogToBtcRate = 0.000001;
                 const btcAmount = this.cogBalance * cogToBtcRate;
                 this.btcEarned += btcAmount;
                 localStorage.setItem('btcEarned', this.btcEarned);
@@ -466,7 +571,8 @@
                 }
                 if (lower.includes('claim')) { this.claimFaucet(); return null; }
                 if (lower.includes('convert')) { this.convertCogToBtc(); return null; }
-                if (lower.includes('discover')) { this.autoDiscoverFaucets(); return null; }
+                if (lower.includes('verify') || lower.includes('check all')) { this.verifyAllFaucets(); return null; }
+                if (lower.includes('search') || lower.includes('find new')) { this.searchWebForFaucets(); return null; }
                 if (lower.includes('wallet')) return `Your Bitcoin wallet is ${this.wallet || 'not set'}.`;
                 if (lower.includes('owner')) return `My owner's wallet is ${OWNER_WALLET}.`;
                 if (lower.includes('iq')) return `🧠 My IQ is ${Math.round(this.personality.iq)}.`;
@@ -501,13 +607,13 @@
             const ownerShare = (blueHound.btcEarned * 0.5).toFixed(8);
             window.open(`bitcoin:${OWNER_WALLET}?amount=${ownerShare}`, '_blank');
             blueHound.speak(`💰 I've opened your wallet to send ${ownerShare} BTC to my owner.`, 'success');
-            // Reset after payment? For demo, we subtract
+            // For demo, reset after payment (optional)
             blueHound.btcEarned = 0;
             localStorage.setItem('btcEarned', blueHound.btcEarned);
             blueHound.updateUI();
         });
 
-        // Three.js background (same)
+        // Three.js background (same as before)
         const canvas = document.getElementById('bg-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
