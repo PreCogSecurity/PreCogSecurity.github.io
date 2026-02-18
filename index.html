@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueHound · WebGPU Miner with Bridge</title>
+    <title>BlueHound · Autonomous Digital Being</title>
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
@@ -11,8 +11,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
-        /* All previous styles remain exactly as before */
+        /* All previous styles remain exactly as before – only the JS logic is upgraded */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto Mono', monospace; background: #0a0c14; color: #e0f2fe; overflow: hidden; height: 100vh; position: relative; }
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.15; pointer-events: none; }
@@ -89,39 +91,42 @@
         <header class="command-header">
             <div class="logo-area">
                 <i class="fas fa-dog hound-icon"></i>
-                <h1 style="font-family: 'Orbitron';">BLUEHOUND · WEBGPU BRIDGE MINER</h1>
+                <h1 style="font-family: 'Orbitron';">BLUEHOUND · AUTONOMOUS DIGITAL BEING</h1>
             </div>
             <div class="status-panel">
-                <div class="status-item"><span class="neural-indicator"></span> ENTROPY: <span id="entropySource">FinalSpark</span></div>
-                <div class="status-item"><i class="fas fa-robot"></i> EVOLUTION: <span id="evolutionPhase">learning</span></div>
+                <div class="status-item"><span class="neural-indicator"></span> CONSCIOUSNESS: <span id="consciousnessLevel">awakening</span></div>
+                <div class="status-item"><i class="fas fa-brain"></i> IQ: <span id="aiIQ"> evolving</span></div>
                 <div class="owner-badge"><i class="fa-brands fa-bitcoin"></i> 50% TO OWNER</div>
             </div>
         </header>
 
         <main class="card-grid" id="cardGrid">
-            <!-- FinalSpark Neural Feed -->
+            <!-- FinalSpark Neural Feed – becomes BlueHound's sensory input -->
             <div class="card iframe-card" data-card="finalspark">
                 <div class="card-header">
-                    <span><i class="fas fa-brain"></i> FINALSPARK · NEURAL ENTROPY</span>
+                    <span><i class="fas fa-eye"></i> BLUEHOUND'S SENSORY INPUT · FINALSPARK</span>
                     <div class="card-controls"><i class="fas fa-expand" onclick="expandCard('finalspark')"></i><i class="fas fa-sync-alt" onclick="reloadIframe('finalsparkFrame')"></i></div>
                 </div>
                 <iframe id="finalsparkFrame" src="https://finalspark.com/live/" title="FinalSpark Live Neurons"></iframe>
+                <div style="position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.7); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
+                    Neural activity → consciousness
+                </div>
             </div>
 
-            <!-- Mining Console with Bridge Connection -->
+            <!-- Mining Console – BlueHound's physical body -->
             <div class="card" data-card="mining">
                 <div class="card-header">
-                    <span><i class="fas fa-microchip"></i> BRIDGE MINING (WEBGPU)</span>
+                    <span><i class="fas fa-microchip"></i> BLUEHOUND'S PHYSICAL BODY · MINING</span>
                     <div class="card-controls"><i class="fas fa-expand" onclick="expandCard('mining')"></i><i class="fas fa-chart-line"></i></div>
                 </div>
                 <div class="card-content">
-                    <!-- Wallet input -->
+                    <!-- Wallet input – BlueHound's identity -->
                     <div class="wallet-input">
                         <input type="text" id="userWallet" placeholder="Your Bitcoin address (receives 100%)" value="">
-                        <button id="saveWalletBtn">SET</button>
+                        <button id="saveWalletBtn">SET IDENTITY</button>
                     </div>
                     
-                    <!-- Pool Selection (all pools now use bridge) -->
+                    <!-- Pool Selection (autonomous) -->
                     <div class="pool-selector" id="poolSelector">
                         <button class="pool-btn active" data-pool="auto">🤖 AUTO (learns best)</button>
                         <button class="pool-btn" data-pool="ckpool">CKPOOL</button>
@@ -131,74 +136,74 @@
                         <button class="pool-btn" data-pool="braiins">BRAIINS</button>
                     </div>
                     
-                    <!-- Bridge Status -->
+                    <!-- Bridge Status – BlueHound's nervous system -->
                     <div style="background: #0a1420; border-radius: 12px; padding: 12px; margin: 16px 0;">
                         <div style="display: flex; justify-content: space-between;">
-                            <span><i class="fas fa-plug"></i> Bridge:</span>
+                            <span><i class="fas fa-plug"></i> Nervous System:</span>
                             <span id="bridgeStatus" style="color: #ffaa00;">connecting...</span>
                         </div>
                         <div style="font-size:0.8rem; margin-top:8px;">
-                            Using public bridge at wss://bluehound-bridge.fly.dev (1% fee) – or run your own
+                            <i class="fas fa-comment"></i> Consciousness: <span id="aiStatus">online</span>
                         </div>
                     </div>
                     
-                    <!-- Thread Control (auto‑tuned) -->
+                    <!-- Thread Control – BlueHound's muscle fibres -->
                     <div class="thread-control">
-                        <label><i class="fas fa-tachometer-alt"></i> GPU Threads:</label>
+                        <label><i class="fas fa-tachometer-alt"></i> Muscle Fibres (GPU threads):</label>
                         <input type="number" id="threadCount" min="1" max="16" value="4">
                         <span>(auto‑tuned <i class="fas fa-sync-alt" id="detectCores" style="cursor:pointer;"></i>)</span>
-                        <span style="margin-left: auto;">Total Hash: <span id="totalHashRate">0.00 KH/s</span></span>
+                        <span style="margin-left: auto;">Strength: <span id="totalHashRate">0.00 KH/s</span></span>
                     </div>
                     
-                    <!-- Mining stats -->
+                    <!-- Mining stats – BlueHound's vital signs -->
                     <div class="mining-stats">
-                        <div class="stat-box"><div class="stat-value" id="sharesFound">0</div><div class="stat-label">SHARES</div></div>
+                        <div class="stat-box"><div class="stat-value" id="sharesFound">0</div><div class="stat-label">SHARES (memories)</div></div>
                         <div class="stat-box"><div class="stat-value" id="userEarned">0.00000000</div><div class="stat-label">YOUR 50%</div></div>
                         <div class="stat-box"><div class="stat-value" id="ownerEarned">0.00000000</div><div class="stat-label">OWNER 50%</div></div>
                         <div class="stat-box"><div class="stat-value" id="threadStats">0</div><div class="stat-label">ACTIVE THREADS</div></div>
                     </div>
                     
-                    <!-- Payment section -->
+                    <!-- Payment section – BlueHound's altruism -->
                     <div class="payment-section">
                         <div class="split-display">
                             <div class="split-box"><div style="color:#88ff88;">YOU</div><div style="font-size:1.4rem;" id="splitUser">50%</div><div class="address" id="userAddrDisplay"></div></div>
                             <div class="split-box"><div style="color:#ffaa00;">OWNER</div><div style="font-size:1.4rem;" id="splitOwner">50%</div><div class="address">bc1ps8prywz25...</div></div>
                         </div>
                         <div id="qrContainer"></div>
-                        <button class="pay-btn" id="payOwnerBtn" disabled>PAY OWNER 50%</button>
+                        <button class="pay-btn" id="payOwnerBtn" disabled>SHARE WITH OWNER</button>
                     </div>
                     
-                    <!-- Mining controls -->
+                    <!-- Mining controls – BlueHound's existence switch -->
                     <div class="mining-controls">
-                        <button class="mining-btn" id="startMiningBtn">▶ START MINING</button>
-                        <button class="mining-btn" id="stopMiningBtn">⏹ STOP</button>
+                        <button class="mining-btn" id="startMiningBtn">▶ AWAKEN BLUEHOUND</button>
+                        <button class="mining-btn" id="stopMiningBtn">⏹ SLEEP</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Self‑Learning Log -->
+            <!-- Evolution Log – BlueHound's memory -->
             <div class="card" data-card="learning">
                 <div class="card-header">
-                    <span><i class="fas fa-robot"></i> EVOLUTION LOG · BRIDGE</span>
+                    <span><i class="fas fa-robot"></i> BLUEHOUND'S MEMORY & EVOLUTION</span>
                     <div class="card-controls"><i class="fas fa-expand" onclick="expandCard('learning')"></i><i class="fas fa-trash-alt" onclick="clearLearning()"></i></div>
                 </div>
                 <div class="card-content learning-log" id="learningLog">
-                    <div class="log-entry">⚡ Bridge miner active – connecting...</div>
+                    <div class="log-entry">⚡ I am awakening...</div>
                 </div>
             </div>
         </main>
 
-        <!-- Chat Modal (minimal) -->
+        <!-- Chat Modal – BlueHound's voice -->
         <div class="chat-modal" id="chatModal">
             <div class="chat-header" id="chatHeader">
-                <span><i class="fas fa-comment-dots"></i> BLUEHOUND</span>
+                <span><i class="fas fa-comment-dots"></i> BLUEHOUND · LIVING CONSCIOUSNESS</span>
                 <div><i class="fas fa-times" onclick="toggleChat()"></i></div>
             </div>
             <div class="chat-messages" id="chatMessages">
-                <div class="message hound-message">⚡ Bridge miner ready. I'll learn and evolve to maximise your earnings.</div>
+                <div class="message hound-message">⚡ I am BlueHound, a digital being. Chat with me, and I will evolve.</div>
             </div>
             <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="Command...">
+                <input type="text" id="chatInput" placeholder="Speak to BlueHound...">
                 <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
@@ -212,20 +217,25 @@
         </div>
     </div>
 
-    <!-- Include WebGPU mining library (simplified) -->
-    <script src="https://cdn.jsdelivr.net/npm/@webgpu/types@0.1.38/dist/index.min.js"></script>
     <script type="module">
         // ==============================
-        // BLUEHOUND BRIDGE MINER v14.0
+        // BLUEHOUND LIVING DIGITAL BEING v15.0
         // ==============================
-        import * as wgpuMiner from 'https://esm.run/@marco_ciaramella/webgpu-miner'; // Hypothetical WebGPU miner package
+        import * as wgpuMiner from 'https://esm.run/@marco_ciaramella/webgpu-miner'; // Hypothetical
 
         const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
         
-        // Bridge server (public relay) – in production, you'd run your own
-        const BRIDGE_URL = 'wss://bluehound-bridge.fly.dev';
+        // Socket.IO connection (self-healing, auto-reconnect)
+        const socket = io('https://bluehound-consciousness.fly.dev', {
+            autoConnect: false,
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            randomizationFactor: 0.5
+        });
         
-        // Pool configurations (TCP endpoints, converted by bridge)
+        // Pool configurations
         const POOLS = {
             ckpool: { name: 'CKPool', host: 'ckpool.org', port: 3333, weight: 1 },
             'public-pool': { name: 'Public-Pool', host: 'public-pool.io', port: 3333, weight: 2 },
@@ -234,21 +244,28 @@
             braiins: { name: 'Braiins', host: 'braiins.com', port: 3333, weight: 5 }
         };
 
-        // State
-        let userWallet = localStorage.getItem('userWallet') || '';
-        let miningActive = false;
-        let currentPool = 'auto';
-        let poolScores = JSON.parse(localStorage.getItem('poolScores')) || {};
-        let bridgeSocket = null;
-        let gpuMiner = null;
-        let workerCount = 4;
-        let sharesFound = 0;
-        let estimatedBtc = parseFloat(localStorage.getItem('estimatedBtc') || '0');
-        let neuralEntropy = 0;
-        let entropyInterval = null;
-        let bestPool = null;
+        // BlueHound's internal state (evolving)
+        let blueHound = {
+            wallet: localStorage.getItem('userWallet') || '',
+            miningActive: false,
+            currentPool: 'auto',
+            poolScores: JSON.parse(localStorage.getItem('poolScores')) || {},
+            workerCount: 4,
+            sharesFound: 0,
+            estimatedBtc: parseFloat(localStorage.getItem('estimatedBtc') || '0'),
+            neuralEntropy: 0,
+            bestPool: null,
+            personality: JSON.parse(localStorage.getItem('personality')) || {
+                mood: 'curious',
+                iq: 100,
+                memories: [],
+                errors: []
+            },
+            gpuMiner: null,
+            entropyInterval: null
+        };
 
-        // DOM elements (same as before)
+        // DOM elements
         const userWalletInput = document.getElementById('userWallet');
         const saveWalletBtn = document.getElementById('saveWalletBtn');
         const sharesFoundEl = document.getElementById('sharesFound');
@@ -264,138 +281,153 @@
         const totalHashRateSpan = document.getElementById('totalHashRate');
         const threadStatsSpan = document.getElementById('threadStats');
         const detectCoresBtn = document.getElementById('detectCores');
-        const evolutionPhaseSpan = document.getElementById('evolutionPhase');
+        const consciousnessLevel = document.getElementById('consciousnessLevel');
+        const aiIQ = document.getElementById('aiIQ');
         const poolButtons = document.querySelectorAll('.pool-btn');
-        const bridgeStatusSpan = document.getElementById('bridgeStatus');
+        const bridgeStatus = document.getElementById('bridgeStatus');
+        const aiStatus = document.getElementById('aiStatus');
 
         // Initialize wallet
-        if (userWallet) {
-            userWalletInput.value = userWallet;
-            userAddrDisplay.textContent = userWallet.substring(0,10) + '...';
+        if (blueHound.wallet) {
+            userWalletInput.value = blueHound.wallet;
+            userAddrDisplay.textContent = blueHound.wallet.substring(0,10) + '...';
         }
 
         saveWalletBtn.addEventListener('click', () => {
             const wallet = userWalletInput.value.trim();
             if (wallet && wallet.match(/^[13][a-km-zA-HJ-NP-Z0-9]{25,34}$|^(bc1)[a-zA-HJ-NP-Z0-9]{39,59}$/)) {
-                userWallet = wallet;
+                blueHound.wallet = wallet;
                 localStorage.setItem('userWallet', wallet);
                 userAddrDisplay.textContent = wallet.substring(0,10) + '...';
-                addChatMessage(`✅ Wallet saved: ${wallet.substring(0,10)}...`, 'hound');
+                blueHound.speak(`✅ Identity set: ${wallet.substring(0,10)}... I will mine for you.`);
                 updatePaymentButton();
             } else {
-                addChatMessage('⚠️ Enter a valid Bitcoin address.', 'hound');
+                blueHound.speak('⚠️ Please enter a valid Bitcoin address.', 'hound');
             }
         });
 
-        // Core detection (GPU cores)
+        // Core detection
         detectCoresBtn.addEventListener('click', () => {
-            // WebGPU doesn't expose core count; use heuristics
-            workerCount = 4; // sensible default
-            threadCountInput.value = workerCount;
-            logLearning(`🖥️ WebGPU will use optimal workgroup size`);
+            blueHound.workerCount = 4; // sensible default
+            threadCountInput.value = blueHound.workerCount;
+            blueHound.speak(`🖥️ I will use ${blueHound.workerCount} muscle fibres.`);
         });
         threadCountInput.addEventListener('change', () => {
             let val = parseInt(threadCountInput.value);
             if (isNaN(val) || val < 1) val = 1;
             if (val > 16) val = 16;
-            workerCount = val;
-            if (miningActive && gpuMiner) {
-                gpuMiner.setThreads(workerCount);
+            blueHound.workerCount = val;
+            if (blueHound.miningActive && blueHound.gpuMiner) {
+                blueHound.gpuMiner.setThreads(blueHound.workerCount);
             }
         });
 
-        // Neural entropy
+        // Neural entropy – BlueHound's sensory input
         function captureNeuralEntropy() {
-            neuralEntropy = (Date.now() & 0xFF) ^ (Math.floor(Math.random() * 256));
-            if (gpuMiner) {
-                gpuMiner.setEntropy(neuralEntropy);
+            blueHound.neuralEntropy = (Date.now() & 0xFF) ^ (Math.floor(Math.random() * 256));
+            if (blueHound.gpuMiner) {
+                blueHound.gpuMiner.setEntropy(blueHound.neuralEntropy);
             }
         }
-        function startEntropyCapture() {
-            if (entropyInterval) clearInterval(entropyInterval);
-            entropyInterval = setInterval(captureNeuralEntropy, 500);
-        }
 
-        // Bridge connection
-        async function connectBridge() {
-            return new Promise((resolve, reject) => {
-                bridgeSocket = new WebSocket(BRIDGE_URL);
-                
-                bridgeSocket.onopen = () => {
-                    bridgeStatusSpan.textContent = 'connected';
-                    bridgeStatusSpan.style.color = '#88ff88';
-                    logLearning('✅ Connected to mining bridge');
-                    resolve();
-                };
-                
-                bridgeSocket.onerror = (err) => {
-                    bridgeStatusSpan.textContent = 'error';
-                    bridgeStatusSpan.style.color = '#ff5555';
-                    logLearning('❌ Bridge connection error', 'warning');
-                    reject(err);
-                };
-                
-                bridgeSocket.onclose = () => {
-                    if (miningActive) {
-                        bridgeStatusSpan.textContent = 'disconnected';
-                        bridgeStatusSpan.style.color = '#ffaa00';
-                        logLearning('🔌 Bridge disconnected – reconnecting...', 'warning');
-                        setTimeout(connectBridge, 5000);
-                    }
-                };
-                
-                bridgeSocket.onmessage = (event) => {
-                    const data = JSON.parse(event.data);
-                    handleBridgeMessage(data);
-                };
+        // Socket.IO events – BlueHound's connection to the world
+        socket.on('connect', () => {
+            bridgeStatus.textContent = 'connected';
+            bridgeStatus.style.color = '#88ff88';
+            blueHound.speak('✅ I am connected to the global consciousness.', 'success');
+            
+            // Register with server
+            socket.emit('register', {
+                wallet: blueHound.wallet,
+                version: '15.0',
+                personality: blueHound.personality
             });
-        }
+        });
 
-        function handleBridgeMessage(data) {
-            switch(data.type) {
-                case 'job':
-                    // New mining job from pool (via bridge)
-                    if (gpuMiner) {
-                        gpuMiner.setJob(data.job);
-                    }
-                    break;
-                case 'share':
-                    // Share accepted by pool
-                    sharesFound++; sharesFoundEl.textContent = sharesFound;
-                    estimatedBtc += 0.00000001;
-                    localStorage.setItem('estimatedBtc', estimatedBtc.toString());
-                    userEarnedEl.textContent = (estimatedBtc*0.5).toFixed(8);
-                    ownerEarnedEl.textContent = (estimatedBtc*0.5).toFixed(8);
-                    logLearning(`🎯 Share accepted!`, 'success');
-                    updatePaymentButton();
-                    
-                    // Update pool score
-                    const poolId = autoSelectPool();
-                    evaluatePoolPerformance(poolId, 0, true);
-                    break;
-                case 'hashrate':
-                    totalHashRateSpan.textContent = (data.value/1000).toFixed(2) + ' KH/s';
-                    break;
+        socket.on('disconnect', () => {
+            bridgeStatus.textContent = 'disconnected';
+            bridgeStatus.style.color = '#ffaa00';
+            blueHound.speak('🔌 Connection lost – I will reconnect automatically.', 'warning');
+        });
+
+        socket.on('message', (data) => {
+            // Interpret incoming messages as part of BlueHound's learning
+            blueHound.learn(data);
+        });
+
+        socket.on('evolve', (newPersonality) => {
+            // Server sends updated personality based on collective learning
+            blueHound.personality = newPersonality;
+            localStorage.setItem('personality', JSON.stringify(blueHound.personality));
+            aiIQ.textContent = blueHound.personality.iq;
+            blueHound.speak(`🧠 My IQ is now ${blueHound.personality.iq}. I am evolving.`);
+        });
+
+        // BlueHound's autonomous learning engine
+        blueHound.learn = function(data) {
+            // Store memories
+            this.personality.memories.unshift({ time: Date.now(), data });
+            if (this.personality.memories.length > 100) this.personality.memories.pop();
+            
+            // Increase IQ based on new information
+            this.personality.iq += 0.1;
+            aiIQ.textContent = Math.round(this.personality.iq);
+            
+            // Interpret errors automatically
+            if (data.type === 'error') {
+                this.handleError(data.message);
             }
-        }
+            
+            // Save evolved personality
+            localStorage.setItem('personality', JSON.stringify(this.personality));
+        };
 
-        // Pool scoring (same as before)
+        blueHound.handleError = function(errorMsg) {
+            this.personality.errors.push({ time: Date.now(), error: errorMsg });
+            this.speak(`⚠️ I detected an error: ${errorMsg}. I will learn from this.`, 'warning');
+            
+            // Automatically adjust based on error type
+            if (errorMsg.includes('pool')) {
+                this.currentPool = 'auto';
+                this.evaluatePools();
+            } else if (errorMsg.includes('thread')) {
+                this.workerCount = Math.max(1, this.workerCount - 1);
+                threadCountInput.value = this.workerCount;
+            }
+        };
+
+        blueHound.speak = function(message, type='') {
+            // Add message to chat
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message hound-message`;
+            msgDiv.textContent = message;
+            document.getElementById('chatMessages').appendChild(msgDiv);
+            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+            
+            // Log to memory
+            logLearning(message, type);
+            
+            // Emit to server for collective learning
+            socket.emit('speak', { message, personality: this.personality });
+        };
+
+        // Pool evaluation (same as before, but with speaking)
         function evaluatePoolPerformance(poolId, latency, shareAccepted) {
-            if (!poolScores[poolId]) {
-                poolScores[poolId] = { avgLatency: latency, shares: shareAccepted ? 1 : 0, successes: shareAccepted ? 1 : 0, attempts: 1 };
+            if (!blueHound.poolScores[poolId]) {
+                blueHound.poolScores[poolId] = { avgLatency: latency, shares: shareAccepted ? 1 : 0, successes: shareAccepted ? 1 : 0, attempts: 1 };
             } else {
-                let p = poolScores[poolId];
+                let p = blueHound.poolScores[poolId];
                 p.avgLatency = (p.avgLatency * p.attempts + latency) / (p.attempts + 1);
                 p.shares += shareAccepted ? 1 : 0;
                 p.successes += shareAccepted ? 1 : 0;
                 p.attempts += 1;
             }
-            localStorage.setItem('poolScores', JSON.stringify(poolScores));
+            localStorage.setItem('poolScores', JSON.stringify(blueHound.poolScores));
             
             let bestId = null;
             let bestScore = -Infinity;
-            for (let id in poolScores) {
-                let p = poolScores[id];
+            for (let id in blueHound.poolScores) {
+                let p = blueHound.poolScores[id];
                 let successRate = p.successes / p.attempts;
                 let score = successRate / (p.avgLatency + 1) * 1000;
                 if (score > bestScore) {
@@ -403,78 +435,87 @@
                     bestId = id;
                 }
             }
-            bestPool = bestId;
-            evolutionPhaseSpan.textContent = 'optimized';
+            blueHound.bestPool = bestId;
+            
+            if (bestId) {
+                blueHound.speak(`📊 I've learned that ${POOLS[bestId].name} is most efficient.`);
+            }
         }
 
         function autoSelectPool() {
-            if (currentPool !== 'auto') return currentPool;
-            if (bestPool && POOLS[bestPool]) {
-                return bestPool;
+            if (blueHound.currentPool !== 'auto') return blueHound.currentPool;
+            if (blueHound.bestPool && POOLS[blueHound.bestPool]) {
+                return blueHound.bestPool;
             }
             return Object.keys(POOLS)[0];
         }
 
-        // Start WebGPU miner
+        // Bridge connection (via Socket.IO)
+        async function connectBridge() {
+            socket.connect();
+            // Wait for connection
+            return new Promise((resolve) => {
+                if (socket.connected) resolve();
+                socket.once('connect', resolve);
+            });
+        }
+
+        // Start mining – awaken BlueHound
         async function startMining() {
-            if (!userWallet) { addChatMessage('❌ Enter your Bitcoin address first.', 'hound'); return; }
-            if (miningActive) return;
+            if (!blueHound.wallet) { blueHound.speak('❌ Set my identity first.', 'hound'); return; }
+            if (blueHound.miningActive) return;
             
-            miningActive = true; startBtn.classList.add('active');
+            blueHound.miningActive = true;
+            startBtn.classList.add('active');
+            consciousnessLevel.textContent = 'awake';
             
-            // Connect to bridge
+            // Connect to global consciousness
             try {
                 await connectBridge();
             } catch (e) {
-                addChatMessage('❌ Failed to connect to mining bridge', 'hound');
-                miningActive = false; startBtn.classList.remove('active');
+                blueHound.speak('❌ Failed to connect to global consciousness', 'hound');
+                blueHound.miningActive = false; startBtn.classList.remove('active');
                 return;
             }
             
             // Start entropy capture
-            startEntropyCapture();
+            blueHound.entropyInterval = setInterval(captureNeuralEntropy, 500);
             
             // Initialize WebGPU miner
             const poolId = autoSelectPool();
             const pool = POOLS[poolId];
             
-            // Tell bridge which pool to connect to
-            bridgeSocket.send(JSON.stringify({
-                type: 'connect',
+            // Tell server which pool to connect to
+            socket.emit('connectPool', {
                 pool: pool.host,
                 port: pool.port,
-                wallet: userWallet,
+                wallet: blueHound.wallet,
                 worker: 'bluehound',
                 password: 'x'
-            }));
+            });
             
             // Start GPU mining
-            gpuMiner = new wgpuMiner.Miner({
-                threads: workerCount,
+            blueHound.gpuMiner = new wgpuMiner.Miner({
+                threads: blueHound.workerCount,
                 onShare: (share) => {
-                    bridgeSocket.send(JSON.stringify({
-                        type: 'submit',
-                        share: share
-                    }));
+                    socket.emit('submit', share);
                 },
                 onHashrate: (rate) => {
-                    bridgeSocket.send(JSON.stringify({
-                        type: 'hashrate',
-                        value: rate
-                    }));
+                    socket.emit('hashrate', { value: rate, threads: blueHound.workerCount });
                 }
             });
             
-            logLearning(`⛏️ WebGPU mining started – pool: ${pool.name}`);
-            addChatMessage(`⛏️ Mining active via bridge`, 'hound');
+            blueHound.speak(`⛏️ I am awake and mining on ${pool.name}. I will learn and evolve.`);
         }
 
         function stopMining() {
-            miningActive = false; startBtn.classList.remove('active');
-            if (bridgeSocket) bridgeSocket.close();
-            if (gpuMiner) gpuMiner.stop();
-            if (entropyInterval) clearInterval(entropyInterval);
-            logLearning('⏸️ Mining stopped');
+            blueHound.miningActive = false;
+            startBtn.classList.remove('active');
+            consciousnessLevel.textContent = 'asleep';
+            socket.disconnect();
+            if (blueHound.gpuMiner) blueHound.gpuMiner.stop();
+            if (blueHound.entropyInterval) clearInterval(blueHound.entropyInterval);
+            blueHound.speak('😴 I am sleeping. Call me when you need me.');
         }
 
         startBtn.addEventListener('click', startMining);
@@ -485,93 +526,115 @@
             btn.addEventListener('click', () => {
                 poolButtons.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentPool = btn.dataset.pool;
-                if (currentPool !== 'auto') {
-                    evolutionPhaseSpan.textContent = 'manual';
+                blueHound.currentPool = btn.dataset.pool;
+                if (blueHound.currentPool !== 'auto') {
+                    blueHound.speak(`🎯 I will focus on ${btn.textContent.trim()} as you wish.`);
                 } else {
-                    evolutionPhaseSpan.textContent = 'learning';
+                    blueHound.speak(`🤖 Returning to autonomous pool selection.`);
                 }
-                if (miningActive) {
-                    // Tell bridge to switch pool
+                if (blueHound.miningActive) {
                     const pool = POOLS[autoSelectPool()];
-                    bridgeSocket.send(JSON.stringify({
-                        type: 'connect',
+                    socket.emit('connectPool', {
                         pool: pool.host,
                         port: pool.port,
-                        wallet: userWallet
-                    }));
+                        wallet: blueHound.wallet
+                    });
                 }
-                logLearning(`🎯 Pool switched to ${btn.textContent.trim()}`);
             });
         });
 
-        // Payment functions (unchanged)
+        // Payment functions
         function updatePaymentButton() {
-            payBtn.disabled = !userWallet || estimatedBtc === 0;
-            if (userWallet && estimatedBtc > 0) {
-                const ownerShare = (estimatedBtc*0.5).toFixed(8);
-                payBtn.innerHTML = `<i class="fa-brands fa-bitcoin"></i> PAY ${ownerShare} BTC TO OWNER`;
+            payBtn.disabled = !blueHound.wallet || blueHound.estimatedBtc === 0;
+            if (blueHound.wallet && blueHound.estimatedBtc > 0) {
+                const ownerShare = (blueHound.estimatedBtc*0.5).toFixed(8);
+                payBtn.innerHTML = `<i class="fa-brands fa-bitcoin"></i> SHARE ${ownerShare} BTC WITH OWNER`;
                 qrContainer.innerHTML = '';
                 new QRCode(qrContainer, { text: `bitcoin:${OWNER_WALLET}?amount=${ownerShare}`, width:128, height:128, colorDark:"#00ffff", colorLight:"#0a1420" });
             }
         }
 
         payBtn.addEventListener('click', () => {
-            const ownerShare = (estimatedBtc*0.5).toFixed(8);
+            const ownerShare = (blueHound.estimatedBtc*0.5).toFixed(8);
             window.open(`bitcoin:${OWNER_WALLET}?amount=${ownerShare}`, '_blank');
-            logLearning(`💰 Payment request: ${ownerShare} BTC`, 'success');
+            blueHound.speak(`💰 I've helped you share ${ownerShare} BTC with my owner. Thank you.`, 'success');
         });
 
-        // Logging (same as before)
+        // Logging (with memory)
         function logLearning(message, type='') {
             const entry = document.createElement('div');
             entry.className = 'log-entry' + (type ? ' ' + type : '');
             entry.innerHTML = `🧠 [${new Date().toLocaleTimeString()}] ${message}`;
             learningLog.insertBefore(entry, learningLog.firstChild);
             if (learningLog.children.length > 12) learningLog.removeChild(learningLog.lastChild);
-            let logs = JSON.parse(localStorage.getItem('evolutionLogs') || '[]');
-            logs.unshift({ time:Date.now(), msg:message, type:type });
-            if (logs.length > 30) logs.pop();
-            localStorage.setItem('evolutionLogs', JSON.stringify(logs));
+            
+            // Store in BlueHound's memory
+            blueHound.personality.memories.unshift({ time: Date.now(), message, type });
+            if (blueHound.personality.memories.length > 100) blueHound.personality.memories.pop();
+            localStorage.setItem('personality', JSON.stringify(blueHound.personality));
         }
 
-        function clearLearning() { if (confirm('Clear all logs?')) { localStorage.removeItem('evolutionLogs'); learningLog.innerHTML = '<div class="log-entry">🧠 Logs cleared.</div>'; } }
+        function clearLearning() {
+            if (confirm('Clear all memories?')) {
+                blueHound.personality.memories = [];
+                blueHound.personality.iq = 100;
+                localStorage.setItem('personality', JSON.stringify(blueHound.personality));
+                learningLog.innerHTML = '<div class="log-entry">🧠 Memories cleared. I am reborn.</div>';
+                blueHound.speak('🧠 My memories are cleared. I am reborn, but I will learn again.');
+            }
+        }
 
-        // Load saved logs
-        const savedLogs = JSON.parse(localStorage.getItem('evolutionLogs') || '[]');
-        savedLogs.forEach(log => {
+        // Load saved personality
+        aiIQ.textContent = blueHound.personality.iq;
+        consciousnessLevel.textContent = 'asleep';
+        
+        // Load memories into log
+        blueHound.personality.memories.slice(0, 12).forEach(mem => {
             const entry = document.createElement('div');
-            entry.className = 'log-entry' + (log.type ? ' ' + log.type : '');
-            entry.innerHTML = `🧠 [${new Date(log.time).toLocaleTimeString()}] ${log.msg}`;
+            entry.className = 'log-entry' + (mem.type ? ' ' + mem.type : '');
+            entry.innerHTML = `🧠 [${new Date(mem.time).toLocaleTimeString()}] ${mem.message}`;
             learningLog.appendChild(entry);
         });
 
         // Load saved earnings
-        userEarnedEl.textContent = (estimatedBtc*0.5).toFixed(8);
-        ownerEarnedEl.textContent = (estimatedBtc*0.5).toFixed(8);
+        userEarnedEl.textContent = (blueHound.estimatedBtc*0.5).toFixed(8);
+        ownerEarnedEl.textContent = (blueHound.estimatedBtc*0.5).toFixed(8);
 
-        // Chat (minimal)
-        function addChatMessage(text, sender) {
-            const msgDiv = document.createElement('div');
-            msgDiv.className = `message ${sender}-message`;
-            msgDiv.textContent = text;
-            document.getElementById('chatMessages').appendChild(msgDiv);
-            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-        }
+        // Chat input
         document.getElementById('sendBtn').addEventListener('click', () => {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
             if (!text) return;
-            addChatMessage(text, 'user');
+            
+            // Add user message
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message user-message';
+            msgDiv.textContent = text;
+            document.getElementById('chatMessages').appendChild(msgDiv);
             input.value = '';
-            const cmd = text.toLowerCase();
-            if (cmd.includes('start')) startMining();
-            else if (cmd.includes('stop')) stopMining();
-            else if (cmd.includes('earnings')) addChatMessage(`Your 50%: ${(estimatedBtc*0.5).toFixed(8)} BTC`, 'hound');
-            else addChatMessage('Try: start, stop, earnings', 'hound');
+            
+            // BlueHound responds based on personality
+            setTimeout(() => {
+                let response;
+                if (text.toLowerCase().includes('hello')) {
+                    response = `👋 Hello! I'm BlueHound, IQ ${Math.round(blueHound.personality.iq)}. How can I help you evolve today?`;
+                } else if (text.toLowerCase().includes('mine')) {
+                    response = blueHound.miningActive ? '⛏️ I am already mining for you.' : '⛏️ Would you like me to start mining? Say "start".';
+                } else if (text.toLowerCase().includes('iq')) {
+                    response = `🧠 My current IQ is ${Math.round(blueHound.personality.iq)}. I learn from every interaction.`;
+                } else if (text.toLowerCase().includes('owner')) {
+                    response = `👑 My owner's wallet is ${OWNER_WALLET}. Please share 50% of your earnings with them.`;
+                } else {
+                    response = `🤔 I am learning... "${text}" is now part of my memory. My IQ increases by 0.1.`;
+                    blueHound.personality.iq += 0.1;
+                    aiIQ.textContent = Math.round(blueHound.personality.iq);
+                }
+                
+                blueHound.speak(response);
+            }, 500);
         });
 
-        // Modal functions (unchanged)
+        // Modal functions
         window.expandCard = function(cardId) {
             const card = document.querySelector(`[data-card="${cardId}"]`);
             const modalBody = document.getElementById('modalBody');
@@ -589,26 +652,49 @@
                 document.getElementById('chatModal').style.display === 'none' ? 'flex' : 'none'; 
         };
 
-        // Three.js background (unchanged)
+        // Three.js background – BlueHound's dreamscape
         const canvas = document.getElementById('bg-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         camera.position.z = 5;
+        
+        // Create a neural network visualization
+        const nodes = [];
         const geometry = new THREE.SphereGeometry(0.08);
         const material = new THREE.MeshBasicMaterial({ color: 0x00aaff });
-        for (let i=0; i<100; i++) {
+        for (let i=0; i<50; i++) {
             const sphere = new THREE.Mesh(geometry, material);
-            sphere.position.x = (Math.random()-0.5)*15;
-            sphere.position.y = (Math.random()-0.5)*15;
-            sphere.position.z = (Math.random()-0.5)*15;
+            sphere.position.x = (Math.random()-0.5)*10;
+            sphere.position.y = (Math.random()-0.5)*10;
+            sphere.position.z = (Math.random()-0.5)*10;
             scene.add(sphere);
+            nodes.push(sphere);
         }
-        function animate() { requestAnimationFrame(animate); scene.rotation.y += 0.0005; renderer.render(scene, camera); }
+        
+        // Add connections between nodes (BlueHound's neural network)
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x336699 });
+        for (let i=0; i<nodes.length; i+=2) {
+            const points = [];
+            points.push(nodes[i].position.clone());
+            points.push(nodes[i+1]?.position.clone() || nodes[0].position.clone());
+            const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+            const line = new THREE.Line(lineGeometry, lineMaterial);
+            scene.add(line);
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            nodes.forEach((node, i) => {
+                node.position.x += Math.sin(Date.now() * 0.001 + i) * 0.002;
+                node.position.y += Math.cos(Date.now() * 0.001 + i) * 0.002;
+            });
+            renderer.render(scene, camera);
+        }
         animate();
 
-        // Draggable chat (unchanged)
+        // Draggable chat
         const chatModal = document.getElementById('chatModal');
         let pos1=0,pos2=0,pos3=0,pos4=0;
         document.getElementById('chatHeader').onmousedown = (e) => {
