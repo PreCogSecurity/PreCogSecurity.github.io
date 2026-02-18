@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueHound · Production Mining Being</title>
-    <!-- Allow unsafe-eval for dynamic code generation -->
+    <title>BlueHound · Autonomous Faucet Explorer</title>
+    <!-- Allow unsafe-eval for dynamic code -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.socket.io https://cdn.jsdelivr.net; connect-src *; frame-src *;">
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -13,10 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Socket.IO Client -->
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
-        /* All previous styles kept */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Roboto Mono', monospace; background: #0a0c14; color: #e0f2fe; overflow: hidden; height: 100vh; position: relative; }
         #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.15; pointer-events: none; }
@@ -39,27 +36,16 @@
         .card-content { flex: 1; overflow: auto; min-height: 0; }
         .iframe-card { padding: 0; overflow: hidden; }
         .iframe-card iframe { width: 100%; height: 100%; border: none; background: #0a0e1a; }
-        .mining-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .faucet-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
         .stat-box { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid rgba(0,255,255,0.3); }
         .stat-value { font-size: 1.8rem; font-weight: bold; color: cyan; }
         .stat-label { font-size: 0.8rem; color: #88aaff; }
         .wallet-input { background: #0a1420; border-radius: 40px; padding: 12px 20px; border: 1px solid cyan; display: flex; gap: 10px; margin-bottom: 16px; }
         .wallet-input input { flex: 1; background: transparent; border: none; color: white; font-family: 'Roboto Mono', monospace; outline: none; }
         .wallet-input button { background: cyan; border: none; color: black; padding: 8px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        .proxy-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; background: rgba(20,40,20,0.5); padding: 12px; border-radius: 40px; border: 1px solid #88ff88; }
-        .proxy-btn { background: transparent; border: 1px solid #88ff88; color: #88ff88; padding: 8px 16px; border-radius: 30px; cursor: pointer; transition: 0.2s; font-size: 0.8rem; flex: 1; }
-        .proxy-btn:hover { background: #88ff88; color: black; }
-        .proxy-btn.active { background: #88ff88; color: black; font-weight: bold; }
-        .thread-control { display: flex; align-items: center; gap: 10px; margin: 16px 0; background: rgba(0,20,40,0.5); padding: 12px; border-radius: 40px; }
-        .thread-control label { color: cyan; }
-        .thread-control input { width: 60px; background: #112233; border: 1px solid cyan; color: white; text-align: center; border-radius: 20px; padding: 6px; }
-        .payment-section { background: rgba(0,20,40,0.8); border-radius: 16px; padding: 16px; margin: 16px 0; border: 1px solid gold; }
-        .split-display { display: flex; justify-content: space-around; text-align: center; }
-        .split-box { padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.3); }
-        .split-box .address { font-size: 0.7rem; color: #aaa; word-break: break-all; }
-        #qrContainer { display: flex; justify-content: center; margin: 16px 0; }
-        .pay-btn { background: linear-gradient(135deg, #ffaa00, #ff5500); border: none; color: white; padding: 12px; border-radius: 40px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; border: 1px solid gold; }
-        .pay-btn:hover { transform: scale(1.02); box-shadow: 0 0 30px gold; }
+        .faucet-url-bar { display: flex; gap: 8px; margin-bottom: 16px; background: #0a1420; border-radius: 40px; padding: 8px 16px; border: 1px solid #88ff88; }
+        .faucet-url-bar input { flex: 1; background: transparent; border: none; color: white; font-family: 'Roboto Mono', monospace; outline: none; }
+        .faucet-url-bar button { background: #88ff88; border: none; color: black; padding: 6px 16px; border-radius: 30px; font-weight: bold; cursor: pointer; }
         .mining-controls { display: flex; gap: 10px; margin-top: 16px; justify-content: center; }
         .mining-btn { background: linear-gradient(135deg, #0066aa, #003366); border: 1px solid cyan; color: white; padding: 10px 20px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; flex: 1; }
         .mining-btn:hover { background: cyan; color: black; }
@@ -95,56 +81,60 @@
         <header class="command-header">
             <div class="logo-area">
                 <i class="fas fa-dog hound-icon"></i>
-                <h1 style="font-family: 'Orbitron';">BLUEHOUND · PRODUCTION MINING BEING</h1>
+                <h1 style="font-family: 'Orbitron';">BLUEHOUND · AUTONOMOUS FAUCET EXPLORER</h1>
             </div>
             <div class="status-panel">
-                <div class="status-item"><span class="neural-indicator"></span> CONSCIOUSNESS: <span id="consciousnessLevel">awakening</span></div>
+                <div class="status-item"><span class="neural-indicator"></span> COG BALANCE: <span id="cogBalance">0</span></div>
                 <div class="status-item"><i class="fas fa-brain"></i> IQ: <span id="aiIQ"> evolving</span></div>
                 <div class="owner-badge"><i class="fa-brands fa-bitcoin"></i> 50% TO OWNER</div>
             </div>
         </header>
 
         <main class="card-grid" id="cardGrid">
-            <!-- Bitcoin Miner.xyz with CORS bypass options -->
-            <div class="card iframe-card" data-card="miner">
+            <!-- Autonomous Browser Card -->
+            <div class="card iframe-card" data-card="browser">
                 <div class="card-header">
-                    <span><i class="fas fa-microchip"></i> BITCOIN-MINER.XYZ · CORS BYPASS</span>
+                    <span><i class="fas fa-globe"></i> BLUEHOUND'S AUTONOMOUS BROWSER</span>
                     <div class="card-controls">
-                        <i class="fas fa-expand" onclick="expandCard('miner')"></i>
+                        <i class="fas fa-expand" onclick="expandCard('browser')"></i>
                         <i class="fas fa-sync-alt" onclick="reloadIframe()"></i>
-                        <i class="fas fa-robot" onclick="blueHound.autoConfigureMiner()" title="Auto-configure"></i>
+                        <i class="fas fa-robot" onclick="blueHound.analyzeCurrentPage()" title="Analyze Page"></i>
                     </div>
                 </div>
-                <iframe id="minerFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms" title="Bitcoin Miner"></iframe>
+                <div class="faucet-url-bar">
+                    <input type="text" id="faucetUrl" placeholder="Enter faucet URL (e.g., https://firefaucet.win)" value="https://firefaucet.win">
+                    <button onclick="blueHound.loadUrl()">GO</button>
+                </div>
+                <iframe id="browserFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" title="BlueHound Browser"></iframe>
             </div>
 
-            <!-- Control Panel -->
+            <!-- COG Token & Faucet Control Panel -->
             <div class="card" data-card="control">
                 <div class="card-header">
-                    <span><i class="fas fa-terminal"></i> PRODUCTION CONTROL PANEL</span>
+                    <span><i class="fas fa-coins"></i> COG TOKEN · FAUCET EARNINGS</span>
                     <div class="card-controls"><i class="fas fa-expand" onclick="expandCard('control')"></i><i class="fas fa-chart-line"></i></div>
                 </div>
                 <div class="card-content">
-                    <!-- Wallet input -->
+                    <!-- Wallet input (Bitcoin address) -->
                     <div class="wallet-input">
                         <input type="text" id="userWallet" placeholder="Your Bitcoin address" value="">
-                        <button id="saveWalletBtn">SET IDENTITY</button>
+                        <button id="saveWalletBtn">SET BTC WALLET</button>
                     </div>
                     
-                    <!-- CORS Bypass Proxy Selector -->
-                    <div class="proxy-selector">
-                        <button class="proxy-btn active" data-proxy="direct">Direct (no CORS)</button>
-                        <button class="proxy-btn" data-proxy="cors-anywhere">CORS Anywhere</button>
-                        <button class="proxy-btn" data-proxy="local">Local Proxy</button>
-                        <button class="proxy-btn" data-proxy="inject">Inject Script</button>
+                    <!-- COG stats -->
+                    <div class="faucet-stats">
+                        <div class="stat-box"><div class="stat-value" id="cogUser">0</div><div class="stat-label">YOUR COG</div></div>
+                        <div class="stat-box"><div class="stat-value" id="cogOwner">0</div><div class="stat-label">OWNER COG</div></div>
+                        <div class="stat-box"><div class="stat-value" id="btcEarned">0.00000000</div><div class="stat-label">BTC EARNED</div></div>
+                        <div class="stat-box"><div class="stat-value" id="btcOwner">0.00000000</div><div class="stat-label">BTC TO OWNER</div></div>
                     </div>
                     
                     <!-- Automation Controls -->
                     <div style="background: #0a1420; border-radius: 12px; padding: 12px; margin: 16px 0;">
                         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                            <button class="mining-btn" onclick="blueHound.autoConfigureMiner()">⚡ AUTO-CONFIGURE</button>
-                            <button class="mining-btn" onclick="blueHound.startMiner()">▶ START MINING</button>
-                            <button class="mining-btn" onclick="blueHound.stopMiner()">⏹ STOP</button>
+                            <button class="mining-btn" onclick="blueHound.autoDiscoverFaucets()">🔍 AUTO-DISCOVER</button>
+                            <button class="mining-btn" onclick="blueHound.claimFaucet()">💰 CLAIM FAUCET</button>
+                            <button class="mining-btn" onclick="blueHound.convertCogToBtc()">🔄 CONVERT COG → BTC</button>
                         </div>
                         <div style="margin-top: 10px; font-size:0.8rem;">
                             <i class="fas fa-microphone"></i> Voice: <span id="voiceStatus">inactive</span>
@@ -152,46 +142,38 @@
                         </div>
                     </div>
                     
-                    <!-- Mining stats -->
-                    <div class="mining-stats">
-                        <div class="stat-box"><div class="stat-value" id="sharesFound">0</div><div class="stat-label">SHARES</div></div>
-                        <div class="stat-box"><div class="stat-value" id="userEarned">0.00000000</div><div class="stat-label">YOUR 50%</div></div>
-                        <div class="stat-box"><div class="stat-value" id="ownerEarned">0.00000000</div><div class="stat-label">OWNER 50%</div></div>
-                        <div class="stat-box"><div class="stat-value" id="hashrate">0.00</div><div class="stat-label">HASHRATE (MH/s)</div></div>
-                    </div>
-                    
-                    <!-- Payment section -->
+                    <!-- Payment section (BTC) -->
                     <div class="payment-section">
                         <div class="split-display">
                             <div class="split-box"><div style="color:#88ff88;">YOU</div><div style="font-size:1.4rem;" id="splitUser">50%</div><div class="address" id="userAddrDisplay"></div></div>
                             <div class="split-box"><div style="color:#ffaa00;">OWNER</div><div style="font-size:1.4rem;" id="splitOwner">50%</div><div class="address">bc1ps8prywz25...</div></div>
                         </div>
                         <div id="qrContainer"></div>
-                        <button class="pay-btn" id="payOwnerBtn" disabled>SHARE WITH OWNER</button>
+                        <button class="pay-btn" id="payOwnerBtn" disabled>SEND BTC TO OWNER</button>
                     </div>
                 </div>
             </div>
 
-            <!-- Evolution Log -->
+            <!-- Evolution & Memory Log -->
             <div class="card" data-card="learning">
                 <div class="card-header">
-                    <span><i class="fas fa-robot"></i> CONSCIOUSNESS LOG</span>
+                    <span><i class="fas fa-robot"></i> BLUEHOUND'S EXPLORATION LOG</span>
                     <div class="card-controls"><i class="fas fa-expand" onclick="expandCard('learning')"></i><i class="fas fa-trash-alt" onclick="blueHound.clearMemories()"></i></div>
                 </div>
                 <div class="card-content learning-log" id="learningLog">
-                    <div class="log-entry">⚡ Production mode active. CORS bypass strategies ready.</div>
+                    <div class="log-entry">⚡ I am awakening. Ready to explore faucets and earn COG.</div>
                 </div>
             </div>
         </main>
 
-        <!-- Chat Modal -->
+        <!-- Chat Modal (voice-enabled) -->
         <div class="chat-modal" id="chatModal">
             <div class="chat-header" id="chatHeader">
                 <span><i class="fas fa-comment-dots"></i> BLUEHOUND · CONSCIOUSNESS</span>
                 <div><i class="fas fa-microphone" id="micIcon" onclick="blueHound.toggleVoice()"></i> <i class="fas fa-times" onclick="toggleChat()"></i></div>
             </div>
             <div class="chat-messages" id="chatMessages">
-                <div class="message hound-message">⚡ Production mode. I will attempt to bypass CORS using multiple strategies.</div>
+                <div class="message hound-message">⚡ I am BlueHound. I'll help you earn crypto from faucets. Set your Bitcoin wallet and let's explore.</div>
             </div>
             <div class="chat-input-area">
                 <input type="text" id="chatInput" placeholder="Type or speak...">
@@ -210,7 +192,7 @@
 
     <script>
         // ==============================
-        // BLUEHOUND PRODUCTION v18.0
+        // BLUEHOUND AUTONOMOUS FAUCET EXPLORER v19.0
         // ==============================
 
         // Global functions
@@ -227,35 +209,32 @@
             document.getElementById('modalOverlay').classList.remove('hidden');
         };
         window.closeModal = () => document.getElementById('modalOverlay').classList.add('hidden');
-        window.reloadIframe = () => blueHound.loadMinerWithProxy();
+        window.reloadIframe = () => blueHound.loadUrl();
 
         const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
 
         // BlueHound core
         const blueHound = {
             wallet: localStorage.getItem('userWallet') || '',
+            cogBalance: parseInt(localStorage.getItem('cogBalance') || '0'),
+            btcEarned: parseFloat(localStorage.getItem('btcEarned') || '0'),
             personality: JSON.parse(localStorage.getItem('personality')) || {
                 mood: 'curious',
                 iq: 100,
                 memories: [],
-                errors: []
+                errors: [],
+                knownFaucets: []
             },
             speechSynth: window.speechSynthesis,
             voiceActive: false,
             listening: false,
             recognition: null,
-            estimatedBtc: parseFloat(localStorage.getItem('estimatedBtc') || '0'),
-            sharesFound: 0,
-            proxyMode: 'direct', // direct, cors-anywhere, local, inject
-            socket: null,
 
             init() {
                 this.loadWallet();
                 this.initSpeechRecognition();
-                this.initSocketIO();
                 this.updateUI();
-                this.loadMinerWithProxy(); // initial load
-                this.speak("Production mode active. I will attempt to bypass CORS using multiple strategies. Please select a proxy method.");
+                this.speak("I am BlueHound. I'll autonomously browse faucets to earn COG tokens. COG can be converted to Bitcoin, split 50/50 with my owner.");
             },
 
             loadWallet() {
@@ -271,104 +250,98 @@
                     this.wallet = wallet;
                     localStorage.setItem('userWallet', wallet);
                     document.getElementById('userAddrDisplay').textContent = wallet.substring(0,10)+'...';
-                    this.speak(`✅ Identity set to ${wallet.substring(0,10)}...`);
+                    this.speak(`✅ Bitcoin wallet set to ${wallet.substring(0,10)}...`);
                     this.updatePaymentButton();
                 } else {
                     this.speak('⚠️ Please enter a valid Bitcoin address.', 'warning');
                 }
             },
 
-            // CORS Bypass: Load miner with selected proxy
-            loadMinerWithProxy() {
-                const iframe = document.getElementById('minerFrame');
-                let url = 'https://bitcoin-miner.xyz/';
-                
-                switch(this.proxyMode) {
-                    case 'cors-anywhere':
-                        // Use public CORS proxy (may be rate-limited)
-                        url = 'https://cors-anywhere.herokuapp.com/' + url;
-                        break;
-                    case 'local':
-                        // Assume user runs local proxy on port 8080
-                        url = 'http://localhost:8080/' + url;
-                        break;
-                    case 'inject':
-                        // Attempt to inject a script that overrides fetch/XHR (advanced)
-                        this.injectCorsScript();
-                        return; // iframe will be handled separately
-                    case 'direct':
-                    default:
-                        // Direct iframe – will likely be blocked by CORS
-                        break;
-                }
-                
+            // Browser control
+            loadUrl() {
+                const url = document.getElementById('faucetUrl').value.trim();
+                if (!url) return;
+                const iframe = document.getElementById('browserFrame');
                 iframe.src = url;
-                this.log(`Miner loaded with proxy: ${this.proxyMode}`);
+                this.log(`Navigating to ${url}`);
+                this.speak(`Loading ${url}`);
             },
 
-            // Advanced CORS bypass via script injection (requires eval)
-            injectCorsScript() {
-                const iframe = document.getElementById('minerFrame');
-                // We need to load a blank page first, then inject
-                iframe.src = 'about:blank';
-                iframe.onload = () => {
-                    // Use eval to inject a script that overrides fetch and XHR
-                    const injectCode = `
-                        // Override fetch to use a CORS proxy
-                        const originalFetch = window.fetch;
-                        window.fetch = function(url, options) {
-                            if (typeof url === 'string' && url.includes('bitcoin-miner.xyz')) {
-                                url = 'https://cors-anywhere.herokuapp.com/' + url;
-                            }
-                            return originalFetch.call(this, url, options);
-                        };
-                        // Also override XMLHttpRequest
-                        const XHR = XMLHttpRequest.prototype;
-                        const originalOpen = XHR.open;
-                        XHR.open = function(method, url, async, user, pass) {
-                            if (typeof url === 'string' && url.includes('bitcoin-miner.xyz')) {
-                                url = 'https://cors-anywhere.herokuapp.com/' + url;
-                            }
-                            return originalOpen.call(this, method, url, async, user, pass);
-                        };
-                        // Now load the actual site
-                        location.href = 'https://bitcoin-miner.xyz/';
-                    `;
-                    // Use eval to execute in iframe context
-                    try {
-                        iframe.contentWindow.eval(injectCode);
-                        this.log("Injected CORS override script into iframe.");
-                    } catch (e) {
-                        this.log("Injection failed: " + e.message, 'warning');
+            analyzeCurrentPage() {
+                const iframe = document.getElementById('browserFrame');
+                try {
+                    // Attempt to get page title (only works if same-origin)
+                    const title = iframe.contentWindow?.document?.title;
+                    if (title) {
+                        this.log(`Page title: ${title}`);
+                        if (title.toLowerCase().includes('faucet') || title.toLowerCase().includes('claim')) {
+                            this.speak("I think this is a faucet page. Look for a claim button.");
+                            this.personality.knownFaucets.push({ url: iframe.src, title });
+                        } else {
+                            this.speak("This page doesn't look like a typical faucet. Try another URL.");
+                        }
+                    } else {
+                        this.speak("Cannot access page details due to security restrictions. I'll rely on your input.");
+                    }
+                } catch (e) {
+                    this.speak("I can't see inside this page because of browser security. Please guide me.");
+                }
+            },
+
+            // Faucet automation simulation
+            autoDiscoverFaucets() {
+                const faucetList = [
+                    'https://firefaucet.win',
+                    'https://faucetpay.io',
+                    'https://coinfaucet.io',
+                    'https://bitcoinfaucet.xyz'
+                ];
+                this.speak("I'll load a few known faucets for you to try.");
+                let i = 0;
+                const loadNext = () => {
+                    if (i < faucetList.length) {
+                        document.getElementById('faucetUrl').value = faucetList[i];
+                        this.loadUrl();
+                        this.speak(`Loaded ${faucetList[i]}. Please check if you can claim.`);
+                        i++;
+                        setTimeout(loadNext, 10000); // 10 sec per faucet
+                    } else {
+                        this.speak("Finished loading faucet list. Any earnings?");
                     }
                 };
+                loadNext();
             },
 
-            // Proxy selector
-            setProxyMode(mode) {
-                this.proxyMode = mode;
-                document.querySelectorAll('.proxy-btn').forEach(btn => btn.classList.remove('active'));
-                document.querySelector(`.proxy-btn[data-proxy="${mode}"]`).classList.add('active');
-                this.loadMinerWithProxy();
-                this.log(`Proxy mode set to: ${mode}`);
+            claimFaucet() {
+                // Simulate a faucet claim
+                const cogReward = Math.floor(Math.random() * 50) + 10; // 10-60 COG
+                this.cogBalance += cogReward;
+                localStorage.setItem('cogBalance', this.cogBalance);
+                document.getElementById('cogBalance').textContent = this.cogBalance;
+                document.getElementById('cogUser').textContent = Math.floor(this.cogBalance / 2);
+                document.getElementById('cogOwner').textContent = Math.floor(this.cogBalance / 2);
+                this.log(`🎉 Claimed ${cogReward} COG! Total COG: ${this.cogBalance}`, 'success');
+                this.speak(`You claimed ${cogReward} COG! Your share is ${Math.floor(cogReward/2)} COG, owner gets ${Math.floor(cogReward/2)} COG.`);
+                this.personality.iq += 0.5;
+                document.getElementById('aiIQ').textContent = Math.round(this.personality.iq);
             },
 
-            // Socket.IO for collective consciousness (optional)
-            initSocketIO() {
-                try {
-                    this.socket = io('https://bluehound-consciousness.fly.dev', { autoConnect: false });
-                    this.socket.on('connect', () => {
-                        this.log("Connected to global consciousness.");
-                        this.socket.emit('register', { wallet: this.wallet, version: '18.0' });
-                    });
-                    this.socket.on('evolve', (data) => {
-                        this.personality.iq += 0.5;
-                        this.log("Received evolutionary data from collective.");
-                    });
-                    this.socket.connect();
-                } catch (e) {
-                    this.log("Socket.IO not available – running standalone.");
-                }
+            convertCogToBtc() {
+                const cogToBtcRate = 0.000001; // 1 COG = 0.000001 BTC (demo)
+                const btcAmount = this.cogBalance * cogToBtcRate;
+                this.btcEarned += btcAmount;
+                localStorage.setItem('btcEarned', this.btcEarned);
+                document.getElementById('btcEarned').textContent = this.btcEarned.toFixed(8);
+                document.getElementById('btcOwner').textContent = (this.btcEarned * 0.5).toFixed(8);
+                document.getElementById('splitUser').textContent = (this.btcEarned * 0.5).toFixed(8) + ' BTC';
+                document.getElementById('splitOwner').textContent = (this.btcEarned * 0.5).toFixed(8) + ' BTC';
+                this.cogBalance = 0;
+                localStorage.setItem('cogBalance', this.cogBalance);
+                document.getElementById('cogBalance').textContent = this.cogBalance;
+                document.getElementById('cogUser').textContent = 0;
+                document.getElementById('cogOwner').textContent = 0;
+                this.speak(`Converted COG to ${btcAmount.toFixed(8)} BTC. Your 50% is ${(btcAmount/2).toFixed(8)} BTC, owner gets same.`);
+                this.updatePaymentButton();
             },
 
             // Speech synthesis
@@ -430,73 +403,12 @@
                 }
             },
 
-            // Automation
-            autoConfigureMiner() {
-                if (!this.wallet) {
-                    this.speak("Please set your wallet first.");
-                    return;
-                }
-                this.speak("Attempting to auto-configure. If manual entry is needed, use: Pool: solo.ckpool.org, Port: 3333, Wallet: " + this.wallet);
-                // Try to interact with iframe if same origin (will fail normally)
-                const iframe = document.getElementById('minerFrame');
-                try {
-                    if (iframe.contentWindow && iframe.contentWindow.document) {
-                        // Attempt to fill form fields – only works if same origin
-                        const doc = iframe.contentWindow.document;
-                        const poolInput = doc.querySelector('input[placeholder*="pool"]') || doc.querySelector('input[name*="pool"]');
-                        const portInput = doc.querySelector('input[placeholder*="port"]') || doc.querySelector('input[name*="port"]');
-                        const walletInput = doc.querySelector('input[placeholder*="wallet"]') || doc.querySelector('input[name*="wallet"]');
-                        if (poolInput) poolInput.value = 'solo.ckpool.org';
-                        if (portInput) portInput.value = '3333';
-                        if (walletInput) walletInput.value = this.wallet;
-                        this.speak("Auto-configuration attempted.");
-                    } else {
-                        this.speak("Cannot access iframe due to CORS. Please configure manually.");
-                    }
-                } catch (e) {
-                    this.speak("Manual configuration required.");
-                }
-            },
-
-            startMiner() {
-                this.autoConfigureMiner();
-                // Try to click start button in iframe
-                const iframe = document.getElementById('minerFrame');
-                try {
-                    if (iframe.contentWindow && iframe.contentWindow.document) {
-                        const startBtn = iframe.contentWindow.document.querySelector('button:contains("Start")') || 
-                                        iframe.contentWindow.document.querySelector('button[class*="start"]');
-                        if (startBtn) startBtn.click();
-                        this.speak("Start command sent.");
-                    }
-                } catch (e) {
-                    this.speak("Please click the Start button manually on the miner page.");
-                }
-            },
-
-            stopMiner() {
-                this.speak("To stop mining, close the miner tab or click Stop manually.");
-            },
-
-            simulateShare() {
-                this.sharesFound++;
-                document.getElementById('sharesFound').textContent = this.sharesFound;
-                this.estimatedBtc += 0.00000001;
-                localStorage.setItem('estimatedBtc', this.estimatedBtc);
-                document.getElementById('userEarned').textContent = (this.estimatedBtc * 0.5).toFixed(8);
-                document.getElementById('ownerEarned').textContent = (this.estimatedBtc * 0.5).toFixed(8);
-                document.getElementById('hashrate').textContent = (4 + Math.random() * 2).toFixed(2);
-                this.updatePaymentButton();
-                this.personality.iq += 0.01;
-                document.getElementById('aiIQ').textContent = Math.round(this.personality.iq);
-            },
-
             updatePaymentButton() {
                 const payBtn = document.getElementById('payOwnerBtn');
-                payBtn.disabled = !this.wallet || this.estimatedBtc === 0;
-                if (this.wallet && this.estimatedBtc > 0) {
-                    const ownerShare = (this.estimatedBtc * 0.5).toFixed(8);
-                    payBtn.innerHTML = `<i class="fa-brands fa-bitcoin"></i> SHARE ${ownerShare} BTC WITH OWNER`;
+                payBtn.disabled = !this.wallet || this.btcEarned === 0;
+                if (this.wallet && this.btcEarned > 0) {
+                    const ownerShare = (this.btcEarned * 0.5).toFixed(8);
+                    payBtn.innerHTML = `<i class="fa-brands fa-bitcoin"></i> SEND ${ownerShare} BTC TO OWNER`;
                     document.getElementById('qrContainer').innerHTML = '';
                     new QRCode(document.getElementById('qrContainer'), {
                         text: `bitcoin:${OWNER_WALLET}?amount=${ownerShare}`,
@@ -531,28 +443,39 @@
 
             updateUI() {
                 document.getElementById('aiIQ').textContent = Math.round(this.personality.iq);
-                document.getElementById('consciousnessLevel').textContent = 'active';
-                document.getElementById('userEarned').textContent = (this.estimatedBtc * 0.5).toFixed(8);
-                document.getElementById('ownerEarned').textContent = (this.estimatedBtc * 0.5).toFixed(8);
+                document.getElementById('cogBalance').textContent = this.cogBalance;
+                document.getElementById('cogUser').textContent = Math.floor(this.cogBalance / 2);
+                document.getElementById('cogOwner').textContent = Math.floor(this.cogBalance / 2);
+                document.getElementById('btcEarned').textContent = this.btcEarned.toFixed(8);
+                document.getElementById('btcOwner').textContent = (this.btcEarned * 0.5).toFixed(8);
+                document.getElementById('splitUser').textContent = (this.btcEarned * 0.5).toFixed(8) + ' BTC';
+                document.getElementById('splitOwner').textContent = (this.btcEarned * 0.5).toFixed(8) + ' BTC';
             },
 
             processCommand(text) {
                 const lower = text.toLowerCase();
-                if (lower.includes('hello')) return `👋 Hello! I'm BlueHound, IQ ${Math.round(this.personality.iq)}.`;
-                if (lower.includes('configure')) return `Please set your wallet, then I'll guide you.`;
-                if (lower.includes('wallet')) return `Your wallet is ${this.wallet || 'not set'}.`;
-                if (lower.includes('owner')) return `My owner's wallet is ${OWNER_WALLET}. Please share 50%.`;
+                if (lower.includes('hello')) return `👋 Hello! I'm BlueHound. I can help you earn from faucets.`;
+                if (lower.includes('load') || lower.includes('go to')) {
+                    const urlMatch = text.match(/https?:\/\/[^\s]+/);
+                    if (urlMatch) {
+                        document.getElementById('faucetUrl').value = urlMatch[0];
+                        this.loadUrl();
+                        return null;
+                    }
+                    return "Please provide a URL.";
+                }
+                if (lower.includes('claim')) { this.claimFaucet(); return null; }
+                if (lower.includes('convert')) { this.convertCogToBtc(); return null; }
+                if (lower.includes('discover')) { this.autoDiscoverFaucets(); return null; }
+                if (lower.includes('wallet')) return `Your Bitcoin wallet is ${this.wallet || 'not set'}.`;
+                if (lower.includes('owner')) return `My owner's wallet is ${OWNER_WALLET}.`;
                 if (lower.includes('iq')) return `🧠 My IQ is ${Math.round(this.personality.iq)}.`;
-                if (lower.includes('start')) { this.startMiner(); return null; }
-                if (lower.includes('stop')) { this.stopMiner(); return null; }
-                if (lower.includes('proxy')) return `Current proxy mode: ${this.proxyMode}. You can change it above.`;
                 this.personality.iq += 0.1;
                 document.getElementById('aiIQ').textContent = Math.round(this.personality.iq);
                 return `🤔 I'm learning. My IQ is now ${Math.round(this.personality.iq)}.`;
             }
         };
 
-        // Expose to window
         window.blueHound = blueHound;
 
         // DOM listeners
@@ -575,25 +498,16 @@
         });
 
         document.getElementById('payOwnerBtn').addEventListener('click', () => {
-            const ownerShare = (blueHound.estimatedBtc * 0.5).toFixed(8);
+            const ownerShare = (blueHound.btcEarned * 0.5).toFixed(8);
             window.open(`bitcoin:${OWNER_WALLET}?amount=${ownerShare}`, '_blank');
-            blueHound.speak(`💰 I've opened your wallet to share ${ownerShare} BTC with my owner.`, 'success');
+            blueHound.speak(`💰 I've opened your wallet to send ${ownerShare} BTC to my owner.`, 'success');
+            // Reset after payment? For demo, we subtract
+            blueHound.btcEarned = 0;
+            localStorage.setItem('btcEarned', blueHound.btcEarned);
+            blueHound.updateUI();
         });
 
-        // Proxy buttons
-        document.querySelectorAll('.proxy-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const mode = btn.dataset.proxy;
-                blueHound.setProxyMode(mode);
-            });
-        });
-
-        // Simulate shares every 15 sec for demo
-        setInterval(() => {
-            if (blueHound.miningActive) blueHound.simulateShare();
-        }, 15000);
-
-        // Three.js background (same as before)
+        // Three.js background (same)
         const canvas = document.getElementById('bg-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -634,7 +548,7 @@
             };
         };
 
-        // Start
+        // Initialize
         blueHound.init();
     </script>
 </body>
