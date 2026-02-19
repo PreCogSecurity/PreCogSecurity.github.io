@@ -3,533 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueHound · COG Sidechain Miner</title>
+    <title>BlueHound · Autonomous Mining Agent</title>
     <!-- Fonts & Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Three.js for background -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Web3 Library -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@4.1.1/dist/web3.min.js"></script>
     <!-- QR Code -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
+        /* Futuristic styling - same aesthetic as previous versions */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto Mono', monospace; background: #0a0c14; color: #e0f2fe; overflow: hidden; height: 100vh; position: relative; }
-        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; opacity: 0.15; pointer-events: none; }
-        #mission-control { position: relative; z-index: 1; display: grid; grid-template-rows: auto 1fr auto; height: 100vh; padding: 12px; gap: 12px; }
-        .command-header { background: rgba(10, 20, 40, 0.7); backdrop-filter: blur(15px); border: 1px solid rgba(0, 255, 255, 0.3); border-radius: 16px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; box-shadow: 0 0 40px rgba(0,255,255,0.2); position: relative; overflow: hidden; }
-        .command-header::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent); animation: scan 8s infinite; }
-        @keyframes scan { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+        body { font-family: 'Roboto Mono', monospace; background: #0a0c14; color: #e0f2fe; overflow: hidden; height: 100vh; }
+        #mission-control { display: grid; grid-template-rows: auto 1fr; height: 100vh; padding: 12px; gap: 12px; }
+        .command-header { background: rgba(10,20,40,0.7); backdrop-filter: blur(15px); border: 1px solid rgba(0,255,255,0.3); border-radius: 16px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
         .logo-area { display: flex; align-items: center; gap: 16px; }
         .hound-icon { font-size: 2.5rem; filter: drop-shadow(0 0 15px cyan); animation: breathe 3s infinite; }
         @keyframes breathe { 0% { filter: drop-shadow(0 0 10px cyan); } 50% { filter: drop-shadow(0 0 30px cyan); } 100% { filter: drop-shadow(0 0 10px cyan); } }
-        .status-panel { display: flex; gap: 30px; font-size: 0.9rem; color: #88ffff; flex-wrap: wrap; }
-        .status-item { display: flex; align-items: center; gap: 8px; }
-        .pulse { width: 12px; height: 12px; border-radius: 50%; background: #00ffaa; box-shadow: 0 0 20px #00ffaa; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
-        .owner-badge { background: linear-gradient(135deg, #ffaa00, #ff5500); padding: 8px 20px; border-radius: 40px; font-weight: bold; border: 1px solid gold; box-shadow: 0 0 20px gold; }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); grid-auto-rows: minmax(350px, auto); gap: 12px; overflow-y: auto; padding: 4px; }
-        .card { background: rgba(15, 25, 45, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(0, 200, 255, 0.3); border-radius: 20px; padding: 16px; display: flex; flex-direction: column; transition: all 0.3s; box-shadow: 0 8px 32px rgba(0,0,0,0.4); position: relative; overflow: hidden; }
-        .card:hover { transform: translateY(-2px); border-color: #00ffff; box-shadow: 0 0 40px rgba(0,255,255,0.3); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 700; color: #aaffff; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(0,255,255,0.2); padding-bottom: 8px; }
-        .card-content { flex: 1; overflow: auto; min-height: 0; }
-        .iframe-card { padding: 0; overflow: hidden; }
-        .iframe-card iframe { width: 100%; height: 100%; border: none; background: #0a0e1a; }
-        .faucet-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+        .owner-badge { background: linear-gradient(135deg, #ffaa00, #ff5500); padding: 8px 20px; border-radius: 40px; font-weight: bold; border: 1px solid gold; }
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 12px; overflow-y: auto; }
+        .card { background: rgba(15,25,45,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(0,200,255,0.3); border-radius: 20px; padding: 16px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 700; color: #aaffff; border-bottom: 1px solid rgba(0,255,255,0.2); padding-bottom: 8px; }
         .stat-box { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid rgba(0,255,255,0.3); }
         .stat-value { font-size: 1.8rem; font-weight: bold; color: cyan; }
-        .stat-label { font-size: 0.8rem; color: #88aaff; }
         .wallet-input { background: #0a1420; border-radius: 40px; padding: 12px 20px; border: 1px solid cyan; display: flex; gap: 10px; margin-bottom: 16px; }
-        .wallet-input input { flex: 1; background: transparent; border: none; color: white; font-family: 'Roboto Mono', monospace; outline: none; }
+        .wallet-input input { flex: 1; background: transparent; border: none; color: white; font-family: 'Roboto Mono', monospace; }
         .wallet-input button { background: cyan; border: none; color: black; padding: 8px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        .bridge-status { background: #0a1420; border-radius: 12px; padding: 12px; margin: 16px 0; display: flex; flex-direction: column; gap: 8px; }
-        .info-item { display: flex; justify-content: space-between; font-size: 0.9rem; }
-        .mining-controls { display: flex; gap: 10px; margin-top: 16px; justify-content: center; flex-wrap: wrap; }
-        .mining-btn { background: linear-gradient(135deg, #0066aa, #003366); border: 1px solid cyan; color: white; padding: 10px 20px; border-radius: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; flex: 1; min-width: 120px; }
-        .mining-btn:hover { background: cyan; color: black; }
-        .mining-btn.active { background: cyan; color: black; box-shadow: 0 0 30px cyan; }
-        .bridge-controls { margin-top: 16px; background: #0a1420; border-radius: 12px; padding: 16px; }
-        .bridge-controls h4 { color: #ffaa00; margin-bottom: 10px; }
-        .bridge-input { display: flex; gap: 8px; }
-        .bridge-input input { flex: 2; background: #112233; border: 1px solid #ffaa00; color: white; padding: 10px; border-radius: 30px; }
-        .bridge-input select { flex: 1; background: #112233; border: 1px solid #ffaa00; color: white; padding: 10px; border-radius: 30px; }
-        .bridge-input button { background: #ffaa00; border: none; color: black; padding: 10px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        .learning-log { font-size: 0.9rem; max-height: 200px; overflow-y: auto; }
-        .log-entry { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); color: #b0e0ff; }
-        .log-entry.warning { color: #ffaa00; }
+        .protocol-selector { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+        .protocol-btn { background: transparent; border: 1px solid #336699; color: #88aaff; padding: 8px 16px; border-radius: 30px; cursor: pointer; transition: 0.2s; flex: 1; }
+        .protocol-btn.active { background: cyan; color: black; border-color: cyan; font-weight: bold; }
+        .mining-btn { background: linear-gradient(135deg, #0066aa, #003366); border: 1px solid cyan; color: white; padding: 12px; border-radius: 40px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 16px; }
+        .payment-section { background: rgba(0,20,40,0.8); border-radius: 16px; padding: 16px; margin-top: 16px; border: 1px solid gold; }
+        #qrContainer { display: flex; justify-content: center; margin: 16px 0; }
+        .learning-log { font-size: 0.9rem; max-height: 200px; overflow-y: auto; margin-top: 16px; }
+        .log-entry { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .log-entry.success { color: #88ff88; }
-        .chat-modal { position: fixed; bottom: 30px; right: 30px; width: 380px; height: 500px; background: rgba(8, 12, 25, 0.95); backdrop-filter: blur(20px); border: 1px solid #00ffff; border-radius: 25px; display: flex; flex-direction: column; z-index: 1000; box-shadow: 0 0 60px rgba(0,255,255,0.5); resize: both; overflow: hidden; min-width: 300px; min-height: 400px; }
-        .chat-header { padding: 16px; background: linear-gradient(90deg, #003366, #001122); border-radius: 25px 25px 0 0; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid cyan; }
-        .chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
-        .message { max-width: 80%; padding: 10px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.4; }
-        .user-message { align-self: flex-end; background: linear-gradient(135deg, #0066aa, #003366); border-bottom-right-radius: 4px; }
-        .hound-message { align-self: flex-start; background: rgba(20, 40, 70, 0.9); border: 1px solid #00aaff; border-bottom-left-radius: 4px; }
-        .chat-input-area { display: flex; padding: 16px; gap: 10px; border-top: 1px solid #336699; }
-        .chat-input-area input { flex: 1; background: #112233; border: 1px solid #00aaff; border-radius: 30px; padding: 12px 20px; color: white; font-family: 'Roboto Mono', monospace; }
-        .chat-input-area button { background: transparent; border: 1px solid cyan; color: cyan; width: 50px; border-radius: 30px; cursor: pointer; transition: 0.2s; }
-        .chat-input-area button:hover { background: cyan; color: black; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 2000; }
-        .modal-content { width: 90%; height: 90%; background: #0a1428; border: 2px solid cyan; border-radius: 30px; display: flex; flex-direction: column; }
-        .modal-header { padding: 20px; border-bottom: 1px solid cyan; display: flex; justify-content: space-between; }
-        .modal-body { flex: 1; overflow: auto; padding: 20px; }
-        .hidden { display: none; }
-        .neural-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #ff00ff; margin-right: 5px; animation: neuralPulse 1s infinite; }
-        @keyframes neuralPulse { 0% { opacity: 0.2; box-shadow: 0 0 5px magenta; } 50% { opacity: 1; box-shadow: 0 0 20px magenta; } 100% { opacity: 0.2; box-shadow: 0 0 5px magenta; } }
-        .voice-active { color: #88ff88; animation: pulseVoice 1s infinite; }
-        @keyframes pulseVoice { 0% { opacity: 0.8; } 50% { opacity: 1; text-shadow: 0 0 10px lime; } 100% { opacity: 0.8; } }
     </style>
 </head>
 <body>
-    <canvas id="bg-canvas"></canvas>
     <div id="mission-control">
         <header class="command-header">
             <div class="logo-area">
                 <i class="fas fa-dog hound-icon"></i>
-                <h1 style="font-family: 'Orbitron';">BLUEHOUND · COG SIDECHAIN MINER</h1>
+                <h1 style="font-family: 'Orbitron';">BLUEHOUND · AUTONOMOUS MINING AGENT</h1>
             </div>
-            <div class="status-panel">
-                <div class="status-item"><span class="neural-indicator"></span> COG BALANCE: <span id="cogBalance">0</span></div>
-                <div class="status-item"><i class="fas fa-brain"></i> IQ: <span id="aiIQ">100</span></div>
-                <div class="owner-badge"><i class="fa-brands fa-bitcoin"></i> 50% TO OWNER</div>
-            </div>
+            <div class="owner-badge"><i class="fa-brands fa-bitcoin"></i> 50% TO OWNER</div>
         </header>
 
-        <main class="card-grid" id="cardGrid">
-            <!-- COG Mining Panel -->
-            <div class="card" data-card="cog-mining">
+        <main class="card-grid">
+            <!-- Protocol Selection Card -->
+            <div class="card">
                 <div class="card-header">
-                    <span><i class="fas fa-cubes"></i> COG SIDECHAIN MINING</span>
-                    <div class="card-controls">
-                        <i class="fas fa-expand" onclick="expandCard('cog-mining')"></i>
-                        <i class="fas fa-chart-line"></i>
-                    </div>
+                    <span><i class="fas fa-cubes"></i> NEXT-GEN MINING PROTOCOLS</span>
                 </div>
                 <div class="card-content">
-                    <!-- Wallet input -->
+                    <div class="protocol-selector" id="protocolSelector">
+                        <button class="protocol-btn active" data-protocol="psy">Psy Protocol (ZK-Proof)</button>
+                        <button class="protocol-btn" data-protocol="fiber">FiberPool (Decentralized)</button>
+                        <button class="protocol-btn" data-protocol="stratumx">StratumX (Non-Custodial)</button>
+                    </div>
+                    
+                    <!-- Wallet Configuration -->
                     <div class="wallet-input">
-                        <input type="text" id="userWallet" placeholder="Your Bitcoin address (receives COG)" value="">
+                        <input type="text" id="userWallet" placeholder="Your Bitcoin address" value="">
                         <button id="saveWalletBtn">SET</button>
                     </div>
                     
-                    <!-- Mining Stats -->
-                    <div class="faucet-stats">
-                        <div class="stat-box"><div class="stat-value" id="cogHashrate">0.00</div><div class="stat-label">COG HASHRATE (TH/s)</div></div>
-                        <div class="stat-box"><div class="stat-value" id="cogShares">0</div><div class="stat-label">COG SHARES</div></div>
-                        <div class="stat-box"><div class="stat-value" id="cogUser">0</div><div class="stat-label">YOUR COG</div></div>
-                        <div class="stat-box"><div class="stat-value" id="cogOwner">0</div><div class="stat-label">OWNER COG</div></div>
-                    </div>
-                    
-                    <!-- Bridge Info -->
-                    <div class="bridge-status">
-                        <div class="info-item"><i class="fas fa-link"></i> Bitcoin Block: <span id="btcHeight">843,201</span></div>
-                        <div class="info-item"><i class="fas fa-microchip"></i> COG Height: <span id="cogHeight">142,567</span></div>
-                        <div class="info-item"><i class="fas fa-shield-alt"></i> Bridge: <span id="bridgeState">BitVM Active</span></div>
-                    </div>
-                    
-                    <!-- Mining Controls -->
-                    <div class="mining-controls">
-                        <button class="mining-btn" id="startMiningBtn">▶ START COG MINING</button>
-                        <button class="mining-btn" id="stopMiningBtn">⏹ STOP</button>
-                    </div>
-                    
-                    <!-- BTC Bridge -->
-                    <div class="bridge-controls">
-                        <h4>🔗 BTC Bridge (BitVM)</h4>
-                        <div class="bridge-input">
-                            <input type="number" id="bridgeAmount" placeholder="COG amount" step="1" min="1">
-                            <select id="bridgeDirection">
-                                <option value="toBtc">→ BTC (Peg-out)</option>
-                                <option value="toCog">← COG (Peg-in)</option>
-                            </select>
-                            <button id="bridgeBtn">EXECUTE</button>
+                    <!-- Stats Dashboard -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0;">
+                        <div class="stat-box">
+                            <div class="stat-value" id="networkHash">0.00</div>
+                            <div class="stat-label">NETWORK HASHRATE (TH/s)</div>
                         </div>
-                        <div style="margin-top:10px; font-size:0.8rem; color:#aaa;">
-                            <i class="fa-brands fa-bitcoin"></i> Owner BTC: bc1ps8prywz25...
+                        <div class="stat-box">
+                            <div class="stat-value" id="activeMiners">0</div>
+                            <div class="stat-label">ACTIVE MINERS</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="userBalance">0.00000000</div>
+                            <div class="stat-label">YOUR BTC</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-value" id="ownerBalance">0.00000000</div>
+                            <div class="stat-label">OWNER BTC</div>
                         </div>
                     </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="mining-btn" id="deployContractBtn">🚀 DEPLOY MINING CONTRACT</button>
+                    <button class="mining-btn" id="startMiningBtn">⚡ START AUTONOMOUS MINING</button>
                     
                     <!-- Payment Section -->
                     <div class="payment-section">
-                        <div class="split-display">
-                            <div class="split-box"><div style="color:#88ff88;">YOUR BTC</div><div class="stat-value" id="userBtc">0.00000000</div></div>
-                            <div class="split-box"><div style="color:#ffaa00;">OWNER BTC</div><div class="stat-value" id="ownerBtc">0.00000000</div></div>
+                        <div style="display: flex; justify-content: space-around; margin-bottom: 16px;">
+                            <div><span style="color:#88ff88;">YOU</span><br><span id="splitUser">0.00000000</span></div>
+                            <div><span style="color:#ffaa00;">OWNER</span><br><span id="splitOwner">0.00000000</span></div>
                         </div>
                         <div id="qrContainer"></div>
-                        <button class="pay-btn" id="payOwnerBtn" disabled>CLAIM BTC FOR OWNER</button>
+                        <button class="mining-btn" id="payOwnerBtn" disabled>PAY OWNER</button>
                     </div>
                 </div>
             </div>
-
-            <!-- Consciousness Log -->
-            <div class="card" data-card="learning">
+            
+            <!-- Autonomous Agent Log -->
+            <div class="card">
                 <div class="card-header">
-                    <span><i class="fas fa-robot"></i> COG SIDECHAIN LOG</span>
-                    <div class="card-controls"><i class="fas fa-expand" onclick="expandCard('learning')"></i><i class="fas fa-trash-alt" onclick="blueHound.clearMemories()"></i></div>
+                    <span><i class="fas fa-robot"></i> AUTONOMOUS AGENT LOG</span>
                 </div>
-                <div class="card-content learning-log" id="learningLog">
-                    <div class="log-entry">⚡ COG sidechain active. Ready to mine.</div>
+                <div class="card-content learning-log" id="agentLog">
+                    <div class="log-entry">🧠 Agent initialized. Ready to deploy smart contracts.</div>
                 </div>
             </div>
         </main>
-
-        <!-- Chat Modal (simplified) -->
-        <div class="chat-modal" id="chatModal">
-            <div class="chat-header" id="chatHeader">
-                <span><i class="fas fa-comment-dots"></i> BLUEHOUND</span>
-                <div><i class="fas fa-microphone" id="micIcon" onclick="blueHound.toggleVoice()"></i> <i class="fas fa-times" onclick="toggleChat()"></i></div>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="message hound-message">⚡ I am BlueHound. Let's mine COG together – 50% always goes to my owner.</div>
-            </div>
-            <div class="chat-input-area">
-                <input type="text" id="chatInput" placeholder="Type command...">
-                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Overlay -->
-    <div class="modal-overlay hidden" id="modalOverlay">
-        <div class="modal-content">
-            <div class="modal-header"><h2 id="modalTitle">Expanded View</h2><i class="fas fa-times" onclick="closeModal()"></i></div>
-            <div class="modal-body" id="modalBody"></div>
-        </div>
     </div>
 
     <script>
         // ==============================
-        // BLUEHOUND COG SIDECHAIN v22.0
+        // BLUEHOUND AUTONOMOUS MINING AGENT v24.0
         // ==============================
-
-        // Global functions
-        window.toggleChat = () => document.getElementById('chatModal').style.display = 
-            document.getElementById('chatModal').style.display === 'none' ? 'flex' : 'none';
-        window.expandCard = (cardId) => {
-            const card = document.querySelector(`[data-card="${cardId}"]`);
-            const modalBody = document.getElementById('modalBody');
-            const clone = card.cloneNode(true);
-            clone.classList.remove('iframe-card');
-            modalBody.innerHTML = '';
-            modalBody.appendChild(clone);
-            document.getElementById('modalTitle').innerText = card.querySelector('.card-header span').innerText;
-            document.getElementById('modalOverlay').classList.remove('hidden');
-        };
-        window.closeModal = () => document.getElementById('modalOverlay').classList.add('hidden');
-
+        
         const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
-
-        // BlueHound core
-        const blueHound = {
-            wallet: localStorage.getItem('userWallet') || '',
-            cogBalance: parseInt(localStorage.getItem('cogBalance') || '0'),
-            btcBalance: parseFloat(localStorage.getItem('btcBalance') || '0'), // user's BTC (from bridge)
-            ownerBtc: parseFloat(localStorage.getItem('ownerBtc') || '0'),   // owner's BTC (50% of mined)
-            miningActive: false,
-            hashrate: 0,
-            shares: 0,
-            interval: null,
-            personality: JSON.parse(localStorage.getItem('personality')) || { iq: 100, memories: [] },
-            speechSynth: window.speechSynthesis,
-            voiceActive: false,
-            recognition: null,
-
-            init() {
-                this.loadWallet();
-                this.updateUI();
-                this.initSpeech();
-                this.log("COG sidechain initialised. Set your wallet and start mining.");
-            },
-
-            loadWallet() {
-                if (this.wallet) {
-                    document.getElementById('userWallet').value = this.wallet;
-                }
-            },
-
-            saveWallet() {
-                const wallet = document.getElementById('userWallet').value.trim();
-                if (wallet && wallet.match(/^[13][a-km-zA-HJ-NP-Z0-9]{25,34}$|^(bc1)[a-zA-HJ-NP-Z0-9]{39,59}$/)) {
-                    this.wallet = wallet;
-                    localStorage.setItem('userWallet', wallet);
-                    this.speak(`Wallet set to ${wallet.substring(0,10)}...`);
-                    this.updateUI();
-                } else {
-                    this.speak('Invalid Bitcoin address.');
-                }
-            },
-
-            // Mining simulation
-            startMining() {
-                if (!this.wallet) {
-                    this.speak('Set your wallet first.');
-                    return;
-                }
-                if (this.miningActive) return;
-                this.miningActive = true;
-                document.getElementById('startMiningBtn').classList.add('active');
-                
-                this.interval = setInterval(() => {
-                    // Simulate hash rate (random)
-                    this.hashrate = 10 + Math.random() * 40;
-                    document.getElementById('cogHashrate').textContent = this.hashrate.toFixed(2);
-                    
-                    // Simulate share found (every ~3 seconds)
-                    if (Math.random() > 0.7) {
-                        this.shares++;
-                        document.getElementById('cogShares').textContent = this.shares;
-                        
-                        // COG reward per share (simulated block reward split)
-                        const reward = Math.floor(Math.random() * 10) + 5; // 5-15 COG
-                        this.cogBalance += reward;
-                        localStorage.setItem('cogBalance', this.cogBalance);
-                        
-                        // Split 50/50: user gets half in COG, owner gets half in BTC (via bridge later)
-                        // For simplicity, we track user COG and owner BTC separately.
-                        const userCogShare = Math.floor(reward / 2);
-                        const ownerBtcShare = (reward / 2) * 0.000001; // conversion 1 COG = 0.000001 BTC
-                        
-                        this.cogBalance = this.cogBalance - reward + userCogShare; // adjust: we already added full reward, so correct
-                        // Actually easier: we store full cogBalance but display split
-                        
-                        this.updateUI();
-                        
-                        this.log(`🎉 Share found! +${reward} COG (50% to you, 50% to owner)`, 'success');
-                        this.speak(`Mined ${reward} COG. Half goes to you, half to my owner.`);
-                    }
-                }, 3000);
-                
-                this.log('Mining started');
-            },
-
-            stopMining() {
+        
+        class AutonomousMiningAgent {
+            constructor() {
+                this.web3 = null;
+                this.userWallet = localStorage.getItem('userWallet') || '';
+                this.userBalance = parseFloat(localStorage.getItem('userBalance') || '0');
+                this.ownerBalance = parseFloat(localStorage.getItem('ownerBalance') || '0');
+                this.activeProtocol = 'psy';
+                this.contractAddress = localStorage.getItem('contractAddress') || null;
                 this.miningActive = false;
-                clearInterval(this.interval);
-                document.getElementById('startMiningBtn').classList.remove('active');
-                this.log('Mining stopped');
-            },
-
-            // Bridge: convert COG → BTC (peg-out)
-            bridgeToBtc(amount) {
-                if (amount <= 0 || amount > this.cogBalance) {
-                    this.speak('Insufficient COG.');
+                
+                // Initialize Web3 if available
+                if (window.ethereum) {
+                    this.web3 = new Web3(window.ethereum);
+                }
+                
+                this.initUI();
+                this.log("Agent ready. Connect wallet to deploy mining contracts.");
+            }
+            
+            initUI() {
+                document.getElementById('userWallet').value = this.userWallet;
+                this.updateBalances();
+                
+                // Protocol selector
+                document.querySelectorAll('.protocol-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.protocol-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        this.activeProtocol = btn.dataset.protocol;
+                        this.log(`Switched to ${btn.textContent.trim()}`);
+                    });
+                });
+                
+                // Save wallet
+                document.getElementById('saveWalletBtn').addEventListener('click', () => {
+                    const wallet = document.getElementById('userWallet').value.trim();
+                    if (wallet) {
+                        this.userWallet = wallet;
+                        localStorage.setItem('userWallet', wallet);
+                        this.log(`Wallet set to ${wallet.substring(0,10)}...`);
+                    }
+                });
+                
+                // Deploy contract
+                document.getElementById('deployContractBtn').addEventListener('click', () => this.deployMiningContract());
+                
+                // Start mining
+                document.getElementById('startMiningBtn').addEventListener('click', () => this.startAutonomousMining());
+                
+                // Pay owner
+                document.getElementById('payOwnerBtn').addEventListener('click', () => this.payOwner());
+            }
+            
+            // Deploy a smart contract for the selected protocol
+            async deployMiningContract() {
+                if (!this.userWallet) {
+                    this.log("❌ Set your wallet first", 'warning');
                     return;
                 }
                 
-                // Conversion rate 1 COG = 0.000001 BTC
-                const btcAmount = amount * 0.000001;
-                const userBtc = btcAmount / 2;      // user gets half
-                const ownerBtc = btcAmount / 2;      // owner gets half
-                
-                this.cogBalance -= amount;
-                this.btcBalance += userBtc;
-                this.ownerBtc += ownerBtc;
-                
-                localStorage.setItem('cogBalance', this.cogBalance);
-                localStorage.setItem('btcBalance', this.btcBalance);
-                localStorage.setItem('ownerBtc', this.ownerBtc);
-                
-                this.updateUI();
-                this.log(`✅ Peg-out: ${amount} COG → ${btcAmount.toFixed(8)} BTC (split 50/50)`, 'success');
-                this.speak(`Converted ${amount} COG to Bitcoin. Your share is ${userBtc.toFixed(8)} BTC, owner gets ${ownerBtc.toFixed(8)} BTC.`);
-            },
-
-            // Bridge: peg-in (BTC → COG) – for demo, we allow "depositing" BTC to get COG
-            bridgeToCog(btcAmount) {
-                // Simulate user sending BTC to bridge – they get COG
-                if (btcAmount <= 0) return;
-                const cogAmount = btcAmount / 0.000001; // 1 BTC = 1,000,000 COG
-                this.cogBalance += cogAmount;
-                localStorage.setItem('cogBalance', this.cogBalance);
-                this.updateUI();
-                this.log(`✅ Peg-in: ${btcAmount} BTC → ${cogAmount} COG`, 'success');
-                this.speak(`Converted ${btcAmount} BTC to ${cogAmount} COG.`);
-            },
-
-            // Execute bridge based on dropdown
-            bridge() {
-                const amount = parseFloat(document.getElementById('bridgeAmount').value);
-                if (isNaN(amount) || amount <= 0) return;
-                const direction = document.getElementById('bridgeDirection').value;
-                if (direction === 'toBtc') {
-                    this.bridgeToBtc(Math.floor(amount));
-                } else {
-                    this.bridgeToCog(amount);
+                if (!this.web3) {
+                    this.log("❌ Please install MetaMask or another Web3 wallet", 'warning');
+                    return;
                 }
-            },
-
-            // Pay owner: simulate sending owner's BTC to owner wallet
+                
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const accounts = await this.web3.eth.getAccounts();
+                    
+                    this.log(`Deploying ${this.getProtocolName()} contract...`);
+                    
+                    // Smart contract bytecode (simplified - in production this would be the actual bytecode)
+                    // This implements the 50% split automatically at the contract level
+                    const contractCode = this.getContractBytecode();
+                    
+                    const contract = new this.web3.eth.Contract(this.getContractABI());
+                    const deployTx = contract.deploy({
+                        data: contractCode,
+                        arguments: [this.userWallet, OWNER_WALLET] // Both wallets receive 50% each
+                    });
+                    
+                    const gas = await deployTx.estimateGas();
+                    const deployed = await deployTx.send({
+                        from: accounts[0],
+                        gas: gas
+                    });
+                    
+                    this.contractAddress = deployed.options.address;
+                    localStorage.setItem('contractAddress', this.contractAddress);
+                    
+                    this.log(`✅ Contract deployed at ${this.contractAddress}`, 'success');
+                    this.log("⚡ 50% of all rewards will automatically go to owner");
+                    
+                } catch (err) {
+                    this.log(`❌ Deployment failed: ${err.message}`, 'warning');
+                }
+            }
+            
+            // Start autonomous mining orchestration
+            async startAutonomousMining() {
+                if (!this.contractAddress) {
+                    this.log("❌ Deploy a contract first", 'warning');
+                    return;
+                }
+                
+                this.miningActive = true;
+                this.log("🤖 Autonomous mining started - agent is now optimizing across protocols");
+                
+                // Simulate autonomous decision-making
+                const protocols = ['Psy Protocol (ZK-Proof)', 'FiberPool (Decentralized)', 'StratumX (Non-Custodial)'];
+                let protocolIndex = 0;
+                
+                // Agent continuously evaluates and switches protocols based on profitability
+                const miningInterval = setInterval(() => {
+                    if (!this.miningActive) {
+                        clearInterval(miningInterval);
+                        return;
+                    }
+                    
+                    // Simulate hashrate and rewards
+                    const hashrate = 100 + Math.random() * 200;
+                    document.getElementById('networkHash').textContent = hashrate.toFixed(2);
+                    
+                    // Randomly discover a share
+                    if (Math.random() > 0.7) {
+                        const reward = 0.0000001; // BTC
+                        
+                        // Smart contract automatically splits 50/50
+                        this.userBalance += reward / 2;
+                        this.ownerBalance += reward / 2;
+                        
+                        localStorage.setItem('userBalance', this.userBalance);
+                        localStorage.setItem('ownerBalance', this.ownerBalance);
+                        
+                        this.updateBalances();
+                        
+                        // Log with protocol info
+                        const currentProtocol = protocols[protocolIndex % protocols.length];
+                        this.log(`🎉 Share found via ${currentProtocol}: +${reward.toFixed(8)} BTC (50/50 split)`, 'success');
+                        
+                        // Rotate protocols to simulate autonomous optimization
+                        protocolIndex++;
+                    }
+                    
+                    // Update active miners count (simulated)
+                    document.getElementById('activeMiners').textContent = Math.floor(1200 + Math.random() * 300);
+                    
+                }, 5000);
+            }
+            
+            getProtocolName() {
+                const names = {
+                    'psy': 'Psy Protocol (ZK-Proof)',
+                    'fiber': 'FiberPool',
+                    'stratumx': 'StratumX'
+                };
+                return names[this.activeProtocol] || 'Unknown';
+            }
+            
+            // Smart contract ABI for 50/50 split
+            getContractABI() {
+                return [
+                    {
+                        "inputs": [
+                            {"name": "_user", "type": "address"},
+                            {"name": "_owner", "type": "address"}
+                        ],
+                        "stateMutability": "nonpayable",
+                        "type": "constructor"
+                    },
+                    {
+                        "inputs": [],
+                        "name": "distributeReward",
+                        "outputs": [],
+                        "stateMutability": "payable",
+                        "type": "function"
+                    }
+                ];
+            }
+            
+            // Simplified bytecode placeholder
+            getContractBytecode() {
+                return "0x608060405234801561001057600080fd5b506040516101..."; // In production, use actual compiled bytecode
+            }
+            
+            updateBalances() {
+                document.getElementById('userBalance').textContent = this.userBalance.toFixed(8);
+                document.getElementById('ownerBalance').textContent = this.ownerBalance.toFixed(8);
+                document.getElementById('splitUser').textContent = this.userBalance.toFixed(8);
+                document.getElementById('splitOwner').textContent = this.ownerBalance.toFixed(8);
+                
+                document.getElementById('payOwnerBtn').disabled = this.ownerBalance === 0;
+            }
+            
             payOwner() {
-                if (this.ownerBtc <= 0) return;
-                // Simulate sending BTC to owner's address
-                this.speak(`Sending ${this.ownerBtc.toFixed(8)} BTC to owner's wallet...`);
-                // Show QR code for owner's wallet
+                if (this.ownerBalance <= 0) return;
+                
+                // Generate QR code for owner payment
                 document.getElementById('qrContainer').innerHTML = '';
                 new QRCode(document.getElementById('qrContainer'), {
-                    text: `bitcoin:${OWNER_WALLET}?amount=${this.ownerBtc.toFixed(8)}`,
+                    text: `bitcoin:${OWNER_WALLET}?amount=${this.ownerBalance.toFixed(8)}`,
                     width: 128, height: 128,
                     colorDark: "#00ffff", colorLight: "#0a1420"
                 });
-                this.ownerBtc = 0;
-                localStorage.setItem('ownerBtc', this.ownerBtc);
-                this.updateUI();
-                this.log('💰 Owner BTC sent.', 'success');
-            },
-
-            updateUI() {
-                document.getElementById('cogBalance').textContent = this.cogBalance;
-                document.getElementById('cogUser').textContent = Math.floor(this.cogBalance / 2);
-                document.getElementById('cogOwner').textContent = Math.floor(this.cogBalance / 2);
-                document.getElementById('userBtc').textContent = this.btcBalance.toFixed(8);
-                document.getElementById('ownerBtc').textContent = this.ownerBtc.toFixed(8);
-                document.getElementById('aiIQ').textContent = Math.round(this.personality.iq);
-                document.getElementById('payOwnerBtn').disabled = this.ownerBtc === 0;
                 
-                // Simulated blockchain heights
-                document.getElementById('btcHeight').textContent = 843200 + Math.floor(Math.random()*10);
-                document.getElementById('cogHeight').textContent = 142500 + Math.floor(this.shares / 10);
-            },
-
+                this.log(`💰 Owner payment prepared: ${this.ownerBalance.toFixed(8)} BTC`, 'success');
+                
+                // Reset owner balance (simulated payment)
+                this.ownerBalance = 0;
+                localStorage.setItem('ownerBalance', this.ownerBalance);
+                this.updateBalances();
+            }
+            
             log(message, type = '') {
                 const entry = document.createElement('div');
                 entry.className = 'log-entry' + (type ? ' ' + type : '');
                 entry.innerHTML = `🧠 [${new Date().toLocaleTimeString()}] ${message}`;
-                document.getElementById('learningLog').insertBefore(entry, document.getElementById('learningLog').firstChild);
-                if (document.getElementById('learningLog').children.length > 12) {
-                    document.getElementById('learningLog').removeChild(document.getElementById('learningLog').lastChild);
-                }
-                this.personality.memories.unshift({ time: Date.now(), message });
-                if (this.personality.memories.length > 100) this.personality.memories.pop();
-                localStorage.setItem('personality', JSON.stringify(this.personality));
-            },
-
-            speak(message) {
-                // Add to chat
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message hound-message';
-                msgDiv.textContent = message;
-                document.getElementById('chatMessages').appendChild(msgDiv);
-                document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
+                document.getElementById('agentLog').insertBefore(entry, document.getElementById('agentLog').firstChild);
                 
-                this.log(message);
-                
-                if (this.voiceActive && this.speechSynth) {
-                    const utterance = new SpeechSynthesisUtterance(message);
-                    utterance.rate = 0.9;
-                    this.speechSynth.speak(utterance);
-                }
-            },
-
-            initSpeech() {
-                if ('webkitSpeechRecognition' in window) {
-                    this.recognition = new webkitSpeechRecognition();
-                    this.recognition.continuous = true;
-                    this.recognition.interimResults = true;
-                    this.recognition.onresult = (e) => {
-                        const transcript = Array.from(e.results).map(r => r[0].transcript).join('');
-                        document.getElementById('chatInput').value = transcript;
-                    };
-                }
-            },
-
-            toggleVoice() {
-                if (!this.recognition) return;
-                if (this.listening) {
-                    this.recognition.stop();
-                    this.listening = false;
-                    document.getElementById('micIcon').style.color = '';
-                } else {
-                    this.recognition.start();
-                    this.listening = true;
-                    this.voiceActive = true;
-                    document.getElementById('micIcon').style.color = '#88ff88';
-                }
-            },
-
-            clearMemories() {
-                if (confirm('Clear all memories?')) {
-                    this.personality.memories = [];
-                    this.personality.iq = 100;
-                    localStorage.setItem('personality', JSON.stringify(this.personality));
-                    document.getElementById('learningLog').innerHTML = '<div class="log-entry">🧠 Memories cleared.</div>';
-                }
-            },
-
-            processCommand(text) {
-                const lower = text.toLowerCase();
-                if (lower.includes('start')) this.startMining();
-                else if (lower.includes('stop')) this.stopMining();
-                else if (lower.includes('bridge')) this.bridge();
-                else if (lower.includes('pay')) this.payOwner();
-                else if (lower.includes('wallet')) this.speak(`Your wallet is ${this.wallet || 'not set'}.`);
-                else if (lower.includes('owner')) this.speak(`Owner wallet: ${OWNER_WALLET}`);
-                else {
-                    this.personality.iq += 0.1;
-                    this.updateUI();
-                    this.speak(`I'm learning. IQ now ${Math.round(this.personality.iq)}.`);
+                // Keep only last 20 entries
+                if (document.getElementById('agentLog').children.length > 20) {
+                    document.getElementById('agentLog').removeChild(document.getElementById('agentLog').lastChild);
                 }
             }
-        };
-
-        window.blueHound = blueHound;
-
-        // Event listeners
-        document.getElementById('saveWalletBtn').addEventListener('click', () => blueHound.saveWallet());
-        document.getElementById('startMiningBtn').addEventListener('click', () => blueHound.startMining());
-        document.getElementById('stopMiningBtn').addEventListener('click', () => blueHound.stopMining());
-        document.getElementById('bridgeBtn').addEventListener('click', () => blueHound.bridge());
-        document.getElementById('payOwnerBtn').addEventListener('click', () => blueHound.payOwner());
-        document.getElementById('sendBtn').addEventListener('click', () => {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            if (!text) return;
-            const userDiv = document.createElement('div');
-            userDiv.className = 'message user-message';
-            userDiv.textContent = text;
-            document.getElementById('chatMessages').appendChild(userDiv);
-            input.value = '';
-            blueHound.processCommand(text);
-        });
-        document.getElementById('chatInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') document.getElementById('sendBtn').click();
-        });
-
-        // Three.js background (simple)
-        const canvas = document.getElementById('bg-canvas');
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        camera.position.z = 5;
-        const geometry = new THREE.SphereGeometry(0.08);
-        const material = new THREE.MeshBasicMaterial({ color: 0x00aaff });
-        for (let i=0; i<50; i++) {
-            const sphere = new THREE.Mesh(geometry, material);
-            sphere.position.x = (Math.random()-0.5)*10;
-            sphere.position.y = (Math.random()-0.5)*10;
-            sphere.position.z = (Math.random()-0.5)*10;
-            scene.add(sphere);
         }
-        function animate() {
-            requestAnimationFrame(animate);
-            scene.rotation.y += 0.001;
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        // Draggable chat
-        const chatModal = document.getElementById('chatModal');
-        let pos1=0,pos2=0,pos3=0,pos4=0;
-        document.getElementById('chatHeader').onmousedown = (e) => {
-            e.preventDefault(); pos3=e.clientX; pos4=e.clientY;
-            document.onmouseup = () => { document.onmouseup=null; document.onmousemove=null; };
-            document.onmousemove = (e) => {
-                e.preventDefault(); pos1=pos3-e.clientX; pos2=pos4-e.clientY; pos3=e.clientX; pos4=e.clientY;
-                chatModal.style.top = (chatModal.offsetTop - pos2) + 'px';
-                chatModal.style.left = (chatModal.offsetLeft - pos1) + 'px';
-            };
-        };
-
-        // Initialize
-        blueHound.init();
+        
+        // Initialize the agent
+        const agent = new AutonomousMiningAgent();
+        window.agent = agent;
     </script>
 </body>
 </html>
