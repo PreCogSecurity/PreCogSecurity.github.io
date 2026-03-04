@@ -2,357 +2,506 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlueHound · Autonomous Mining Agent</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>PRECOG · FREE OPEN MAPS + TELEMETRY RPG</title>
+    <!-- Leaflet (100% free, no key) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Fonts & Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
-    <!-- Web3 Library -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@4.1.1/dist/web3.min.js"></script>
-    <!-- QR Code -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Futuristic styling - same aesthetic as previous versions */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Roboto Mono', monospace; background: #0a0c14; color: #e0f2fe; overflow: hidden; height: 100vh; }
-        #mission-control { display: grid; grid-template-rows: auto 1fr; height: 100vh; padding: 12px; gap: 12px; }
-        .command-header { background: rgba(10,20,40,0.7); backdrop-filter: blur(15px); border: 1px solid rgba(0,255,255,0.3); border-radius: 16px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-area { display: flex; align-items: center; gap: 16px; }
-        .hound-icon { font-size: 2.5rem; filter: drop-shadow(0 0 15px cyan); animation: breathe 3s infinite; }
-        @keyframes breathe { 0% { filter: drop-shadow(0 0 10px cyan); } 50% { filter: drop-shadow(0 0 30px cyan); } 100% { filter: drop-shadow(0 0 10px cyan); } }
-        .owner-badge { background: linear-gradient(135deg, #ffaa00, #ff5500); padding: 8px 20px; border-radius: 40px; font-weight: bold; border: 1px solid gold; }
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 12px; overflow-y: auto; }
-        .card { background: rgba(15,25,45,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(0,200,255,0.3); border-radius: 20px; padding: 16px; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 700; color: #aaffff; border-bottom: 1px solid rgba(0,255,255,0.2); padding-bottom: 8px; }
-        .stat-box { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; text-align: center; border: 1px solid rgba(0,255,255,0.3); }
-        .stat-value { font-size: 1.8rem; font-weight: bold; color: cyan; }
-        .wallet-input { background: #0a1420; border-radius: 40px; padding: 12px 20px; border: 1px solid cyan; display: flex; gap: 10px; margin-bottom: 16px; }
-        .wallet-input input { flex: 1; background: transparent; border: none; color: white; font-family: 'Roboto Mono', monospace; }
-        .wallet-input button { background: cyan; border: none; color: black; padding: 8px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; }
-        .protocol-selector { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
-        .protocol-btn { background: transparent; border: 1px solid #336699; color: #88aaff; padding: 8px 16px; border-radius: 30px; cursor: pointer; transition: 0.2s; flex: 1; }
-        .protocol-btn.active { background: cyan; color: black; border-color: cyan; font-weight: bold; }
-        .mining-btn { background: linear-gradient(135deg, #0066aa, #003366); border: 1px solid cyan; color: white; padding: 12px; border-radius: 40px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 16px; }
-        .payment-section { background: rgba(0,20,40,0.8); border-radius: 16px; padding: 16px; margin-top: 16px; border: 1px solid gold; }
-        #qrContainer { display: flex; justify-content: center; margin: 16px 0; }
-        .learning-log { font-size: 0.9rem; max-height: 200px; overflow-y: auto; margin-top: 16px; }
-        .log-entry { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .log-entry.success { color: #88ff88; }
+        body {
+            background: #0b0f1a;
+            font-family: 'Inter', sans-serif;
+            color: #d3e2ff;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .game-container {
+            max-width: 520px;
+            width: 100%;
+            background: rgba(16, 24, 40, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid #2c405e;
+            border-radius: 44px;
+            padding: 24px 20px 32px;
+            box-shadow: 0 25px 50px -10px #000000cc, 0 0 0 2px #2563eb40 inset;
+        }
+        .officer-header {
+            display: flex;
+            justify-content: space-between;
+            background: #121d31;
+            border-radius: 60px;
+            padding: 10px 18px;
+            border: 1px solid #375a82;
+            margin-bottom: 22px;
+        }
+        .badge {
+            background: #1f314a;
+            border-radius: 40px;
+            padding: 5px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #aac9ff;
+            border: 1px solid #3d6090;
+        }
+        .officer-id {
+            font-weight: 700;
+            background: #07111f;
+            padding: 5px 20px;
+            border-radius: 40px;
+            font-size: 1rem;
+            color: #b8dbff;
+            border: 1px solid #3a6ea5;
+            letter-spacing: 0.5px;
+        }
+        /* map container */
+        .map-wrapper {
+            border-radius: 36px;
+            overflow: hidden;
+            border: 2px solid #2e4f7a;
+            height: 240px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+        #free-map {
+            height: 100%;
+            width: 100%;
+            background: #18273f;
+        }
+        .location-btn-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .share-location-btn {
+            background: #1e3a5f;
+            border: 1px solid #4682b4;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #0f2638;
+            transition: 0.07s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .share-location-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 2px 0 #0f2638;
+        }
+        .share-location-btn i {
+            font-size: 1.2rem;
+        }
+        /* telemetry cards */
+        .telemetry-grid {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
+        .tele-card {
+            flex: 1 1 0;
+            min-width: 90px;
+            background: #0f1a29;
+            border: 1px solid #2e4c73;
+            border-radius: 24px;
+            padding: 12px 4px;
+            text-align: center;
+            box-shadow: 0 6px 0 #09111d;
+        }
+        .tele-icon { font-size: 1.8rem; color: #64b6ff; }
+        .tele-label { font-size: 0.7rem; color: #8fb3ec; margin: 6px 0 2px; text-transform: uppercase; }
+        .tele-value { font-size: 1.6rem; font-weight: 700; color: white; text-shadow: 0 0 10px #0080ff; }
+        .tele-unit { font-size: 0.8rem; color: #a5c4ff; margin-left: 2px; }
+        /* critical stats */
+        .stats-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 18px 0 14px 6px;
+            color: #f0f6ff;
+        }
+        .stat-item {
+            background: #111e31;
+            border-radius: 60px;
+            padding: 10px 18px 10px 14px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #31537c;
+            box-shadow: 0 6px 0 #0b1422;
+        }
+        .stat-icon { font-size: 2rem; width: 48px; text-align: center; }
+        .domestic { color: #ffae6a; }
+        .legal { color: #a9befa; }
+        .business { color: #a1dcb3; }
+        .community { color: #e6b0ff; }
+        .stat-content { flex: 1; }
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .progress-bg {
+            height: 16px;
+            background: #1e314d;
+            border-radius: 40px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4791ff, #004ecc);
+            border-radius: 40px;
+            width: 0%;
+            box-shadow: 0 0 12px #0066ff;
+        }
+        .stat-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #90abda;
+            margin-top: 5px;
+        }
+        .percentage { font-weight: 700; color: white; }
+        .update-timestamp {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5f7dad;
+            margin: 24px 0 12px;
+            border-top: 1px dashed #314e78;
+            padding-top: 16px;
+        }
+        button.refresh {
+            width: 100%;
+            background: #153049;
+            border: 1px solid #2d66a3;
+            color: white;
+            padding: 14px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 7px 0 #0b1b2e;
+            transition: 0.07s;
+            margin-top: 6px;
+        }
+        button.refresh:active { transform: translateY(5px); box-shadow: 0 2px 0 #0b1b2e; }
+        .footnote {
+            font-size: 0.65rem;
+            color: #44658f;
+            margin-top: 18px;
+            text-align: center;
+        }
+        .streak-badge {
+            background: #1f3a2e;
+            border-radius: 30px;
+            padding: 2px 12px;
+            border: 1px solid #65a580;
+            color: #b3f0c1;
+        }
     </style>
 </head>
 <body>
-    <div id="mission-control">
-        <header class="command-header">
-            <div class="logo-area">
-                <i class="fas fa-dog hound-icon"></i>
-                <h1 style="font-family: 'Orbitron';">BLUEHOUND · AUTONOMOUS MINING AGENT</h1>
-            </div>
-            <div class="owner-badge"><i class="fa-brands fa-bitcoin"></i> 50% TO OWNER</div>
-        </header>
+    <div class="game-container">
+        <!-- Precog Identity -->
+        <div class="officer-header">
+            <span class="badge"><i class="fas fa-shield-halos"></i> PRECOG SECURITY</span>
+            <span class="officer-id" id="precogId">PCO-****-****</span>
+        </div>
 
-        <main class="card-grid">
-            <!-- Protocol Selection Card -->
-            <div class="card">
-                <div class="card-header">
-                    <span><i class="fas fa-cubes"></i> NEXT-GEN MINING PROTOCOLS</span>
-                </div>
-                <div class="card-content">
-                    <div class="protocol-selector" id="protocolSelector">
-                        <button class="protocol-btn active" data-protocol="psy">Psy Protocol (ZK-Proof)</button>
-                        <button class="protocol-btn" data-protocol="fiber">FiberPool (Decentralized)</button>
-                        <button class="protocol-btn" data-protocol="stratumx">StratumX (Non-Custodial)</button>
-                    </div>
-                    
-                    <!-- Wallet Configuration -->
-                    <div class="wallet-input">
-                        <input type="text" id="userWallet" placeholder="Your Bitcoin address" value="">
-                        <button id="saveWalletBtn">SET</button>
-                    </div>
-                    
-                    <!-- Stats Dashboard -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0;">
-                        <div class="stat-box">
-                            <div class="stat-value" id="networkHash">0.00</div>
-                            <div class="stat-label">NETWORK HASHRATE (TH/s)</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value" id="activeMiners">0</div>
-                            <div class="stat-label">ACTIVE MINERS</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value" id="userBalance">0.00000000</div>
-                            <div class="stat-label">YOUR BTC</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value" id="ownerBalance">0.00000000</div>
-                            <div class="stat-label">OWNER BTC</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <button class="mining-btn" id="deployContractBtn">🚀 DEPLOY MINING CONTRACT</button>
-                    <button class="mining-btn" id="startMiningBtn">⚡ START AUTONOMOUS MINING</button>
-                    
-                    <!-- Payment Section -->
-                    <div class="payment-section">
-                        <div style="display: flex; justify-content: space-around; margin-bottom: 16px;">
-                            <div><span style="color:#88ff88;">YOU</span><br><span id="splitUser">0.00000000</span></div>
-                            <div><span style="color:#ffaa00;">OWNER</span><br><span id="splitOwner">0.00000000</span></div>
-                        </div>
-                        <div id="qrContainer"></div>
-                        <button class="mining-btn" id="payOwnerBtn" disabled>PAY OWNER</button>
-                    </div>
-                </div>
+        <!-- Free OpenStreetMap (Leaflet) -->
+        <div class="map-wrapper">
+            <div id="free-map"></div>
+        </div>
+
+        <!-- Share Live Location Button -->
+        <div class="location-btn-container">
+            <button class="share-location-btn" id="shareLocationBtn">
+                <i class="fas fa-location-dot"></i> SHARE LIVE LOCATION
+            </button>
+        </div>
+
+        <!-- Real Device Telemetry (4 core sensors) -->
+        <div class="telemetry-grid">
+            <div class="tele-card">
+                <i class="fas fa-battery-three-quarters tele-icon"></i>
+                <div class="tele-label">BATTERY</div>
+                <div><span class="tele-value" id="batteryValue">87</span><span class="tele-unit">%</span></div>
             </div>
-            
-            <!-- Autonomous Agent Log -->
-            <div class="card">
-                <div class="card-header">
-                    <span><i class="fas fa-robot"></i> AUTONOMOUS AGENT LOG</span>
-                </div>
-                <div class="card-content learning-log" id="agentLog">
-                    <div class="log-entry">🧠 Agent initialized. Ready to deploy smart contracts.</div>
-                </div>
+            <div class="tele-card">
+                <i class="fas fa-wifi tele-icon"></i>
+                <div class="tele-label">NETWORK</div>
+                <div><span class="tele-value" id="networkValue">7.2</span><span class="tele-unit">Mbps</span></div>
             </div>
-        </main>
+            <div class="tele-card">
+                <i class="fas fa-compass tele-icon"></i>
+                <div class="tele-label">STABILITY</div>
+                <div><span class="tele-value" id="stabilityValue">94</span><span class="tele-unit">%</span></div>
+            </div>
+            <div class="tele-card">
+                <i class="fas fa-microchip tele-icon"></i>
+                <div class="tele-label">MEMORY</div>
+                <div><span class="tele-value" id="memoryValue">4.0</span><span class="tele-unit">GB</span></div>
+            </div>
+        </div>
+
+        <!-- Critical Stats (derived from telemetry) -->
+        <div class="stats-header">
+            <i class="fas fa-chart-line"></i> <span>LIFE SCORE · CORE METRICS</span>
+        </div>
+
+        <!-- Domestic (Battery) -->
+        <div class="stat-item">
+            <div class="stat-icon domestic"><i class="fas fa-house-chimney"></i></div>
+            <div class="stat-content">
+                <div class="stat-header"><span>DOMESTIC</span> <span class="percentage" id="domesticPercent">87%</span></div>
+                <div class="progress-bg"><div class="progress-fill" id="domesticBar" style="width:87%"></div></div>
+                <div class="stat-footer"><span>?? home energy</span> <span id="domesticTrend">? stable</span></div>
+            </div>
+        </div>
+        <!-- Legal (Orientation stability) -->
+        <div class="stat-item">
+            <div class="stat-icon legal"><i class="fas fa-gavel"></i></div>
+            <div class="stat-content">
+                <div class="stat-header"><span>LEGAL</span> <span class="percentage" id="legalPercent">94%</span></div>
+                <div class="progress-bg"><div class="progress-fill" id="legalBar" style="width:94%"></div></div>
+                <div class="stat-footer"><span>?? balance</span> <span id="legalTrend">? +2%</span></div>
+            </div>
+        </div>
+        <!-- Business (Network speed) -->
+        <div class="stat-item">
+            <div class="stat-icon business"><i class="fas fa-briefcase"></i></div>
+            <div class="stat-content">
+                <div class="stat-header"><span>BUSINESS</span> <span class="percentage" id="businessPercent">72%</span></div>
+                <div class="progress-bg"><div class="progress-fill" id="businessBar" style="width:72%"></div></div>
+                <div class="stat-footer"><span>?? throughput</span> <span id="businessTrend">? -1%</span></div>
+            </div>
+        </div>
+        <!-- Community (Memory / cores) -->
+        <div class="stat-item">
+            <div class="stat-icon community"><i class="fas fa-users"></i></div>
+            <div class="stat-content">
+                <div class="stat-header"><span>COMMUNITY</span> <span class="percentage" id="communityPercent">50%</span></div>
+                <div class="progress-bg"><div class="progress-fill" id="communityBar" style="width:50%"></div></div>
+                <div class="stat-footer"><span>?? cognitive links</span> <span id="communityTrend">? stable</span></div>
+            </div>
+        </div>
+
+        <!-- Timestamp & Streak -->
+        <div class="update-timestamp">
+            <i class="fas fa-sync"></i> <span id="timestampDisplay">just now</span> · <span class="streak-badge"><i class="fas fa-bolt"></i> 12 day streak</span>
+        </div>
+
+        <!-- Manual refresh -->
+        <button class="refresh" id="refreshBtn"><i class="fas fa-rotate"></i> SCAN TELEMETRY NOW</button>
+        <div class="footnote">
+            ? Using real Android telemetry: battery, network, orientation & memory.<br>
+            ??? Map: OpenStreetMap (100% free, no API key)
+        </div>
     </div>
 
     <script>
-        // ==============================
-        // BLUEHOUND AUTONOMOUS MINING AGENT v24.0
-        // ==============================
-        
-        const OWNER_WALLET = 'bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy';
-        
-        class AutonomousMiningAgent {
-            constructor() {
-                this.web3 = null;
-                this.userWallet = localStorage.getItem('userWallet') || '';
-                this.userBalance = parseFloat(localStorage.getItem('userBalance') || '0');
-                this.ownerBalance = parseFloat(localStorage.getItem('ownerBalance') || '0');
-                this.activeProtocol = 'psy';
-                this.contractAddress = localStorage.getItem('contractAddress') || null;
-                this.miningActive = false;
-                
-                // Initialize Web3 if available
-                if (window.ethereum) {
-                    this.web3 = new Web3(window.ethereum);
-                }
-                
-                this.initUI();
-                this.log("Agent ready. Connect wallet to deploy mining contracts.");
+        (function() {
+            // ---------- generate unique Precog ID ----------
+            function randomId() {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+                let p1 = '', p2 = '';
+                for (let i=0; i<4; i++) p1 += chars[Math.floor(Math.random()*chars.length)];
+                for (let i=0; i<4; i++) p2 += chars[Math.floor(Math.random()*chars.length)];
+                return `PCO-${p1}-${p2}`;
             }
-            
-            initUI() {
-                document.getElementById('userWallet').value = this.userWallet;
-                this.updateBalances();
-                
-                // Protocol selector
-                document.querySelectorAll('.protocol-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.querySelectorAll('.protocol-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        this.activeProtocol = btn.dataset.protocol;
-                        this.log(`Switched to ${btn.textContent.trim()}`);
-                    });
-                });
-                
-                // Save wallet
-                document.getElementById('saveWalletBtn').addEventListener('click', () => {
-                    const wallet = document.getElementById('userWallet').value.trim();
-                    if (wallet) {
-                        this.userWallet = wallet;
-                        localStorage.setItem('userWallet', wallet);
-                        this.log(`Wallet set to ${wallet.substring(0,10)}...`);
-                    }
-                });
-                
-                // Deploy contract
-                document.getElementById('deployContractBtn').addEventListener('click', () => this.deployMiningContract());
-                
-                // Start mining
-                document.getElementById('startMiningBtn').addEventListener('click', () => this.startAutonomousMining());
-                
-                // Pay owner
-                document.getElementById('payOwnerBtn').addEventListener('click', () => this.payOwner());
-            }
-            
-            // Deploy a smart contract for the selected protocol
-            async deployMiningContract() {
-                if (!this.userWallet) {
-                    this.log("❌ Set your wallet first", 'warning');
+            document.getElementById('precogId').textContent = randomId();
+
+            // ---------- Free Map (Leaflet + OpenStreetMap) ----------
+            const map = L.map('free-map').setView([37.7749, -122.4194], 12); // default San Francisco
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            let userMarker = L.marker([37.7749, -122.4194]).addTo(map);
+            userMarker.bindPopup('Precog Officer (default)');
+
+            // ---------- Share Live Location Button (using browser geolocation) ----------
+            let watchId = null;
+            document.getElementById('shareLocationBtn').addEventListener('click', function() {
+                if (!navigator.geolocation) {
+                    alert('Geolocation is not supported by your browser.');
                     return;
                 }
-                
-                if (!this.web3) {
-                    this.log("❌ Please install MetaMask or another Web3 wallet", 'warning');
-                    return;
+
+                // Stop any previous watch
+                if (watchId !== null) {
+                    navigator.geolocation.clearWatch(watchId);
+                    watchId = null;
                 }
-                
-                try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    const accounts = await this.web3.eth.getAccounts();
-                    
-                    this.log(`Deploying ${this.getProtocolName()} contract...`);
-                    
-                    // Smart contract bytecode (simplified - in production this would be the actual bytecode)
-                    // This implements the 50% split automatically at the contract level
-                    const contractCode = this.getContractBytecode();
-                    
-                    const contract = new this.web3.eth.Contract(this.getContractABI());
-                    const deployTx = contract.deploy({
-                        data: contractCode,
-                        arguments: [this.userWallet, OWNER_WALLET] // Both wallets receive 50% each
-                    });
-                    
-                    const gas = await deployTx.estimateGas();
-                    const deployed = await deployTx.send({
-                        from: accounts[0],
-                        gas: gas
-                    });
-                    
-                    this.contractAddress = deployed.options.address;
-                    localStorage.setItem('contractAddress', this.contractAddress);
-                    
-                    this.log(`✅ Contract deployed at ${this.contractAddress}`, 'success');
-                    this.log("⚡ 50% of all rewards will automatically go to owner");
-                    
-                } catch (err) {
-                    this.log(`❌ Deployment failed: ${err.message}`, 'warning');
-                }
-            }
-            
-            // Start autonomous mining orchestration
-            async startAutonomousMining() {
-                if (!this.contractAddress) {
-                    this.log("❌ Deploy a contract first", 'warning');
-                    return;
-                }
-                
-                this.miningActive = true;
-                this.log("🤖 Autonomous mining started - agent is now optimizing across protocols");
-                
-                // Simulate autonomous decision-making
-                const protocols = ['Psy Protocol (ZK-Proof)', 'FiberPool (Decentralized)', 'StratumX (Non-Custodial)'];
-                let protocolIndex = 0;
-                
-                // Agent continuously evaluates and switches protocols based on profitability
-                const miningInterval = setInterval(() => {
-                    if (!this.miningActive) {
-                        clearInterval(miningInterval);
-                        return;
-                    }
-                    
-                    // Simulate hashrate and rewards
-                    const hashrate = 100 + Math.random() * 200;
-                    document.getElementById('networkHash').textContent = hashrate.toFixed(2);
-                    
-                    // Randomly discover a share
-                    if (Math.random() > 0.7) {
-                        const reward = 0.0000001; // BTC
-                        
-                        // Smart contract automatically splits 50/50
-                        this.userBalance += reward / 2;
-                        this.ownerBalance += reward / 2;
-                        
-                        localStorage.setItem('userBalance', this.userBalance);
-                        localStorage.setItem('ownerBalance', this.ownerBalance);
-                        
-                        this.updateBalances();
-                        
-                        // Log with protocol info
-                        const currentProtocol = protocols[protocolIndex % protocols.length];
-                        this.log(`🎉 Share found via ${currentProtocol}: +${reward.toFixed(8)} BTC (50/50 split)`, 'success');
-                        
-                        // Rotate protocols to simulate autonomous optimization
-                        protocolIndex++;
-                    }
-                    
-                    // Update active miners count (simulated)
-                    document.getElementById('activeMiners').textContent = Math.floor(1200 + Math.random() * 300);
-                    
-                }, 5000);
-            }
-            
-            getProtocolName() {
-                const names = {
-                    'psy': 'Psy Protocol (ZK-Proof)',
-                    'fiber': 'FiberPool',
-                    'stratumx': 'StratumX'
-                };
-                return names[this.activeProtocol] || 'Unknown';
-            }
-            
-            // Smart contract ABI for 50/50 split
-            getContractABI() {
-                return [
-                    {
-                        "inputs": [
-                            {"name": "_user", "type": "address"},
-                            {"name": "_owner", "type": "address"}
-                        ],
-                        "stateMutability": "nonpayable",
-                        "type": "constructor"
+
+                // Start watching position
+                watchId = navigator.geolocation.watchPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        const latlng = [latitude, longitude];
+
+                        // Center map and update marker
+                        map.setView(latlng, 18);
+                        if (userMarker) {
+                            userMarker.setLatLng(latlng);
+                            userMarker.setPopupContent('Your live location');
+                            // optional: change marker style
+                            userMarker.setIcon(L.divIcon({
+                                className: 'custom-marker',
+                                html: '<i class="fas fa-circle" style="color: #EA4335; font-size: 1.8rem; text-shadow: 0 0 10px white;"></i>',
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 15]
+                            }));
+                        } else {
+                            userMarker = L.marker(latlng).addTo(map);
+                        }
+                    },
+                    (error) => {
+                        let msg = 'Location error: ';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED: msg += 'Permission denied. Click "Share live location" to allow.'; break;
+                            case error.POSITION_UNAVAILABLE: msg += 'Position unavailable.'; break;
+                            case error.TIMEOUT: msg += 'Timeout.'; break;
+                            default: msg += 'Unknown error.';
+                        }
+                        alert(msg);
+                        if (watchId) {
+                            navigator.geolocation.clearWatch(watchId);
+                            watchId = null;
+                        }
                     },
                     {
-                        "inputs": [],
-                        "name": "distributeReward",
-                        "outputs": [],
-                        "stateMutability": "payable",
-                        "type": "function"
+                        enableHighAccuracy: true,
+                        maximumAge: 0,
+                        timeout: 10000,
                     }
-                ];
+                );
+            });
+
+            // ---------- telemetry & stats update (unchanged) ----------
+            const batteryEl = document.getElementById('batteryValue');
+            const networkEl = document.getElementById('networkValue');
+            const stabilityEl = document.getElementById('stabilityValue');
+            const memoryEl = document.getElementById('memoryValue');
+
+            const domPercent = document.getElementById('domesticPercent');
+            const domBar = document.getElementById('domesticBar');
+            const legalPercent = document.getElementById('legalPercent');
+            const legalBar = document.getElementById('legalBar');
+            const busPercent = document.getElementById('businessPercent');
+            const busBar = document.getElementById('businessBar');
+            const comPercent = document.getElementById('communityPercent');
+            const comBar = document.getElementById('communityBar');
+
+            const timestampEl = document.getElementById('timestampDisplay');
+
+            // orientation stability
+            let orientationSamples = [];
+            const MAX_SAMPLES = 10;
+
+            function updateOrientationStability(event) {
+                if (!event) return;
+                const beta = event.beta;
+                const gamma = event.gamma;
+                if (beta === null || gamma === null) return;
+                const magnitude = Math.sqrt(beta*beta + gamma*gamma);
+                orientationSamples.push(magnitude);
+                if (orientationSamples.length > MAX_SAMPLES) orientationSamples.shift();
+                if (orientationSamples.length < 2) return;
+                const mean = orientationSamples.reduce((a,b)=>a+b,0) / orientationSamples.length;
+                const variance = orientationSamples.reduce((a,b)=>a + (b-mean)**2, 0) / orientationSamples.length;
+                const stdDev = Math.sqrt(variance);
+                const cappedStd = Math.min(stdDev, 45);
+                const stability = Math.max(0, 100 - (cappedStd / 45) * 100);
+                stabilityEl.textContent = Math.round(stability);
+                legalPercent.textContent = Math.round(stability) + '%';
+                legalBar.style.width = Math.round(stability) + '%';
             }
-            
-            // Simplified bytecode placeholder
-            getContractBytecode() {
-                return "0x608060405234801561001057600080fd5b506040516101..."; // In production, use actual compiled bytecode
+
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', updateOrientationStability);
+            } else {
+                stabilityEl.textContent = 'N/A';
             }
-            
-            updateBalances() {
-                document.getElementById('userBalance').textContent = this.userBalance.toFixed(8);
-                document.getElementById('ownerBalance').textContent = this.ownerBalance.toFixed(8);
-                document.getElementById('splitUser').textContent = this.userBalance.toFixed(8);
-                document.getElementById('splitOwner').textContent = this.ownerBalance.toFixed(8);
-                
-                document.getElementById('payOwnerBtn').disabled = this.ownerBalance === 0;
-            }
-            
-            payOwner() {
-                if (this.ownerBalance <= 0) return;
-                
-                // Generate QR code for owner payment
-                document.getElementById('qrContainer').innerHTML = '';
-                new QRCode(document.getElementById('qrContainer'), {
-                    text: `bitcoin:${OWNER_WALLET}?amount=${this.ownerBalance.toFixed(8)}`,
-                    width: 128, height: 128,
-                    colorDark: "#00ffff", colorLight: "#0a1420"
-                });
-                
-                this.log(`💰 Owner payment prepared: ${this.ownerBalance.toFixed(8)} BTC`, 'success');
-                
-                // Reset owner balance (simulated payment)
-                this.ownerBalance = 0;
-                localStorage.setItem('ownerBalance', this.ownerBalance);
-                this.updateBalances();
-            }
-            
-            log(message, type = '') {
-                const entry = document.createElement('div');
-                entry.className = 'log-entry' + (type ? ' ' + type : '');
-                entry.innerHTML = `🧠 [${new Date().toLocaleTimeString()}] ${message}`;
-                document.getElementById('agentLog').insertBefore(entry, document.getElementById('agentLog').firstChild);
-                
-                // Keep only last 20 entries
-                if (document.getElementById('agentLog').children.length > 20) {
-                    document.getElementById('agentLog').removeChild(document.getElementById('agentLog').lastChild);
+
+            async function updateAllStats() {
+                // battery
+                if (navigator.getBattery) {
+                    try {
+                        const battery = await navigator.getBattery();
+                        const level = Math.round(battery.level * 100);
+                        batteryEl.textContent = level;
+                        domPercent.textContent = level + '%';
+                        domBar.style.width = level + '%';
+                    } catch (e) {
+                        batteryEl.textContent = '?';
+                    }
+                } else {
+                    batteryEl.textContent = '?';
                 }
+
+                // network
+                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                if (connection) {
+                    let downlink = connection.downlink;
+                    if (downlink === undefined) downlink = 5;
+                    networkEl.textContent = downlink.toFixed(1);
+                    const business = Math.min(100, Math.round((downlink / 10) * 100));
+                    busPercent.textContent = business + '%';
+                    busBar.style.width = business + '%';
+                } else {
+                    networkEl.textContent = '?';
+                }
+
+                // memory
+                if (navigator.deviceMemory) {
+                    const mem = navigator.deviceMemory;
+                    memoryEl.textContent = mem.toFixed(1);
+                    const community = Math.min(100, Math.round((mem / 8) * 100));
+                    comPercent.textContent = community + '%';
+                    comBar.style.width = community + '%';
+                } else if (navigator.hardwareConcurrency) {
+                    const cores = navigator.hardwareConcurrency;
+                    memoryEl.textContent = cores + ' cores';
+                    const community = Math.min(100, Math.round((cores / 8) * 100));
+                    comPercent.textContent = community + '%';
+                    comBar.style.width = community + '%';
+                } else {
+                    memoryEl.textContent = '?';
+                }
+
+                // trends
+                const trends = ['? +2%', '? -1%', '? stable', '? +5%', '? -3%'];
+                document.getElementById('domesticTrend').textContent = trends[Math.floor(Math.random() * trends.length)];
+                document.getElementById('legalTrend').textContent = trends[Math.floor(Math.random() * trends.length)];
+                document.getElementById('businessTrend').textContent = trends[Math.floor(Math.random() * trends.length)];
+                document.getElementById('communityTrend').textContent = trends[Math.floor(Math.random() * trends.length)];
+
+                // timestamp
+                const now = new Date();
+                timestampEl.textContent = now.toLocaleTimeString() + ' · ' + now.toLocaleDateString();
             }
-        }
-        
-        // Initialize the agent
-        const agent = new AutonomousMiningAgent();
-        window.agent = agent;
+
+            updateAllStats();
+            document.getElementById('refreshBtn').addEventListener('click', updateAllStats);
+            setInterval(updateAllStats, 30000);
+        })();
     </script>
 </body>
 </html>
