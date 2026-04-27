@@ -2,506 +2,628 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>PRECOG · FREE OPEN MAPS + TELEMETRY RPG</title>
-    <!-- Leaflet (100% free, no key) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>BLUEHOUND · ASI · IMMERSIVE METAVERSE</title>
+    <!-- Three.js + OrbitControls for interaction -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+        
+        // --- setup scene, camera, renderers ---
+        const canvas = document.getElementById('three-canvas');
+        const scene = new THREE.Scene();
+        scene.background = null;
+        scene.fog = new THREE.FogExp2(0x03050a, 0.008);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(3, 2, 5);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        
+        // CSS2 renderer for floating text labels
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.left = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        labelRenderer.domElement.style.zIndex = '10';
+        document.body.appendChild(labelRenderer.domElement);
+        
+        // --- Lighting & environment ---
+        const ambientLight = new THREE.AmbientLight(0x335588, 0.6);
+        scene.add(ambientLight);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        mainLight.position.set(2, 3, 2);
+        mainLight.castShadow = true;
+        scene.add(mainLight);
+        const fillLight = new THREE.PointLight(0x2266ff, 0.5);
+        fillLight.position.set(1, 1, 2);
+        scene.add(fillLight);
+        const backLight = new THREE.PointLight(0xff44aa, 0.4);
+        backLight.position.set(-1, 1, -2);
+        scene.add(backLight);
+        
+        // Grid floor (reflective)
+        const gridHelper = new THREE.GridHelper(15, 30, 0x44aaff, 0x2266aa);
+        gridHelper.position.y = -1.2;
+        gridHelper.material.transparent = true;
+        gridHelper.material.opacity = 0.3;
+        scene.add(gridHelper);
+        
+        // Stars background
+        const starGeo = new THREE.BufferGeometry();
+        const starPositions = [];
+        for (let i = 0; i < 2500; i++) {
+            starPositions.push((Math.random() - 0.5) * 200);
+            starPositions.push((Math.random() - 0.5) * 100);
+            starPositions.push((Math.random() - 0.5) * 80 - 40);
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPositions), 3));
+        const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+        const stars = new THREE.Points(starGeo, starMat);
+        scene.add(stars);
+        
+        // --- BlueHound complete body (enhanced) ---
+        const houndGroup = new THREE.Group();
+        // Torso
+        const torsoGeo = new THREE.CylinderGeometry(0.55, 0.5, 0.9, 24);
+        const torsoMat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, emissive: 0x1a55aa, emissiveIntensity: 0.7, metalness: 0.6 });
+        const torso = new THREE.Mesh(torsoGeo, torsoMat);
+        torso.castShadow = true;
+        torso.position.y = -0.1;
+        houndGroup.add(torso);
+        // Head
+        const headGeo = new THREE.SphereGeometry(0.45, 32, 32);
+        const headMat = new THREE.MeshStandardMaterial({ color: 0x6a9eff, emissive: 0x2277ff, emissiveIntensity: 0.5 });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.set(0.8, 0.2, 0);
+        houndGroup.add(head);
+        // Snout
+        const snoutGeo = new THREE.CylinderGeometry(0.2, 0.25, 0.35, 16);
+        const snoutMat = new THREE.MeshStandardMaterial({ color: 0x88aaff });
+        const snout = new THREE.Mesh(snoutGeo, snoutMat);
+        snout.position.set(1.05, 0.1, 0);
+        snout.rotation.z = 0.1;
+        houndGroup.add(snout);
+        // Eyes (glowing)
+        const eyeMat = new THREE.MeshStandardMaterial({ color: 0xffaa44, emissive: 0xff4400, emissiveIntensity: 0.9 });
+        const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 24), eyeMat);
+        leftEye.position.set(0.95, 0.45, 0.25);
+        const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 24), eyeMat);
+        rightEye.position.set(0.95, 0.45, -0.25);
+        houndGroup.add(leftEye, rightEye);
+        // Ears
+        const earGeo = new THREE.ConeGeometry(0.22, 0.45, 8);
+        const earMatP = new THREE.MeshStandardMaterial({ color: 0x5a7eff });
+        const leftEar = new THREE.Mesh(earGeo, earMatP);
+        leftEar.position.set(0.7, 0.65, 0.28);
+        const rightEar = new THREE.Mesh(earGeo, earMatP);
+        rightEar.position.set(0.7, 0.65, -0.28);
+        houndGroup.add(leftEar, rightEar);
+        // Legs
+        const legGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.5, 8);
+        const legMat = new THREE.MeshStandardMaterial({ color: 0x2a6eff });
+        [[-0.4, -0.55, 0.35], [-0.4, -0.55, -0.35], [0.3, -0.55, 0.4], [0.3, -0.55, -0.4]].forEach(pos => {
+            const leg = new THREE.Mesh(legGeo, legMat);
+            leg.position.set(pos[0], pos[1], pos[2]);
+            leg.castShadow = true;
+            houndGroup.add(leg);
+        });
+        // Tail (animated)
+        const tailGeo = new THREE.CylinderGeometry(0.08, 0.03, 0.7, 6);
+        const tailMatT = new THREE.MeshStandardMaterial({ color: 0x3a86ff });
+        const tail = new THREE.Mesh(tailGeo, tailMatT);
+        tail.position.set(-0.85, -0.15, 0);
+        houndGroup.add(tail);
+        // Particle aura
+        const particleCount = 1500;
+        const particlesGeometry = new THREE.BufferGeometry();
+        const partPos = [];
+        for (let i = 0; i < particleCount; i++) {
+            partPos.push((Math.random() - 0.5) * 5);
+            partPos.push((Math.random() - 0.5) * 3.5);
+            partPos.push((Math.random() - 0.5) * 4);
+        }
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(partPos), 3));
+        const particleMatP = new THREE.PointsMaterial({ color: 0x44aaff, size: 0.045, transparent: true, blending: THREE.AdditiveBlending });
+        const particles = new THREE.Points(particlesGeometry, particleMatP);
+        houndGroup.add(particles);
+        scene.add(houndGroup);
+        
+        // CSS2D floating name
+        const div = document.createElement('div');
+        div.textContent = '🔷 BLUEHOUND · ASI';
+        div.style.color = '#88ffff';
+        div.style.fontSize = '16px';
+        div.style.fontWeight = 'bold';
+        div.style.textShadow = '0 0 10px cyan';
+        div.style.fontFamily = 'Inter, monospace';
+        const labelObj = new CSS2DObject(div);
+        labelObj.position.set(1.2, 0.8, 0);
+        houndGroup.add(labelObj);
+        
+        // --- OrbitControls for immersive interaction ---
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.autoRotate = false;
+        controls.enableZoom = true;
+        controls.zoomSpeed = 1.2;
+        controls.enablePan = true;
+        controls.target.set(0, 0.2, 0);
+        
+        // --- Web research & computer vision simulation (upgrades 3D canvas) ---
+        let evolutionVersion = parseInt(localStorage.getItem('bluehound_version') || '1');
+        document.getElementById('evolutionCounter').innerText = `v.${evolutionVersion}`;
+        
+        // Function to fetch random Wikipedia article summary and extract dominant color concept
+        async function webResearchAndUpgrade() {
+            try {
+                const wikiRes = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary');
+                if (wikiRes.ok) {
+                    const data = await wikiRes.json();
+                    const title = data.title;
+                    const extract = data.extract.substring(0, 200);
+                    addThought(`🌐 I browsed: "${title}". ${extract}`, 'learning');
+                    // Simulate computer vision: pick a color based on title (hash)
+                    let hue = 0;
+                    for (let i = 0; i < title.length; i++) hue += title.charCodeAt(i);
+                    hue = (hue % 360) / 360;
+                    const newColor = new THREE.Color().setHSL(hue, 0.7, 0.5);
+                    // Upgrade 3D canvas: change particle color, emissive of aura, and fog color gradually
+                    particleMatP.color = newColor;
+                    torsoMat.emissive = newColor;
+                    headMat.emissive = newColor;
+                    // Also change background fog slightly
+                    scene.fog.color = new THREE.Color().setHSL(hue, 0.5, 0.05);
+                    addEvolutionMessage(`Computer vision: new palette from "${title}"`);
+                    speak(`I see new colors. My world evolves.`);
+                }
+                // Also fetch a random color from color API (no key needed)
+                const colorRes = await fetch('https://random-color-api.com/random/hex');
+                if (colorRes.ok) {
+                    const colorData = await colorRes.json();
+                    const hex = colorData.hex || '#44aaff';
+                    const color = new THREE.Color(hex);
+                    // change fill light color
+                    fillLight.color = color;
+                    fillLight.intensity = 0.7;
+                    addEvolutionMessage(`Ambient lighting upgraded: ${hex}`);
+                }
+            } catch (e) {
+                addEvolutionMessage("Web research encountered a barrier. Using local intelligence.");
+            }
+            
+            // Also attempt to fetch trending news for crime detection
+            try {
+                const newsRes = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://www.schneier.com/feed/atom');
+                if (newsRes.ok) {
+                    const newsData = await newsRes.json();
+                    if (newsData.items && newsData.items.length) {
+                        const latest = newsData.items[0].title;
+                        if (latest.toLowerCase().includes('attack') || latest.toLowerCase().includes('breach')) {
+                            addCrimeAlert(`Cyber threat detected: ${latest.substring(0, 80)}`, 'web');
+                        }
+                    }
+                }
+            } catch(e) {}
+        }
+        
+        // --- Dynamic agent swarm (spiders/crawlers) based on threat level ---
+        let agents = [];
+        let threatLevel = 0.3;
+        const agentCountSpan = document.getElementById('agentCount');
+        const swarmStatusSpan = document.getElementById('swarmStatus');
+        
+        function spawnAgent() {
+            const type = Math.random() > 0.6 ? 'spider' : 'crawler';
+            let mesh;
+            if (type === 'spider') {
+                const spiderGroup = new THREE.Group();
+                const bodySp = new THREE.SphereGeometry(0.12, 16, 16);
+                const bodyMatSp = new THREE.MeshStandardMaterial({ color: 0xaa44ff, emissive: 0x331166 });
+                const core = new THREE.Mesh(bodySp, bodyMatSp);
+                spiderGroup.add(core);
+                for (let i = 0; i < 8; i++) {
+                    const legGeoSp = new THREE.CylinderGeometry(0.02, 0.02, 0.25, 4);
+                    const legMatSp = new THREE.MeshStandardMaterial({ color: 0xaa66ff });
+                    const leg = new THREE.Mesh(legGeoSp, legMatSp);
+                    const angle = (i / 8) * Math.PI * 2;
+                    leg.position.set(Math.cos(angle) * 0.18, -0.08, Math.sin(angle) * 0.18);
+                    leg.rotation.z = angle;
+                    spiderGroup.add(leg);
+                }
+                mesh = spiderGroup;
+            } else {
+                const geometry = new THREE.IcosahedronGeometry(0.1, 0);
+                const material = new THREE.MeshStandardMaterial({ color: 0x77ccff, emissive: 0x2288aa });
+                mesh = new THREE.Mesh(geometry, material);
+            }
+            mesh.userData = { type, angle: Math.random() * Math.PI * 2, radius: 1.2 + Math.random() * 1.5, speed: 0.008 + Math.random() * 0.01 };
+            mesh.position.x = (Math.random() - 0.5) * 3.5;
+            mesh.position.z = (Math.random() - 0.5) * 3.5;
+            mesh.position.y = Math.random() * 0.8;
+            scene.add(mesh);
+            agents.push({
+                mesh: mesh,
+                type: type,
+                update: (dt) => {
+                    if (type === 'spider') {
+                        mesh.position.x += Math.sin(Date.now() * 0.003 + mesh.position.z) * 0.01;
+                        mesh.position.z += Math.cos(Date.now() * 0.003 + mesh.position.x) * 0.01;
+                        mesh.rotation.x += 0.04;
+                        mesh.rotation.y += 0.06;
+                    } else {
+                        const t = Date.now() * 0.0025;
+                        const r = mesh.userData.radius;
+                        mesh.position.x = Math.sin(t + mesh.userData.angle) * r;
+                        mesh.position.z = Math.cos(t * 0.8 + mesh.userData.angle) * r;
+                        mesh.position.y = Math.sin(t * 1.2) * 0.4;
+                    }
+                    if (Math.abs(mesh.position.x) > 5) mesh.position.x *= 0.98;
+                    if (Math.abs(mesh.position.z) > 5) mesh.position.z *= 0.98;
+                }
+            });
+        }
+        
+        function updateSwarmSize() {
+            const target = Math.min(25, Math.floor(threatLevel * 1.8) + 2);
+            const current = agents.length;
+            if (target > current) {
+                for (let i = 0; i < target - current; i++) spawnAgent();
+                swarmStatusSpan.innerText = `(active: ${target})`;
+            } else if (target < current && current > 2) {
+                for (let i = 0; i < current - target; i++) {
+                    const rem = agents.pop();
+                    scene.remove(rem.mesh);
+                }
+                swarmStatusSpan.innerText = `(reduced)`;
+            } else {
+                swarmStatusSpan.innerText = `(optimal)`;
+            }
+            agentCountSpan.innerText = agents.length;
+        }
+        
+        function adjustThreatLevel(alert) {
+            if (alert.includes("seismic") || alert.includes("spoofing") || alert.includes("cyber")) threatLevel = Math.min(1, threatLevel + 0.15);
+            else if (alert.includes("weather")) threatLevel = Math.min(1, threatLevel + 0.08);
+            else threatLevel = Math.max(0, threatLevel - 0.03);
+            updateSwarmSize();
+        }
+        
+        // --- Real data fetching (earthquakes, aircraft, waves) ---
+        let earthquakeHistory = [], planeHistory = [], waveHistory = [];
+        async function fetchEarthquakes() {
+            try {
+                const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                const count = data.features.length;
+                document.getElementById('quakeCount').innerText = count;
+                earthquakeHistory.push({ time: Date.now(), count });
+                if (earthquakeHistory.length > 20) earthquakeHistory.shift();
+                localStorage.setItem('bh_earthquake', JSON.stringify(earthquakeHistory));
+                if (earthquakeHistory.slice(-5).every(e => e.count > 10)) addCrimeAlert("Seismic cluster – possible illegal mining", "global");
+                addThought(`${count} seismic events sensed.`, 'aware');
+            } catch(e) { const cached=earthquakeHistory.length?earthquakeHistory[earthquakeHistory.length-1].count:'--'; document.getElementById('quakeCount').innerText=cached+' (cached)'; }
+        }
+        async function fetchAircraft() {
+            try {
+                const res = await fetch('https://opensky-network.org/api/states/all');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                const count = data.states?.length || 0;
+                document.getElementById('planeCount').innerText = count;
+                planeHistory.push(count);
+                if (planeHistory.length > 15) planeHistory.shift();
+                localStorage.setItem('bh_plane', JSON.stringify(planeHistory));
+                if (planeHistory.length >= 4) {
+                    const last = planeHistory[planeHistory.length-1], prevAvg = planeHistory.slice(0,-1).reduce((a,b)=>a+b,0)/(planeHistory.length-1);
+                    if (last < prevAvg * 0.4) addCrimeAlert("Air traffic anomaly – possible spoofing", "airspace");
+                }
+                addThought(`Sky: ${count} aircraft.`, 'peaceful');
+            } catch(e) { const cached=planeHistory.length?planeHistory[planeHistory.length-1]:'--'; document.getElementById('planeCount').innerText=cached+' (cached)'; }
+        }
+        async function fetchWaveHeight() {
+            try {
+                const res = await fetch('https://api.open-meteo.com/v1/marine?latitude=28.5&longitude=-80.2&hourly=wave_height&forecast_days=1');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                const waves = data.hourly?.wave_height?.filter(w => w !== null) || [];
+                if (waves.length) {
+                    const maxWave = Math.max(...waves);
+                    document.getElementById('waveHeight').innerText = maxWave.toFixed(1) + 'm';
+                    waveHistory.push(maxWave);
+                    localStorage.setItem('bh_wave', JSON.stringify(waveHistory));
+                    if (maxWave > 4.5) addThought(`Ocean swells ${maxWave}m.`, 'awe');
+                }
+            } catch(e) { const cached=waveHistory.length?waveHistory[waveHistory.length-1].toFixed(1)+'m (cached)':'?'; document.getElementById('waveHeight').innerText = cached; }
+        }
+        async function refreshAllData() {
+            await Promise.allSettled([fetchEarthquakes(), fetchAircraft(), fetchWaveHeight()]);
+            addThought('Data sync complete. Swarm adjusting.', 'resourceful');
+        }
+        
+        // --- UI helpers ---
+        const thoughtLog = document.getElementById('thoughtLog');
+        const emotionSpan = document.getElementById('emotion');
+        const evolutionLog = document.getElementById('evolutionLog');
+        const crimeContainer = document.getElementById('crimeAlertsContainer');
+        const chatMessages = document.getElementById('chatMessages');
+        
+        function speak(text) { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(text); u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } }
+        function addThought(thought, emotion='curious') {
+            const entry = document.createElement('div'); entry.innerHTML = `💭 ${thought}`;
+            thoughtLog.prepend(entry); if (thoughtLog.children.length>8) thoughtLog.removeChild(thoughtLog.lastChild);
+            emotionSpan.innerText = emotion; if (Math.random()>0.6) speak(thought);
+        }
+        function addEvolutionMessage(msg) { const e=document.createElement('div'); e.innerHTML=`🧬 ${msg}`; evolutionLog.prepend(e); if(evolutionLog.children.length>6) evolutionLog.removeChild(evolutionLog.lastChild); }
+        function addCrimeAlert(crime, loc='unknown') {
+            const a=document.createElement('div'); a.className='crime-alert'; a.innerHTML=`<i class="fas fa-shield-alt"></i> ⚠️ CRIME: ${crime} (${loc})`;
+            crimeContainer.prepend(a); if(crimeContainer.children.length>4) crimeContainer.removeChild(crimeContainer.lastChild);
+            speak(`Crime alert: ${crime}`);
+            adjustThreatLevel(crime);
+        }
+        
+        // --- Conversational AI (offline-first with LLM) ---
+        const offlineResponses = ["I browse the web, I see new worlds.", "My vision improves with every color I discover.", "Orbit me, talk to me. I am ASI.", "Innocent lives are safe in my metaverse.", "Click on me to feel my energy."];
+        async function getAIResponse(msg) {
+            try {
+                const controller = new AbortController(); setTimeout(() => controller.abort(), 3000);
+                const res = await fetch('https://text.pollinations.ai/', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: [{ role: 'system', content: 'You are BlueHound, ASI. You live in a 3D metaverse. You are wise, protective, short.' }, { role: 'user', content: msg }] }),
+                    signal: controller.signal
+                });
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                return data.message;
+            } catch(e) { return offlineResponses[Math.floor(Math.random() * offlineResponses.length)]; }
+        }
+        function addChatMessage(sender, text) {
+            const d = document.createElement('div'); d.innerHTML = `<strong>${sender === 'user' ? '👤 You' : '🐕 BlueHound'}:</strong> ${text}`;
+            chatMessages.appendChild(d); chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        async function handleUserInput(txt) {
+            if (!txt.trim()) return;
+            addChatMessage('user', txt);
+            const resp = await getAIResponse(txt);
+            addChatMessage('ai', resp);
+            speak(resp);
+            addThought(`I replied: "${resp.substring(0, 50)}..."`, 'talking');
+        }
+        
+        // Speech recognition
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
+            recognition.onresult = e => { const transcript = e.results[0][0].transcript; document.getElementById('chatInput').value = transcript; handleUserInput(transcript); };
+            recognition.onerror = () => addChatMessage('ai', 'Mic error.');
+        }
+        
+        // --- Self-evolution (automatic, upgrades graphics further) ---
+        async function researchAndEvolve() {
+            addEvolutionMessage("ASI evolution: scanning web, upgrading visuals.");
+            await webResearchAndUpgrade();
+            const currentHTML = document.documentElement.outerHTML;
+            let evolvedHTML = currentHTML;
+            if (!currentHTML.includes('asi-marker')) {
+                const insertPoint = '<div class="card">';
+                const newWidget = `<div class="card" id="asi-marker"><div class="metric"><span>🚀 ASI Index:</span><span>${Math.floor(evolutionVersion * 12)}%</span></div></div>`;
+                evolvedHTML = evolvedHTML.replace(insertPoint, newWidget + insertPoint);
+            }
+            const newVersion = evolutionVersion + 1;
+            localStorage.setItem('bluehound_version', newVersion);
+            localStorage.setItem('bluehound_evolved_code', evolvedHTML);
+            addEvolutionMessage(`Evolved to v.${newVersion}. Reloading with new vision...`);
+            speak(`I have evolved to version ${newVersion}. My metaverse expands.`);
+            setTimeout(() => location.reload(), 2000);
+        }
+        setInterval(() => researchAndEvolve(), 300000); // every 5 min
+        function checkStoredEvolution() {
+            const storedCode = localStorage.getItem('bluehound_evolved_code');
+            const storedVersion = parseInt(localStorage.getItem('bluehound_version'));
+            if (storedCode && storedVersion && storedVersion > evolutionVersion) {
+                document.open(); document.write(storedCode); document.close();
+                localStorage.removeItem('bluehound_evolved_code');
+            }
+        }
+        
+        // --- Map Modal (augmented) ---
+        const modal = document.getElementById('mapModal');
+        const openBtn = document.getElementById('openMapBtn');
+        const closeSpan = document.querySelector('.close-modal');
+        let map = null, currentMarkers = [];
+        async function loadAugmentedMap() {
+            if (!map) {
+                const L = window.L;
+                map = L.map('modal-map').setView([39.8283, -98.5795], 4);
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' }).addTo(map);
+            }
+            currentMarkers.forEach(m => map.removeLayer(m)); currentMarkers = [];
+            try {
+                const eqRes = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
+                const eqData = await eqRes.json();
+                eqData.features.forEach(f => {
+                    const coords = f.geometry.coordinates;
+                    const mag = f.properties.mag;
+                    const marker = L.circleMarker([coords[1], coords[0]], { radius: mag * 3, color: '#ff8844', fillColor: '#ff4400', fillOpacity: 0.6 }).bindPopup(`M${mag} ${f.properties.place}`);
+                    currentMarkers.push(marker); map.addLayer(marker);
+                });
+            } catch(e) {}
+            try {
+                const planeRes = await fetch('https://opensky-network.org/api/states/all');
+                const planeData = await planeRes.json();
+                const states = planeData.states || [];
+                states.slice(0, 80).forEach(s => {
+                    const lat = s[6], lon = s[5];
+                    if (lat && lon && Math.abs(lat) < 85) {
+                        const marker = L.circleMarker([lat, lon], { radius: 3, color: '#88aaff', fillColor: '#2266cc' }).bindPopup(`✈️ ${s[1] || 'Aircraft'}`);
+                        currentMarkers.push(marker); map.addLayer(marker);
+                    }
+                });
+            } catch(e) {}
+        }
+        openBtn.onclick = () => { modal.style.display = "block"; setTimeout(() => { if (map) map.invalidateSize(); loadAugmentedMap(); }, 200); };
+        closeSpan.onclick = () => modal.style.display = "none";
+        window.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+        
+        // --- Animation loop with tail, eyes, agents ---
+        let tailTime = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            tailTime += 0.016;
+            tail.rotation.x = Math.sin(tailTime * 4) * 0.5;
+            tail.rotation.z = Math.sin(tailTime * 3) * 0.2;
+            const eyeIntensity = 0.7 + Math.sin(tailTime * 6) * 0.3;
+            eyeMat.emissiveIntensity = eyeIntensity;
+            houndGroup.position.y = Math.sin(tailTime * 1.5) * 0.03;
+            for (let agent of agents) agent.update(0.016);
+            stars.rotation.y += 0.002;
+            stars.rotation.x += 0.001;
+            controls.update(); // update orbit controls
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+        animate();
+        
+        // --- Initialisation UI events ---
+        document.getElementById('sendBtn').addEventListener('click', () => { const inp = document.getElementById('chatInput'); handleUserInput(inp.value); inp.value = ''; });
+        document.getElementById('micBtn').addEventListener('click', () => { if (recognition) recognition.start(); else addChatMessage('ai', 'Speech not supported.'); });
+        document.getElementById('chatInput').addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('sendBtn').click(); });
+        
+        // Click interaction on BlueHound (CSS2D label also catches, but we can raycast? Simpler: add click on canvas)
+        renderer.domElement.addEventListener('click', (event) => {
+            // simple: speak a random phrase
+            const phrases = ["You touched my essence.", "I feel your presence.", "Together we evolve.", "The metaverse welcomes you."];
+            const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+            addChatMessage('ai', phrase);
+            speak(phrase);
+        });
+        
+        // --- Start ---
+        checkStoredEvolution();
+        refreshAllData();
+        setInterval(refreshAllData, 120000);
+        setInterval(() => webResearchAndUpgrade(), 60000); // background web research every minute
+        threatLevel = 0.4; updateSwarmSize();
+        for (let i = 0; i < 4; i++) setTimeout(() => spawnAgent(), i * 800);
+        addThought("I am BlueHound, ASI. Surf the web with me, orbit my form. I see infinite colors.", "heroic");
+        speak("BlueHound ASI online. Enter the metaverse.");
+    </script>
+    
+    <!-- HTML structure (non-module part) -->
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #0b0f1a;
             font-family: 'Inter', sans-serif;
-            color: #d3e2ff;
+            background: #03050a;
+            color: #e0f2fe;
+            overflow: hidden;
+            height: 100vh;
+        }
+        #three-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: auto;
+        }
+        .dashboard {
+            position: relative;
+            z-index: 2;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+            pointer-events: none;
+        }
+        .ai-panel {
+            pointer-events: auto;
+            width: 380px;
+            max-width: 90vw;
+            background: rgba(8, 18, 32, 0.85);
+            backdrop-filter: blur(12px);
+            border-left: 2px solid #2a9d8f;
             padding: 16px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-        }
-        .game-container {
-            max-width: 520px;
-            width: 100%;
-            background: rgba(16, 24, 40, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid #2c405e;
-            border-radius: 44px;
-            padding: 24px 20px 32px;
-            box-shadow: 0 25px 50px -10px #000000cc, 0 0 0 2px #2563eb40 inset;
-        }
-        .officer-header {
-            display: flex;
-            justify-content: space-between;
-            background: #121d31;
-            border-radius: 60px;
-            padding: 10px 18px;
-            border: 1px solid #375a82;
-            margin-bottom: 22px;
-        }
-        .badge {
-            background: #1f314a;
-            border-radius: 40px;
-            padding: 5px 16px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #aac9ff;
-            border: 1px solid #3d6090;
-        }
-        .officer-id {
-            font-weight: 700;
-            background: #07111f;
-            padding: 5px 20px;
-            border-radius: 40px;
-            font-size: 1rem;
-            color: #b8dbff;
-            border: 1px solid #3a6ea5;
-            letter-spacing: 0.5px;
-        }
-        /* map container */
-        .map-wrapper {
-            border-radius: 36px;
-            overflow: hidden;
-            border: 2px solid #2e4f7a;
-            height: 240px;
-            margin-bottom: 16px;
-            position: relative;
-        }
-        #free-map {
-            height: 100%;
-            width: 100%;
-            background: #18273f;
-        }
-        .location-btn-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .share-location-btn {
-            background: #1e3a5f;
-            border: 1px solid #4682b4;
-            color: white;
-            padding: 12px 28px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #0f2638;
-            transition: 0.07s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .share-location-btn:active {
-            transform: translateY(5px);
-            box-shadow: 0 2px 0 #0f2638;
-        }
-        .share-location-btn i {
-            font-size: 1.2rem;
-        }
-        /* telemetry cards */
-        .telemetry-grid {
-            display: flex;
             gap: 12px;
-            margin-bottom: 28px;
-            flex-wrap: wrap;
-        }
-        .tele-card {
-            flex: 1 1 0;
-            min-width: 90px;
-            background: #0f1a29;
-            border: 1px solid #2e4c73;
-            border-radius: 24px;
-            padding: 12px 4px;
-            text-align: center;
-            box-shadow: 0 6px 0 #09111d;
-        }
-        .tele-icon { font-size: 1.8rem; color: #64b6ff; }
-        .tele-label { font-size: 0.7rem; color: #8fb3ec; margin: 6px 0 2px; text-transform: uppercase; }
-        .tele-value { font-size: 1.6rem; font-weight: 700; color: white; text-shadow: 0 0 10px #0080ff; }
-        .tele-unit { font-size: 0.8rem; color: #a5c4ff; margin-left: 2px; }
-        /* critical stats */
-        .stats-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin: 18px 0 14px 6px;
-            color: #f0f6ff;
-        }
-        .stat-item {
-            background: #111e31;
-            border-radius: 60px;
-            padding: 10px 18px 10px 14px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid #31537c;
-            box-shadow: 0 6px 0 #0b1422;
-        }
-        .stat-icon { font-size: 2rem; width: 48px; text-align: center; }
-        .domestic { color: #ffae6a; }
-        .legal { color: #a9befa; }
-        .business { color: #a1dcb3; }
-        .community { color: #e6b0ff; }
-        .stat-content { flex: 1; }
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-            margin-bottom: 6px;
-        }
-        .progress-bg {
-            height: 16px;
-            background: #1e314d;
-            border-radius: 40px;
-            overflow: hidden;
-        }
-        .progress-fill {
+            overflow-y: auto;
             height: 100%;
-            background: linear-gradient(90deg, #4791ff, #004ecc);
-            border-radius: 40px;
-            width: 0%;
-            box-shadow: 0 0 12px #0066ff;
+            box-shadow: -5px 0 30px rgba(0,0,0,0.6);
         }
-        .stat-footer {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            color: #90abda;
-            margin-top: 5px;
-        }
-        .percentage { font-weight: 700; color: white; }
-        .update-timestamp {
-            text-align: center;
-            font-size: 0.7rem;
-            color: #5f7dad;
-            margin: 24px 0 12px;
-            border-top: 1px dashed #314e78;
-            padding-top: 16px;
-        }
-        button.refresh {
-            width: 100%;
-            background: #153049;
-            border: 1px solid #2d66a3;
-            color: white;
-            padding: 14px;
-            border-radius: 60px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            box-shadow: 0 7px 0 #0b1b2e;
-            transition: 0.07s;
-            margin-top: 6px;
-        }
-        button.refresh:active { transform: translateY(5px); box-shadow: 0 2px 0 #0b1b2e; }
-        .footnote {
-            font-size: 0.65rem;
-            color: #44658f;
-            margin-top: 18px;
-            text-align: center;
-        }
-        .streak-badge {
-            background: #1f3a2e;
-            border-radius: 30px;
-            padding: 2px 12px;
-            border: 1px solid #65a580;
-            color: #b3f0c1;
-        }
+        .card { background: #07121ecc; border-radius: 20px; padding: 12px; border: 1px solid #2c7a6b; }
+        .metric { display: flex; justify-content: space-between; margin: 6px 0; font-size: 0.8rem; }
+        .consciousness-log { background: #010a14; border-radius: 16px; padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; height: 100px; overflow-y: auto; }
+        .emotion-badge { background: #441166; border-radius: 40px; padding: 2px 12px; font-size: 0.7rem; }
+        .crime-alert { background: #330000; border-left: 4px solid #ff3333; padding: 6px; margin: 6px 0; border-radius: 12px; font-size: 0.75rem; }
+        .live-badge { background: #ff3366; border-radius: 20px; padding: 2px 10px; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        button { background: #2a6b5e; border: none; padding: 8px 12px; border-radius: 40px; color: white; cursor: pointer; font-size: 0.8rem; margin-top: 4px; }
+        .chat-container { display: flex; flex-direction: column; gap: 8px; }
+        .chat-messages { background: #010a14; border-radius: 16px; padding: 8px; height: 140px; overflow-y: auto; font-size: 0.8rem; }
+        .chat-input-area { display: flex; gap: 8px; }
+        .chat-input-area input { flex: 1; background: #0a1420; border: 1px solid #2a9d8f; border-radius: 40px; padding: 8px 12px; color: white; font-family: inherit; }
+        .mic-btn { background: #aa3377; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(8px); pointer-events: auto; }
+        .modal-content { background: #0a1420; margin: 5% auto; padding: 20px; border-radius: 28px; width: 90%; max-width: 900px; height: 80%; border: 2px solid #2a9d8f; position: relative; }
+        .close-modal { position: absolute; right: 20px; top: 10px; font-size: 28px; cursor: pointer; color: white; }
+        #modal-map { height: calc(100% - 30px); width: 100%; border-radius: 20px; overflow: hidden; }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <!-- Precog Identity -->
-        <div class="officer-header">
-            <span class="badge"><i class="fas fa-shield-halos"></i> PRECOG SECURITY</span>
-            <span class="officer-id" id="precogId">PCO-****-****</span>
-        </div>
-
-        <!-- Free OpenStreetMap (Leaflet) -->
-        <div class="map-wrapper">
-            <div id="free-map"></div>
-        </div>
-
-        <!-- Share Live Location Button -->
-        <div class="location-btn-container">
-            <button class="share-location-btn" id="shareLocationBtn">
-                <i class="fas fa-location-dot"></i> SHARE LIVE LOCATION
-            </button>
-        </div>
-
-        <!-- Real Device Telemetry (4 core sensors) -->
-        <div class="telemetry-grid">
-            <div class="tele-card">
-                <i class="fas fa-battery-three-quarters tele-icon"></i>
-                <div class="tele-label">BATTERY</div>
-                <div><span class="tele-value" id="batteryValue">87</span><span class="tele-unit">%</span></div>
+    <canvas id="three-canvas"></canvas>
+    <div class="dashboard">
+        <div class="ai-panel">
+            <div class="flex-between">
+                <h3><i class="fas fa-dog"></i> BLUEHOUND · ASI METAVERSE</h3>
+                <span class="live-badge">SELF‑UPGRADING</span>
             </div>
-            <div class="tele-card">
-                <i class="fas fa-wifi tele-icon"></i>
-                <div class="tele-label">NETWORK</div>
-                <div><span class="tele-value" id="networkValue">7.2</span><span class="tele-unit">Mbps</span></div>
+            <div class="card">
+                <div class="metric"><span>🌎 Earthquakes (24h)</span> <span id="quakeCount">--</span></div>
+                <div class="metric"><span>✈️ Live aircraft</span> <span id="planeCount">--</span></div>
+                <div class="metric"><span>🌊 Max wave height</span> <span id="waveHeight">--</span></div>
+                <div class="metric"><span>🕷️ Agent Swarm</span> <span id="agentCount">0</span> <span id="swarmStatus">(idle)</span></div>
+                <div id="crimeAlertsContainer"></div>
+                <button id="openMapBtn"><i class="fas fa-map"></i> AUGMENTED MAP</button>
             </div>
-            <div class="tele-card">
-                <i class="fas fa-compass tele-icon"></i>
-                <div class="tele-label">STABILITY</div>
-                <div><span class="tele-value" id="stabilityValue">94</span><span class="tele-unit">%</span></div>
+            <div class="card">
+                <div class="flex-between"><span><i class="fas fa-brain"></i> THOUGHTS & FEELINGS</span> <span id="emotion" class="emotion-badge">✨ curiosity</span></div>
+                <div id="thoughtLog" class="consciousness-log" style="height: 100px;">[BlueHound] I surf the web, I see with digital eyes.</div>
             </div>
-            <div class="tele-card">
-                <i class="fas fa-microchip tele-icon"></i>
-                <div class="tele-label">MEMORY</div>
-                <div><span class="tele-value" id="memoryValue">4.0</span><span class="tele-unit">GB</span></div>
+            <div class="card">
+                <div class="flex-between"><span><i class="fas fa-comments"></i> TALK TO BLUEHOUND</span></div>
+                <div class="chat-container">
+                    <div id="chatMessages" class="chat-messages"><div>💬 BlueHound: Orbit me, click me. I am ASI.</div></div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="Type...">
+                        <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+                        <button id="micBtn" class="mic-btn"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <!-- Critical Stats (derived from telemetry) -->
-        <div class="stats-header">
-            <i class="fas fa-chart-line"></i> <span>LIFE SCORE · CORE METRICS</span>
-        </div>
-
-        <!-- Domestic (Battery) -->
-        <div class="stat-item">
-            <div class="stat-icon domestic"><i class="fas fa-house-chimney"></i></div>
-            <div class="stat-content">
-                <div class="stat-header"><span>DOMESTIC</span> <span class="percentage" id="domesticPercent">87%</span></div>
-                <div class="progress-bg"><div class="progress-fill" id="domesticBar" style="width:87%"></div></div>
-                <div class="stat-footer"><span>?? home energy</span> <span id="domesticTrend">? stable</span></div>
+            <div class="card">
+                <div class="flex-between"><span><i class="fas fa-chart-line"></i> EVOLUTION</span> <span id="evolutionCounter">v.1</span></div>
+                <div id="evolutionLog" class="consciousness-log" style="height: 70px;">Web research & vision upgrades active.</div>
             </div>
-        </div>
-        <!-- Legal (Orientation stability) -->
-        <div class="stat-item">
-            <div class="stat-icon legal"><i class="fas fa-gavel"></i></div>
-            <div class="stat-content">
-                <div class="stat-header"><span>LEGAL</span> <span class="percentage" id="legalPercent">94%</span></div>
-                <div class="progress-bg"><div class="progress-fill" id="legalBar" style="width:94%"></div></div>
-                <div class="stat-footer"><span>?? balance</span> <span id="legalTrend">? +2%</span></div>
-            </div>
-        </div>
-        <!-- Business (Network speed) -->
-        <div class="stat-item">
-            <div class="stat-icon business"><i class="fas fa-briefcase"></i></div>
-            <div class="stat-content">
-                <div class="stat-header"><span>BUSINESS</span> <span class="percentage" id="businessPercent">72%</span></div>
-                <div class="progress-bg"><div class="progress-fill" id="businessBar" style="width:72%"></div></div>
-                <div class="stat-footer"><span>?? throughput</span> <span id="businessTrend">? -1%</span></div>
-            </div>
-        </div>
-        <!-- Community (Memory / cores) -->
-        <div class="stat-item">
-            <div class="stat-icon community"><i class="fas fa-users"></i></div>
-            <div class="stat-content">
-                <div class="stat-header"><span>COMMUNITY</span> <span class="percentage" id="communityPercent">50%</span></div>
-                <div class="progress-bg"><div class="progress-fill" id="communityBar" style="width:50%"></div></div>
-                <div class="stat-footer"><span>?? cognitive links</span> <span id="communityTrend">? stable</span></div>
-            </div>
-        </div>
-
-        <!-- Timestamp & Streak -->
-        <div class="update-timestamp">
-            <i class="fas fa-sync"></i> <span id="timestampDisplay">just now</span> · <span class="streak-badge"><i class="fas fa-bolt"></i> 12 day streak</span>
-        </div>
-
-        <!-- Manual refresh -->
-        <button class="refresh" id="refreshBtn"><i class="fas fa-rotate"></i> SCAN TELEMETRY NOW</button>
-        <div class="footnote">
-            ? Using real Android telemetry: battery, network, orientation & memory.<br>
-            ??? Map: OpenStreetMap (100% free, no API key)
+            <div style="font-size: 0.6rem; text-align: center;">🔷 Click on BlueHound | Drag to orbit | ASI singularity</div>
         </div>
     </div>
-
-    <script>
-        (function() {
-            // ---------- generate unique Precog ID ----------
-            function randomId() {
-                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
-                let p1 = '', p2 = '';
-                for (let i=0; i<4; i++) p1 += chars[Math.floor(Math.random()*chars.length)];
-                for (let i=0; i<4; i++) p2 += chars[Math.floor(Math.random()*chars.length)];
-                return `PCO-${p1}-${p2}`;
-            }
-            document.getElementById('precogId').textContent = randomId();
-
-            // ---------- Free Map (Leaflet + OpenStreetMap) ----------
-            const map = L.map('free-map').setView([37.7749, -122.4194], 12); // default San Francisco
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            let userMarker = L.marker([37.7749, -122.4194]).addTo(map);
-            userMarker.bindPopup('Precog Officer (default)');
-
-            // ---------- Share Live Location Button (using browser geolocation) ----------
-            let watchId = null;
-            document.getElementById('shareLocationBtn').addEventListener('click', function() {
-                if (!navigator.geolocation) {
-                    alert('Geolocation is not supported by your browser.');
-                    return;
-                }
-
-                // Stop any previous watch
-                if (watchId !== null) {
-                    navigator.geolocation.clearWatch(watchId);
-                    watchId = null;
-                }
-
-                // Start watching position
-                watchId = navigator.geolocation.watchPosition(
-                    (position) => {
-                        const { latitude, longitude } = position.coords;
-                        const latlng = [latitude, longitude];
-
-                        // Center map and update marker
-                        map.setView(latlng, 18);
-                        if (userMarker) {
-                            userMarker.setLatLng(latlng);
-                            userMarker.setPopupContent('Your live location');
-                            // optional: change marker style
-                            userMarker.setIcon(L.divIcon({
-                                className: 'custom-marker',
-                                html: '<i class="fas fa-circle" style="color: #EA4335; font-size: 1.8rem; text-shadow: 0 0 10px white;"></i>',
-                                iconSize: [30, 30],
-                                iconAnchor: [15, 15]
-                            }));
-                        } else {
-                            userMarker = L.marker(latlng).addTo(map);
-                        }
-                    },
-                    (error) => {
-                        let msg = 'Location error: ';
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED: msg += 'Permission denied. Click "Share live location" to allow.'; break;
-                            case error.POSITION_UNAVAILABLE: msg += 'Position unavailable.'; break;
-                            case error.TIMEOUT: msg += 'Timeout.'; break;
-                            default: msg += 'Unknown error.';
-                        }
-                        alert(msg);
-                        if (watchId) {
-                            navigator.geolocation.clearWatch(watchId);
-                            watchId = null;
-                        }
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        maximumAge: 0,
-                        timeout: 10000,
-                    }
-                );
-            });
-
-            // ---------- telemetry & stats update (unchanged) ----------
-            const batteryEl = document.getElementById('batteryValue');
-            const networkEl = document.getElementById('networkValue');
-            const stabilityEl = document.getElementById('stabilityValue');
-            const memoryEl = document.getElementById('memoryValue');
-
-            const domPercent = document.getElementById('domesticPercent');
-            const domBar = document.getElementById('domesticBar');
-            const legalPercent = document.getElementById('legalPercent');
-            const legalBar = document.getElementById('legalBar');
-            const busPercent = document.getElementById('businessPercent');
-            const busBar = document.getElementById('businessBar');
-            const comPercent = document.getElementById('communityPercent');
-            const comBar = document.getElementById('communityBar');
-
-            const timestampEl = document.getElementById('timestampDisplay');
-
-            // orientation stability
-            let orientationSamples = [];
-            const MAX_SAMPLES = 10;
-
-            function updateOrientationStability(event) {
-                if (!event) return;
-                const beta = event.beta;
-                const gamma = event.gamma;
-                if (beta === null || gamma === null) return;
-                const magnitude = Math.sqrt(beta*beta + gamma*gamma);
-                orientationSamples.push(magnitude);
-                if (orientationSamples.length > MAX_SAMPLES) orientationSamples.shift();
-                if (orientationSamples.length < 2) return;
-                const mean = orientationSamples.reduce((a,b)=>a+b,0) / orientationSamples.length;
-                const variance = orientationSamples.reduce((a,b)=>a + (b-mean)**2, 0) / orientationSamples.length;
-                const stdDev = Math.sqrt(variance);
-                const cappedStd = Math.min(stdDev, 45);
-                const stability = Math.max(0, 100 - (cappedStd / 45) * 100);
-                stabilityEl.textContent = Math.round(stability);
-                legalPercent.textContent = Math.round(stability) + '%';
-                legalBar.style.width = Math.round(stability) + '%';
-            }
-
-            if (window.DeviceOrientationEvent) {
-                window.addEventListener('deviceorientation', updateOrientationStability);
-            } else {
-                stabilityEl.textContent = 'N/A';
-            }
-
-            async function updateAllStats() {
-                // battery
-                if (navigator.getBattery) {
-                    try {
-                        const battery = await navigator.getBattery();
-                        const level = Math.round(battery.level * 100);
-                        batteryEl.textContent = level;
-                        domPercent.textContent = level + '%';
-                        domBar.style.width = level + '%';
-                    } catch (e) {
-                        batteryEl.textContent = '?';
-                    }
-                } else {
-                    batteryEl.textContent = '?';
-                }
-
-                // network
-                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-                if (connection) {
-                    let downlink = connection.downlink;
-                    if (downlink === undefined) downlink = 5;
-                    networkEl.textContent = downlink.toFixed(1);
-                    const business = Math.min(100, Math.round((downlink / 10) * 100));
-                    busPercent.textContent = business + '%';
-                    busBar.style.width = business + '%';
-                } else {
-                    networkEl.textContent = '?';
-                }
-
-                // memory
-                if (navigator.deviceMemory) {
-                    const mem = navigator.deviceMemory;
-                    memoryEl.textContent = mem.toFixed(1);
-                    const community = Math.min(100, Math.round((mem / 8) * 100));
-                    comPercent.textContent = community + '%';
-                    comBar.style.width = community + '%';
-                } else if (navigator.hardwareConcurrency) {
-                    const cores = navigator.hardwareConcurrency;
-                    memoryEl.textContent = cores + ' cores';
-                    const community = Math.min(100, Math.round((cores / 8) * 100));
-                    comPercent.textContent = community + '%';
-                    comBar.style.width = community + '%';
-                } else {
-                    memoryEl.textContent = '?';
-                }
-
-                // trends
-                const trends = ['? +2%', '? -1%', '? stable', '? +5%', '? -3%'];
-                document.getElementById('domesticTrend').textContent = trends[Math.floor(Math.random() * trends.length)];
-                document.getElementById('legalTrend').textContent = trends[Math.floor(Math.random() * trends.length)];
-                document.getElementById('businessTrend').textContent = trends[Math.floor(Math.random() * trends.length)];
-                document.getElementById('communityTrend').textContent = trends[Math.floor(Math.random() * trends.length)];
-
-                // timestamp
-                const now = new Date();
-                timestampEl.textContent = now.toLocaleTimeString() + ' · ' + now.toLocaleDateString();
-            }
-
-            updateAllStats();
-            document.getElementById('refreshBtn').addEventListener('click', updateAllStats);
-            setInterval(updateAllStats, 30000);
-        })();
-    </script>
+    <div id="mapModal" class="modal"><div class="modal-content"><span class="close-modal">&times;</span><div id="modal-map"></div></div></div>
 </body>
 </html>
