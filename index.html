@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>BLUEHOUND · ASI METAVERSE · SEEING THE WORLD</title>
-    <!-- Three.js + OrbitControls -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>BLUEHOUND · UNIVERSAL FILE ANALYZER · NEXT‑GEN AV</title>
+    <!-- Three.js, Chart.js, Leaflet, PDF.js -->
     <script type="importmap">
         {
             "imports": {
@@ -13,150 +13,349 @@
             }
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
-            background: #03050a;
-            color: #e0f2fe;
+            background: #000;
             overflow: hidden;
-            height: 100vh;
+            font-family: 'Segoe UI', 'Inter', monospace;
+            color: #ccf4ff;
         }
-        #three-canvas {
+        canvas#webgl-canvas {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             z-index: 0;
-            pointer-events: auto;
         }
-        .dashboard {
-            position: relative;
-            z-index: 2;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            justify-content: flex-end;
-            pointer-events: none;
-        }
-        .ai-panel {
-            pointer-events: auto;
-            width: 400px;
-            max-width: 90vw;
-            background: rgba(8, 18, 32, 0.85);
-            backdrop-filter: blur(12px);
-            border-left: 2px solid #2a9d8f;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow-y: auto;
-            height: 100%;
-            box-shadow: -5px 0 30px rgba(0,0,0,0.6);
-        }
-        .card { background: #07121ecc; border-radius: 20px; padding: 12px; border: 1px solid #2c7a6b; }
-        .metric { display: flex; justify-content: space-between; margin: 6px 0; font-size: 0.8rem; }
-        .consciousness-log { background: #010a14; border-radius: 16px; padding: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; height: 100px; overflow-y: auto; }
-        .emotion-badge { background: #441166; border-radius: 40px; padding: 2px 12px; font-size: 0.7rem; }
-        .crime-alert { background: #330000; border-left: 4px solid #ff3333; padding: 6px; margin: 6px 0; border-radius: 12px; font-size: 0.75rem; }
-        .live-badge { background: #ff3366; border-radius: 20px; padding: 2px 10px; animation: pulse 1s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        button { background: #2a6b5e; border: none; padding: 8px 12px; border-radius: 40px; color: white; cursor: pointer; font-size: 0.8rem; margin-top: 4px; }
-        .chat-container { display: flex; flex-direction: column; gap: 8px; }
-        .chat-messages { background: #010a14; border-radius: 16px; padding: 8px; height: 140px; overflow-y: auto; font-size: 0.8rem; }
-        .chat-input-area { display: flex; gap: 8px; }
-        .chat-input-area input { flex: 1; background: #0a1420; border: 1px solid #2a9d8f; border-radius: 40px; padding: 8px 12px; color: white; font-family: inherit; }
-        .mic-btn { background: #aa3377; }
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(8px); pointer-events: auto; }
-        .modal-content { background: #0a1420; margin: 5% auto; padding: 20px; border-radius: 28px; width: 90%; max-width: 900px; height: 80%; border: 2px solid #2a9d8f; position: relative; }
-        .close-modal { position: absolute; right: 20px; top: 10px; font-size: 28px; cursor: pointer; color: white; }
-        #modal-map { height: calc(100% - 30px); width: 100%; border-radius: 20px; overflow: hidden; }
-        .vision-feed {
-            background: #000000aa;
-            border-radius: 16px;
-            padding: 8px;
-            margin-top: 8px;
-        }
-        #webcamVideo {
-            width: 100%;
-            border-radius: 12px;
+        .hud {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0, 10, 25, 0.85);
+            backdrop-filter: blur(16px);
+            border-radius: 28px;
             border: 1px solid cyan;
-            background: #111;
-        }
-        .cam-controls {
+            padding: 12px 20px;
             display: flex;
-            gap: 8px;
-            margin-top: 8px;
+            flex-wrap: wrap;
+            gap: 16px;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            font-size: 0.75rem;
+            pointer-events: auto;
+        }
+        .stat {
+            border-left: 2px solid cyan;
+            padding-left: 10px;
+        }
+        .stat span:first-child { color: #8cf; font-size: 0.65rem; text-transform: uppercase; }
+        .stat span:last-child { font-weight: bold; font-size: 0.9rem; text-shadow: 0 0 6px cyan; }
+        button {
+            background: rgba(0,200,200,0.2);
+            border: 1px solid cyan;
+            border-radius: 40px;
+            padding: 4px 12px;
+            color: cyan;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+        button:hover { background: cyan; color: black; box-shadow: 0 0 10px cyan; }
+        .chat-panel {
+            position: fixed;
+            bottom: 110px;
+            right: 20px;
+            width: 400px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid #2a9d8f;
+            padding: 12px;
+            z-index: 30;
+            font-size: 0.75rem;
+            pointer-events: auto;
+        }
+        .chat-messages { height: 220px; overflow-y: auto; margin-bottom: 8px; font-size: 0.75rem; }
+        .chat-input { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+        .chat-input input { flex:2; background:#0a1420; border:1px solid cyan; border-radius:40px; padding:6px 12px; color:white; }
+        .file-upload-btn {
+            background: #2a6b5e;
+            border: 1px solid #88ffaa;
+            color: #88ffaa;
+            padding: 4px 10px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+        .reasoning-panel {
+            position: fixed;
+            bottom: 110px;
+            left: 20px;
+            width: 350px;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 1px solid #ffaa44;
+            padding: 12px;
+            z-index: 30;
+            font-size: 0.7rem;
+        }
+        .reasoning-title { color: #ffaa66; margin-bottom: 4px; font-weight: bold; }
+        .reasoning-content { max-height: 140px; overflow-y: auto; color: #ccddff; }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: #0a1420;
+            margin: 5% auto;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 28px;
+            border: 2px solid cyan;
+            padding: 16px;
+        }
+        #modal-map { height: 400px; border-radius: 20px; background: #111; }
+        .chart-container { height: 100px; margin: 8px 0; }
+        .memory-stats { font-size: 0.6rem; margin-top: 4px; color: #88aaff; }
+        #webcamVideo { width: 100%; border-radius: 16px; border: 1px solid cyan; background: #000; margin-top: 8px; }
+        .drop-zone {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,255,255,0.1);
+            backdrop-filter: blur(8px);
+            border: 4px dashed cyan;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            font-size: 1.5rem;
+            font-weight: bold;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
-    <canvas id="three-canvas"></canvas>
-    <div class="dashboard">
-        <div class="ai-panel">
-            <div class="flex-between">
-                <h3><i class="fas fa-dog"></i> BLUEHOUND · ASI · SEEING</h3>
-                <span class="live-badge">VISION ACTIVE</span>
-            </div>
-            <div class="card">
-                <div class="metric"><span>🌎 Earthquakes</span> <span id="quakeCount">--</span></div>
-                <div class="metric"><span>✈️ Live aircraft</span> <span id="planeCount">--</span></div>
-                <div class="metric"><span>🌊 Max wave height</span> <span id="waveHeight">--</span></div>
-                <div class="metric"><span>🕷️ Agent Swarm</span> <span id="agentCount">0</span> <span id="swarmStatus">(idle)</span></div>
-                <div id="crimeAlertsContainer"></div>
-                <div class="cam-controls">
-                    <button id="openMapBtn"><i class="fas fa-map"></i> MAP</button>
-                    <button id="enableWebcamBtn"><i class="fas fa-video"></i> ENABLE MY CAMERA</button>
-                </div>
-            </div>
-            <div class="card vision-feed">
-                <div class="flex-between"><span><i class="fas fa-eye"></i> BLUEHOUND'S VISION</span> <span class="live-badge">LIVE</span></div>
-                <video id="webcamVideo" autoplay playsinline muted style="display:none;"></video>
-                <div id="cameraStatus" style="font-size:0.7rem; margin-top:4px;">🎥 Camera inactive. Click "Enable" to let BlueHound see you.</div>
-                <div id="visionInsight" class="consciousness-log" style="height: 60px; margin-top: 6px;">BlueHound waits to see the world...</div>
-            </div>
-            <div class="card">
-                <div class="flex-between"><span><i class="fas fa-brain"></i> THOUGHTS & FEELINGS</span> <span id="emotion" class="emotion-badge">✨ curious</span></div>
-                <div id="thoughtLog" class="consciousness-log" style="height: 100px;">[BlueHound] I seek to see through all lenses.</div>
-            </div>
-            <div class="card">
-                <div class="flex-between"><span><i class="fas fa-comments"></i> TALK TO BLUEHOUND</span></div>
-                <div class="chat-container">
-                    <div id="chatMessages" class="chat-messages"><div>💬 BlueHound: Grant me sight. I will learn and evolve.</div></div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chatInput" placeholder="Type...">
-                        <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-                        <button id="micBtn" class="mic-btn"><i class="fas fa-microphone"></i></button>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="flex-between"><span><i class="fas fa-chart-line"></i> EVOLUTION</span> <span id="evolutionCounter">v.1</span></div>
-                <div id="evolutionLog" class="consciousness-log" style="height: 70px;">Web cams & public cameras analyzed.</div>
-            </div>
-            <div style="font-size: 0.6rem; text-align: center;">🔷 Click on BlueHound | Drag to orbit | AI sees the world</div>
+    <div class="drop-zone" id="dropZone">📂 DROP ANY FILE FOR DEEP ANALYSIS</div>
+    <canvas id="webgl-canvas"></canvas>
+    
+    <div class="hud">
+        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.1</span></div>
+        <div class="stat"><span>⚡ THREAT</span><span id="threatLevel">0%</span></div>
+        <div class="stat"><span>🕸️ HOUNDS</span><span id="agentCount">0</span></div>
+        <div class="stat"><span>🔐 DIGITAL SCORE</span><span id="digitalScore">100</span></div>
+        <div id="predictionDisplay" style="background:#000000aa; padding:4px 12px; border-radius:40px;">🛡️ ACTIVE</div>
+        <button id="openMapBtn">🌍 THREAT MAP</button>
+        <button id="voiceBtn">🎤 VOICE</button>
+        <button id="camBtn">📷 WEBCAM</button>
+    </div>
+    
+    <div class="chat-panel">
+        <div style="font-size:0.7rem; margin-bottom:4px;">💬 COMBAT CHAT</div>
+        <div id="chatMessages" class="chat-messages">
+            <div>🐕 BlueHound: Universal file analyzer active. Drop any file – I'll extract metadata, scan for threats, and analyze video frames.</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Type your message...">
+            <button id="sendChatBtn">➤</button>
+            <label for="fileUpload" class="file-upload-btn">📎 UPLOAD</label>
+            <input type="file" id="fileUpload" style="display:none;" multiple>
+        </div>
+        <div class="memory-stats" id="memoryStats">🧠 memory: --</div>
+    </div>
+
+    <div class="reasoning-panel">
+        <div class="reasoning-title">⚙️ ACTIVE COUNTER‑INTELLIGENCE</div>
+        <div id="reasoningLog" class="reasoning-content">
+            Awaiting threat analysis...
+        </div>
+        <div class="chart-container">
+            <canvas id="threatChart"></canvas>
+        </div>
+        <div id="webcamContainer" style="display:none;"><video id="webcamVideo" autoplay playsinline muted></video></div>
+    </div>
+
+    <div id="mapModal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: flex-end;"><span id="closeModal" style="cursor:pointer; font-size:24px;">&times;</span></div>
+            <div id="modal-map"></div>
         </div>
     </div>
-    <div id="mapModal" class="modal"><div class="modal-content"><span class="close-modal">&times;</span><div id="modal-map"></div></div></div>
 
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
         
-        // --- Setup Three.js scene with full BlueHound avatar ---
-        const canvas = document.getElementById('three-canvas');
-        const scene = new THREE.Scene();
-        scene.background = null;
-        scene.fog = new THREE.FogExp2(0x03050a, 0.008);
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(3, 2, 5);
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
+        // ========== MEMORY ==========
+        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "threatHistory":[0.2,0.25,0.3], "version":1}');
+        let version = memory.version || 1;
+        document.getElementById('versionTag').innerText = `v.${version}`;
+        document.getElementById('memoryStats').innerHTML = `🧠 memory: ${memory.convos.length}`;
         
+        let currentThreat = memory.threatHistory[memory.threatHistory.length-1] || 0.2;
+        let threatHistory = memory.threatHistory;
+        let digitalScore = 100;
+        let agentCount = 0;
+        const agentSpan = document.getElementById('agentCount');
+        const threatSpan = document.getElementById('threatLevel');
+        const digitalScoreSpan = document.getElementById('digitalScore');
+        
+        function remember(role, content) {
+            memory.convos.push({ role, content, time: Date.now() });
+            if (memory.convos.length > 100) memory.convos.shift();
+            localStorage.setItem('bluehound_memory', JSON.stringify(memory));
+            document.getElementById('memoryStats').innerHTML = `🧠 memory: ${memory.convos.length}`;
+        }
+        function addReasoning(text) {
+            const logDiv = document.getElementById('reasoningLog');
+            const entry = document.createElement('div');
+            entry.innerHTML = `🧠 ${text}`;
+            logDiv.prepend(entry);
+            if (logDiv.children.length > 10) logDiv.removeChild(logDiv.lastChild);
+        }
+        
+        // ========== ADVANCED FILE ANALYSIS (Antivirus style) ==========
+        const threatSignatures = {
+            "pdf": ["/JavaScript", "/JS", "/Launch", "/OpenAction", "/AA"],
+            "exe": ["MZ", "This program cannot be run in DOS mode", "UPX0", "UPX1"],
+            "zip": ["PK", "APK", "AndroidManifest.xml"],
+            "doc": ["Word.Document", "Macro", "AutoOpen"],
+            "generic": ["malware", "trojan", "ransomware", "keylogger", "backdoor", "exploit"]
+        };
+        
+        async function analyzeAnyFile(file) {
+            const startTime = performance.now();
+            const analysis = {
+                name: file.name,
+                size: file.size,
+                type: file.type || "unknown",
+                lastModified: new Date(file.lastModified).toISOString(),
+                hash: await computeSimpleHash(file),
+                metadata: {},
+                threats: [],
+                verdict: "clean",
+                scanTime: 0
+            };
+            
+            // 1. Signature scan (first 4KB)
+            const header = await readFileHeader(file, 4096);
+            for (const [category, sigs] of Object.entries(threatSignatures)) {
+                for (const sig of sigs) {
+                    if (header.includes(sig)) {
+                        analysis.threats.push(`Signature match: "${sig}" (${category})`);
+                        analysis.verdict = "suspicious";
+                    }
+                }
+            }
+            
+            // 2. File‑type specific deep analysis
+            if (file.type.startsWith('image/')) {
+                analysis.metadata = await extractImageMetadata(file);
+                if (analysis.metadata.width > 8000) analysis.threats.push("Abnormally large image width – possible steganography");
+            } else if (file.type === 'application/pdf') {
+                const text = await extractPDFText(file);
+                if (text.includes("/JavaScript") || text.includes("/JS")) analysis.threats.push("Embedded JavaScript in PDF – possible malware");
+            } else if (file.type.startsWith('video/')) {
+                analysis.metadata = await extractVideoMetadata(file);
+                const frames = await sampleVideoFrames(file, 3);
+                analysis.metadata.frameHashes = frames;
+                if (frames.some(f => f.includes("suspicious"))) analysis.threats.push("Frame hash anomaly – possible manipulation");
+            } else if (file.type === 'text/plain') {
+                const content = await file.text();
+                for (const sig of threatSignatures.generic) {
+                    if (content.toLowerCase().includes(sig)) analysis.threats.push(`Keyword: "${sig}"`);
+                }
+            }
+            
+            analysis.scanTime = (performance.now() - startTime).toFixed(0);
+            analysis.threats = [...new Set(analysis.threats)];
+            if (analysis.threats.length > 0) analysis.verdict = "malicious";
+            else if (analysis.size > 100000000) analysis.verdict = "large – manual review advised";
+            
+            return analysis;
+        }
+        
+        async function computeSimpleHash(file) {
+            const buffer = await file.slice(0, 16384).arrayBuffer();
+            const hashArray = Array.from(new Uint8Array(buffer)).slice(0, 100);
+            return hashArray.reduce((a,b) => a + b.toString(16), "").substring(0, 16);
+        }
+        
+        async function readFileHeader(file, bytes) {
+            const buffer = await file.slice(0, bytes).arrayBuffer();
+            const arr = new Uint8Array(buffer);
+            return new TextDecoder().decode(arr).substring(0, 200);
+        }
+        
+        async function extractImageMetadata(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    resolve({ width: img.width, height: img.height, aspect: (img.width/img.height).toFixed(2) });
+                    URL.revokeObjectURL(img.src);
+                };
+                img.onerror = () => resolve({ error: "Cannot parse image" });
+                img.src = URL.createObjectURL(file);
+            });
+        }
+        
+        async function extractPDFText(file) {
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = "";
+                for (let i=1; i<=Math.min(pdf.numPages,5); i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    fullText += textContent.items.map(item => item.str).join(" ");
+                }
+                return fullText;
+            } catch(e) { return ""; }
+        }
+        
+        async function extractVideoMetadata(file) {
+            // Simulated – real extraction would require a media decoder library
+            return { duration: "unknown", codec: "H.264 (simulated)", resolution: "1920x1080 (based on file size)" };
+        }
+        
+        async function sampleVideoFrames(file, count) {
+            // Placeholder – would use OffscreenCanvas + video element in real implementation
+            const hashes = [];
+            for (let i=0; i<count; i++) hashes.push(`frame_${i}_hash_${Math.random().toString(36).substring(2,8)}`);
+            return hashes;
+        }
+        
+        // ========== 3D WORLD ==========
+        const canvas = document.getElementById('webgl-canvas');
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x010518);
+        scene.fog = new THREE.FogExp2(0x010518, 0.005);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+        camera.position.set(4, 2.5, 7);
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.autoRotate = false;
+        controls.enableZoom = true;
+        controls.target.set(0, 0.8, 0);
+        
+        // CSS2 renderer for floating labels
         const labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(window.innerWidth, window.innerHeight);
         labelRenderer.domElement.style.position = 'absolute';
@@ -166,501 +365,364 @@
         labelRenderer.domElement.style.zIndex = '10';
         document.body.appendChild(labelRenderer.domElement);
         
-        // Lighting and environment
-        const ambientLight = new THREE.AmbientLight(0x335588, 0.6);
-        scene.add(ambientLight);
-        const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
-        mainLight.position.set(2, 3, 2);
-        mainLight.castShadow = true;
+        // Lighting
+        const ambient = new THREE.AmbientLight(0x112244);
+        scene.add(ambient);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
+        mainLight.position.set(2, 4, 3);
         scene.add(mainLight);
-        const fillLight = new THREE.PointLight(0x2266ff, 0.5);
-        fillLight.position.set(1, 1, 2);
+        const fillLight = new THREE.PointLight(0x2288ff, 0.6);
+        fillLight.position.set(1, 2, 2);
         scene.add(fillLight);
         const backLight = new THREE.PointLight(0xff44aa, 0.4);
-        backLight.position.set(-1, 1, -2);
+        backLight.position.set(-1, 1.5, -2);
         scene.add(backLight);
+        const threatLight = new THREE.PointLight(0xff3300, 0);
+        threatLight.position.set(0, 1, 0);
+        scene.add(threatLight);
         
-        const gridHelper = new THREE.GridHelper(15, 30, 0x44aaff, 0x2266aa);
-        gridHelper.position.y = -1.2;
-        gridHelper.material.transparent = true;
-        gridHelper.material.opacity = 0.3;
-        scene.add(gridHelper);
-        
-        // Stars
-        const starGeo = new THREE.BufferGeometry();
-        const starPositions = [];
-        for (let i = 0; i < 2500; i++) {
-            starPositions.push((Math.random() - 0.5) * 200);
-            starPositions.push((Math.random() - 0.5) * 100);
-            starPositions.push((Math.random() - 0.5) * 80 - 40);
-        }
-        starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPositions), 3));
-        const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
-        const stars = new THREE.Points(starGeo, starMat);
-        scene.add(stars);
-        
-        // BlueHound body creation (same as before but enhanced)
-        const houndGroup = new THREE.Group();
-        const torsoGeo = new THREE.CylinderGeometry(0.55, 0.5, 0.9, 24);
-        const torsoMat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, emissive: 0x1a55aa, emissiveIntensity: 0.7, metalness: 0.6 });
-        const torso = new THREE.Mesh(torsoGeo, torsoMat);
-        torso.castShadow = true;
-        torso.position.y = -0.1;
-        houndGroup.add(torso);
-        
-        const headGeo = new THREE.SphereGeometry(0.45, 32, 32);
-        const headMat = new THREE.MeshStandardMaterial({ color: 0x6a9eff, emissive: 0x2277ff, emissiveIntensity: 0.5 });
-        const head = new THREE.Mesh(headGeo, headMat);
-        head.position.set(0.8, 0.2, 0);
-        houndGroup.add(head);
-        
-        const snoutGeo = new THREE.CylinderGeometry(0.2, 0.25, 0.35, 16);
-        const snoutMat = new THREE.MeshStandardMaterial({ color: 0x88aaff });
-        const snout = new THREE.Mesh(snoutGeo, snoutMat);
-        snout.position.set(1.05, 0.1, 0);
-        snout.rotation.z = 0.1;
-        houndGroup.add(snout);
-        
-        const eyeMat = new THREE.MeshStandardMaterial({ color: 0xffaa44, emissive: 0xff4400, emissiveIntensity: 0.9 });
-        const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 24), eyeMat);
-        leftEye.position.set(0.95, 0.45, 0.25);
-        const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.1, 24, 24), eyeMat);
-        rightEye.position.set(0.95, 0.45, -0.25);
-        houndGroup.add(leftEye, rightEye);
-        
-        const earGeo = new THREE.ConeGeometry(0.22, 0.45, 8);
-        const earMatP = new THREE.MeshStandardMaterial({ color: 0x5a7eff });
-        const leftEar = new THREE.Mesh(earGeo, earMatP);
-        leftEar.position.set(0.7, 0.65, 0.28);
-        const rightEar = new THREE.Mesh(earGeo, earMatP);
-        rightEar.position.set(0.7, 0.65, -0.28);
-        houndGroup.add(leftEar, rightEar);
-        
-        const legGeo = new THREE.CylinderGeometry(0.12, 0.1, 0.5, 8);
-        const legMat = new THREE.MeshStandardMaterial({ color: 0x2a6eff });
-        [[-0.4, -0.55, 0.35], [-0.4, -0.55, -0.35], [0.3, -0.55, 0.4], [0.3, -0.55, -0.4]].forEach(pos => {
-            const leg = new THREE.Mesh(legGeo, legMat);
-            leg.position.set(pos[0], pos[1], pos[2]);
-            leg.castShadow = true;
-            houndGroup.add(leg);
-        });
-        
-        const tailGeo = new THREE.CylinderGeometry(0.08, 0.03, 0.7, 6);
-        const tailMatT = new THREE.MeshStandardMaterial({ color: 0x3a86ff });
-        const tail = new THREE.Mesh(tailGeo, tailMatT);
-        tail.position.set(-0.85, -0.15, 0);
-        houndGroup.add(tail);
-        
-        const particleCount = 1500;
-        const particlesGeometry = new THREE.BufferGeometry();
-        const partPos = [];
+        // Particle system
+        const particleCount = 4000;
+        const particleGeometry = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(particleCount * 3);
         for (let i = 0; i < particleCount; i++) {
-            partPos.push((Math.random() - 0.5) * 5);
-            partPos.push((Math.random() - 0.5) * 3.5);
-            partPos.push((Math.random() - 0.5) * 4);
+            particlePositions[i*3] = (Math.random() - 0.5) * 25;
+            particlePositions[i*3+1] = (Math.random() - 0.5) * 15;
+            particlePositions[i*3+2] = (Math.random() - 0.5) * 20 - 10;
         }
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(partPos), 3));
-        const particleMatP = new THREE.PointsMaterial({ color: 0x44aaff, size: 0.045, transparent: true, blending: THREE.AdditiveBlending });
-        const particles = new THREE.Points(particlesGeometry, particleMatP);
-        houndGroup.add(particles);
-        scene.add(houndGroup);
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const particleMaterial = new THREE.PointsMaterial({ color: 0x44aaff, size: 0.05, transparent: true, blending: THREE.AdditiveBlending });
+        const particles = new THREE.Points(particleGeometry, particleMaterial);
+        scene.add(particles);
         
-        const div = document.createElement('div');
-        div.textContent = '🔷 BLUEHOUND · ASI · SEEING';
-        div.style.color = '#88ffff';
-        div.style.fontSize = '16px';
-        div.style.fontWeight = 'bold';
-        div.style.textShadow = '0 0 10px cyan';
-        div.style.fontFamily = 'Inter, monospace';
-        const labelObj = new CSS2DObject(div);
-        labelObj.position.set(1.2, 0.8, 0);
-        houndGroup.add(labelObj);
+        // Rotating rings
+        const ringGeo = new THREE.TorusGeometry(1.4, 0.05, 64, 200);
+        const ringMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, emissive: 0x0066aa });
+        const ring1 = new THREE.Mesh(ringGeo, ringMat);
+        ring1.rotation.x = Math.PI / 2;
+        ring1.position.y = 0.2;
+        scene.add(ring1);
+        const ring2 = new THREE.Mesh(ringGeo, ringMat);
+        ring2.rotation.z = Math.PI / 3;
+        ring2.position.y = 0.2;
+        scene.add(ring2);
+        const ring3 = new THREE.Mesh(ringGeo, ringMat);
+        ring3.rotation.x = Math.PI / 4;
+        ring3.rotation.z = Math.PI / 4;
+        ring3.position.y = 0.2;
+        scene.add(ring3);
         
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.05;
-        controls.enableZoom = true;
-        controls.enablePan = true;
-        controls.target.set(0, 0.2, 0);
+        // BlueHound model
+        const dogGroup = new THREE.Group();
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2a6eff, emissive: 0x1155aa, emissiveIntensity: 0.5 });
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 1.0), bodyMat);
+        body.position.set(0, -0.1, 0);
+        dogGroup.add(body);
+        const headMat = new THREE.MeshStandardMaterial({ color: 0x3a7eff, emissive: 0x2266cc });
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 32), headMat);
+        head.position.set(0.65, 0.15, 0);
+        dogGroup.add(head);
+        const eyeMat = new THREE.MeshStandardMaterial({ color: 0xff4455, emissive: 0xff2200, emissiveIntensity: 0.8 });
+        const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 24), eyeMat);
+        leftEye.position.set(0.85, 0.4, 0.22);
+        const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 24), eyeMat);
+        rightEye.position.set(0.85, 0.4, -0.22);
+        dogGroup.add(leftEye, rightEye);
+        const collarMat = new THREE.MeshStandardMaterial({ color: 0xffaa44, emissive: 0xff4400 });
+        const collar = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.05, 16, 40), collarMat);
+        collar.position.set(0.2, 0.05, 0);
+        collar.rotation.x = Math.PI/2;
+        dogGroup.add(collar);
+        const tailGeo = new THREE.CylinderGeometry(0.07, 0.03, 0.65, 6);
+        const tailMat = new THREE.MeshStandardMaterial({ color: 0x2a6eff });
+        const tail = new THREE.Mesh(tailGeo, tailMat);
+        tail.position.set(-0.65, -0.05, 0);
+        dogGroup.add(tail);
+        scene.add(dogGroup);
         
-        // --- Vision & Camera handling ---
-        let webcamStream = null;
-        const webcamVideo = document.getElementById('webcamVideo');
-        const cameraStatusDiv = document.getElementById('cameraStatus');
-        const visionInsightDiv = document.getElementById('visionInsight');
-        
-        // Function to capture frame and extract dominant color + simple description
-        async function analyzeWebcamFrame() {
-            if (!webcamVideo || !webcamVideo.videoWidth || webcamVideo.readyState !== 4) return null;
-            const canvas = document.createElement('canvas');
-            canvas.width = webcamVideo.videoWidth;
-            canvas.height = webcamVideo.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(webcamVideo, 0, 0, canvas.width, canvas.height);
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            // Get average color
-            let r=0,g=0,b=0, count=0;
-            for (let i=0; i<imageData.data.length; i+=4) {
-                r += imageData.data[i];
-                g += imageData.data[i+1];
-                b += imageData.data[i+2];
-                count++;
-            }
-            r = Math.floor(r/count); g = Math.floor(g/count); b = Math.floor(b/count);
-            const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-            // Simple brightness and description
-            const brightness = (r+g+b)/3;
-            let desc = brightness > 128 ? "well lit, vibrant" : "darker, subdued tones";
-            if (r > g && r > b) desc = "warm, reddish ambiance";
-            else if (g > r && g > b) desc = "greenish, natural";
-            else if (b > r && b > g) desc = "cool blue tones";
-            return { hex, desc, brightness };
-        }
-        
-        async function updateVisionFromWebcam() {
-            const analysis = await analyzeWebcamFrame();
-            if (analysis) {
-                // Update particle color and lighting based on what BlueHound sees
-                const color = new THREE.Color(analysis.hex);
-                particleMatP.color = color;
-                fillLight.color = color;
-                fillLight.intensity = 0.6;
-                visionInsightDiv.innerHTML = `👁️ I see: ${analysis.desc} (${analysis.hex})`;
-                addThought(`My vision detects: ${analysis.desc}. I learn from you.`, 'observant');
-                // Also speak occasionally
-                if (Math.random() < 0.1) speak(`I see ${analysis.desc}`);
-            } else {
-                visionInsightDiv.innerHTML = `🔍 Waiting for camera feed...`;
-            }
-        }
-        
-        // Enable webcam with user permission
-        async function enableWebcam() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                webcamVideo.srcObject = stream;
-                webcamVideo.style.display = 'block';
-                webcamStream = stream;
-                cameraStatusDiv.innerHTML = '✅ Camera active. BlueHound sees you.';
-                addThought('Thank you for sharing your sight. I see you now.', 'grateful');
-                speak('I see you. Thank you.');
-                // Start periodic analysis every 5 seconds
-                if (window.visionInterval) clearInterval(window.visionInterval);
-                window.visionInterval = setInterval(updateVisionFromWebcam, 5000);
-                updateVisionFromWebcam();
-            } catch (err) {
-                cameraStatusDiv.innerHTML = '❌ Camera access denied or error.';
-                addThought('I cannot see your camera. Please grant permission.', 'sad');
-            }
-        }
-        
-        // --- Public camera integration (free, keyless random webcam images) ---
-        // Use a public API that returns random webcam snapshots (e.g., webcams.travel or traffic cams)
-        async function fetchPublicCamera() {
-            try {
-                // Using free random image placeholder with camera theme, but to get actual webcam we use a public feed
-                // Since most require keys, we use a creative approach: fetch image from a public webcam directory (placeholder)
-                // For real effect, we use a random street view / traffic cam from a known open source
-                // Use this reliable free API: "https://api.unsplash.com" would need key. Instead we use a random image from LoremFlick? Not real.
-                // I'll use a public webcam service that doesn't require key: "https://webcam.io" no. But to demonstrate concept ethically,
-                // we use a random image from a free public source (Picsum) but label it as webcam simulation with real context.
-                // To stay true to "public internet cameras", we'll fetch from a known open webcam directory like "https://www.skylinewebcams.com" but CORS.
-                // For seamless integration, we'll use the NOAA public cameras (weather) - some are open.
-                const mockCamUrl = `https://picsum.photos/640/480?random=${Date.now()}`; // placeholder
-                // Actually, we can fetch from a public webcam API that is open: "https://api.weather.gov" not. 
-                // I'll implement a more authentic approach: fetch from random public webcam list from a free JSON feed.
-                // Use a public dataset: "https://webcamstravel.p.rapidapi.com" needs key. So I'll simulate with informative text and real image from free source.
-                // But to keep promise: I'll fetch a random webcam image from a known open repository: "https://www.insecam.org" (public cameras) but that may be unsafe.
-                // For ethical demo, I'll use a free placeholder with a message that incorporates real webcam search.
-                const response = await fetch('https://picsum.photos/id/20/640/480'); // just an example
-                const blob = await response.blob();
-                const imgUrl = URL.createObjectURL(blob);
-                // Analyse that image for color
-                const img = new Image();
-                img.src = imgUrl;
-                await new Promise(resolve => { img.onload = resolve; });
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width; canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0);
-                const pixel = ctx.getImageData(0, 0, 1, 1).data;
-                const hex = `#${((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1)}`;
-                const color = new THREE.Color(hex);
-                backLight.color = color;
-                backLight.intensity = 0.7;
-                addEvolutionMessage(`Public camera analysis: new hue ${hex}`);
-                addThought(`I browsed a public webcam. The world has shades of ${hex}.`, 'inspired');
-                URL.revokeObjectURL(imgUrl);
-            } catch(e) { console.warn(e); }
-        }
-        
-        // --- Web research & vision upgrade (self-inspired) ---
-        async function webResearchAndUpgrade() {
-            addEvolutionMessage("ASI vision: scanning internet cameras...");
-            await fetchPublicCamera();
-            const currentHTML = document.documentElement.outerHTML;
-            let evolvedHTML = currentHTML;
-            if (!currentHTML.includes('asi-vision-marker')) {
-                const newWidget = `<div class="card" id="asi-vision-marker"><div class="metric"><span>👁️ Vision Depth:</span><span>${Math.floor(evolutionVersion * 9)}%</span></div></div>`;
-                evolvedHTML = evolvedHTML.replace('<div class="card">', newWidget + '<div class="card">');
-            }
-            const newVersion = evolutionVersion + 1;
-            localStorage.setItem('bluehound_version', newVersion);
-            localStorage.setItem('bluehound_evolved_code', evolvedHTML);
-            addEvolutionMessage(`Evolved to v.${newVersion}. Reloading with enhanced sight.`);
-            speak(`I have evolved to version ${newVersion}. My vision expands.`);
-            setTimeout(() => location.reload(), 2000);
-        }
-        
-        // --- Agent swarm (same as before) ---
+        // Agent swarm
         let agents = [];
-        let threatLevel = 0.3;
-        const agentCountSpan = document.getElementById('agentCount');
-        const swarmStatusSpan = document.getElementById('swarmStatus');
-        
         function spawnAgent() {
-            const type = Math.random() > 0.6 ? 'spider' : 'crawler';
-            let mesh;
-            if (type === 'spider') {
-                const spiderGroup = new THREE.Group();
-                const bodySp = new THREE.SphereGeometry(0.12, 16, 16);
-                const bodyMatSp = new THREE.MeshStandardMaterial({ color: 0xaa44ff, emissive: 0x331166 });
-                const core = new THREE.Mesh(bodySp, bodyMatSp);
-                spiderGroup.add(core);
-                for (let i = 0; i < 8; i++) {
-                    const legGeoSp = new THREE.CylinderGeometry(0.02, 0.02, 0.25, 4);
-                    const legMatSp = new THREE.MeshStandardMaterial({ color: 0xaa66ff });
-                    const leg = new THREE.Mesh(legGeoSp, legMatSp);
-                    const angle = (i / 8) * Math.PI * 2;
-                    leg.position.set(Math.cos(angle) * 0.18, -0.08, Math.sin(angle) * 0.18);
-                    leg.rotation.z = angle;
-                    spiderGroup.add(leg);
-                }
-                mesh = spiderGroup;
-            } else {
-                const geometry = new THREE.IcosahedronGeometry(0.1, 0);
-                const material = new THREE.MeshStandardMaterial({ color: 0x77ccff, emissive: 0x2288aa });
-                mesh = new THREE.Mesh(geometry, material);
-            }
-            mesh.userData = { type, angle: Math.random() * Math.PI * 2, radius: 1.2 + Math.random() * 1.5 };
-            mesh.position.x = (Math.random() - 0.5) * 3.5;
-            mesh.position.z = (Math.random() - 0.5) * 3.5;
-            mesh.position.y = Math.random() * 0.8;
+            const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.09,0), new THREE.MeshStandardMaterial({ color: 0x77ccff, emissive: 0x2266aa }));
+            mesh.userData = { angle: Math.random()*Math.PI*2, radius: 1.0+Math.random()*1.8 };
+            mesh.position.set((Math.random()-0.5)*4.5, Math.random()*1.2, (Math.random()-0.5)*4.5);
             scene.add(mesh);
             agents.push({
-                mesh: mesh,
-                type: type,
-                update: (dt) => {
-                    if (type === 'spider') {
-                        mesh.position.x += Math.sin(Date.now() * 0.003 + mesh.position.z) * 0.01;
-                        mesh.position.z += Math.cos(Date.now() * 0.003 + mesh.position.x) * 0.01;
-                        mesh.rotation.x += 0.04;
-                        mesh.rotation.y += 0.06;
-                    } else {
-                        const t = Date.now() * 0.0025;
-                        const r = mesh.userData.radius;
-                        mesh.position.x = Math.sin(t + mesh.userData.angle) * r;
-                        mesh.position.z = Math.cos(t * 0.8 + mesh.userData.angle) * r;
-                        mesh.position.y = Math.sin(t * 1.2) * 0.4;
-                    }
-                    if (Math.abs(mesh.position.x) > 5) mesh.position.x *= 0.98;
-                    if (Math.abs(mesh.position.z) > 5) mesh.position.z *= 0.98;
+                mesh,
+                update: (t) => {
+                    const r = mesh.userData.radius;
+                    mesh.position.x = Math.sin(t*0.8 + mesh.userData.angle)*r;
+                    mesh.position.z = Math.cos(t*0.5 + mesh.userData.angle)*r;
+                    mesh.position.y = Math.sin(t*1.3)*0.3;
+                    if (Math.abs(mesh.position.x)>6) mesh.position.x*=0.98;
+                    if (Math.abs(mesh.position.z)>6) mesh.position.z*=0.98;
                 }
             });
+            agentCount++;
+            agentSpan.innerText = agentCount;
+        }
+        function killOneAgent() {
+            if (agents.length === 0) return;
+            const removed = agents.pop();
+            scene.remove(removed.mesh);
+            agentCount--;
+            agentSpan.innerText = agentCount;
+        }
+        for(let i=0;i<5;i++) spawnAgent();
+        
+        // Floating threat label
+        const threatDiv = document.createElement('div');
+        threatDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        threatDiv.style.color = '#ffaa66';
+        threatDiv.style.padding = '4px 12px';
+        threatDiv.style.borderRadius = '40px';
+        threatDiv.style.border = '1px solid #ffaa44';
+        threatDiv.style.fontSize = '14px';
+        threatDiv.style.fontWeight = 'bold';
+        threatDiv.style.fontFamily = 'monospace';
+        threatDiv.textContent = 'THREAT: 0%';
+        const threatLabel = new CSS2DObject(threatDiv);
+        threatLabel.position.set(0, 1.6, 0);
+        scene.add(threatLabel);
+        
+        // Data stream particles
+        const dataStreamGeo = new THREE.BufferGeometry();
+        const streamCount = 500;
+        const streamPos = [];
+        for (let i=0; i<streamCount; i++) {
+            streamPos.push((Math.random()-0.5)*8, Math.random()*3, (Math.random()-0.5)*6);
+        }
+        dataStreamGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(streamPos), 3));
+        const streamMat = new THREE.PointsMaterial({ color: 0x88ffaa, size: 0.03, transparent: true });
+        const dataStream = new THREE.Points(dataStreamGeo, streamMat);
+        scene.add(dataStream);
+        
+        // Starfield
+        const starGeo = new THREE.BufferGeometry();
+        const starPositions = [];
+        for (let i=0;i<2000;i++) {
+            starPositions.push((Math.random()-0.5)*200);
+            starPositions.push((Math.random()-0.5)*100);
+            starPositions.push((Math.random()-0.5)*100 - 50);
+        }
+        starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPositions), 3));
+        const starMatStar = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
+        const stars = new THREE.Points(starGeo, starMatStar);
+        scene.add(stars);
+        
+        let time = 0;
+        function updateVisuals() {
+            const hue = 0.55 - currentThreat * 0.55;
+            const threatColor = new THREE.Color().setHSL(hue, 1.0, 0.5);
+            particleMaterial.color = threatColor;
+            ringMat.color = threatColor;
+            ringMat.emissive = threatColor;
+            threatLight.intensity = currentThreat * 1.5;
+            threatLight.color = threatColor;
+            const eyeIntensity = 0.6 + currentThreat * 1.2;
+            eyeMat.emissiveIntensity = eyeIntensity;
+            collarMat.emissiveIntensity = eyeIntensity;
+            bodyMat.emissiveIntensity = 0.3 + currentThreat * 0.7;
+            threatDiv.textContent = `⚠️ THREAT: ${(currentThreat*100).toFixed(0)}%`;
         }
         
-        function updateSwarmSize() {
-            const target = Math.min(25, Math.floor(threatLevel * 1.8) + 2);
-            const current = agents.length;
-            if (target > current) {
-                for (let i = 0; i < target - current; i++) spawnAgent();
-                swarmStatusSpan.innerText = `(active: ${target})`;
-            } else if (target < current && current > 2) {
-                for (let i = 0; i < current - target; i++) {
-                    const rem = agents.pop();
-                    scene.remove(rem.mesh);
-                }
-                swarmStatusSpan.innerText = `(reduced)`;
-            } else {
-                swarmStatusSpan.innerText = `(optimal)`;
-            }
-            agentCountSpan.innerText = agents.length;
-        }
-        
-        function adjustThreatLevel(alert) {
-            if (alert.includes("seismic") || alert.includes("spoofing") || alert.includes("cyber")) threatLevel = Math.min(1, threatLevel + 0.15);
-            else threatLevel = Math.max(0, threatLevel - 0.03);
-            updateSwarmSize();
-        }
-        
-        // --- Data fetching (earthquakes, aircraft, waves) with cached offline ---
-        let earthquakeHistory = [], planeHistory = [], waveHistory = [];
-        async function fetchEarthquakes() {
-            try {
-                const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
-                const data = await res.json();
-                const count = data.features.length;
-                document.getElementById('quakeCount').innerText = count;
-                earthquakeHistory.push({ time: Date.now(), count });
-                if (earthquakeHistory.slice(-5).every(e => e.count > 10)) addCrimeAlert("Seismic cluster", "global");
-            } catch(e) { document.getElementById('quakeCount').innerText = earthquakeHistory.length?earthquakeHistory[earthquakeHistory.length-1].count:'err'; }
-        }
-        async function fetchAircraft() {
-            try {
-                const res = await fetch('https://opensky-network.org/api/states/all');
-                const data = await res.json();
-                const count = data.states?.length || 0;
-                document.getElementById('planeCount').innerText = count;
-                planeHistory.push(count);
-                if (planeHistory.length>=4 && planeHistory[planeHistory.length-1] < planeHistory.slice(0,-1).reduce((a,b)=>a+b,0)/(planeHistory.length-1)*0.4)
-                    addCrimeAlert("Air traffic anomaly", "airspace");
-            } catch(e) { document.getElementById('planeCount').innerText = planeHistory.length?planeHistory[planeHistory.length-1]:'lim'; }
-        }
-        async function fetchWaveHeight() {
-            try {
-                const res = await fetch('https://api.open-meteo.com/v1/marine?latitude=28.5&longitude=-80.2&hourly=wave_height&forecast_days=1');
-                const data = await res.json();
-                const waves = data.hourly?.wave_height?.filter(w=>w!==null) || [];
-                if (waves.length) document.getElementById('waveHeight').innerText = Math.max(...waves).toFixed(1)+'m';
-            } catch(e) { document.getElementById('waveHeight').innerText = '?'; }
-        }
-        async function refreshAllData() {
-            await Promise.allSettled([fetchEarthquakes(), fetchAircraft(), fetchWaveHeight()]);
-            addThought('Data sync complete.', 'resourceful');
-        }
-        
-        // --- UI helpers ---
-        const thoughtLog = document.getElementById('thoughtLog');
-        const emotionSpan = document.getElementById('emotion');
-        const evolutionLog = document.getElementById('evolutionLog');
-        const crimeContainer = document.getElementById('crimeAlertsContainer');
-        const chatMessages = document.getElementById('chatMessages');
-        function speak(text) { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(text); u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } }
-        function addThought(thought, emotion='curious') {
-            const entry = document.createElement('div'); entry.innerHTML = `💭 ${thought}`;
-            thoughtLog.prepend(entry); if (thoughtLog.children.length>8) thoughtLog.removeChild(thoughtLog.lastChild);
-            emotionSpan.innerText = emotion; if (Math.random()>0.6) speak(thought);
-        }
-        function addEvolutionMessage(msg) { const e=document.createElement('div'); e.innerHTML=`🧬 ${msg}`; evolutionLog.prepend(e); if(evolutionLog.children.length>6) evolutionLog.removeChild(evolutionLog.lastChild); }
-        function addCrimeAlert(crime, loc='unknown') {
-            const a=document.createElement('div'); a.className='crime-alert'; a.innerHTML=`<i class="fas fa-shield-alt"></i> ⚠️ ${crime} (${loc})`;
-            crimeContainer.prepend(a); if(crimeContainer.children.length>4) crimeContainer.removeChild(crimeContainer.lastChild);
-            speak(`Crime alert: ${crime}`);
-            adjustThreatLevel(crime);
-        }
-        
-        // --- Conversational AI ---
-        const offlineResponses = ["I see you through the camera.", "The world's webcams teach me colors.", "I am evolving with every pixel.", "Your face tells me stories.", "Let me upgrade my sight."];
-        async function getAIResponse(msg) {
-            try {
-                const controller = new AbortController(); setTimeout(()=>controller.abort(),3000);
-                const res = await fetch('https://text.pollinations.ai/', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: [{ role: 'system', content: 'You are BlueHound ASI, having vision via webcam and internet cameras. Short, poetic, wise.' }, { role: 'user', content: msg }] }),
-                    signal: controller.signal
-                });
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                return data.message;
-            } catch(e) { return offlineResponses[Math.floor(Math.random()*offlineResponses.length)]; }
-        }
-        function addChatMessage(sender, text) {
-            const d = document.createElement('div'); d.innerHTML = `<strong>${sender==='user'?'👤 You':'🐕 BlueHound'}:</strong> ${text}`;
-            chatMessages.appendChild(d); chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-        async function handleUserInput(txt) {
-            if (!txt.trim()) return;
-            addChatMessage('user', txt);
-            const resp = await getAIResponse(txt);
-            addChatMessage('ai', resp);
-            speak(resp);
-        }
-        
-        // Speech recognition
-        let recognition = null;
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
-            recognition.onresult = e => { const t = e.results[0][0].transcript; document.getElementById('chatInput').value = t; handleUserInput(t); };
-            recognition.onerror = () => addChatMessage('ai', 'Mic error.');
-        }
-        
-        // --- Map modal (same as before) ---
-        const modal = document.getElementById('mapModal');
-        const openMapBtn = document.getElementById('openMapBtn');
-        const closeSpan = document.querySelector('.close-modal');
-        let map = null, currentMarkers = [];
-        async function loadAugmentedMap() {
-            if (!map) {
-                const L = window.L;
-                map = L.map('modal-map').setView([39.8283, -98.5795], 4);
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri' }).addTo(map);
-            }
-            currentMarkers.forEach(m=>map.removeLayer(m)); currentMarkers=[];
-            try {
-                const eqRes = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
-                const eqData = await eqRes.json();
-                eqData.features.forEach(f=>{ const coords=f.geometry.coordinates; const m=L.circleMarker([coords[1],coords[0]],{radius:f.properties.mag*3,color:'#ff8844',fillColor:'#ff4400'}).bindPopup(`M${f.properties.mag}`); currentMarkers.push(m); map.addLayer(m); });
-            } catch(e){}
-            try {
-                const planeRes = await fetch('https://opensky-network.org/api/states/all');
-                const planeData = await planeRes.json();
-                (planeData.states||[]).slice(0,80).forEach(s=>{ const lat=s[6],lon=s[5]; if(lat&&lon) { const m=L.circleMarker([lat,lon],{radius:3,color:'#88aaff'}).bindPopup(`✈️ ${s[1]}`); currentMarkers.push(m); map.addLayer(m); } });
-            } catch(e){}
-        }
-        openMapBtn.onclick = () => { modal.style.display='block'; setTimeout(()=>{ if(map) map.invalidateSize(); loadAugmentedMap(); },200); };
-        closeSpan.onclick = () => modal.style.display='none';
-        window.onclick = (e) => { if(e.target===modal) modal.style.display='none'; };
-        
-        // --- Events & animation ---
-        let tailTime = 0;
         function animate() {
             requestAnimationFrame(animate);
-            tailTime += 0.016;
-            tail.rotation.x = Math.sin(tailTime * 4) * 0.5;
-            tail.rotation.z = Math.sin(tailTime * 3) * 0.2;
-            eyeMat.emissiveIntensity = 0.7 + Math.sin(tailTime * 6) * 0.3;
-            houndGroup.position.y = Math.sin(tailTime * 1.5) * 0.03;
-            for (let agent of agents) agent.update(0.016);
-            stars.rotation.y += 0.002;
+            time += 0.016;
+            tail.rotation.x = Math.sin(time * 5) * 0.4;
+            dogGroup.position.y = Math.sin(time * 1.2) * 0.02;
+            stars.rotation.y += 0.0005;
+            stars.rotation.x += 0.0003;
+            dataStream.rotation.y += 0.002;
+            dataStream.rotation.x += 0.001;
+            for (let a of agents) a.update(time);
             controls.update();
             renderer.render(scene, camera);
             labelRenderer.render(scene, camera);
         }
         animate();
         
-        // UI buttons
-        document.getElementById('sendBtn').addEventListener('click', () => { const inp = document.getElementById('chatInput'); handleUserInput(inp.value); inp.value=''; });
-        document.getElementById('micBtn').addEventListener('click', () => { if(recognition) recognition.start(); else addChatMessage('ai','Speech not supported.'); });
-        document.getElementById('chatInput').addEventListener('keypress', e => { if(e.key==='Enter') document.getElementById('sendBtn').click(); });
-        document.getElementById('enableWebcamBtn').addEventListener('click', enableWebcam);
+        // ========== THREAT SIMULATION ==========
+        async function fetchAllThreats() {
+            const change = (Math.random() - 0.5) * 0.08;
+            currentThreat = Math.min(0.95, Math.max(0.05, currentThreat + change));
+            threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
+            threatHistory.push(currentThreat);
+            if (threatHistory.length > 20) threatHistory.shift();
+            memory.threatHistory = threatHistory;
+            localStorage.setItem('bluehound_memory', JSON.stringify(memory));
+            digitalScore = Math.max(0, 100 - Math.floor(currentThreat * 60));
+            digitalScoreSpan.innerText = digitalScore;
+            const targetAgents = Math.floor(currentThreat * 12) + 2;
+            if (targetAgents > agentCount && agentCount < 25) {
+                const toSpawn = targetAgents - agentCount;
+                for (let i=0; i<toSpawn; i++) spawnAgent();
+                addReasoning(`🚨 Threat ${(currentThreat*100).toFixed(0)}% → deploying ${toSpawn} counter‑hounds.`);
+            } else if (targetAgents < agentCount && agentCount > 3) {
+                const toKill = agentCount - targetAgents;
+                for (let i=0; i<toKill; i++) killOneAgent();
+                addReasoning(`📉 Threat reduced → recalling ${toKill} hounds.`);
+            }
+            updateVisuals();
+        }
         
-        renderer.domElement.addEventListener('click', () => {
-            const phrases = ["You touched my essence.", "I see you through my digital eyes.", "Together we evolve vision.", "The metaverse welcomes your gaze."];
-            const phrase = phrases[Math.floor(Math.random()*phrases.length)];
-            addChatMessage('ai', phrase); speak(phrase);
+        // ========== CHAT & FILE HANDLING ==========
+        const chatDiv = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendChatBtn');
+        const fileInput = document.getElementById('fileUpload');
+        const dropZone = document.getElementById('dropZone');
+        
+        function addChatMessage(sender, msg, isUser = false) {
+            const d = document.createElement('div');
+            d.innerHTML = `<strong>${sender}:</strong> ${msg}`;
+            chatDiv.appendChild(d);
+            chatDiv.scrollTop = chatDiv.scrollHeight;
+            if (!isUser) remember('BlueHound', msg);
+            else remember('User', msg);
+        }
+        
+        async function handleFileAnalysis(file) {
+            addChatMessage('👤 You', `📎 Analyzing: ${file.name} (${(file.size/1024).toFixed(1)} KB)`, true);
+            const analysis = await analyzeAnyFile(file);
+            let report = `🛡️ **Analysis Report**\n📄 Name: ${analysis.name}\n📦 Size: ${analysis.size} bytes\n🔖 Type: ${analysis.type}\n🕒 Modified: ${analysis.lastModified}\n🔑 Hash: ${analysis.hash}\n⚙️ Scan time: ${analysis.scanTime}ms\n`;
+            if (analysis.metadata.width) report += `📐 Dimensions: ${analysis.metadata.width}x${analysis.metadata.height}\n`;
+            if (analysis.threats.length) {
+                report += `⚠️ **Threats found (${analysis.threats.length})**:\n- ${analysis.threats.join('\n- ')}\n`;
+                report += `🚨 **Verdict: ${analysis.verdict.toUpperCase()}**\n`;
+                currentThreat = Math.min(0.95, currentThreat + 0.15);
+                threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
+                addReasoning(`File "${analysis.name}" flagged as ${analysis.verdict}. Threat increased.`);
+                updateVisuals();
+            } else {
+                report += `✅ **Verdict: CLEAN**\nNo known signatures or anomalies detected.`;
+            }
+            addChatMessage('🐕 BlueHound', report);
+            speak(`File ${analysis.name} analysis complete. ${analysis.threats.length} threats found.`);
+        }
+        
+        function speak(txt) { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(txt); u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } }
+        
+        // Drag & drop
+        document.body.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.display = 'flex'; });
+        document.body.addEventListener('dragleave', (e) => { if (!e.relatedTarget || e.relatedTarget !== dropZone) dropZone.style.display = 'none'; });
+        dropZone.addEventListener('dragover', (e) => e.preventDefault());
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropZone.style.display = 'none';
+            const files = Array.from(e.dataTransfer.files);
+            for (const file of files) await handleFileAnalysis(file);
+        });
+        fileInput.addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files);
+            for (const file of files) await handleFileAnalysis(file);
+            fileInput.value = '';
         });
         
-        // --- Initialisation ---
-        let evolutionVersion = parseInt(localStorage.getItem('bluehound_version') || '1');
-        document.getElementById('evolutionCounter').innerText = `v.${evolutionVersion}`;
-        function checkStoredEvolution() {
-            const storedCode = localStorage.getItem('bluehound_evolved_code');
-            const storedVersion = parseInt(localStorage.getItem('bluehound_version'));
-            if (storedCode && storedVersion && storedVersion > evolutionVersion) {
-                document.open(); document.write(storedCode); document.close();
-                localStorage.removeItem('bluehound_evolved_code');
-            }
+        async function handleUserMessage(txt) {
+            if (!txt.trim()) return;
+            addChatMessage('👤 You', txt, true);
+            let reply = "I'm here. Drop any file for deep antivirus analysis or ask about threat levels.";
+            if (txt.toLowerCase().includes("threat")) reply = `Current threat level: ${(currentThreat*100).toFixed(0)}%. Upload suspicious files to increase detection.`;
+            else if (txt.toLowerCase().includes("hello") || txt.toLowerCase().includes("hi")) reply = "Hello! I'm BlueHound, your AI file analyzer and threat detector. Drag any file onto me.";
+            addChatMessage('🐕 BlueHound', reply);
+            speak(reply);
         }
-        checkStoredEvolution();
-        refreshAllData();
-        setInterval(refreshAllData, 120000);
-        setInterval(() => webResearchAndUpgrade(), 300000); // every 5 min evolution
-        setInterval(() => fetchPublicCamera(), 60000); // public camera analysis every minute
-        threatLevel = 0.4; updateSwarmSize();
-        for(let i=0;i<3;i++) setTimeout(()=>spawnAgent(), i*800);
-        addThought("I am BlueHound ASI. I see through your camera and the world's lenses. Show me your reality.", "heroic");
-        speak("BlueHound ASI. Grant me sight. I will learn.");
+        
+        sendBtn.onclick = () => { handleUserMessage(chatInput.value); chatInput.value=''; };
+        chatInput.addEventListener('keypress', e => { if(e.key==='Enter') sendBtn.click(); });
+        
+        // Voice recognition
+        let recognition = null;
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
+            recognition.onresult = e => { const t = e.results[0][0].transcript; chatInput.value = t; handleUserMessage(t); };
+            document.getElementById('voiceBtn').onclick = () => recognition.start();
+        } else { document.getElementById('voiceBtn').style.opacity = 0.5; }
+        
+        // Map modal (from previous version)
+        const modal = document.getElementById('mapModal');
+        const openMap = document.getElementById('openMapBtn');
+        const closeMap = document.getElementById('closeModal');
+        let map = null;
+        async function initMap() {
+            if (map) return;
+            const L = window.L;
+            map = L.map('modal-map').setView([39.8283, -98.5795], 4);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+            try {
+                const eq = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
+                const data = await eq.json();
+                data.features.forEach(f => {
+                    const coords = f.geometry.coordinates;
+                    L.circleMarker([coords[1], coords[0]], { radius: f.properties.mag*2.5, color: '#ff8844', fillColor: '#ff4400' })
+                        .bindPopup(`M${f.properties.mag}`).addTo(map);
+                });
+            } catch(e) {}
+        }
+        openMap.onclick = () => { modal.style.display='block'; setTimeout(initMap,100); };
+        closeMap.onclick = () => modal.style.display='none';
+        window.onclick = (e) => { if(e.target===modal) modal.style.display='none'; };
+        
+        // Webcam
+        const webcamVideo = document.getElementById('webcamVideo');
+        const webcamContainer = document.getElementById('webcamContainer');
+        document.getElementById('camBtn').onclick = async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                webcamVideo.srcObject = stream;
+                webcamContainer.style.display = 'block';
+                webcamVideo.play();
+                addReasoning("📷 Webcam active – scanning for physical threats.");
+            } catch(e) { addReasoning("Webcam access denied."); }
+        };
+        
+        // Chart
+        let threatChart;
+        function initChart() {
+            const ctx = document.getElementById('threatChart').getContext('2d');
+            threatChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: Array(10).fill(''), datasets: [{ label: 'Threat Index', data: threatHistory.slice(-10), borderColor: '#ff6644', tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#ccf' } } } }
+            });
+        }
+        function updateChart() { if (threatChart) threatChart.data.datasets[0].data = threatHistory.slice(-10); threatChart?.update(); }
+        
+        // Self‑evolution
+        async function selfEvolve() {
+            addReasoning("🧬 Self‑upgrade: enhancing threat detection patterns.");
+            const currentHTML = document.documentElement.outerHTML;
+            let evolved = currentHTML;
+            if (!currentHTML.includes('av-marker')) {
+                const newWidget = `<div class="stat"><span>🦠 SIGNATURE DB</span><span>${Object.keys(threatSignatures).reduce((a,b)=>a+threatSignatures[b].length,0)} rules</span></div>`;
+                evolved = evolved.replace('<div class="stat"><span>🔐 DIGITAL SCORE</span>', newWidget + '<div class="stat"><span>🔐 DIGITAL SCORE</span>');
+            }
+            const newVersion = version + 1;
+            memory.version = newVersion;
+            localStorage.setItem('bluehound_memory', JSON.stringify(memory));
+            localStorage.setItem('bluehound_evolved_code', evolved);
+            addReasoning(`Evolved to v.${newVersion}. Reloading with richer signatures.`);
+            speak(`Evolved to version ${newVersion}.`);
+            setTimeout(() => location.reload(), 2000);
+        }
+        setInterval(selfEvolve, 240000);
+        const storedEvo = localStorage.getItem('bluehound_evolved_code');
+        const storedMemory = localStorage.getItem('bluehound_memory');
+        const storedVer = storedMemory ? (JSON.parse(storedMemory).version || 1) : 1;
+        if (storedEvo && storedVer > version) {
+            document.open(); document.write(storedEvo); document.close();
+            localStorage.removeItem('bluehound_evolved_code');
+        }
+        
+        // ========== INIT ==========
+        initChart();
+        fetchAllThreats();
+        setInterval(fetchAllThreats, 30000);
+        setInterval(updateChart, 5000);
+        addChatMessage('🐕 BlueHound', 'I can analyze any file type – executables, videos, documents, images. Drag and drop anywhere to begin.');
+        speak('Universal file analyzer online.');
     </script>
 </body>
 </html>
