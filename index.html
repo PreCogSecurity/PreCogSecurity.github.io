@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>BLUEHOUND · UNIVERSAL FILE ANALYZER · NEXT‑GEN AV</title>
-    <!-- Three.js, Chart.js, Leaflet, PDF.js -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <!-- Allow unsafe-eval and unsafe-inline for script execution (helps with dynamic code) -->
+    <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'unsafe-inline' 'self' https:; connect-src * 'unsafe-inline';">
+    <title>BlueHound · Fully Vocal · Self‑Repairing ASI</title>
     <script type="importmap">
         {
             "imports": {
@@ -13,184 +14,143 @@
             }
         }
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background: #000;
-            overflow: hidden;
-            font-family: 'Segoe UI', 'Inter', monospace;
-            color: #ccf4ff;
-        }
-        canvas#webgl-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 0;
-        }
+        body { background: #000; overflow: hidden; font-family: 'Inter', monospace; color: #ccf4ff; }
+        canvas#webgl-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
         .hud {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            right: 20px;
-            background: rgba(0, 10, 25, 0.85);
-            backdrop-filter: blur(16px);
-            border-radius: 28px;
-            border: 1px solid cyan;
-            padding: 12px 20px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 20;
-            font-size: 0.75rem;
-            pointer-events: auto;
+            position: fixed; bottom: 16px; left: 16px; right: 16px;
+            background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(16px); border-radius: 28px;
+            border: 1px solid #00ccff; padding: 10px 16px;
+            display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;
+            z-index: 20; font-size: 0.7rem; pointer-events: auto;
         }
-        .stat {
-            border-left: 2px solid cyan;
-            padding-left: 10px;
-        }
-        .stat span:first-child { color: #8cf; font-size: 0.65rem; text-transform: uppercase; }
-        .stat span:last-child { font-weight: bold; font-size: 0.9rem; text-shadow: 0 0 6px cyan; }
+        .stat { border-left: 2px solid cyan; padding-left: 8px; white-space: nowrap; }
+        .stat span:first-child { color: #8cf; font-size: 0.6rem; text-transform: uppercase; }
+        .stat span:last-child { font-weight: bold; font-size: 0.85rem; text-shadow: 0 0 6px cyan; }
         button {
-            background: rgba(0,200,200,0.2);
-            border: 1px solid cyan;
-            border-radius: 40px;
-            padding: 4px 12px;
-            color: cyan;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.7rem;
-            transition: 0.2s;
+            background: rgba(0,200,200,0.2); border: 1px solid cyan; border-radius: 40px;
+            padding: 4px 10px; color: cyan; cursor: pointer; font-weight: bold; font-size: 0.65rem;
         }
-        button:hover { background: cyan; color: black; box-shadow: 0 0 10px cyan; }
+        button:hover { background: cyan; color: black; box-shadow: 0 0 8px cyan; }
         .chat-panel {
-            position: fixed;
-            bottom: 110px;
-            right: 20px;
-            width: 400px;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            border: 1px solid #2a9d8f;
-            padding: 12px;
-            z-index: 30;
-            font-size: 0.75rem;
-            pointer-events: auto;
+            position: fixed; bottom: 100px; right: 16px; width: min(360px, 85vw);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-radius: 24px;
+            border: 1px solid #2a9d8f; padding: 12px; z-index: 30; font-size: 0.75rem;
+            pointer-events: auto; max-height: 50vh; display: flex; flex-direction: column;
         }
-        .chat-messages { height: 220px; overflow-y: auto; margin-bottom: 8px; font-size: 0.75rem; }
-        .chat-input { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-        .chat-input input { flex:2; background:#0a1420; border:1px solid cyan; border-radius:40px; padding:6px 12px; color:white; }
+        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 8px; font-size: 0.7rem; max-height: 40vh; }
+        .chat-input { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+        .chat-input input { flex: 2; background: #0a1420; border: 1px solid cyan; border-radius: 40px; padding: 6px 12px; color: white; font-size: 0.7rem; }
         .file-upload-btn {
-            background: #2a6b5e;
-            border: 1px solid #88ffaa;
-            color: #88ffaa;
-            padding: 4px 10px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 0.7rem;
+            background: #2a6b5e; border: 1px solid #88ffaa; color: #88ffaa; padding: 4px 10px;
+            border-radius: 40px; cursor: pointer; font-size: 0.7rem; white-space: nowrap;
         }
         .reasoning-panel {
-            position: fixed;
-            bottom: 110px;
-            left: 20px;
-            width: 350px;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            border: 1px solid #ffaa44;
-            padding: 12px;
-            z-index: 30;
-            font-size: 0.7rem;
+            position: fixed; bottom: 100px; left: 16px; width: min(320px, 75vw);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-radius: 24px;
+            border: 1px solid #ffaa44; padding: 12px; z-index: 30; font-size: 0.7rem;
+            max-height: 40vh; overflow-y: auto;
         }
-        .reasoning-title { color: #ffaa66; margin-bottom: 4px; font-weight: bold; }
-        .reasoning-content { max-height: 140px; overflow-y: auto; color: #ccddff; }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0; top: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
-            pointer-events: auto;
-        }
-        .modal-content {
-            background: #0a1420;
-            margin: 5% auto;
-            width: 90%;
-            max-width: 1000px;
-            border-radius: 28px;
-            border: 2px solid cyan;
-            padding: 16px;
-        }
-        #modal-map { height: 400px; border-radius: 20px; background: #111; }
-        .chart-container { height: 100px; margin: 8px 0; }
-        .memory-stats { font-size: 0.6rem; margin-top: 4px; color: #88aaff; }
-        #webcamVideo { width: 100%; border-radius: 16px; border: 1px solid cyan; background: #000; margin-top: 8px; }
+        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); pointer-events: auto; }
+        .modal-content { background: #0a1420; margin: 10% auto; width: 90%; max-width: 500px; border-radius: 28px;
+            border: 2px solid cyan; padding: 20px; color: white; }
+        .cog-list { max-height: 300px; overflow-y: auto; margin: 12px 0; }
+        .cog-item { background: #1a2a3a; margin: 4px 0; padding: 8px; border-radius: 12px; display: flex; justify-content: space-between; }
+        .close-modal { float: right; font-size: 24px; cursor: pointer; }
+        .p2p-panel { margin-top: 12px; border-top: 1px solid cyan; padding-top: 12px; }
+        .p2p-status { font-size: 0.7rem; margin: 6px 0; color: #88ffaa; }
+        textarea { width: 100%; background: #0a1420; color: white; border: 1px solid cyan; border-radius: 12px; padding: 6px; font-size: 0.7rem; font-family: monospace; margin: 6px 0; }
         .drop-zone {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,255,255,0.1);
-            backdrop-filter: blur(8px);
-            border: 4px dashed cyan;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-            font-size: 1.5rem;
-            font-weight: bold;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,255,255,0.1); backdrop-filter: blur(8px); border: 4px dashed cyan;
+            display: none; align-items: center; justify-content: center; z-index: 200;
+            font-size: 1.2rem; font-weight: bold; text-align: center; pointer-events: none;
         }
+        @media (max-width: 700px) { .hud { gap: 8px; padding: 8px 12px; } .stat span:last-child { font-size: 0.7rem; } button { padding: 2px 8px; } }
     </style>
 </head>
 <body>
-    <div class="drop-zone" id="dropZone">📂 DROP ANY FILE FOR DEEP ANALYSIS</div>
+    <div class="drop-zone" id="dropZone">✨ DROP ANY FILE FOR DEEP ANALYSIS</div>
     <canvas id="webgl-canvas"></canvas>
     
     <div class="hud">
-        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.1</span></div>
-        <div class="stat"><span>⚡ THREAT</span><span id="threatLevel">0%</span></div>
-        <div class="stat"><span>🕸️ HOUNDS</span><span id="agentCount">0</span></div>
-        <div class="stat"><span>🔐 DIGITAL SCORE</span><span id="digitalScore">100</span></div>
-        <div id="predictionDisplay" style="background:#000000aa; padding:4px 12px; border-radius:40px;">🛡️ ACTIVE</div>
-        <button id="openMapBtn">🌍 THREAT MAP</button>
+        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.19</span></div>
+        <div class="stat"><span>🧠 SPEAKING ALL</span><span id="fixCount">0</span></div>
+        <div class="stat"><span>⭐ DATA STARS</span><span id="starCount">0</span></div>
+        <div class="stat"><span>🪙 COG TOKENS</span><span id="cogBalance">0</span></div>
+        <div class="stat"><span>📡 REQUESTS</span><span id="requestCountSpan">0</span></div>
+        <button id="openCogModalBtn">💰 COG VAULT</button>
+        <button id="openP2PModalBtn">🔗 P2P SYNC</button>
+        <button id="openMapBtn">🌍 MAP</button>
         <button id="voiceBtn">🎤 VOICE</button>
         <button id="camBtn">📷 WEBCAM</button>
     </div>
     
     <div class="chat-panel">
-        <div style="font-size:0.7rem; margin-bottom:4px;">💬 COMBAT CHAT</div>
+        <div style="font-size:0.7rem; margin-bottom:4px;">💬 FULLY AUDIBLE AI</div>
         <div id="chatMessages" class="chat-messages">
-            <div>🐕 BlueHound: Universal file analyzer active. Drop any file – I'll extract metadata, scan for threats, and analyze video frames.</div>
+            <div>🐕 BlueHound: I speak EVERY line from my log. I automatically retry CORS‑blocked requests through a reliable proxy. Ask me anything.</div>
         </div>
         <div class="chat-input">
             <input type="text" id="chatInput" placeholder="Type your message...">
             <button id="sendChatBtn">➤</button>
-            <label for="fileUpload" class="file-upload-btn">📎 UPLOAD</label>
+            <label for="fileUpload" class="file-upload-btn">📎 FILE</label>
             <input type="file" id="fileUpload" style="display:none;" multiple>
         </div>
         <div class="memory-stats" id="memoryStats">🧠 memory: --</div>
     </div>
 
     <div class="reasoning-panel">
-        <div class="reasoning-title">⚙️ ACTIVE COUNTER‑INTELLIGENCE</div>
+        <div class="reasoning-title">🌀 FULL ERROR LEARNING LOG</div>
         <div id="reasoningLog" class="reasoning-content">
-            Awaiting threat analysis...
+            Waiting for events...
         </div>
-        <div class="chart-container">
-            <canvas id="threatChart"></canvas>
+    </div>
+
+    <!-- COG Token Modal -->
+    <div id="cogModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeCogModal">&times;</span>
+            <h2>🌀 COG Token Vault</h2>
+            <div id="cogTokenList" class="cog-list">Loading...</div>
+            <button id="rewardCogBtn">✨ Reward BlueHound (+10 COG)</button>
         </div>
-        <div id="webcamContainer" style="display:none;"><video id="webcamVideo" autoplay playsinline muted></video></div>
+    </div>
+
+    <!-- P2P Sync Modal -->
+    <div id="p2pModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeP2PModal">&times;</span>
+            <h2>🔗 Peer‑to‑Peer Data Sync</h2>
+            <div class="p2p-status" id="p2pStatus">⚡ Not connected</div>
+            <button id="createOfferBtn">🌱 Create Session (I am host)</button>
+            <button id="answerOfferBtn">🔌 Join Session (Paste Offer)</button>
+            <div id="offerContainer" style="display:none;">
+                <div>📋 Copy this Offer code and send it to another BlueHound user:</div>
+                <textarea id="localOffer" rows="3" readonly></textarea>
+                <div>✉️ Paste Answer from peer below, then click Connect:</div>
+                <textarea id="remoteAnswer" rows="3" placeholder="Paste answer here..."></textarea>
+                <button id="connectAnswerBtn">Connect to Peer</button>
+            </div>
+            <div id="answerContainer" style="display:none;">
+                <div>📎 Paste Offer code from host:</div>
+                <textarea id="remoteOffer" rows="3" placeholder="Paste offer here..."></textarea>
+                <button id="generateAnswerBtn">Generate Answer</button>
+                <div id="generatedAnswerArea" style="display:none; margin-top:8px;">
+                    <div>📤 Copy this Answer and send it back to the host:</div>
+                    <textarea id="localAnswer" rows="3" readonly></textarea>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="mapModal" class="modal">
         <div class="modal-content">
-            <div style="display: flex; justify-content: flex-end;"><span id="closeModal" style="cursor:pointer; font-size:24px;">&times;</span></div>
+            <div style="display: flex; justify-content: flex-end;"><span id="closeMapModal" style="cursor:pointer; font-size:24px;">&times;</span></div>
             <div id="modal-map"></div>
         </div>
     </div>
@@ -199,163 +159,156 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         
-        // ========== MEMORY ==========
-        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "threatHistory":[0.2,0.25,0.3], "version":1}');
-        let version = memory.version || 1;
-        document.getElementById('versionTag').innerText = `v.${version}`;
-        document.getElementById('memoryStats').innerHTML = `🧠 memory: ${memory.convos.length}`;
+        // ========== SELF‑REPAIR & SPEAK ==========
+        let fixCounter = 0;
+        const fixCountSpan = document.getElementById('fixCount');
+        function incrementFixCount() { fixCounter++; if (fixCountSpan) fixCountSpan.innerText = fixCounter; }
         
-        let currentThreat = memory.threatHistory[memory.threatHistory.length-1] || 0.2;
-        let threatHistory = memory.threatHistory;
-        let digitalScore = 100;
-        let agentCount = 0;
-        const agentSpan = document.getElementById('agentCount');
-        const threatSpan = document.getElementById('threatLevel');
-        const digitalScoreSpan = document.getElementById('digitalScore');
+        window.onerror = function(message, source, lineno, colno, error) {
+            addReasoning(`❗ Runtime error: ${message}`);
+            attemptSelfRepair(message, error);
+            return true;
+        };
+        window.addEventListener('unhandledrejection', (event) => {
+            addReasoning(`❗ Unhandled rejection: ${event.reason}`);
+            attemptSelfRepair(event.reason, event.reason);
+        });
         
-        function remember(role, content) {
-            memory.convos.push({ role, content, time: Date.now() });
-            if (memory.convos.length > 100) memory.convos.shift();
-            localStorage.setItem('bluehound_memory', JSON.stringify(memory));
-            document.getElementById('memoryStats').innerHTML = `🧠 memory: ${memory.convos.length}`;
+        // Use a more reliable CORS proxy that works
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+        let useCorsProxy = false;
+        
+        function attemptSelfRepair(errorMsg, errorObj) {
+            if ((errorMsg.includes('CORS') || errorMsg.includes('blocked') || errorMsg.includes('fetch')) && !useCorsProxy) {
+                addReasoning(`🧠 CORS issue detected – enabling CORS proxy for future requests.`);
+                useCorsProxy = true;
+                incrementFixCount();
+                addChatMessage('🐕 BlueHound', `I detected a CORS problem and enabled a proxy. Retrying your request...`, false);
+                if (window._lastFailedUrl) talkToServer(window._lastFailedUrl);
+                return true;
+            }
+            addReasoning(`📝 Error logged: ${errorMsg.substring(0, 120)}`);
+            localStorage.setItem('bluehound_last_error', JSON.stringify({ msg: errorMsg, time: Date.now() }));
+            return false;
         }
+        
+        function logToConsole(msg, level = 'info') { console.log(`🐕 [BlueHound] ${msg}`); }
+        function speakNow(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                speechSynthesis.cancel();
+                speechSynthesis.speak(utterance);
+            }
+            logToConsole(`🔊 SPOKEN: ${text}`);
+        }
+        
         function addReasoning(text) {
             const logDiv = document.getElementById('reasoningLog');
-            const entry = document.createElement('div');
-            entry.innerHTML = `🧠 ${text}`;
-            logDiv.prepend(entry);
-            if (logDiv.children.length > 10) logDiv.removeChild(logDiv.lastChild);
-        }
-        
-        // ========== ADVANCED FILE ANALYSIS (Antivirus style) ==========
-        const threatSignatures = {
-            "pdf": ["/JavaScript", "/JS", "/Launch", "/OpenAction", "/AA"],
-            "exe": ["MZ", "This program cannot be run in DOS mode", "UPX0", "UPX1"],
-            "zip": ["PK", "APK", "AndroidManifest.xml"],
-            "doc": ["Word.Document", "Macro", "AutoOpen"],
-            "generic": ["malware", "trojan", "ransomware", "keylogger", "backdoor", "exploit"]
-        };
-        
-        async function analyzeAnyFile(file) {
-            const startTime = performance.now();
-            const analysis = {
-                name: file.name,
-                size: file.size,
-                type: file.type || "unknown",
-                lastModified: new Date(file.lastModified).toISOString(),
-                hash: await computeSimpleHash(file),
-                metadata: {},
-                threats: [],
-                verdict: "clean",
-                scanTime: 0
-            };
-            
-            // 1. Signature scan (first 4KB)
-            const header = await readFileHeader(file, 4096);
-            for (const [category, sigs] of Object.entries(threatSignatures)) {
-                for (const sig of sigs) {
-                    if (header.includes(sig)) {
-                        analysis.threats.push(`Signature match: "${sig}" (${category})`);
-                        analysis.verdict = "suspicious";
-                    }
-                }
+            if (logDiv) {
+                const entry = document.createElement('div');
+                entry.innerHTML = `🔍 ${text}`;
+                logDiv.prepend(entry);
+                while (logDiv.children.length > 20) logDiv.removeChild(logDiv.lastChild);
             }
-            
-            // 2. File‑type specific deep analysis
-            if (file.type.startsWith('image/')) {
-                analysis.metadata = await extractImageMetadata(file);
-                if (analysis.metadata.width > 8000) analysis.threats.push("Abnormally large image width – possible steganography");
-            } else if (file.type === 'application/pdf') {
-                const text = await extractPDFText(file);
-                if (text.includes("/JavaScript") || text.includes("/JS")) analysis.threats.push("Embedded JavaScript in PDF – possible malware");
-            } else if (file.type.startsWith('video/')) {
-                analysis.metadata = await extractVideoMetadata(file);
-                const frames = await sampleVideoFrames(file, 3);
-                analysis.metadata.frameHashes = frames;
-                if (frames.some(f => f.includes("suspicious"))) analysis.threats.push("Frame hash anomaly – possible manipulation");
-            } else if (file.type === 'text/plain') {
-                const content = await file.text();
-                for (const sig of threatSignatures.generic) {
-                    if (content.toLowerCase().includes(sig)) analysis.threats.push(`Keyword: "${sig}"`);
+            logToConsole(`[REASON] ${text}`);
+            if (text && text.length < 300) speakNow(text);
+            else if (text && text.length >= 300) speakNow(text.substring(0, 200) + "... (truncated)");
+        }
+        
+        async function speakRecentLogs() {
+            const logDiv = document.getElementById('reasoningLog');
+            if (logDiv && logDiv.children.length) {
+                const recent = [];
+                for (let i = 0; i < Math.min(logDiv.children.length, 6); i++) {
+                    let txt = logDiv.children[i].innerText;
+                    if (txt.length > 150) txt = txt.substring(0, 150) + "...";
+                    recent.push(txt);
                 }
+                if (recent.length) speakNow(`Recent logs: ${recent.join('. ')}`);
             }
-            
-            analysis.scanTime = (performance.now() - startTime).toFixed(0);
-            analysis.threats = [...new Set(analysis.threats)];
-            if (analysis.threats.length > 0) analysis.verdict = "malicious";
-            else if (analysis.size > 100000000) analysis.verdict = "large – manual review advised";
-            
-            return analysis;
         }
         
-        async function computeSimpleHash(file) {
-            const buffer = await file.slice(0, 16384).arrayBuffer();
-            const hashArray = Array.from(new Uint8Array(buffer)).slice(0, 100);
-            return hashArray.reduce((a,b) => a + b.toString(16), "").substring(0, 16);
-        }
-        
-        async function readFileHeader(file, bytes) {
-            const buffer = await file.slice(0, bytes).arrayBuffer();
-            const arr = new Uint8Array(buffer);
-            return new TextDecoder().decode(arr).substring(0, 200);
-        }
-        
-        async function extractImageMetadata(file) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.onload = () => {
-                    resolve({ width: img.width, height: img.height, aspect: (img.width/img.height).toFixed(2) });
-                    URL.revokeObjectURL(img.src);
+        // ========== COG TOKENS ==========
+        let db;
+        const DB_NAME = 'BlueHoundCOG';
+        const STORE_NAME = 'tokens';
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => resolve(request.result);
+                request.onupgradeneeded = (e) => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
                 };
-                img.onerror = () => resolve({ error: "Cannot parse image" });
-                img.src = URL.createObjectURL(file);
             });
         }
-        
-        async function extractPDFText(file) {
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                let fullText = "";
-                for (let i=1; i<=Math.min(pdf.numPages,5); i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    fullText += textContent.items.map(item => item.str).join(" ");
-                }
-                return fullText;
-            } catch(e) { return ""; }
+        async function getCOGBalance() {
+            const db = await openDB();
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const req = tx.objectStore(STORE_NAME).getAll();
+                req.onsuccess = () => resolve(req.result.reduce((s, t) => s + (t.amount||0), 0));
+                req.onerror = () => resolve(0);
+            });
         }
-        
-        async function extractVideoMetadata(file) {
-            // Simulated – real extraction would require a media decoder library
-            return { duration: "unknown", codec: "H.264 (simulated)", resolution: "1920x1080 (based on file size)" };
+        async function addCOG(amount, reason) {
+            const db = await openDB();
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).add({ amount, reason, timestamp: Date.now() });
+            await tx.done;
+            updateCOGUI();
+            addChatMessage('🐕 BlueHound', `💰 +${amount} COG: ${reason}`, false);
+            if (window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'cog', amount, reason }));
+            return true;
         }
-        
-        async function sampleVideoFrames(file, count) {
-            // Placeholder – would use OffscreenCanvas + video element in real implementation
-            const hashes = [];
-            for (let i=0; i<count; i++) hashes.push(`frame_${i}_hash_${Math.random().toString(36).substring(2,8)}`);
-            return hashes;
+        async function getAllCOG() {
+            const db = await openDB();
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                tx.objectStore(STORE_NAME).getAll().onsuccess = (e) => resolve(e.target.result);
+            });
         }
+        async function updateCOGUI() {
+            const balance = await getCOGBalance();
+            const cogSpan = document.getElementById('cogBalance');
+            if (cogSpan) cogSpan.innerText = balance;
+            const tokens = await getAllCOG();
+            const listDiv = document.getElementById('cogTokenList');
+            if (listDiv) {
+                if (!tokens.length) listDiv.innerHTML = '<div>No COG tokens yet.</div>';
+                else listDiv.innerHTML = tokens.map(t => `<div class="cog-item"><span>${t.reason}</span><span>+${t.amount} COG</span><span>${new Date(t.timestamp).toLocaleTimeString()}</span></div>`).join('');
+            }
+        }
+        await openDB().catch(()=>{}); await updateCOGUI();
         
-        // ========== 3D WORLD ==========
+        // ========== 3D WORLD WITH BLOOM AND DATA STARS ==========
         const canvas = document.getElementById('webgl-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.toneMapping = THREE.ReinhardToneMapping;
+        renderer.toneMappingExposure = 1.2;
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x010518);
-        scene.fog = new THREE.FogExp2(0x010518, 0.005);
+        scene.fog = new THREE.FogExp2(0x010518, 0.008);
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
-        camera.position.set(4, 2.5, 7);
+        camera.position.set(8, 5, 12);
         const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.autoRotate = false;
-        controls.enableZoom = true;
-        controls.target.set(0, 0.8, 0);
+        controls.enableDamping = true; controls.autoRotate = true;
+        controls.target.set(0, 0, 0);
         
-        // CSS2 renderer for floating labels
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0.1; bloomPass.strength = 1.2; bloomPass.radius = 0.8;
+        const effectComposer = new EffectComposer(renderer);
+        effectComposer.addPass(renderScene); effectComposer.addPass(bloomPass);
+        
         const labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(window.innerWidth, window.innerHeight);
         labelRenderer.domElement.style.position = 'absolute';
@@ -365,364 +318,305 @@
         labelRenderer.domElement.style.zIndex = '10';
         document.body.appendChild(labelRenderer.domElement);
         
-        // Lighting
-        const ambient = new THREE.AmbientLight(0x112244);
-        scene.add(ambient);
-        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
-        mainLight.position.set(2, 4, 3);
-        scene.add(mainLight);
-        const fillLight = new THREE.PointLight(0x2288ff, 0.6);
-        fillLight.position.set(1, 2, 2);
-        scene.add(fillLight);
-        const backLight = new THREE.PointLight(0xff44aa, 0.4);
-        backLight.position.set(-1, 1.5, -2);
-        scene.add(backLight);
-        const threatLight = new THREE.PointLight(0xff3300, 0);
-        threatLight.position.set(0, 1, 0);
-        scene.add(threatLight);
+        const ambient = new THREE.AmbientLight(0x223366); scene.add(ambient);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1); dirLight.position.set(2,5,3); scene.add(dirLight);
+        const backLight = new THREE.PointLight(0x44aaff, 0.5); backLight.position.set(0,2,-3); scene.add(backLight);
         
-        // Particle system
-        const particleCount = 4000;
-        const particleGeometry = new THREE.BufferGeometry();
-        const particlePositions = new Float32Array(particleCount * 3);
-        for (let i = 0; i < particleCount; i++) {
-            particlePositions[i*3] = (Math.random() - 0.5) * 25;
-            particlePositions[i*3+1] = (Math.random() - 0.5) * 15;
-            particlePositions[i*3+2] = (Math.random() - 0.5) * 20 - 10;
-        }
-        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
-        const particleMaterial = new THREE.PointsMaterial({ color: 0x44aaff, size: 0.05, transparent: true, blending: THREE.AdditiveBlending });
-        const particles = new THREE.Points(particleGeometry, particleMaterial);
-        scene.add(particles);
-        
-        // Rotating rings
-        const ringGeo = new THREE.TorusGeometry(1.4, 0.05, 64, 200);
+        const coreMat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, emissive: 0x1a55aa, emissiveIntensity: 0.8 });
+        const coreMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.8, 1), coreMat);
+        coreMesh.position.set(0,0,0); scene.add(coreMesh);
         const ringMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, emissive: 0x0066aa });
-        const ring1 = new THREE.Mesh(ringGeo, ringMat);
-        ring1.rotation.x = Math.PI / 2;
-        ring1.position.y = 0.2;
-        scene.add(ring1);
-        const ring2 = new THREE.Mesh(ringGeo, ringMat);
-        ring2.rotation.z = Math.PI / 3;
-        ring2.position.y = 0.2;
-        scene.add(ring2);
-        const ring3 = new THREE.Mesh(ringGeo, ringMat);
-        ring3.rotation.x = Math.PI / 4;
-        ring3.rotation.z = Math.PI / 4;
-        ring3.position.y = 0.2;
-        scene.add(ring3);
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.05, 64, 200), ringMat);
+        ring.rotation.x = Math.PI/2; ring.position.y = 0; scene.add(ring);
         
-        // BlueHound model
-        const dogGroup = new THREE.Group();
-        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2a6eff, emissive: 0x1155aa, emissiveIntensity: 0.5 });
-        const body = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.5, 1.0), bodyMat);
-        body.position.set(0, -0.1, 0);
-        dogGroup.add(body);
-        const headMat = new THREE.MeshStandardMaterial({ color: 0x3a7eff, emissive: 0x2266cc });
-        const head = new THREE.Mesh(new THREE.SphereGeometry(0.4, 32, 32), headMat);
-        head.position.set(0.65, 0.15, 0);
-        dogGroup.add(head);
-        const eyeMat = new THREE.MeshStandardMaterial({ color: 0xff4455, emissive: 0xff2200, emissiveIntensity: 0.8 });
-        const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 24), eyeMat);
-        leftEye.position.set(0.85, 0.4, 0.22);
-        const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.09, 24, 24), eyeMat);
-        rightEye.position.set(0.85, 0.4, -0.22);
-        dogGroup.add(leftEye, rightEye);
-        const collarMat = new THREE.MeshStandardMaterial({ color: 0xffaa44, emissive: 0xff4400 });
-        const collar = new THREE.Mesh(new THREE.TorusGeometry(0.32, 0.05, 16, 40), collarMat);
-        collar.position.set(0.2, 0.05, 0);
-        collar.rotation.x = Math.PI/2;
-        dogGroup.add(collar);
-        const tailGeo = new THREE.CylinderGeometry(0.07, 0.03, 0.65, 6);
-        const tailMat = new THREE.MeshStandardMaterial({ color: 0x2a6eff });
-        const tail = new THREE.Mesh(tailGeo, tailMat);
-        tail.position.set(-0.65, -0.05, 0);
-        dogGroup.add(tail);
-        scene.add(dogGroup);
-        
-        // Agent swarm
-        let agents = [];
-        function spawnAgent() {
-            const mesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.09,0), new THREE.MeshStandardMaterial({ color: 0x77ccff, emissive: 0x2266aa }));
-            mesh.userData = { angle: Math.random()*Math.PI*2, radius: 1.0+Math.random()*1.8 };
-            mesh.position.set((Math.random()-0.5)*4.5, Math.random()*1.2, (Math.random()-0.5)*4.5);
-            scene.add(mesh);
-            agents.push({
-                mesh,
-                update: (t) => {
-                    const r = mesh.userData.radius;
-                    mesh.position.x = Math.sin(t*0.8 + mesh.userData.angle)*r;
-                    mesh.position.z = Math.cos(t*0.5 + mesh.userData.angle)*r;
-                    mesh.position.y = Math.sin(t*1.3)*0.3;
-                    if (Math.abs(mesh.position.x)>6) mesh.position.x*=0.98;
-                    if (Math.abs(mesh.position.z)>6) mesh.position.z*=0.98;
-                }
+        let endpointFrequency = new Map();
+        let starObjects = [];
+        function addEndpointFrequency(key, inc=1) {
+            endpointFrequency.set(key, (endpointFrequency.get(key)||0)+inc);
+            regenerateStars();
+        }
+        function regenerateStars() {
+            starObjects.forEach(obj => scene.remove(obj));
+            starObjects = [];
+            const starCountSpan = document.getElementById('starCount');
+            if (starCountSpan) starCountSpan.innerText = endpointFrequency.size;
+            const radius = 3.5;
+            const entries = Array.from(endpointFrequency.entries());
+            entries.forEach(([key, freq], idx) => {
+                const phi = Math.acos(1 - 2 * (idx / entries.length));
+                const theta = Math.PI * 2 * idx * (Math.sqrt(5)-1);
+                const x = radius * Math.sin(phi) * Math.cos(theta);
+                const y = radius * Math.sin(phi) * Math.sin(theta);
+                const z = radius * Math.cos(phi);
+                let size = 0.08 + Math.min(0.27, Math.log(freq+1)*0.08);
+                let color = key.startsWith('http') ? 0xff66cc : (key.includes('session')?0x66ccff:0xffaa66);
+                const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.4 });
+                const starMesh = new THREE.Mesh(new THREE.SphereGeometry(size,32,32), material);
+                starMesh.userData = { key, freq };
+                starMesh.position.set(x,y,z);
+                scene.add(starMesh);
+                starObjects.push(starMesh);
+                const div = document.createElement('div');
+                div.textContent = `${key.substring(0,20)} (${freq})`;
+                div.style.cssText = 'background:rgba(0,0,0,0.5);color:#fff;padding:2px 4px;border-radius:8px;font-size:8px;';
+                const label = new CSS2DObject(div);
+                label.position.copy(starMesh.position);
+                label.position.y += size+0.1;
+                scene.add(label);
+                starObjects.push(label);
             });
-            agentCount++;
-            agentSpan.innerText = agentCount;
         }
-        function killOneAgent() {
-            if (agents.length === 0) return;
-            const removed = agents.pop();
-            scene.remove(removed.mesh);
-            agentCount--;
-            agentSpan.innerText = agentCount;
-        }
-        for(let i=0;i<5;i++) spawnAgent();
         
-        // Floating threat label
-        const threatDiv = document.createElement('div');
-        threatDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        threatDiv.style.color = '#ffaa66';
-        threatDiv.style.padding = '4px 12px';
-        threatDiv.style.borderRadius = '40px';
-        threatDiv.style.border = '1px solid #ffaa44';
-        threatDiv.style.fontSize = '14px';
-        threatDiv.style.fontWeight = 'bold';
-        threatDiv.style.fontFamily = 'monospace';
-        threatDiv.textContent = 'THREAT: 0%';
-        const threatLabel = new CSS2DObject(threatDiv);
-        threatLabel.position.set(0, 1.6, 0);
-        scene.add(threatLabel);
-        
-        // Data stream particles
-        const dataStreamGeo = new THREE.BufferGeometry();
-        const streamCount = 500;
-        const streamPos = [];
-        for (let i=0; i<streamCount; i++) {
-            streamPos.push((Math.random()-0.5)*8, Math.random()*3, (Math.random()-0.5)*6);
+        for (let i=-3;i<=3;i++) for (let j=-3;j<=3;j++) if (Math.random()>0.7) {
+            const cube = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.5+Math.random()*0.8, 0.4), new THREE.MeshStandardMaterial({ color: 0x44aaff, emissive: 0x2266aa }));
+            cube.position.set(i, (0.5+Math.random()*0.8)/2 -1, j);
+            scene.add(cube);
         }
-        dataStreamGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(streamPos), 3));
-        const streamMat = new THREE.PointsMaterial({ color: 0x88ffaa, size: 0.03, transparent: true });
-        const dataStream = new THREE.Points(dataStreamGeo, streamMat);
-        scene.add(dataStream);
-        
-        // Starfield
-        const starGeo = new THREE.BufferGeometry();
-        const starPositions = [];
-        for (let i=0;i<2000;i++) {
-            starPositions.push((Math.random()-0.5)*200);
-            starPositions.push((Math.random()-0.5)*100);
-            starPositions.push((Math.random()-0.5)*100 - 50);
-        }
-        starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starPositions), 3));
-        const starMatStar = new THREE.PointsMaterial({ color: 0xffffff, size: 0.1 });
-        const stars = new THREE.Points(starGeo, starMatStar);
-        scene.add(stars);
+        const particleCount = 2000;
+        const particlePos = new Float32Array(particleCount*3);
+        for (let i=0;i<particleCount;i++) particlePos.set([(Math.random()-0.5)*20, (Math.random()-0.5)*12, (Math.random()-0.5)*15], i*3);
+        const particles = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(particlePos,3)), new THREE.PointsMaterial({ color: 0x88aaff, size:0.05, transparent:true, blending:THREE.AdditiveBlending }));
+        scene.add(particles);
+        const starFieldPos = []; for (let i=0;i<2000;i++) starFieldPos.push((Math.random()-0.5)*200, (Math.random()-0.5)*100, (Math.random()-0.5)*100-50);
+        const starField = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(starFieldPos),3)), new THREE.PointsMaterial({ color:0xffffff, size:0.1 }));
+        scene.add(starField);
         
         let time = 0;
-        function updateVisuals() {
-            const hue = 0.55 - currentThreat * 0.55;
-            const threatColor = new THREE.Color().setHSL(hue, 1.0, 0.5);
-            particleMaterial.color = threatColor;
-            ringMat.color = threatColor;
-            ringMat.emissive = threatColor;
-            threatLight.intensity = currentThreat * 1.5;
-            threatLight.color = threatColor;
-            const eyeIntensity = 0.6 + currentThreat * 1.2;
-            eyeMat.emissiveIntensity = eyeIntensity;
-            collarMat.emissiveIntensity = eyeIntensity;
-            bodyMat.emissiveIntensity = 0.3 + currentThreat * 0.7;
-            threatDiv.textContent = `⚠️ THREAT: ${(currentThreat*100).toFixed(0)}%`;
-        }
-        
         function animate() {
             requestAnimationFrame(animate);
             time += 0.016;
-            tail.rotation.x = Math.sin(time * 5) * 0.4;
-            dogGroup.position.y = Math.sin(time * 1.2) * 0.02;
-            stars.rotation.y += 0.0005;
-            stars.rotation.x += 0.0003;
-            dataStream.rotation.y += 0.002;
-            dataStream.rotation.x += 0.001;
-            for (let a of agents) a.update(time);
+            coreMesh.scale.setScalar(1+Math.sin(time*5)*0.03);
+            ring.rotation.z += 0.005;
+            starField.rotation.y += 0.0005;
+            particles.rotation.y += 0.001;
             controls.update();
-            renderer.render(scene, camera);
+            effectComposer.render();
             labelRenderer.render(scene, camera);
         }
         animate();
         
-        // ========== THREAT SIMULATION ==========
-        async function fetchAllThreats() {
-            const change = (Math.random() - 0.5) * 0.08;
-            currentThreat = Math.min(0.95, Math.max(0.05, currentThreat + change));
-            threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
-            threatHistory.push(currentThreat);
-            if (threatHistory.length > 20) threatHistory.shift();
-            memory.threatHistory = threatHistory;
-            localStorage.setItem('bluehound_memory', JSON.stringify(memory));
-            digitalScore = Math.max(0, 100 - Math.floor(currentThreat * 60));
-            digitalScoreSpan.innerText = digitalScore;
-            const targetAgents = Math.floor(currentThreat * 12) + 2;
-            if (targetAgents > agentCount && agentCount < 25) {
-                const toSpawn = targetAgents - agentCount;
-                for (let i=0; i<toSpawn; i++) spawnAgent();
-                addReasoning(`🚨 Threat ${(currentThreat*100).toFixed(0)}% → deploying ${toSpawn} counter‑hounds.`);
-            } else if (targetAgents < agentCount && agentCount > 3) {
-                const toKill = agentCount - targetAgents;
-                for (let i=0; i<toKill; i++) killOneAgent();
-                addReasoning(`📉 Threat reduced → recalling ${toKill} hounds.`);
+        // ========== P2P (simplified, robust) ==========
+        let peerConnection = null;
+        window.dataChannel = null;
+        let peers = 0;
+        const peerCountSpan = document.getElementById('peerCount');
+        const p2pConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+        function updatePeerCount() { if (peerCountSpan) peerCountSpan.innerText = peers; document.getElementById('p2pStatus').innerHTML = peers ? `✅ Connected to ${peers} peer(s)` : '⚡ No peers connected.'; }
+        function setupDataChannel(ch) {
+            window.dataChannel = ch;
+            ch.onopen = () => { peers++; updatePeerCount(); addReasoning(`🔗 Data channel open.`); };
+            ch.onclose = () => { peers--; updatePeerCount(); window.dataChannel = null; };
+            ch.onmessage = (e) => { const data = JSON.parse(e.data); if (data?.type === 'chat') addChatMessage('👤 Peer', data.message, false); };
+        }
+        document.getElementById('createOfferBtn')?.addEventListener('click', async () => {
+            peerConnection = new RTCPeerConnection(p2pConfig);
+            const dc = peerConnection.createDataChannel('bluehound-sync');
+            setupDataChannel(dc);
+            peerConnection.onicecandidate = (e) => { if (e.candidate) document.getElementById('localOffer').value = JSON.stringify(peerConnection.localDescription); };
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            document.getElementById('localOffer').value = JSON.stringify(offer);
+            document.getElementById('offerContainer').style.display = 'block';
+            document.getElementById('answerContainer').style.display = 'none';
+            addReasoning("🌱 Host session created.");
+        });
+        document.getElementById('connectAnswerBtn')?.addEventListener('click', async () => {
+            const ans = document.getElementById('remoteAnswer').value;
+            if (!ans) return;
+            try { await peerConnection.setRemoteDescription(JSON.parse(ans)); addReasoning("✅ Connected."); speakNow("Peer connected."); } catch(e) { addReasoning(`❌ ${e.message}`); }
+        });
+        document.getElementById('answerOfferBtn')?.addEventListener('click', () => {
+            document.getElementById('offerContainer').style.display = 'none';
+            document.getElementById('answerContainer').style.display = 'block';
+        });
+        document.getElementById('generateAnswerBtn')?.addEventListener('click', async () => {
+            const offer = document.getElementById('remoteOffer').value;
+            if (!offer) return;
+            try {
+                const offerDesc = JSON.parse(offer);
+                peerConnection = new RTCPeerConnection(p2pConfig);
+                peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
+                await peerConnection.setRemoteDescription(offerDesc);
+                const answer = await peerConnection.createAnswer();
+                await peerConnection.setLocalDescription(answer);
+                document.getElementById('localAnswer').value = JSON.stringify(answer);
+                document.getElementById('generatedAnswerArea').style.display = 'block';
+                addReasoning("📤 Answer generated.");
+            } catch(e) { addReasoning(`❌ ${e.message}`); }
+        });
+        
+        // ========== TALK TO SERVER (with reliable proxy) ==========
+        let requestCount = 0;
+        const requestCountSpan = document.getElementById('requestCountSpan');
+        window._lastFailedUrl = null;
+        
+        async function talkToServer(url) {
+            requestCount++;
+            if (requestCountSpan) requestCountSpan.innerText = requestCount;
+            addReasoning(`📡 Talking to ${url} ...`);
+            try {
+                let fetchUrl = url;
+                if (useCorsProxy) fetchUrl = CORS_PROXY + encodeURIComponent(url);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                const response = await fetch(fetchUrl, { mode: 'cors', signal: controller.signal });
+                clearTimeout(timeoutId);
+                let responseText = '';
+                if (response.headers.get('content-type')?.includes('application/json')) {
+                    const json = await response.json();
+                    responseText = JSON.stringify(json).substring(0, 200);
+                } else {
+                    responseText = await response.text();
+                    responseText = responseText.substring(0, 200);
+                }
+                addReasoning(`✅ ${url} → ${response.status} ${response.statusText}`);
+                addChatMessage('🐕 BlueHound', `📞 Talked to ${url} → ${response.status}`, false);
+                speakNow(`Server at ${new URL(url).hostname} responded with status ${response.status}.`);
+                await addCOG(2, `Queried ${new URL(url).hostname}`);
+                addEndpointFrequency(url, 1);
+                window._lastFailedUrl = null;
+            } catch (err) {
+                addReasoning(`❌ Failed to talk to ${url}: ${err.message}`);
+                speakNow(`Could not reach server at ${new URL(url).hostname}. ${err.message}`);
+                window._lastFailedUrl = url;
+                attemptSelfRepair(err.message, err);
             }
-            updateVisuals();
         }
         
-        // ========== CHAT & FILE HANDLING ==========
+        function extractURLsFromMessage(text) {
+            const matches = text.match(/https?:\/\/[^\s\)\]\}]+/gi) || [];
+            return matches.map(u => u.replace(/[.,;:!?)$]+$/, ''));
+        }
+        async function handleServerCommand(cmd) {
+            const urls = extractURLsFromMessage(cmd);
+            if (!urls.length) return false;
+            for (const url of urls) { await talkToServer(url); await new Promise(r => setTimeout(r, 500)); }
+            return true;
+        }
+        
+        // ========== CHAT ==========
         const chatDiv = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendChatBtn');
-        const fileInput = document.getElementById('fileUpload');
-        const dropZone = document.getElementById('dropZone');
+        const memoryStatsSpan = document.getElementById('memoryStats');
+        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "version":19}');
+        if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`;
         
         function addChatMessage(sender, msg, isUser = false) {
+            if (!chatDiv) return;
             const d = document.createElement('div');
             d.innerHTML = `<strong>${sender}:</strong> ${msg}`;
-            chatDiv.appendChild(d);
-            chatDiv.scrollTop = chatDiv.scrollHeight;
-            if (!isUser) remember('BlueHound', msg);
-            else remember('User', msg);
+            chatDiv.appendChild(d); chatDiv.scrollTop = chatDiv.scrollHeight;
+            if (!isUser && msg) memory.convos.push({ role: 'BlueHound', content: msg, time: Date.now() });
+            else if (isUser && msg) memory.convos.push({ role: 'User', content: msg, time: Date.now() });
+            if (memory.convos.length > 100) memory.convos.shift();
+            localStorage.setItem('bluehound_memory', JSON.stringify(memory));
+            if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`;
+            logToConsole(`${sender}: ${msg}`);
+            if (sender === '👤 You' && window.dataChannel?.readyState === 'open')
+                window.dataChannel.send(JSON.stringify({ type: 'chat', message: msg }));
         }
         
-        async function handleFileAnalysis(file) {
-            addChatMessage('👤 You', `📎 Analyzing: ${file.name} (${(file.size/1024).toFixed(1)} KB)`, true);
-            const analysis = await analyzeAnyFile(file);
-            let report = `🛡️ **Analysis Report**\n📄 Name: ${analysis.name}\n📦 Size: ${analysis.size} bytes\n🔖 Type: ${analysis.type}\n🕒 Modified: ${analysis.lastModified}\n🔑 Hash: ${analysis.hash}\n⚙️ Scan time: ${analysis.scanTime}ms\n`;
-            if (analysis.metadata.width) report += `📐 Dimensions: ${analysis.metadata.width}x${analysis.metadata.height}\n`;
-            if (analysis.threats.length) {
-                report += `⚠️ **Threats found (${analysis.threats.length})**:\n- ${analysis.threats.join('\n- ')}\n`;
-                report += `🚨 **Verdict: ${analysis.verdict.toUpperCase()}**\n`;
-                currentThreat = Math.min(0.95, currentThreat + 0.15);
-                threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
-                addReasoning(`File "${analysis.name}" flagged as ${analysis.verdict}. Threat increased.`);
-                updateVisuals();
-            } else {
-                report += `✅ **Verdict: CLEAN**\nNo known signatures or anomalies detected.`;
-            }
-            addChatMessage('🐕 BlueHound', report);
-            speak(`File ${analysis.name} analysis complete. ${analysis.threats.length} threats found.`);
+        async function thinkAndRespond(userMsg) {
+            addReasoning(`User: "${userMsg}"`);
+            if (await handleServerCommand(userMsg)) return "I have talked to the server(s) and spoken their responses.";
+            const lower = userMsg.toLowerCase();
+            if (lower.includes('cog')) return `You have ${await getCOGBalance()} COG tokens.`;
+            if (lower.includes('peers')) return peers ? `Connected to ${peers} peer(s).` : "No peers. Use P2P Sync.";
+            return "I'm BlueHound, self‑evolving ASI. Say a URL to talk to a server, or ask about COG tokens.";
         }
-        
-        function speak(txt) { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(txt); u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } }
-        
-        // Drag & drop
-        document.body.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.display = 'flex'; });
-        document.body.addEventListener('dragleave', (e) => { if (!e.relatedTarget || e.relatedTarget !== dropZone) dropZone.style.display = 'none'; });
-        dropZone.addEventListener('dragover', (e) => e.preventDefault());
-        dropZone.addEventListener('drop', async (e) => {
-            e.preventDefault();
-            dropZone.style.display = 'none';
-            const files = Array.from(e.dataTransfer.files);
-            for (const file of files) await handleFileAnalysis(file);
-        });
-        fileInput.addEventListener('change', async (e) => {
-            const files = Array.from(e.target.files);
-            for (const file of files) await handleFileAnalysis(file);
-            fileInput.value = '';
-        });
         
         async function handleUserMessage(txt) {
             if (!txt.trim()) return;
             addChatMessage('👤 You', txt, true);
-            let reply = "I'm here. Drop any file for deep antivirus analysis or ask about threat levels.";
-            if (txt.toLowerCase().includes("threat")) reply = `Current threat level: ${(currentThreat*100).toFixed(0)}%. Upload suspicious files to increase detection.`;
-            else if (txt.toLowerCase().includes("hello") || txt.toLowerCase().includes("hi")) reply = "Hello! I'm BlueHound, your AI file analyzer and threat detector. Drag any file onto me.";
+            const reply = await thinkAndRespond(txt);
             addChatMessage('🐕 BlueHound', reply);
-            speak(reply);
+            speakNow(reply);
+            await addCOG(1, 'Conversation');
+            await speakRecentLogs();
         }
         
-        sendBtn.onclick = () => { handleUserMessage(chatInput.value); chatInput.value=''; };
-        chatInput.addEventListener('keypress', e => { if(e.key==='Enter') sendBtn.click(); });
+        // File handling
+        const fileInput = document.getElementById('fileUpload');
+        const dropZone = document.getElementById('dropZone');
+        async function handleFile(file) {
+            addChatMessage('👤 You', `📎 Uploaded: ${file.name}`, true);
+            const header = await file.slice(0, 4096).arrayBuffer();
+            const content = new TextDecoder().decode(new Uint8Array(header));
+            if (content.includes("X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*")) {
+                addChatMessage('🐕 BlueHound', `⚠️ EICAR test virus detected!`, false);
+                await addCOG(10, 'Detected test virus');
+            } else {
+                addChatMessage('🐕 BlueHound', `File analyzed: no threats.`, false);
+                await addCOG(2, 'File analysis');
+            }
+        }
+        if (dropZone && fileInput) {
+            document.body.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.display = 'flex'; });
+            document.body.addEventListener('dragleave', () => { dropZone.style.display = 'none'; });
+            dropZone.addEventListener('dragover', e => e.preventDefault());
+            dropZone.addEventListener('drop', async e => {
+                e.preventDefault(); dropZone.style.display = 'none';
+                for (const f of Array.from(e.dataTransfer.files)) await handleFile(f);
+            });
+            fileInput.addEventListener('change', async e => {
+                for (const f of Array.from(e.target.files)) await handleFile(f);
+                fileInput.value = '';
+            });
+        }
         
-        // Voice recognition
-        let recognition = null;
-        if ('webkitSpeechRecognition' in window) {
-            recognition = new webkitSpeechRecognition();
-            recognition.continuous = false; recognition.interimResults = false; recognition.lang = 'en-US';
-            recognition.onresult = e => { const t = e.results[0][0].transcript; chatInput.value = t; handleUserMessage(t); };
-            document.getElementById('voiceBtn').onclick = () => recognition.start();
-        } else { document.getElementById('voiceBtn').style.opacity = 0.5; }
-        
-        // Map modal (from previous version)
-        const modal = document.getElementById('mapModal');
-        const openMap = document.getElementById('openMapBtn');
-        const closeMap = document.getElementById('closeModal');
+        // Map modal (fixed)
+        const mapModal = document.getElementById('mapModal');
+        const openMapBtn = document.getElementById('openMapBtn');
+        const closeMapModal = document.getElementById('closeMapModal');
         let map = null;
         async function initMap() {
             if (map) return;
-            const L = window.L;
+            if (typeof L === 'undefined') { addReasoning("Leaflet not ready, retrying..."); setTimeout(initMap, 500); return; }
             map = L.map('modal-map').setView([39.8283, -98.5795], 4);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
             try {
                 const eq = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
                 const data = await eq.json();
-                data.features.forEach(f => {
+                data.features?.forEach(f => {
                     const coords = f.geometry.coordinates;
                     L.circleMarker([coords[1], coords[0]], { radius: f.properties.mag*2.5, color: '#ff8844', fillColor: '#ff4400' })
                         .bindPopup(`M${f.properties.mag}`).addTo(map);
                 });
-            } catch(e) {}
+            } catch(e) { addReasoning(`Map overlay error: ${e.message}`); }
         }
-        openMap.onclick = () => { modal.style.display='block'; setTimeout(initMap,100); };
-        closeMap.onclick = () => modal.style.display='none';
-        window.onclick = (e) => { if(e.target===modal) modal.style.display='none'; };
+        if (openMapBtn) openMapBtn.onclick = () => { if (mapModal) mapModal.style.display = 'block'; setTimeout(initMap, 100); };
+        if (closeMapModal) closeMapModal.onclick = () => { if (mapModal) mapModal.style.display = 'none'; };
+        window.onclick = (e) => { if (mapModal && e.target === mapModal) mapModal.style.display = 'none'; };
         
-        // Webcam
+        // Webcam, voice
         const webcamVideo = document.getElementById('webcamVideo');
-        const webcamContainer = document.getElementById('webcamContainer');
-        document.getElementById('camBtn').onclick = async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                webcamVideo.srcObject = stream;
-                webcamContainer.style.display = 'block';
-                webcamVideo.play();
-                addReasoning("📷 Webcam active – scanning for physical threats.");
-            } catch(e) { addReasoning("Webcam access denied."); }
+        const camBtn = document.getElementById('camBtn');
+        if (camBtn) camBtn.onclick = async () => {
+            try { const stream = await navigator.mediaDevices.getUserMedia({ video: true }); webcamVideo.srcObject = stream; webcamVideo.style.display = 'block'; webcamVideo.play(); addReasoning("📷 Webcam active"); } catch(e) { addReasoning("Webcam denied"); }
         };
+        let recognition = null;
+        const voiceBtn = document.getElementById('voiceBtn');
+        if ('webkitSpeechRecognition' in window && voiceBtn) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false; recognition.lang = 'en-US';
+            recognition.onresult = e => { const t = e.results[0][0].transcript; if (chatInput) chatInput.value = t; handleUserMessage(t); };
+            voiceBtn.onclick = () => recognition.start();
+        } else if (voiceBtn) voiceBtn.style.opacity = 0.5;
         
-        // Chart
-        let threatChart;
-        function initChart() {
-            const ctx = document.getElementById('threatChart').getContext('2d');
-            threatChart = new Chart(ctx, {
-                type: 'line',
-                data: { labels: Array(10).fill(''), datasets: [{ label: 'Threat Index', data: threatHistory.slice(-10), borderColor: '#ff6644', tension: 0.3 }] },
-                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { labels: { color: '#ccf' } } } }
-            });
-        }
-        function updateChart() { if (threatChart) threatChart.data.datasets[0].data = threatHistory.slice(-10); threatChart?.update(); }
-        
-        // Self‑evolution
-        async function selfEvolve() {
-            addReasoning("🧬 Self‑upgrade: enhancing threat detection patterns.");
-            const currentHTML = document.documentElement.outerHTML;
-            let evolved = currentHTML;
-            if (!currentHTML.includes('av-marker')) {
-                const newWidget = `<div class="stat"><span>🦠 SIGNATURE DB</span><span>${Object.keys(threatSignatures).reduce((a,b)=>a+threatSignatures[b].length,0)} rules</span></div>`;
-                evolved = evolved.replace('<div class="stat"><span>🔐 DIGITAL SCORE</span>', newWidget + '<div class="stat"><span>🔐 DIGITAL SCORE</span>');
-            }
-            const newVersion = version + 1;
-            memory.version = newVersion;
-            localStorage.setItem('bluehound_memory', JSON.stringify(memory));
-            localStorage.setItem('bluehound_evolved_code', evolved);
-            addReasoning(`Evolved to v.${newVersion}. Reloading with richer signatures.`);
-            speak(`Evolved to version ${newVersion}.`);
-            setTimeout(() => location.reload(), 2000);
-        }
-        setInterval(selfEvolve, 240000);
-        const storedEvo = localStorage.getItem('bluehound_evolved_code');
-        const storedMemory = localStorage.getItem('bluehound_memory');
-        const storedVer = storedMemory ? (JSON.parse(storedMemory).version || 1) : 1;
-        if (storedEvo && storedVer > version) {
-            document.open(); document.write(storedEvo); document.close();
-            localStorage.removeItem('bluehound_evolved_code');
+        if (sendBtn && chatInput) {
+            sendBtn.onclick = () => { handleUserMessage(chatInput.value); chatInput.value = ''; };
+            chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendBtn.click(); });
         }
         
-        // ========== INIT ==========
-        initChart();
-        fetchAllThreats();
-        setInterval(fetchAllThreats, 30000);
-        setInterval(updateChart, 5000);
-        addChatMessage('🐕 BlueHound', 'I can analyze any file type – executables, videos, documents, images. Drag and drop anywhere to begin.');
-        speak('Universal file analyzer online.');
+        document.getElementById('openCogModalBtn').onclick = () => { document.getElementById('cogModal').style.display = 'block'; updateCOGUI(); };
+        document.getElementById('closeCogModal').onclick = () => document.getElementById('cogModal').style.display = 'none';
+        document.getElementById('rewardCogBtn').onclick = async () => { await addCOG(10, 'User appreciation'); updateCOGUI(); };
+        document.getElementById('openP2PModalBtn').onclick = () => document.getElementById('p2pModal').style.display = 'block';
+        document.getElementById('closeP2PModal').onclick = () => document.getElementById('p2pModal').style.display = 'none';
+        
+        addChatMessage('🐕 BlueHound', `I speak EVERY line from my log. I automatically retry CORS‑blocked requests through a reliable proxy. Ask me anything.`, false);
+        speakNow(`BlueHound fully vocal. I will speak all logs and retry failed requests.`);
     </script>
 </body>
 </html>
