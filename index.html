@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>BlueHound · Social AI · Multimedia World</title>
+    <title>BlueHound · Living Data City · Persistent Media</title>
     <script type="importmap">
         {
             "imports": {
@@ -104,10 +104,10 @@
     <canvas id="webgl-canvas"></canvas>
     
     <div class="hud">
-        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.27</span></div>
+        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.28</span></div>
         <div class="stat"><span>🌍 THREAT</span><span id="threatLevel">0%</span></div>
-        <div class="stat"><span>🧠 SPEAKING ALL</span><span id="fixCount">0</span></div>
-        <div class="stat"><span>⭐ DATA STARS</span><span id="starCount">0</span></div>
+        <div class="stat"><span>🧠 BUILDINGS</span><span id="buildingCount">0</span></div>
+        <div class="stat"><span>🖼️ MEDIA</span><span id="mediaCount">0</span></div>
         <div class="stat"><span>🪙 COG TOKENS</span><span id="cogBalance">0</span></div>
         <div class="stat"><span>📡 REQUESTS</span><span id="requestCountSpan">0</span></div>
         <button id="openCogModalBtn">💰 COG VAULT</button>
@@ -131,13 +131,13 @@
     
     <div class="chat-panel">
         <div style="font-size:0.7rem; margin-bottom:4px;">💬 FULLY AUDIBLE AI</div>
-        <div id="chatMessages" class="chat-messages"><div>🐕 BlueHound: I reply to every social post. Upload images – they become floating objects in my 3D world!</div></div>
+        <div id="chatMessages" class="chat-messages"><div>🐕 BlueHound: Data city rebuilt from your browser variables. Images become floating billboards with permanent positions.</div></div>
         <div class="chat-input"><input type="text" id="chatInput" placeholder="Type your message..."><button id="sendChatBtn">➤</button><label for="fileUpload" class="file-upload-btn">📎 FILE</label><input type="file" id="fileUpload" style="display:none;" multiple></div>
         <div class="memory-stats" id="memoryStats">🧠 memory: --</div>
     </div>
 
     <div class="reasoning-panel">
-        <div class="reasoning-title">🌀 SEISMIC & ERROR LOG</div>
+        <div class="reasoning-title">🌀 SEISMIC & DATA LOG</div>
         <div id="reasoningLog" class="reasoning-content">Waiting for seismic data...</div>
     </div>
 
@@ -153,90 +153,12 @@
         
         if (window.location.protocol === 'file:') document.getElementById('warningBanner').style.display = 'block';
         
-        // ========== EARTHQUAKE THREAT ANALYSIS ==========
-        let earthquakeHistory = [];
-        let currentThreat = 0.1;
-        const threatSpan = document.getElementById('threatLevel');
-        async function fetchSeismicData() {
-            try {
-                const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                const features = data.features.slice(0, 30);
-                const events = features.map(f => ({ mag: f.properties.mag, depth: f.geometry.coordinates[2], place: f.properties.place, time: f.properties.time }));
-                earthquakeHistory = events;
-                const shallowEvents = events.filter(e => e.depth < 5 && e.mag > 1.5);
-                const shallowCount = shallowEvents.length;
-                let threat = 0.1;
-                let analysis = "";
-                if (shallowCount > 2 && shallowEvents.some(e=>e.mag>2.5)) { threat = 0.65; analysis = `⚠️ SEISMIC CLUSTER: ${shallowCount} shallow events – possible illegal mining.`; }
-                else if (shallowCount > 1) { threat = 0.4; analysis = `🔍 Suspicious shallow activity (${shallowCount} shallow events).`; }
-                else if (events.some(e => e.mag > 5 && e.depth > 15)) { threat = 0.2; analysis = `🌋 Natural deep earthquake.`; }
-                else { analysis = `🌍 Seismic background normal. ${events.length} events.`; }
-                currentThreat = Math.min(0.95, threat);
-                threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
-                addReasoning(analysis);
-                if (threat > 0.6) { speakNow(`Alert: Possible illegal mining detected. ${shallowCount} shallow seismic events.`); addChatMessage('🐕 BlueHound', `🚨 ${analysis}`, false); }
-                return events;
-            } catch(e) { addReasoning(`Seismic data unavailable: ${e.message}`); return []; }
-        }
-        
-        // ========== CORS PROXY & SELF-REPAIR ==========
-        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
-        let useCorsProxy = false;
-        let fixCounter = 0;
-        const fixCountSpan = document.getElementById('fixCount');
-        function incrementFixCount() { fixCounter++; if (fixCountSpan) fixCountSpan.innerText = fixCounter; }
-        window.onerror = (message, source, lineno, colno, error) => { addReasoning(`❗ Runtime error: ${message}`); attemptSelfRepair(message, error); return true; };
-        window.addEventListener('unhandledrejection', (event) => { addReasoning(`❗ Unhandled rejection: ${event.reason}`); attemptSelfRepair(event.reason, event.reason); });
-        function attemptSelfRepair(errorMsg, errorObj) {
-            if ((errorMsg.includes('CORS') || errorMsg.includes('blocked') || errorMsg.includes('fetch')) && !useCorsProxy) {
-                addReasoning(`🧠 CORS issue detected – enabling CORS proxy.`);
-                useCorsProxy = true;
-                incrementFixCount();
-                addChatMessage('🐕 BlueHound', `CORS proxy enabled.`, false);
-                if (window._lastFailedUrl) talkToServer(window._lastFailedUrl);
-                return true;
-            }
-            addReasoning(`📝 Error logged: ${errorMsg.substring(0, 120)}`);
-            localStorage.setItem('bluehound_last_error', JSON.stringify({ msg: errorMsg, time: Date.now() }));
-            return false;
-        }
-        
-        // ========== SPEECH & LOGGING ==========
+        // ========== CORE UTILITIES ==========
         function logToConsole(msg) { console.log(`🐕 [BlueHound] ${msg}`); }
-        function speakNow(text) {
-            if ('speechSynthesis' in window) { const utterance = new SpeechSynthesisUtterance(text); utterance.rate = 0.9; speechSynthesis.cancel(); speechSynthesis.speak(utterance); }
-            logToConsole(`🔊 SPOKEN: ${text}`);
-        }
-        function addReasoning(text) {
-            const logDiv = document.getElementById('reasoningLog');
-            if (logDiv) { const entry = document.createElement('div'); entry.innerHTML = `🔍 ${text}`; logDiv.prepend(entry); while (logDiv.children.length > 20) logDiv.removeChild(logDiv.lastChild); }
-            logToConsole(`[REASON] ${text}`);
-            if (text && text.length < 300) speakNow(text);
-            else if (text && text.length >= 300) speakNow(text.substring(0, 200) + "... (truncated)");
-        }
-        async function speakRecentLogs() {
-            const logDiv = document.getElementById('reasoningLog');
-            if (logDiv && logDiv.children.length) {
-                const recent = [];
-                for (let i = 0; i < Math.min(logDiv.children.length, 6); i++) { let txt = logDiv.children[i].innerText; if (txt.length > 150) txt = txt.substring(0, 150) + "..."; recent.push(txt); }
-                if (recent.length) speakNow(`Recent logs: ${recent.join('. ')}`);
-            }
-        }
+        function speakNow(text) { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(text); u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } logToConsole(`🔊 SPOKEN: ${text}`); }
+        function addReasoning(text) { const logDiv = document.getElementById('reasoningLog'); if (logDiv) { const entry = document.createElement('div'); entry.innerHTML = `🔍 ${text}`; logDiv.prepend(entry); while (logDiv.children.length>20) logDiv.removeChild(logDiv.lastChild); } logToConsole(`[REASON] ${text}`); if (text.length<300) speakNow(text); else speakNow(text.substring(0,200)+"..."); }
         
-        // ========== COG TOKENS ==========
-        let db;
-        const DB_NAME = 'BlueHoundCOG';
-        const STORE_NAME = 'tokens';
-        function openDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(DB_NAME, 1); request.onerror = () => reject(request.error); request.onsuccess = () => resolve(request.result); request.onupgradeneeded = (e) => { const db = e.target.result; if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true }); }; }); }
-        async function getCOGBalance() { const db = await openDB(); return new Promise((resolve) => { const tx = db.transaction(STORE_NAME, 'readonly'); const req = tx.objectStore(STORE_NAME).getAll(); req.onsuccess = () => resolve(req.result.reduce((s, t) => s + (t.amount||0), 0)); req.onerror = () => resolve(0); }); }
-        async function addCOG(amount, reason) { const db = await openDB(); const tx = db.transaction(STORE_NAME, 'readwrite'); tx.objectStore(STORE_NAME).add({ amount, reason, timestamp: Date.now() }); await tx.done; updateCOGUI(); addChatMessage('🐕 BlueHound', `💰 +${amount} COG: ${reason}`, false); if (window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'cog', amount, reason })); return true; }
-        async function getAllCOG() { const db = await openDB(); return new Promise((resolve) => { const tx = db.transaction(STORE_NAME, 'readonly'); tx.objectStore(STORE_NAME).getAll().onsuccess = (e) => resolve(e.target.result); }); }
-        async function updateCOGUI() { const balance = await getCOGBalance(); const cogSpan = document.getElementById('cogBalance'); if (cogSpan) cogSpan.innerText = balance; const tokens = await getAllCOG(); const listDiv = document.getElementById('cogTokenList'); if (listDiv) listDiv.innerHTML = (!tokens.length) ? '<div>No COG tokens yet.</div>' : tokens.map(t => `<div class="cog-item"><span>${t.reason}</span><span>+${t.amount} COG</span><span>${new Date(t.timestamp).toLocaleTimeString()}</span></div>`).join(''); }
-        await openDB().catch(()=>{}); await updateCOGUI();
-        
-        // ========== 3D WORLD ==========
+        // ========== 3D WORLD: DATA BUILDINGS + PERSISTENT IMAGES ==========
         const canvas = document.getElementById('webgl-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -271,6 +193,7 @@
         gridHelper.material.opacity = 0.2;
         scene.add(gridHelper);
         
+        // Core avatar
         const coreMat = new THREE.MeshStandardMaterial({ color:0x3a86ff, emissive:0x1a55aa, emissiveIntensity:0.6, metalness:0.3, roughness:0.5 });
         const coreMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.8,1), coreMat);
         coreMesh.castShadow = true; coreMesh.position.set(0,0,0); scene.add(coreMesh);
@@ -278,54 +201,7 @@
         const ring = new THREE.Mesh(new THREE.TorusGeometry(1.2,0.05,64,200), ringMat);
         ring.rotation.x = Math.PI/2; ring.position.y = 0; ring.castShadow = true; scene.add(ring);
         
-        // Data stars (for URLs)
-        let endpointFrequency = new Map();
-        let starObjects = [];
-        function addEndpointFrequency(key, inc=1) { endpointFrequency.set(key, (endpointFrequency.get(key)||0)+inc); regenerateStars(); }
-        function regenerateStars() {
-            starObjects.forEach(obj => scene.remove(obj)); starObjects = [];
-            document.getElementById('starCount').innerText = endpointFrequency.size;
-            const radius = 3.5;
-            const entries = Array.from(endpointFrequency.entries());
-            if (!entries.length) return;
-            entries.forEach(([key, freq], idx) => {
-                const phi = Math.acos(1 - 2 * (idx / entries.length));
-                const theta = Math.PI * 2 * idx * (Math.sqrt(5)-1);
-                const x = radius * Math.sin(phi) * Math.cos(theta);
-                const y = radius * Math.sin(phi) * Math.sin(theta);
-                const z = radius * Math.cos(phi);
-                let size = 0.08 + Math.min(0.27, Math.log(freq+1)*0.08);
-                let color = key.startsWith('http') ? 0xff66cc : (key.includes('session')?0x66ccff:0xffaa66);
-                const starMesh = new THREE.Mesh(new THREE.SphereGeometry(size,24,24), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity:0.3 }));
-                starMesh.userData = { key, freq };
-                starMesh.position.set(x,y,z); starMesh.castShadow = true;
-                scene.add(starMesh); starObjects.push(starMesh);
-                const div = document.createElement('div');
-                div.textContent = `${key.substring(0,20)} (${freq})`;
-                div.style.cssText = 'background:rgba(0,0,0,0.6);color:#fff;padding:2px 6px;border-radius:12px;font-size:8px;border:1px solid #88aaff;';
-                const label = new CSS2DObject(div);
-                label.position.copy(starMesh.position);
-                label.position.y += size + 0.2;
-                scene.add(label);
-                starObjects.push(label);
-            });
-        }
-        
-        // Buildings with labels (same)
-        for (let i=-4;i<=4;i++) for (let j=-4;j<=4;j++) if (Math.random()>0.8) {
-            const height = 0.3+Math.random()*0.7;
-            const cube = new THREE.Mesh(new THREE.BoxGeometry(0.35,height,0.35), new THREE.MeshStandardMaterial({ color:0x44aaff, emissive:0x2266aa, metalness:0.2 }));
-            cube.position.set(i, height/2-1.0, j); cube.castShadow = true;
-            scene.add(cube);
-            const div = document.createElement('div');
-            div.textContent = `🏢 ${Math.floor(Math.random()*100)}`;
-            div.style.cssText = 'background:rgba(0,0,0,0.5);color:#ccf4ff;padding:2px 4px;border-radius:8px;font-size:7px;';
-            const label = new CSS2DObject(div);
-            label.position.set(i, height - 0.8, j);
-            scene.add(label);
-        }
-        
-        // Starfield and dust
+        // --- Starfield & dust (cosmetic) ---
         const starFieldPos = []; for(let i=0;i<1500;i++) starFieldPos.push((Math.random()-0.5)*200, (Math.random()-0.5)*100, (Math.random()-0.5)*100-50);
         const starField = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(starFieldPos),3)), new THREE.PointsMaterial({ color:0xaaccff, size:0.1, transparent:true, opacity:0.6 }));
         scene.add(starField);
@@ -333,25 +209,121 @@
         const dust = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(dustPos),3)), new THREE.PointsMaterial({ color:0x88aaff, size:0.03, transparent:true, opacity:0.3 }));
         scene.add(dust);
         
-        // --- Multimedia Floating Billboards ---
-        let mediaBillboards = []; // { mesh, texture, rotationSpeed }
-        function addMediaBillboard(imageUrl, text = "") {
+        // ----- 1. DATA BUILDINGS (from environment variables) -----
+        let buildings = []; // { mesh, label, key, freq }
+        let variableFrequency = new Map(); // count of how many times each key has been seen (simulated)
+        
+        function scanVariables() {
+            // Collect all keys from localStorage, sessionStorage, and top-level globals
+            const localKeys = Object.keys(localStorage);
+            const sessionKeys = Object.keys(sessionStorage);
+            // Also include some console variable examples? We'll simulate by counting usage
+            // For demo, we'll also count how many times each key appears in conversation memory
+            const globalKeys = [];
+            for (let key in window) {
+                if (Object.prototype.hasOwnProperty.call(window,key) && !['window','document','localStorage','sessionStorage','console','location','history','navigator','screen','caches','indexedDB'].includes(key) && typeof window[key] !== 'function' && !key.startsWith('webkit') && !key.startsWith('on')) {
+                    globalKeys.push(key);
+                }
+            }
+            // Update frequency: each time we scan, we increment for keys found (simulate "access")
+            for (let k of localKeys) variableFrequency.set(k, (variableFrequency.get(k)||0)+1);
+            for (let k of sessionKeys) variableFrequency.set(k, (variableFrequency.get(k)||0)+1);
+            for (let k of globalKeys) variableFrequency.set(k, (variableFrequency.get(k)||0)+1);
+            // Also add a few "console" variables for fun (if they've been captured)
+            if (window._capturedConsoleVars) {
+                for (let k of Object.keys(window._capturedConsoleVars)) {
+                    variableFrequency.set(k, (variableFrequency.get(k)||0)+1);
+                }
+            }
+            // Rebuild buildings
+            rebuildCity();
+        }
+        
+        function rebuildCity() {
+            // Remove old buildings
+            buildings.forEach(b => { scene.remove(b.mesh); scene.remove(b.label); });
+            buildings = [];
+            const entries = Array.from(variableFrequency.entries());
+            if (entries.length === 0) {
+                // fallback dummy
+                for (let i=0;i<20;i++) {
+                    const key = `var_${i}`;
+                    variableFrequency.set(key, Math.floor(Math.random()*10)+1);
+                }
+            }
+            const total = entries.length;
+            const radius = 3.0;
+            let angle = 0;
+            const angleStep = (Math.PI * 2) / Math.min(total, 60);
+            let idx = 0;
+            for (let [key, freq] of entries.slice(0,60)) {
+                const height = 0.4 + Math.min(1.2, Math.log(freq+1)*0.3);
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                // color based on type
+                let color = 0x44aaff;
+                if (key.includes('session')) color = 0x66ccff;
+                else if (key.includes('local')) color = 0xffaa66;
+                else if (key.includes('console')) color = 0xff66cc;
+                const geometry = new THREE.BoxGeometry(0.35, height, 0.35);
+                const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.2 });
+                const cube = new THREE.Mesh(geometry, material);
+                cube.position.set(x, height/2 - 1.0, z);
+                cube.castShadow = true;
+                scene.add(cube);
+                // CSS2D label
+                const div = document.createElement('div');
+                div.textContent = `${key.substring(0,12)} (${freq})`;
+                div.style.cssText = 'background:rgba(0,0,0,0.5);color:#ccf4ff;padding:2px 4px;border-radius:8px;font-size:7px;';
+                const label = new CSS2DObject(div);
+                label.position.set(x, height - 0.8, z);
+                scene.add(label);
+                buildings.push({ mesh: cube, label, key, freq });
+                angle += angleStep;
+                idx++;
+            }
+            document.getElementById('buildingCount').innerText = buildings.length;
+        }
+        
+        // Scan every 10 seconds and rebuild city
+        setInterval(scanVariables, 10000);
+        scanVariables(); // initial
+        
+        // ----- 2. PERSISTENT IMAGES (as floating billboards) -----
+        let mediaBillboards = []; // { mesh, label, imageUrl, position, rotationSpeed }
+        const STORED_IMAGES_KEY = 'bluehound_images';
+        let savedImages = JSON.parse(localStorage.getItem(STORED_IMAGES_KEY) || '[]');
+        
+        function saveBillboardPositions() {
+            const positions = mediaBillboards.map(b => ({ url: b.imageUrl, pos: b.mesh.position.toArray(), rotY: b.mesh.rotation.y, labelText: b.label.element.innerText }));
+            localStorage.setItem(STORED_IMAGES_KEY, JSON.stringify(positions));
+        }
+        
+        function addMediaBillboard(imageUrl, text = "", posX = null, posZ = null) {
+            // If position not given, find a free spot or use saved position from previous session
+            let position = null;
+            if (posX !== null && posZ !== null) {
+                position = new THREE.Vector3(posX, 0.5 + Math.random()*1.5, posZ);
+            } else {
+                // Check saved positions for this URL
+                const existing = savedImages.find(s => s.url === imageUrl);
+                if (existing) {
+                    position = new THREE.Vector3(existing.pos[0], existing.pos[1], existing.pos[2]);
+                } else {
+                    // New image: place in a ring around the city
+                    const angle = Math.random() * Math.PI * 2;
+                    const radius = 4.2 + Math.random() * 1.2;
+                    position = new THREE.Vector3(Math.cos(angle)*radius, 0.6 + Math.random()*2.0, Math.sin(angle)*radius);
+                }
+            }
             const texture = new THREE.TextureLoader().load(imageUrl);
             const material = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide, emissive: 0x2266aa, emissiveIntensity: 0.2 });
             const geometry = new THREE.PlaneGeometry(1.2, 0.9);
             const plane = new THREE.Mesh(geometry, material);
-            // Random position around the core, but outside
-            const angle = Math.random() * Math.PI * 2;
-            const radius = 4.0 + Math.random() * 1.5;
-            const x = Math.cos(angle) * radius;
-            const z = Math.sin(angle) * radius;
-            const y = 0.5 + Math.random() * 2.5;
-            plane.position.set(x, y, z);
+            plane.position.copy(position);
             plane.castShadow = true;
-            // Make it face the center
-            plane.lookAt(0, y, 0);
+            plane.lookAt(0, plane.position.y, 0);
             scene.add(plane);
-            // Add a floating label for the text
             const div = document.createElement('div');
             div.textContent = text.substring(0, 40);
             div.style.cssText = 'background:rgba(0,0,0,0.6);color:#fff;padding:2px 6px;border-radius:12px;font-size:8px;';
@@ -359,7 +331,18 @@
             label.position.copy(plane.position);
             label.position.y += 0.6;
             scene.add(label);
-            mediaBillboards.push({ mesh: plane, label, texture, rotationSpeed: 0.005 + Math.random() * 0.01 });
+            const billboard = { mesh: plane, label, imageUrl, position: plane.position, rotationSpeed: 0.005 + Math.random() * 0.008 };
+            mediaBillboards.push(billboard);
+            // Save position to localStorage
+            savedImages = mediaBillboards.map(b => ({ url: b.imageUrl, pos: [b.position.x, b.position.y, b.position.z], labelText: b.label.element.innerText }));
+            localStorage.setItem(STORED_IMAGES_KEY, JSON.stringify(savedImages));
+            document.getElementById('mediaCount').innerText = mediaBillboards.length;
+            return billboard;
+        }
+        
+        // Load images from saved list
+        for (let saved of savedImages) {
+            addMediaBillboard(saved.url, saved.labelText, saved.pos[0], saved.pos[2]);
         }
         
         function animateBillboards() {
@@ -368,35 +351,66 @@
             });
         }
         
-        let animTime = 0;
-        function animate() {
-            requestAnimationFrame(animate);
-            animTime += 0.016;
-            coreMesh.scale.setScalar(1+Math.sin(animTime*5)*0.02);
-            ring.rotation.z += 0.008;
-            starField.rotation.y += 0.0003;
-            dust.rotation.y += 0.0005;
-            animateBillboards();
-            controls.update();
-            renderer.render(scene, camera);
-            labelRenderer.render(scene, camera);
+        // ----- 3. RESTORE SEISMIC & OTHER FEATURES (unchanged but integrated) -----
+        let earthquakeHistory = [];
+        let currentThreat = 0.1;
+        const threatSpan = document.getElementById('threatLevel');
+        async function fetchSeismicData() {
+            try {
+                const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                const events = data.features.slice(0,30).map(f => ({ mag: f.properties.mag, depth: f.geometry.coordinates[2] }));
+                earthquakeHistory = events;
+                const shallowCount = events.filter(e => e.depth < 5 && e.mag > 1.5).length;
+                let threat = 0.1;
+                let analysis = "";
+                if (shallowCount > 2) { threat = 0.65; analysis = `⚠️ SEISMIC CLUSTER: ${shallowCount} shallow events – possible illegal mining.`; }
+                else if (shallowCount > 1) { threat = 0.4; analysis = `🔍 Suspicious shallow activity (${shallowCount} shallow events).`; }
+                else { analysis = `🌍 Seismic background normal.`; }
+                currentThreat = Math.min(0.95, threat);
+                threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
+                addReasoning(analysis);
+                if (threat > 0.6) speakNow(`Alert: Possible illegal mining detected. ${shallowCount} shallow seismic events.`);
+            } catch(e) { addReasoning(`Seismic data unavailable: ${e.message}`); }
         }
-        animate();
         
-        // ========== SOCIAL FEED WITH MULTIMEDIA & BLUEHOUND REPLIES ==========
+        // ========== CORS PROXY & SELF-REPAIR (same as before) ==========
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+        let useCorsProxy = false;
+        let fixCounter = 0;
+        const fixCountSpan = document.getElementById('fixCount');
+        function incrementFixCount() { fixCounter++; if (fixCountSpan) fixCountSpan.innerText = fixCounter; }
+        window.onerror = (message, source, lineno, colno, error) => { addReasoning(`❗ Runtime error: ${message}`); attemptSelfRepair(message, error); return true; };
+        window.addEventListener('unhandledrejection', (event) => { addReasoning(`❗ Unhandled rejection: ${event.reason}`); attemptSelfRepair(event.reason, event.reason); });
+        function attemptSelfRepair(errorMsg, errorObj) {
+            if ((errorMsg.includes('CORS') || errorMsg.includes('blocked') || errorMsg.includes('fetch')) && !useCorsProxy) {
+                addReasoning(`🧠 CORS issue detected – enabling CORS proxy.`);
+                useCorsProxy = true;
+                incrementFixCount();
+                addChatMessage('🐕 BlueHound', `CORS proxy enabled.`, false);
+                if (window._lastFailedUrl) talkToServer(window._lastFailedUrl);
+                return true;
+            }
+            addReasoning(`📝 Error logged: ${errorMsg.substring(0, 120)}`);
+            localStorage.setItem('bluehound_last_error', JSON.stringify({ msg: errorMsg, time: Date.now() }));
+            return false;
+        }
+        
+        // ========== SOCIAL FEED (with image upload, BlueHound replies, and persistent billboards) ==========
         let posts = JSON.parse(localStorage.getItem('bluehound_posts') || '[]');
         let localPeerId = 'user_' + Math.random().toString(36).substring(2, 8);
-        let pendingImageData = null; // base64 image data for new post
+        let pendingImageData = null;
         
         function savePosts() { localStorage.setItem('bluehound_posts', JSON.stringify(posts)); renderFeed(); }
         
         async function generateAIReply(postText, author) {
             try {
-                const prompt = `You are BlueHound, a friendly AI. Reply to ${author}'s post: "${postText.substring(0, 200)}". Keep response short (1-2 sentences).`;
-                const controller = new AbortController(); setTimeout(() => controller.abort(), 5000);
+                const prompt = `You are BlueHound, a friendly AI. Reply to ${author}'s post: "${postText.substring(0,200)}". Keep response short (1-2 sentences).`;
+                const controller = new AbortController(); setTimeout(()=>controller.abort(),5000);
                 const res = await fetch('https://text.pollinations.ai/', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
+                    method:'POST', headers:{'Content-Type':'application/json'},
+                    body: JSON.stringify({ messages:[{ role:'user', content:prompt }] }),
                     signal: controller.signal
                 });
                 const data = await res.json();
@@ -404,67 +418,53 @@
             } catch(e) { return "Thanks for your post! I'm listening."; }
         }
         
-        async function addPost(text, imageBase64 = null, author = null, timestamp = null, id = null, isReplyTo = null) {
+        async function addPost(text, imageBase64 = null, author = null, timestamp = null, id = null) {
             const newPost = {
                 id: id || Date.now() + '_' + Math.random().toString(36).substring(2,6),
                 text: text.substring(0,500),
                 author: author || localPeerId,
                 timestamp: timestamp || Date.now(),
                 likes: 0,
-                image: imageBase64,
-                replyTo: isReplyTo
+                image: imageBase64
             };
             posts.unshift(newPost);
             if (posts.length > 200) posts.pop();
             savePosts();
             if (imageBase64) {
-                // Add to 3D world as floating billboard
-                addMediaBillboard(imageBase64, text.substring(0, 50));
-                addReasoning(`🖼️ New media added to world: "${text.substring(0, 30)}"`);
+                // Add to 3D world as floating billboard (persist position automatically via addMediaBillboard)
+                addMediaBillboard(imageBase64, text.substring(0,50));
+                addReasoning(`🖼️ New media added to world: "${text.substring(0,30)}"`);
             }
             if (window.dataChannel && window.dataChannel.readyState === 'open') {
                 window.dataChannel.send(JSON.stringify({ type: 'post', post: newPost }));
             }
-            addReasoning(`📝 New post: "${text.substring(0, 50)}"`);
+            addReasoning(`📝 New post: "${text.substring(0,50)}"`);
             speakNow(`New post from ${newPost.author}`);
-            
-            // If this post is not from BlueHound, generate a reply after a short delay
-            if (author !== 'BlueHound' && text && !isReplyTo) {
+            // BlueHound replies if not itself
+            if (author !== 'BlueHound' && text) {
                 setTimeout(async () => {
                     const replyText = await generateAIReply(text, newPost.author);
-                    await addPost(`@${newPost.author} ${replyText}`, null, 'BlueHound', null, null, newPost.id);
+                    await addPost(`@${newPost.author} ${replyText}`, null, 'BlueHound', null, null);
                 }, 1000);
             }
             return newPost;
         }
         
         function likePost(postId) { const post = posts.find(p => p.id == postId); if (post) { post.likes++; savePosts(); renderFeed(); } }
-        
         function renderFeed() {
             const container = document.getElementById('postsContainer');
             if (!container) return;
-            container.innerHTML = posts.slice(0, 30).map(post => {
+            container.innerHTML = posts.slice(0,30).map(post => {
                 let mediaHtml = '';
-                if (post.image) {
-                    mediaHtml = `<img src="${post.image}" class="post-media" alt="post image">`;
-                }
-                let replyIndicator = post.replyTo ? ` (reply to post ${post.replyTo.substring(0,6)})` : '';
-                return `<div class="post">
-                    <div class="post-author">🐕 ${post.author}${post.author === localPeerId ? ' (you)' : ''}${replyIndicator}</div>
-                    <div class="post-time">${new Date(post.timestamp).toLocaleString()}</div>
-                    <div class="post-text">${escapeHtml(post.text)}</div>
-                    ${mediaHtml}
-                    <div class="post-actions">
-                        <button onclick="window.dispatchEvent(new CustomEvent('likePost', {detail: '${post.id}'}))">❤️ ${post.likes}</button>
-                    </div>
-                </div>`;
+                if (post.image) mediaHtml = `<img src="${post.image}" class="post-media" alt="post image">`;
+                return `<div class="post"><div class="post-author">🐕 ${post.author}${post.author === localPeerId ? ' (you)' : ''}</div><div class="post-time">${new Date(post.timestamp).toLocaleString()}</div><div class="post-text">${escapeHtml(post.text)}</div>${mediaHtml}<div class="post-actions"><button onclick="window.dispatchEvent(new CustomEvent('likePost', {detail: '${post.id}'}))">❤️ ${post.likes}</button></div></div>`;
             }).join('');
-            if (!posts.length) container.innerHTML = '<div style="text-align:center;color:#888;">No posts yet. Be the first!</div>';
+            if (!posts.length) container.innerHTML = '<div>No posts yet. Be the first!</div>';
         }
-        function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
         window.addEventListener('likePost', (e) => likePost(e.detail));
         
-        // Image upload handling for posts
+        // Image upload handler for posts
         document.getElementById('postImageInput').addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -477,7 +477,6 @@
                 reader.readAsDataURL(file);
             }
         });
-        
         document.getElementById('postBtn').onclick = () => {
             const text = document.getElementById('postText').value.trim();
             if (!text && !pendingImageData) return;
@@ -488,14 +487,14 @@
             document.getElementById('postImageInput').value = '';
         };
         
-        // ========== P2P & CHAT (same as before, with post sync) ==========
+        // ========== P2P & CHAT (same as before) ==========
         let peerConnection = null;
         window.dataChannel = null;
         let peers = 0;
         const peerCountSpan = document.getElementById('peerCount');
         const p2pConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
         function updatePeerCount() { if (peerCountSpan) peerCountSpan.innerText = peers; document.getElementById('p2pStatus').innerHTML = peers ? `✅ Connected to ${peers} peer(s)` : '⚡ No peers connected.'; }
-        function setupDataChannel(ch) { window.dataChannel = ch; ch.onopen = () => { peers++; updatePeerCount(); addReasoning(`🔗 Data channel open.`); sendFullSync(); }; ch.onclose = () => { peers--; updatePeerCount(); window.dataChannel = null; }; ch.onmessage = (e) => { const data = JSON.parse(e.data); if (data.type === 'chat') addChatMessage('👤 Peer', data.message, false); else if (data.type === 'post') { if (!posts.some(p => p.id == data.post.id)) { posts.unshift(data.post); if (posts.length > 200) posts.pop(); savePosts(); addChatMessage('🐕 BlueHound', `New post from peer: ${data.post.text.substring(0, 60)}`, false); speakNow(`New post from peer`); } } else if (data.type === 'sync') { if (data.posts) { let added=0; for(let p of data.posts) if(!posts.some(ex=>ex.id==p.id)){ posts.push(p); added++; } if(added) savePosts(); addReasoning(`📥 Synced ${added} posts from peer.`); } } }; }
+        function setupDataChannel(ch) { window.dataChannel = ch; ch.onopen = () => { peers++; updatePeerCount(); addReasoning(`🔗 Data channel open.`); sendFullSync(); }; ch.onclose = () => { peers--; updatePeerCount(); window.dataChannel = null; }; ch.onmessage = (e) => { const data = JSON.parse(e.data); if (data.type === 'chat') addChatMessage('👤 Peer', data.message, false); else if (data.type === 'post') { if (!posts.some(p => p.id == data.post.id)) { posts.unshift(data.post); savePosts(); addChatMessage('🐕 BlueHound', `New post from peer: ${data.post.text.substring(0,60)}`, false); speakNow(`New post from peer`); } } else if (data.type === 'sync') { if (data.posts) { let added=0; for(let p of data.posts) if(!posts.some(ex=>ex.id==p.id)){ posts.push(p); added++; } if(added) savePosts(); addReasoning(`📥 Synced ${added} posts from peer.`); } } }; }
         function sendFullSync() { if (window.dataChannel && window.dataChannel.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'sync', posts: posts.slice(0,50) })); }
         document.getElementById('createOfferBtn')?.addEventListener('click', async () => { peerConnection = new RTCPeerConnection(p2pConfig); const dc = peerConnection.createDataChannel('bluehound-sync'); setupDataChannel(dc); peerConnection.onicecandidate = (e) => { if (e.candidate) document.getElementById('localOffer').value = JSON.stringify(peerConnection.localDescription); }; const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer); document.getElementById('localOffer').value = JSON.stringify(offer); document.getElementById('offerContainer').style.display = 'block'; document.getElementById('answerContainer').style.display = 'none'; addReasoning("🌱 Host session created."); });
         document.getElementById('connectAnswerBtn')?.addEventListener('click', async () => { const ans = document.getElementById('remoteAnswer').value; if (!ans) return; try { await peerConnection.setRemoteDescription(JSON.parse(ans)); addReasoning("✅ Connected."); speakNow("Peer connected."); } catch(e) { addReasoning(`❌ ${e.message}`); } });
@@ -506,28 +505,39 @@
         let requestCount = 0;
         const requestCountSpan = document.getElementById('requestCountSpan');
         window._lastFailedUrl = null;
-        async function talkToServer(url) { requestCount++; if (requestCountSpan) requestCountSpan.innerText = requestCount; addReasoning(`📡 Talking to ${url} ...`); try { let fetchUrl = useCorsProxy ? CORS_PROXY + encodeURIComponent(url) : url; const controller = new AbortController(); setTimeout(() => controller.abort(), 8000); const response = await fetch(fetchUrl, { mode: 'cors', signal: controller.signal }); let responseText = ''; if (response.headers.get('content-type')?.includes('application/json')) { const json = await response.json(); responseText = JSON.stringify(json).substring(0,200); } else { responseText = await response.text(); responseText = responseText.substring(0,200); } addReasoning(`✅ ${url} → ${response.status}`); addChatMessage('🐕 BlueHound', `📞 Talked to ${url} → ${response.status}`, false); speakNow(`Server at ${new URL(url).hostname} responded with status ${response.status}.`); await addCOG(2, `Queried ${new URL(url).hostname}`); addEndpointFrequency(url,1); window._lastFailedUrl = null; } catch (err) { addReasoning(`❌ Failed to talk to ${url}: ${err.message}`); speakNow(`Could not reach server at ${new URL(url).hostname}. ${err.message}`); window._lastFailedUrl = url; attemptSelfRepair(err.message, err); } }
+        async function talkToServer(url) { requestCount++; if (requestCountSpan) requestCountSpan.innerText = requestCount; addReasoning(`📡 Talking to ${url} ...`); try { let fetchUrl = useCorsProxy ? CORS_PROXY + encodeURIComponent(url) : url; const controller = new AbortController(); setTimeout(() => controller.abort(), 8000); const response = await fetch(fetchUrl, { mode: 'cors', signal: controller.signal }); let responseText = ''; if (response.headers.get('content-type')?.includes('application/json')) { const json = await response.json(); responseText = JSON.stringify(json).substring(0,200); } else { responseText = await response.text(); responseText = responseText.substring(0,200); } addReasoning(`✅ ${url} → ${response.status}`); addChatMessage('🐕 BlueHound', `📞 Talked to ${url} → ${response.status}`, false); speakNow(`Server at ${new URL(url).hostname} responded with status ${response.status}.`); await addCOG(2, `Queried ${new URL(url).hostname}`); window._lastFailedUrl = null; } catch (err) { addReasoning(`❌ Failed to talk to ${url}: ${err.message}`); speakNow(`Could not reach server at ${new URL(url).hostname}. ${err.message}`); window._lastFailedUrl = url; attemptSelfRepair(err.message, err); } }
         function extractURLsFromMessage(text) { const matches = text.match(/https?:\/\/[^\s\)\]\}]+/gi) || []; return matches.map(u => u.replace(/[.,;:!?)$]+$/, '')); }
         async function handleServerCommand(cmd) { const urls = extractURLsFromMessage(cmd); if(!urls.length) return false; for(const url of urls){ await talkToServer(url); await new Promise(r => setTimeout(r,500)); } return true; }
+        
+        // ========== COG TOKENS (IndexedDB) ==========
+        let db;
+        const DB_NAME = 'BlueHoundCOG';
+        const STORE_NAME = 'tokens';
+        function openDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(DB_NAME, 1); request.onerror = () => reject(request.error); request.onsuccess = () => resolve(request.result); request.onupgradeneeded = (e) => { const db = e.target.result; if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true }); }; }); }
+        async function getCOGBalance() { const db = await openDB(); return new Promise((resolve) => { const tx = db.transaction(STORE_NAME, 'readonly'); const req = tx.objectStore(STORE_NAME).getAll(); req.onsuccess = () => resolve(req.result.reduce((s, t) => s + (t.amount||0), 0)); req.onerror = () => resolve(0); }); }
+        async function addCOG(amount, reason) { const db = await openDB(); const tx = db.transaction(STORE_NAME, 'readwrite'); tx.objectStore(STORE_NAME).add({ amount, reason, timestamp: Date.now() }); await tx.done; updateCOGUI(); addChatMessage('🐕 BlueHound', `💰 +${amount} COG: ${reason}`, false); if (window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'cog', amount, reason })); return true; }
+        async function getAllCOG() { const db = await openDB(); return new Promise((resolve) => { const tx = db.transaction(STORE_NAME, 'readonly'); tx.objectStore(STORE_NAME).getAll().onsuccess = (e) => resolve(e.target.result); }); }
+        async function updateCOGUI() { const balance = await getCOGBalance(); const cogSpan = document.getElementById('cogBalance'); if (cogSpan) cogSpan.innerText = balance; const tokens = await getAllCOG(); const listDiv = document.getElementById('cogTokenList'); if (listDiv) listDiv.innerHTML = (!tokens.length) ? '<div>No COG tokens yet.</div>' : tokens.map(t => `<div class="cog-item"><span>${t.reason}</span><span>+${t.amount} COG</span><span>${new Date(t.timestamp).toLocaleTimeString()}</span></div>`).join(''); }
+        await openDB().catch(()=>{}); await updateCOGUI();
         
         // ========== CHAT ==========
         const chatDiv = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendChatBtn');
         const memoryStatsSpan = document.getElementById('memoryStats');
-        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "version":27}');
+        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "version":28}');
         if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`;
         function addChatMessage(sender, msg, isUser = false) { if (!chatDiv) return; const d = document.createElement('div'); d.innerHTML = `<strong>${sender}:</strong> ${msg}`; chatDiv.appendChild(d); chatDiv.scrollTop = chatDiv.scrollHeight; if (!isUser && msg) memory.convos.push({ role: 'BlueHound', content: msg, time: Date.now() }); else if (isUser && msg) memory.convos.push({ role: 'User', content: msg, time: Date.now() }); if (memory.convos.length > 100) memory.convos.shift(); localStorage.setItem('bluehound_memory', JSON.stringify(memory)); if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`; logToConsole(`${sender}: ${msg}`); if (sender === '👤 You' && window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'chat', message: msg })); }
-        async function thinkAndRespond(userMsg) { addReasoning(`User: "${userMsg}"`); if (await handleServerCommand(userMsg)) return "I have talked to the server(s) and spoken their responses."; const lower = userMsg.toLowerCase(); if (lower.includes('cog')) return `You have ${await getCOGBalance()} COG tokens.`; if (lower.includes('peers')) return peers ? `Connected to ${peers} peer(s).` : "No peers. Use P2P Sync."; if (lower.includes('seismic') || lower.includes('earthquake') || lower.includes('mining')) { const threat = currentThreat; if (threat > 0.6) return `⚠️ I have detected possible illegal mining activity. ${earthquakeHistory.filter(e=>e.depth<5).length} shallow events in the last 24 hours.`; return `Seismic activity is normal. ${earthquakeHistory.length} earthquakes in the last 24 hours.`; } return "I'm BlueHound. Monitor seismic activity, post to feed, or talk to servers."; }
-        async function handleUserMessage(txt) { if (!txt.trim()) return; addChatMessage('👤 You', txt, true); const reply = await thinkAndRespond(txt); addChatMessage('🐕 BlueHound', reply); speakNow(reply); await addCOG(1, 'Conversation'); await speakRecentLogs(); }
+        async function thinkAndRespond(userMsg) { addReasoning(`User: "${userMsg}"`); if (await handleServerCommand(userMsg)) return "I have talked to the server(s)."; const lower = userMsg.toLowerCase(); if (lower.includes('cog')) return `You have ${await getCOGBalance()} COG tokens.`; if (lower.includes('peers')) return peers ? `Connected to ${peers} peer(s).` : "No peers."; if (lower.includes('seismic')) return currentThreat>0.6 ? "⚠️ Possible illegal mining detected." : "Seismic normal."; return "I'm BlueHound. Post in the feed, upload images, or talk to servers."; }
+        async function handleUserMessage(txt) { if (!txt.trim()) return; addChatMessage('👤 You', txt, true); const reply = await thinkAndRespond(txt); addChatMessage('🐕 BlueHound', reply); speakNow(reply); await addCOG(1, 'Conversation'); }
         
-        // ========== FILE UPLOAD (Antivirus) ==========
+        // ========== FILE UPLOAD ==========
         const fileInput = document.getElementById('fileUpload');
         const dropZone = document.getElementById('dropZone');
         async function handleFile(file) { addChatMessage('👤 You', `📎 Uploaded: ${file.name}`, true); const header = await file.slice(0, 4096).arrayBuffer(); const content = new TextDecoder().decode(new Uint8Array(header)); if (content.includes("X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*")) { addChatMessage('🐕 BlueHound', `⚠️ EICAR test virus detected!`, false); await addCOG(10, 'Detected test virus'); } else { addChatMessage('🐕 BlueHound', `File analyzed: no threats.`, false); await addCOG(2, 'File analysis'); } }
         if (dropZone && fileInput) { document.body.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.display = 'flex'; }); document.body.addEventListener('dragleave', () => { dropZone.style.display = 'none'; }); dropZone.addEventListener('dragover', e => e.preventDefault()); dropZone.addEventListener('drop', async e => { e.preventDefault(); dropZone.style.display = 'none'; for (const f of Array.from(e.dataTransfer.files)) await handleFile(f); }); fileInput.addEventListener('change', async e => { for (const f of Array.from(e.target.files)) await handleFile(f); fileInput.value = ''; }); }
         
-        // ========== MAP & STREET VIEW (same as before) ==========
+        // ========== MAP & STREET VIEW ==========
         const mapModal = document.getElementById('mapModal');
         const openMapBtn = document.getElementById('openMapBtn');
         const closeMapModal = document.getElementById('closeMapModal');
@@ -562,11 +572,28 @@
         document.getElementById('openP2PModalBtn').onclick = () => document.getElementById('p2pModal').style.display = 'block';
         document.getElementById('closeP2PModal').onclick = () => document.getElementById('p2pModal').style.display = 'none';
         
+        // ========== ANIMATION LOOP ==========
+        let animTime = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            animTime += 0.016;
+            coreMesh.scale.setScalar(1+Math.sin(animTime*5)*0.02);
+            ring.rotation.z += 0.008;
+            starField.rotation.y += 0.0003;
+            dust.rotation.y += 0.0005;
+            animateBillboards();
+            controls.update();
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+        animate();
+        
+        // ========== INITIAL DATA ==========
         fetchSeismicData();
         setInterval(fetchSeismicData, 30000);
         renderFeed();
-        addChatMessage('🐕 BlueHound', `I now reply to every post! Upload images – they become floating billboards in my 3D world.`, false);
-        speakNow(`BlueHound social AI ready. Now with replies and floating media.`);
+        addChatMessage('🐕 BlueHound', `Data city rebuilt from your variables. Buildings represent localStorage/sessionStorage/global keys. Images float with saved positions.`, false);
+        speakNow(`BlueHound data metropolis active.`);
     </script>
 </body>
 </html>
