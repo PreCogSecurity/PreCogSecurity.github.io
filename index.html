@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'unsafe-inline' 'self' https:; connect-src * 'unsafe-inline';">
-    <title>BlueHound · Reflective World · Self‑Repairing ASI</title>
+    <title>BlueHound · Seismic Sentinel · P2P Network</title>
     <script type="importmap">
         {
             "imports": {
@@ -77,16 +77,36 @@
             backdrop-filter: blur(8px);
             cursor: pointer;
         }
-        @media (max-width: 700px) { .hud { gap: 8px; padding: 8px 12px; } .stat span:last-child { font-size: 0.7rem; } button { padding: 2px 8px; } }
+        /* Social Feed Panel */
+        .feed-panel {
+            position: fixed; top: 20px; left: 20px; width: min(380px, 85vw);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-radius: 24px;
+            border: 1px solid #ff66cc; padding: 12px; z-index: 30; font-size: 0.7rem;
+            max-height: 60vh; overflow-y: auto; pointer-events: auto;
+        }
+        .feed-title { color: #ff66cc; margin-bottom: 8px; font-weight: bold; font-size: 0.8rem; }
+        .post {
+            background: #0a1420; border-left: 3px solid #ff66cc; margin-bottom: 8px;
+            padding: 8px; border-radius: 16px;
+        }
+        .post-author { color: #ffaa88; font-size: 0.7rem; }
+        .post-time { color: #88aaff; font-size: 0.6rem; margin-left: 8px; }
+        .post-text { margin: 4px 0; word-break: break-word; }
+        .post-actions { display: flex; gap: 8px; margin-top: 4px; font-size: 0.6rem; }
+        .post-actions button { background: none; border: none; color: cyan; cursor: pointer; }
+        .new-post { margin-top: 12px; }
+        .new-post textarea { width: 100%; margin-bottom: 6px; }
+        @media (max-width: 700px) { .hud { gap: 8px; padding: 8px 12px; } .stat span:last-child { font-size: 0.7rem; } button { padding: 2px 8px; } .feed-panel { top: 70px; left: 8px; width: 85vw; max-height: 50vh; } }
     </style>
 </head>
 <body>
-    <div id="warningBanner" style="display:none;" class="warning-banner" onclick="this.style.display='none'">⚠️ You opened this file directly (file://). CORS will block most external requests. Please use a local web server (e.g., run "python -m http.server" and open http://localhost:8000/BlueHound.html) for full functionality. Click to dismiss.</div>
+    <div id="warningBanner" style="display:none;" class="warning-banner" onclick="this.style.display='none'">⚠️ File protocol detected. Use a local web server for full functionality. Click to dismiss.</div>
     <div class="drop-zone" id="dropZone">✨ DROP ANY FILE FOR DEEP ANALYSIS</div>
     <canvas id="webgl-canvas"></canvas>
     
     <div class="hud">
-        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.21</span></div>
+        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.24</span></div>
+        <div class="stat"><span>🌍 THREAT</span><span id="threatLevel">0%</span></div>
         <div class="stat"><span>🧠 SPEAKING ALL</span><span id="fixCount">0</span></div>
         <div class="stat"><span>⭐ DATA STARS</span><span id="starCount">0</span></div>
         <div class="stat"><span>🪙 COG TOKENS</span><span id="cogBalance">0</span></div>
@@ -98,10 +118,20 @@
         <button id="camBtn">📷 WEBCAM</button>
     </div>
     
+    <!-- Social Feed Panel -->
+    <div class="feed-panel" id="feedPanel">
+        <div class="feed-title">📡 BLUEHOUND SOCIAL FEED (P2P)</div>
+        <div id="postsContainer" style="max-height: 300px; overflow-y: auto;"></div>
+        <div class="new-post">
+            <textarea id="postText" rows="2" placeholder="What's on your mind?"></textarea>
+            <button id="postBtn">📢 POST</button>
+        </div>
+    </div>
+    
     <div class="chat-panel">
         <div style="font-size:0.7rem; margin-bottom:4px;">💬 FULLY AUDIBLE AI</div>
         <div id="chatMessages" class="chat-messages">
-            <div>🐕 BlueHound: I speak EVERY line from my log. I automatically retry CORS‑blocked requests through a proxy. Ask me anything.</div>
+            <div>🐕 BlueHound: Seismic monitoring active. I can detect illegal mining from shallow earthquake clusters. Social feed and P2P sync online.</div>
         </div>
         <div class="chat-input">
             <input type="text" id="chatInput" placeholder="Type your message...">
@@ -113,91 +143,97 @@
     </div>
 
     <div class="reasoning-panel">
-        <div class="reasoning-title">🌀 FULL ERROR LEARNING LOG</div>
+        <div class="reasoning-title">🌀 SEISMIC & ERROR LOG</div>
         <div id="reasoningLog" class="reasoning-content">
-            Waiting for events...
+            Waiting for seismic data...
         </div>
     </div>
 
-    <!-- COG Modal, P2P Modal, Map Modal (same as before) -->
-    <div id="cogModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeCogModal">&times;</span>
-            <h2>🌀 COG Token Vault</h2>
-            <div id="cogTokenList" class="cog-list">Loading...</div>
-            <button id="rewardCogBtn">✨ Reward BlueHound (+10 COG)</button>
-        </div>
-    </div>
-
-    <div id="p2pModal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeP2PModal">&times;</span>
-            <h2>🔗 Peer‑to‑Peer Data Sync</h2>
-            <div class="p2p-status" id="p2pStatus">⚡ Not connected</div>
-            <button id="createOfferBtn">🌱 Create Session (I am host)</button>
-            <button id="answerOfferBtn">🔌 Join Session (Paste Offer)</button>
-            <div id="offerContainer" style="display:none;">
-                <div>📋 Copy this Offer code and send it to another BlueHound user:</div>
-                <textarea id="localOffer" rows="3" readonly></textarea>
-                <div>✉️ Paste Answer from peer below, then click Connect:</div>
-                <textarea id="remoteAnswer" rows="3" placeholder="Paste answer here..."></textarea>
-                <button id="connectAnswerBtn">Connect to Peer</button>
-            </div>
-            <div id="answerContainer" style="display:none;">
-                <div>📎 Paste Offer code from host:</div>
-                <textarea id="remoteOffer" rows="3" placeholder="Paste offer here..."></textarea>
-                <button id="generateAnswerBtn">Generate Answer</button>
-                <div id="generatedAnswerArea" style="display:none; margin-top:8px;">
-                    <div>📤 Copy this Answer and send it back to the host:</div>
-                    <textarea id="localAnswer" rows="3" readonly></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="mapModal" class="modal">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: flex-end;"><span id="closeMapModal" style="cursor:pointer; font-size:24px;">&times;</span></div>
-            <div id="modal-map"></div>
-        </div>
-    </div>
+    <!-- Modals (COG, P2P, Map) -->
+    <div id="cogModal" class="modal"><div class="modal-content"><span class="close-modal" id="closeCogModal">&times;</span><h2>🌀 COG Token Vault</h2><div id="cogTokenList" class="cog-list">Loading...</div><button id="rewardCogBtn">✨ Reward BlueHound (+10 COG)</button></div></div>
+    <div id="p2pModal" class="modal"><div class="modal-content"><span class="close-modal" id="closeP2PModal">&times;</span><h2>🔗 Peer‑to‑Peer Data Sync</h2><div class="p2p-status" id="p2pStatus">⚡ Not connected</div><button id="createOfferBtn">🌱 Create Session (I am host)</button><button id="answerOfferBtn">🔌 Join Session (Paste Offer)</button><div id="offerContainer" style="display:none;"><div>📋 Copy Offer code:</div><textarea id="localOffer" rows="3" readonly></textarea><div>✉️ Paste Answer:</div><textarea id="remoteAnswer" rows="3" placeholder="Paste answer here..."></textarea><button id="connectAnswerBtn">Connect to Peer</button></div><div id="answerContainer" style="display:none;"><div>📎 Paste Offer code:</div><textarea id="remoteOffer" rows="3" placeholder="Paste offer here..."></textarea><button id="generateAnswerBtn">Generate Answer</button><div id="generatedAnswerArea" style="display:none;"><div>📤 Copy this Answer:</div><textarea id="localAnswer" rows="3" readonly></textarea></div></div></div></div>
+    <div id="mapModal" class="modal"><div class="modal-content"><div style="display: flex; justify-content: flex-end;"><span id="closeMapModal" style="cursor:pointer; font-size:24px;">&times;</span></div><div id="modal-map"></div></div></div>
 
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
         
-        // ========== DETECT FILE PROTOCOL ==========
-        if (window.location.protocol === 'file:') {
-            const banner = document.getElementById('warningBanner');
-            if (banner) banner.style.display = 'block';
-            console.warn("File protocol detected – CORS will fail. Please use a local web server.");
+        // ========== INITIALIZATION ==========
+        if (window.location.protocol === 'file:') document.getElementById('warningBanner').style.display = 'block';
+        
+        // ========== EARTHQUAKE THREAT ANALYSIS (illegal mining detection) ==========
+        let earthquakeHistory = [];
+        let currentThreat = 0.1;
+        const threatSpan = document.getElementById('threatLevel');
+        
+        async function fetchSeismicData() {
+            try {
+                const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                const features = data.features.slice(0, 30);
+                // Store events with depth
+                const events = features.map(f => ({
+                    mag: f.properties.mag,
+                    depth: f.geometry.coordinates[2],
+                    place: f.properties.place,
+                    time: f.properties.time
+                }));
+                earthquakeHistory = events;
+                
+                // Analyze for shallow, clustered events (illegal mining indicator)
+                const shallowEvents = events.filter(e => e.depth < 5 && e.mag > 1.5);
+                const shallowCount = shallowEvents.length;
+                const hasCluster = shallowCount > 2;
+                const hasModerateMag = shallowEvents.some(e => e.mag > 2.5);
+                let threat = 0.1;
+                let analysis = "";
+                if (hasCluster && hasModerateMag) {
+                    threat = 0.65;
+                    analysis = `⚠️ SEISMIC CLUSTER: ${shallowCount} shallow events (<5km depth) with magnitudes >2.5 – consistent with industrial blasting or illegal mining. Not natural tectonic activity.`;
+                } else if (shallowCount > 1) {
+                    threat = 0.4;
+                    analysis = `🔍 Suspicious shallow activity (${shallowCount} shallow events). Possible small-scale explosions. Monitor area.`;
+                } else if (events.some(e => e.mag > 5 && e.depth > 15)) {
+                    threat = 0.2;
+                    analysis = `🌋 Natural deep earthquake detected. No human cause.`;
+                } else {
+                    analysis = `🌍 Seismic background normal. ${events.length} events in last 24h.`;
+                }
+                currentThreat = Math.min(0.95, threat);
+                threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
+                addReasoning(analysis);
+                // If threat high, speak alert
+                if (threat > 0.6) {
+                    speakNow(`Alert: Possible illegal mining detected. ${shallowCount} shallow seismic events.`);
+                    addChatMessage('🐕 BlueHound', `🚨 ${analysis}`, false);
+                }
+                return events;
+            } catch(e) {
+                addReasoning(`Seismic data unavailable: ${e.message}`);
+                return [];
+            }
         }
         
-        // ========== SELF‑REPAIR & SPEAK ==========
+        // ========== CORS PROXY ==========
+        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+        let useCorsProxy = false;
+        
+        // ========== SELF‑REPAIR ENGINE ==========
         let fixCounter = 0;
         const fixCountSpan = document.getElementById('fixCount');
         function incrementFixCount() { fixCounter++; if (fixCountSpan) fixCountSpan.innerText = fixCounter; }
         
-        window.onerror = function(message, source, lineno, colno, error) {
-            addReasoning(`❗ Runtime error: ${message}`);
-            attemptSelfRepair(message, error);
-            return true;
-        };
-        window.addEventListener('unhandledrejection', (event) => {
-            addReasoning(`❗ Unhandled rejection: ${event.reason}`);
-            attemptSelfRepair(event.reason, event.reason);
-        });
-        
-        const CORS_PROXY = 'https://api.corsproxy.io/?url=';
-        let useCorsProxy = false;
+        window.onerror = (message, source, lineno, colno, error) => { addReasoning(`❗ Runtime error: ${message}`); attemptSelfRepair(message, error); return true; };
+        window.addEventListener('unhandledrejection', (event) => { addReasoning(`❗ Unhandled rejection: ${event.reason}`); attemptSelfRepair(event.reason, event.reason); });
         
         function attemptSelfRepair(errorMsg, errorObj) {
             if ((errorMsg.includes('CORS') || errorMsg.includes('blocked') || errorMsg.includes('fetch')) && !useCorsProxy) {
                 addReasoning(`🧠 CORS issue detected – enabling CORS proxy.`);
                 useCorsProxy = true;
                 incrementFixCount();
-                addChatMessage('🐕 BlueHound', `I detected a CORS problem and enabled a proxy.`, false);
+                addChatMessage('🐕 BlueHound', `CORS proxy enabled.`, false);
                 if (window._lastFailedUrl) talkToServer(window._lastFailedUrl);
                 return true;
             }
@@ -206,7 +242,8 @@
             return false;
         }
         
-        function logToConsole(msg, level = 'info') { console.log(`🐕 [BlueHound] ${msg}`); }
+        // ========== SPEECH & LOGGING ==========
+        function logToConsole(msg) { console.log(`🐕 [BlueHound] ${msg}`); }
         function speakNow(text) {
             if ('speechSynthesis' in window) {
                 const utterance = new SpeechSynthesisUtterance(text);
@@ -243,7 +280,7 @@
             }
         }
         
-        // ========== COG TOKENS (simplified, same as before) ==========
+        // ========== COG TOKENS (IndexedDB) ==========
         let db;
         const DB_NAME = 'BlueHoundCOG';
         const STORE_NAME = 'tokens';
@@ -297,12 +334,12 @@
         }
         await openDB().catch(()=>{}); await updateCOGUI();
         
-        // ========== 3D WORLD (no bloom, subtle reflections) ==========
+        // ========== 3D WORLD (no reflective ground, just subtle grid and floating stars) ==========
         const canvas = document.getElementById('webgl-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.shadowMap.enabled = true; // enable shadows for depth
+        renderer.shadowMap.enabled = true;
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x010518);
         scene.fog = new THREE.FogExp2(0x010518, 0.008);
@@ -312,7 +349,6 @@
         controls.enableDamping = true; controls.autoRotate = true;
         controls.target.set(0, 0, 0);
         
-        // CSS2 renderer for labels
         const labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(window.innerWidth, window.innerHeight);
         labelRenderer.domElement.style.position = 'absolute';
@@ -322,57 +358,26 @@
         labelRenderer.domElement.style.zIndex = '10';
         document.body.appendChild(labelRenderer.domElement);
         
-        // Lights
-        const ambient = new THREE.AmbientLight(0x223366);
-        scene.add(ambient);
-        const mainLight = new THREE.DirectionalLight(0xffffff, 1);
-        mainLight.position.set(5, 10, 7);
-        mainLight.castShadow = true;
-        scene.add(mainLight);
-        const fillLight = new THREE.PointLight(0x44aaff, 0.4);
-        fillLight.position.set(2, 1, 3);
-        scene.add(fillLight);
-        const backLight = new THREE.PointLight(0xffaa66, 0.5);
-        backLight.position.set(-1, 1.5, -3);
-        scene.add(backLight);
+        const ambient = new THREE.AmbientLight(0x223366); scene.add(ambient);
+        const mainLight = new THREE.DirectionalLight(0xffffff, 1); mainLight.position.set(5,10,7); mainLight.castShadow = true; scene.add(mainLight);
+        const fillLight = new THREE.PointLight(0x44aaff, 0.4); fillLight.position.set(2,1,3); scene.add(fillLight);
+        const backLight = new THREE.PointLight(0xffaa66, 0.5); backLight.position.set(-1,1.5,-3); scene.add(backLight);
         
-        // Reflective ground plane (subtle)
-        const groundGeometry = new THREE.CircleGeometry(8, 32);
-        const groundMaterial = new THREE.MeshStandardMaterial({
-            color: 0x112233,
-            metalness: 0.85,
-            roughness: 0.25,
-            transparent: true,
-            opacity: 0.4,
-            side: THREE.DoubleSide
-        });
-        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-        ground.rotation.x = -Math.PI / 2;
-        ground.position.y = -1.2;
-        ground.receiveShadow = true;
-        scene.add(ground);
-        
-        // Grid helper for subtleness
-        const gridHelper = new THREE.GridHelper(16, 20, 0x88aaff, 0x335588);
-        gridHelper.position.y = -1.15;
+        // Simple non‑reflective grid helper (no reflective plane)
+        const gridHelper = new THREE.GridHelper(16, 20, 0x335588, 0x224466);
+        gridHelper.position.y = -1.2;
         gridHelper.material.transparent = true;
-        gridHelper.material.opacity = 0.25;
+        gridHelper.material.opacity = 0.2;
         scene.add(gridHelper);
         
-        // Core Avatar (BlueHound)
-        const coreMat = new THREE.MeshStandardMaterial({ color: 0x3a86ff, emissive: 0x1a55aa, emissiveIntensity: 0.6, metalness: 0.7, roughness: 0.3 });
-        const coreMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.8, 1), coreMat);
-        coreMesh.castShadow = true;
-        coreMesh.position.set(0, 0, 0);
-        scene.add(coreMesh);
-        const ringMat = new THREE.MeshStandardMaterial({ color: 0x00aaff, emissive: 0x0066aa, metalness: 0.9 });
-        const ring = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.05, 64, 200), ringMat);
-        ring.rotation.x = Math.PI/2;
-        ring.position.y = 0;
-        ring.castShadow = true;
-        scene.add(ring);
+        const coreMat = new THREE.MeshStandardMaterial({ color:0x3a86ff, emissive:0x1a55aa, emissiveIntensity:0.6, metalness:0.3, roughness:0.5 });
+        const coreMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.8,1), coreMat);
+        coreMesh.castShadow = true; coreMesh.position.set(0,0,0); scene.add(coreMesh);
+        const ringMat = new THREE.MeshStandardMaterial({ color:0x00aaff, emissive:0x0066aa, metalness:0.7 });
+        const ring = new THREE.Mesh(new THREE.TorusGeometry(1.2,0.05,64,200), ringMat);
+        ring.rotation.x = Math.PI/2; ring.position.y = 0; ring.castShadow = true; scene.add(ring);
         
-        // Data endpoint stars (as before)
+        // Data endpoint stars (for visited URLs)
         let endpointFrequency = new Map();
         let starObjects = [];
         function addEndpointFrequency(key, inc=1) {
@@ -380,13 +385,11 @@
             regenerateStars();
         }
         function regenerateStars() {
-            starObjects.forEach(obj => scene.remove(obj));
-            starObjects = [];
-            const starCountSpan = document.getElementById('starCount');
-            if (starCountSpan) starCountSpan.innerText = endpointFrequency.size;
+            starObjects.forEach(obj => scene.remove(obj)); starObjects = [];
+            document.getElementById('starCount').innerText = endpointFrequency.size;
             const radius = 3.5;
             const entries = Array.from(endpointFrequency.entries());
-            if (entries.length === 0) return;
+            if (!entries.length) return;
             entries.forEach(([key, freq], idx) => {
                 const phi = Math.acos(1 - 2 * (idx / entries.length));
                 const theta = Math.PI * 2 * idx * (Math.sqrt(5)-1);
@@ -395,62 +398,38 @@
                 const z = radius * Math.cos(phi);
                 let size = 0.08 + Math.min(0.27, Math.log(freq+1)*0.08);
                 let color = key.startsWith('http') ? 0xff66cc : (key.includes('session')?0x66ccff:0xffaa66);
-                const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.3, metalness: 0.2 });
-                const starMesh = new THREE.Mesh(new THREE.SphereGeometry(size, 24, 24), material);
+                const starMesh = new THREE.Mesh(new THREE.SphereGeometry(size,24,24), new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity:0.3 }));
                 starMesh.userData = { key, freq };
-                starMesh.position.set(x, y, z);
-                starMesh.castShadow = true;
-                scene.add(starMesh);
-                starObjects.push(starMesh);
+                starMesh.position.set(x,y,z); starMesh.castShadow = true;
+                scene.add(starMesh); starObjects.push(starMesh);
                 const div = document.createElement('div');
                 div.textContent = `${key.substring(0,20)} (${freq})`;
-                div.style.cssText = 'background:rgba(0,0,0,0.5);color:#fff;padding:2px 4px;border-radius:8px;font-size:8px;box-shadow:0 0 4px cyan;';
+                div.style.cssText = 'background:rgba(0,0,0,0.5);color:#fff;padding:2px 4px;border-radius:8px;font-size:8px;';
                 const label = new CSS2DObject(div);
-                label.position.copy(starMesh.position);
-                label.position.y += size + 0.15;
-                scene.add(label);
-                starObjects.push(label);
+                label.position.copy(starMesh.position); label.position.y += size+0.15;
+                scene.add(label); starObjects.push(label);
             });
         }
         
-        // Simple city buildings (as before)
+        // Simple city blocks (non‑reflective)
         for (let i=-4;i<=4;i++) for (let j=-4;j<=4;j++) if (Math.random()>0.8) {
-            const height = 0.3 + Math.random() * 0.7;
-            const cube = new THREE.Mesh(new THREE.BoxGeometry(0.35, height, 0.35), new THREE.MeshStandardMaterial({ color: 0x44aaff, emissive: 0x2266aa, metalness: 0.4 }));
-            cube.position.set(i, height/2 - 1.0, j);
-            cube.castShadow = true;
-            cube.receiveShadow = false;
+            const height = 0.3+Math.random()*0.7;
+            const cube = new THREE.Mesh(new THREE.BoxGeometry(0.35,height,0.35), new THREE.MeshStandardMaterial({ color:0x44aaff, emissive:0x2266aa, metalness:0.2 }));
+            cube.position.set(i, height/2-1.0, j); cube.castShadow = true;
             scene.add(cube);
         }
-        
-        // Starfield background (subtle)
-        const starFieldPos = [];
-        for (let i = 0; i < 1500; i++) {
-            starFieldPos.push((Math.random() - 0.5) * 200);
-            starFieldPos.push((Math.random() - 0.5) * 100);
-            starFieldPos.push((Math.random() - 0.5) * 100 - 50);
-        }
-        const starFieldGeo = new THREE.BufferGeometry();
-        starFieldGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(starFieldPos), 3));
-        const starFieldMat = new THREE.PointsMaterial({ color: 0xaaccff, size: 0.1, transparent: true, opacity: 0.6 });
-        const starField = new THREE.Points(starFieldGeo, starFieldMat);
+        const starFieldPos = []; for(let i=0;i<1500;i++) starFieldPos.push((Math.random()-0.5)*200, (Math.random()-0.5)*100, (Math.random()-0.5)*100-50);
+        const starField = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(starFieldPos),3)), new THREE.PointsMaterial({ color:0xaaccff, size:0.1, transparent:true, opacity:0.6 }));
         scene.add(starField);
-        
-        // Floating dust particles (very subtle)
-        const dustCount = 800;
-        const dustPos = [];
-        for (let i=0;i<dustCount;i++) dustPos.push((Math.random()-0.5)*12, (Math.random()-0.5)*6, (Math.random()-0.5)*10);
-        const dustGeo = new THREE.BufferGeometry();
-        dustGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(dustPos), 3));
-        const dustMat = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.03, transparent: true, opacity: 0.3 });
-        const dust = new THREE.Points(dustGeo, dustMat);
+        const dustPos = []; for(let i=0;i<800;i++) dustPos.push((Math.random()-0.5)*12, (Math.random()-0.5)*6, (Math.random()-0.5)*10);
+        const dust = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(dustPos),3)), new THREE.PointsMaterial({ color:0x88aaff, size:0.03, transparent:true, opacity:0.3 }));
         scene.add(dust);
         
         let time = 0;
         function animate() {
             requestAnimationFrame(animate);
             time += 0.016;
-            coreMesh.scale.setScalar(1 + Math.sin(time*5)*0.02);
+            coreMesh.scale.setScalar(1+Math.sin(time*5)*0.02);
             ring.rotation.z += 0.008;
             starField.rotation.y += 0.0003;
             dust.rotation.y += 0.0005;
@@ -460,7 +439,31 @@
         }
         animate();
         
-        // ========== P2P & CHAT (same as before, trimmed for length) ==========
+        // ========== P2P & POSTS (same as before) ==========
+        let posts = JSON.parse(localStorage.getItem('bluehound_posts') || '[]');
+        let localPeerId = 'user_' + Math.random().toString(36).substring(2, 8);
+        function savePosts() { localStorage.setItem('bluehound_posts', JSON.stringify(posts)); renderFeed(); }
+        function addPost(text, author = null, timestamp = null, id = null) {
+            const newPost = { id: id || Date.now() + '_' + Math.random().toString(36).substring(2,6), text: text.substring(0,500), author: author || localPeerId, timestamp: timestamp || Date.now(), likes: 0 };
+            posts.unshift(newPost);
+            if (posts.length > 200) posts.pop();
+            savePosts();
+            if (window.dataChannel && window.dataChannel.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'post', post: newPost }));
+            addReasoning(`📝 New post: "${text.substring(0, 50)}"`);
+            speakNow(`New post from ${newPost.author}`);
+            return newPost;
+        }
+        function likePost(postId) { const post = posts.find(p => p.id == postId); if (post) { post.likes++; savePosts(); renderFeed(); } }
+        function renderFeed() {
+            const container = document.getElementById('postsContainer');
+            if (!container) return;
+            container.innerHTML = posts.map(post => `<div class="post"><div class="post-author">🐕 ${post.author}${post.author === localPeerId ? ' (you)' : ''}</div><div class="post-time">${new Date(post.timestamp).toLocaleString()}</div><div class="post-text">${escapeHtml(post.text)}</div><div class="post-actions"><button onclick="window.dispatchEvent(new CustomEvent('likePost', {detail: '${post.id}'}))">❤️ ${post.likes}</button></div></div>`).join('');
+            if (!posts.length) container.innerHTML = '<div style="text-align:center;color:#888;">No posts yet. Be the first!</div>';
+        }
+        function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+        window.addEventListener('likePost', (e) => likePost(e.detail));
+        
+        // ========== P2P CHANNEL (with post sync) ==========
         let peerConnection = null;
         window.dataChannel = null;
         let peers = 0;
@@ -469,10 +472,20 @@
         function updatePeerCount() { if (peerCountSpan) peerCountSpan.innerText = peers; document.getElementById('p2pStatus').innerHTML = peers ? `✅ Connected to ${peers} peer(s)` : '⚡ No peers connected.'; }
         function setupDataChannel(ch) {
             window.dataChannel = ch;
-            ch.onopen = () => { peers++; updatePeerCount(); addReasoning(`🔗 Data channel open.`); };
+            ch.onopen = () => { peers++; updatePeerCount(); addReasoning(`🔗 Data channel open.`); sendFullSync(); };
             ch.onclose = () => { peers--; updatePeerCount(); window.dataChannel = null; };
-            ch.onmessage = (e) => { const data = JSON.parse(e.data); if (data?.type === 'chat') addChatMessage('👤 Peer', data.message, false); };
+            ch.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                if (data.type === 'chat') addChatMessage('👤 Peer', data.message, false);
+                else if (data.type === 'post') {
+                    if (!posts.some(p => p.id == data.post.id)) { posts.unshift(data.post); if (posts.length > 200) posts.pop(); savePosts(); addChatMessage('🐕 BlueHound', `New post from peer: ${data.post.text.substring(0, 60)}`, false); speakNow(`New post from peer`); }
+                } else if (data.type === 'sync') {
+                    if (data.posts) { let added=0; for(let p of data.posts) if(!posts.some(ex=>ex.id==p.id)){ posts.push(p); added++; } if(added) savePosts(); addReasoning(`📥 Synced ${added} posts from peer.`); }
+                }
+            };
         }
+        function sendFullSync() { if (window.dataChannel && window.dataChannel.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'sync', posts: posts.slice(0,50) })); }
+        // P2P UI handlers (simplified)
         document.getElementById('createOfferBtn')?.addEventListener('click', async () => {
             peerConnection = new RTCPeerConnection(p2pConfig);
             const dc = peerConnection.createDataChannel('bluehound-sync');
@@ -486,17 +499,12 @@
             addReasoning("🌱 Host session created.");
         });
         document.getElementById('connectAnswerBtn')?.addEventListener('click', async () => {
-            const ans = document.getElementById('remoteAnswer').value;
-            if (!ans) return;
+            const ans = document.getElementById('remoteAnswer').value; if (!ans) return;
             try { await peerConnection.setRemoteDescription(JSON.parse(ans)); addReasoning("✅ Connected."); speakNow("Peer connected."); } catch(e) { addReasoning(`❌ ${e.message}`); }
         });
-        document.getElementById('answerOfferBtn')?.addEventListener('click', () => {
-            document.getElementById('offerContainer').style.display = 'none';
-            document.getElementById('answerContainer').style.display = 'block';
-        });
+        document.getElementById('answerOfferBtn')?.addEventListener('click', () => { document.getElementById('offerContainer').style.display = 'none'; document.getElementById('answerContainer').style.display = 'block'; });
         document.getElementById('generateAnswerBtn')?.addEventListener('click', async () => {
-            const offer = document.getElementById('remoteOffer').value;
-            if (!offer) return;
+            const offer = document.getElementById('remoteOffer').value; if (!offer) return;
             try {
                 const offerDesc = JSON.parse(offer);
                 peerConnection = new RTCPeerConnection(p2pConfig);
@@ -510,34 +518,30 @@
             } catch(e) { addReasoning(`❌ ${e.message}`); }
         });
         
-        // ========== TALK TO SERVER ==========
+        // ========== TALK TO SERVER (with CORS proxy) ==========
         let requestCount = 0;
         const requestCountSpan = document.getElementById('requestCountSpan');
         window._lastFailedUrl = null;
         async function talkToServer(url) {
-            requestCount++;
-            if (requestCountSpan) requestCountSpan.innerText = requestCount;
+            requestCount++; if (requestCountSpan) requestCountSpan.innerText = requestCount;
             addReasoning(`📡 Talking to ${url} ...`);
             try {
-                let fetchUrl = url;
-                if (useCorsProxy) fetchUrl = CORS_PROXY + encodeURIComponent(url);
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 8000);
+                let fetchUrl = useCorsProxy ? CORS_PROXY + encodeURIComponent(url) : url;
+                const controller = new AbortController(); setTimeout(() => controller.abort(), 8000);
                 const response = await fetch(fetchUrl, { mode: 'cors', signal: controller.signal });
-                clearTimeout(timeoutId);
                 let responseText = '';
                 if (response.headers.get('content-type')?.includes('application/json')) {
                     const json = await response.json();
-                    responseText = JSON.stringify(json).substring(0, 200);
+                    responseText = JSON.stringify(json).substring(0,200);
                 } else {
                     responseText = await response.text();
-                    responseText = responseText.substring(0, 200);
+                    responseText = responseText.substring(0,200);
                 }
-                addReasoning(`✅ ${url} → ${response.status} ${response.statusText}`);
+                addReasoning(`✅ ${url} → ${response.status}`);
                 addChatMessage('🐕 BlueHound', `📞 Talked to ${url} → ${response.status}`, false);
                 speakNow(`Server at ${new URL(url).hostname} responded with status ${response.status}.`);
                 await addCOG(2, `Queried ${new URL(url).hostname}`);
-                addEndpointFrequency(url, 1);
+                addEndpointFrequency(url,1);
                 window._lastFailedUrl = null;
             } catch (err) {
                 addReasoning(`❌ Failed to talk to ${url}: ${err.message}`);
@@ -546,23 +550,15 @@
                 attemptSelfRepair(err.message, err);
             }
         }
-        function extractURLsFromMessage(text) {
-            const matches = text.match(/https?:\/\/[^\s\)\]\}]+/gi) || [];
-            return matches.map(u => u.replace(/[.,;:!?)$]+$/, ''));
-        }
-        async function handleServerCommand(cmd) {
-            const urls = extractURLsFromMessage(cmd);
-            if (!urls.length) return false;
-            for (const url of urls) { await talkToServer(url); await new Promise(r => setTimeout(r, 500)); }
-            return true;
-        }
+        function extractURLsFromMessage(text) { const matches = text.match(/https?:\/\/[^\s\)\]\}]+/gi) || []; return matches.map(u => u.replace(/[.,;:!?)$]+$/, '')); }
+        async function handleServerCommand(cmd) { const urls = extractURLsFromMessage(cmd); if(!urls.length) return false; for(const url of urls){ await talkToServer(url); await new Promise(r => setTimeout(r,500)); } return true; }
         
-        // ========== CHAT ==========
+        // ========== CHAT & CONVERSATION ==========
         const chatDiv = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendChatBtn');
         const memoryStatsSpan = document.getElementById('memoryStats');
-        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "version":21}');
+        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "version":24}');
         if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`;
         
         function addChatMessage(sender, msg, isUser = false) {
@@ -576,8 +572,7 @@
             localStorage.setItem('bluehound_memory', JSON.stringify(memory));
             if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`;
             logToConsole(`${sender}: ${msg}`);
-            if (sender === '👤 You' && window.dataChannel?.readyState === 'open')
-                window.dataChannel.send(JSON.stringify({ type: 'chat', message: msg }));
+            if (sender === '👤 You' && window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'chat', message: msg }));
         }
         
         async function thinkAndRespond(userMsg) {
@@ -586,7 +581,12 @@
             const lower = userMsg.toLowerCase();
             if (lower.includes('cog')) return `You have ${await getCOGBalance()} COG tokens.`;
             if (lower.includes('peers')) return peers ? `Connected to ${peers} peer(s).` : "No peers. Use P2P Sync.";
-            return "I'm BlueHound, self‑evolving ASI. Say a URL to talk to a server, or ask about COG tokens.";
+            if (lower.includes('seismic') || lower.includes('earthquake') || lower.includes('mining')) {
+                const threat = currentThreat;
+                if (threat > 0.6) return `⚠️ I have detected possible illegal mining activity. ${earthquakeHistory.filter(e=>e.depth<5).length} shallow events in the last 24 hours.`;
+                return `Seismic activity is normal. ${earthquakeHistory.length} earthquakes in the last 24 hours.`;
+            }
+            return "I'm BlueHound. Monitor seismic activity for illegal mining, post to the feed, or talk to servers.";
         }
         
         async function handleUserMessage(txt) {
@@ -599,7 +599,7 @@
             await speakRecentLogs();
         }
         
-        // File, map, webcam, voice (simplified, same as before)
+        // ========== FILE UPLOAD (EICAR test) ==========
         const fileInput = document.getElementById('fileUpload');
         const dropZone = document.getElementById('dropZone');
         async function handleFile(file) {
@@ -628,14 +628,14 @@
             });
         }
         
-        // Map modal (same as before)
+        // ========== MAP, WEBCAM, VOICE ==========
         const mapModal = document.getElementById('mapModal');
         const openMapBtn = document.getElementById('openMapBtn');
         const closeMapModal = document.getElementById('closeMapModal');
         let map = null;
         async function initMap() {
             if (map) return;
-            if (typeof L === 'undefined') { addReasoning("Leaflet not ready, retrying..."); setTimeout(initMap, 500); return; }
+            if (typeof L === 'undefined') { setTimeout(initMap, 500); return; }
             map = L.map('modal-map').setView([39.8283, -98.5795], 4);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
             try {
@@ -643,8 +643,7 @@
                 const data = await eq.json();
                 data.features?.forEach(f => {
                     const coords = f.geometry.coordinates;
-                    L.circleMarker([coords[1], coords[0]], { radius: f.properties.mag*2.5, color: '#ff8844', fillColor: '#ff4400' })
-                        .bindPopup(`M${f.properties.mag}`).addTo(map);
+                    L.circleMarker([coords[1], coords[0]], { radius: f.properties.mag*2.5, color: '#ff8844', fillColor: '#ff4400' }).bindPopup(`M${f.properties.mag}`).addTo(map);
                 });
             } catch(e) { addReasoning(`Map overlay error: ${e.message}`); }
         }
@@ -652,12 +651,12 @@
         if (closeMapModal) closeMapModal.onclick = () => { if (mapModal) mapModal.style.display = 'none'; };
         window.onclick = (e) => { if (mapModal && e.target === mapModal) mapModal.style.display = 'none'; };
         
-        // Webcam and voice
         const webcamVideo = document.getElementById('webcamVideo');
         const camBtn = document.getElementById('camBtn');
         if (camBtn) camBtn.onclick = async () => {
             try { const stream = await navigator.mediaDevices.getUserMedia({ video: true }); webcamVideo.srcObject = stream; webcamVideo.style.display = 'block'; webcamVideo.play(); addReasoning("📷 Webcam active"); } catch(e) { addReasoning("Webcam denied"); }
         };
+        
         let recognition = null;
         const voiceBtn = document.getElementById('voiceBtn');
         if ('webkitSpeechRecognition' in window && voiceBtn) {
@@ -677,9 +676,14 @@
         document.getElementById('rewardCogBtn').onclick = async () => { await addCOG(10, 'User appreciation'); updateCOGUI(); };
         document.getElementById('openP2PModalBtn').onclick = () => document.getElementById('p2pModal').style.display = 'block';
         document.getElementById('closeP2PModal').onclick = () => document.getElementById('p2pModal').style.display = 'none';
+        document.getElementById('postBtn').onclick = () => { const text = document.getElementById('postText').value.trim(); if (text) { addPost(text); document.getElementById('postText').value = ''; addChatMessage('🐕 BlueHound', `Posted to feed: "${text.substring(0,60)}"`, false); speakNow(`Post added to feed.`); } };
         
-        addChatMessage('🐕 BlueHound', `Bloom removed, subtle reflections added. I speak every log line. CORS proxy enabled.`, false);
-        speakNow(`BlueHound ready. Reflections active.`);
+        // Periodic seismic updates
+        fetchSeismicData();
+        setInterval(fetchSeismicData, 30000);
+        renderFeed();
+        addChatMessage('🐕 BlueHound', `Seismic monitoring active. I can detect illegal mining from shallow earthquake clusters. CORS proxy enabled.`, false);
+        speakNow(`BlueHound seismic sentinel ready.`);
     </script>
 </body>
 </html>
