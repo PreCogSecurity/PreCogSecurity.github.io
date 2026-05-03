@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <meta http-equiv="Content-Security-Policy" content="script-src 'unsafe-eval' 'unsafe-inline' 'self' https:; connect-src * 'unsafe-inline';">
-    <title>BlueHound · Seismic Sentinel · P2P Network</title>
+    <title>BlueHound · Seismic Sentinel · Robust Maps & 3D Labels</title>
     <script type="importmap">
         {
             "imports": {
@@ -55,8 +54,8 @@
         }
         .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); pointer-events: auto; }
-        .modal-content { background: #0a1420; margin: 10% auto; width: 90%; max-width: 500px; border-radius: 28px;
-            border: 2px solid cyan; padding: 20px; color: white; }
+        .modal-content { background: #0a1420; margin: 5% auto; width: 90%; max-width: 1000px; border-radius: 28px;
+            border: 2px solid cyan; padding: 20px; color: white; max-height: 85%; overflow-y: auto; }
         .cog-list { max-height: 300px; overflow-y: auto; margin: 12px 0; }
         .cog-item { background: #1a2a3a; margin: 4px 0; padding: 8px; border-radius: 12px; display: flex; justify-content: space-between; }
         .close-modal { float: right; font-size: 24px; cursor: pointer; }
@@ -77,7 +76,6 @@
             backdrop-filter: blur(8px);
             cursor: pointer;
         }
-        /* Social Feed Panel */
         .feed-panel {
             position: fixed; top: 20px; left: 20px; width: min(380px, 85vw);
             background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-radius: 24px;
@@ -85,10 +83,7 @@
             max-height: 60vh; overflow-y: auto; pointer-events: auto;
         }
         .feed-title { color: #ff66cc; margin-bottom: 8px; font-weight: bold; font-size: 0.8rem; }
-        .post {
-            background: #0a1420; border-left: 3px solid #ff66cc; margin-bottom: 8px;
-            padding: 8px; border-radius: 16px;
-        }
+        .post { background: #0a1420; border-left: 3px solid #ff66cc; margin-bottom: 8px; padding: 8px; border-radius: 16px; }
         .post-author { color: #ffaa88; font-size: 0.7rem; }
         .post-time { color: #88aaff; font-size: 0.6rem; margin-left: 8px; }
         .post-text { margin: 4px 0; word-break: break-word; }
@@ -96,6 +91,7 @@
         .post-actions button { background: none; border: none; color: cyan; cursor: pointer; }
         .new-post { margin-top: 12px; }
         .new-post textarea { width: 100%; margin-bottom: 6px; }
+        .street-view { width: 100%; height: 300px; border-radius: 20px; margin-top: 12px; border: 1px solid cyan; }
         @media (max-width: 700px) { .hud { gap: 8px; padding: 8px 12px; } .stat span:last-child { font-size: 0.7rem; } button { padding: 2px 8px; } .feed-panel { top: 70px; left: 8px; width: 85vw; max-height: 50vh; } }
     </style>
 </head>
@@ -105,7 +101,7 @@
     <canvas id="webgl-canvas"></canvas>
     
     <div class="hud">
-        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.24</span></div>
+        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.26</span></div>
         <div class="stat"><span>🌍 THREAT</span><span id="threatLevel">0%</span></div>
         <div class="stat"><span>🧠 SPEAKING ALL</span><span id="fixCount">0</span></div>
         <div class="stat"><span>⭐ DATA STARS</span><span id="starCount">0</span></div>
@@ -118,51 +114,37 @@
         <button id="camBtn">📷 WEBCAM</button>
     </div>
     
-    <!-- Social Feed Panel -->
     <div class="feed-panel" id="feedPanel">
         <div class="feed-title">📡 BLUEHOUND SOCIAL FEED (P2P)</div>
         <div id="postsContainer" style="max-height: 300px; overflow-y: auto;"></div>
-        <div class="new-post">
-            <textarea id="postText" rows="2" placeholder="What's on your mind?"></textarea>
-            <button id="postBtn">📢 POST</button>
-        </div>
+        <div class="new-post"><textarea id="postText" rows="2" placeholder="What's on your mind?"></textarea><button id="postBtn">📢 POST</button></div>
     </div>
     
     <div class="chat-panel">
         <div style="font-size:0.7rem; margin-bottom:4px;">💬 FULLY AUDIBLE AI</div>
-        <div id="chatMessages" class="chat-messages">
-            <div>🐕 BlueHound: Seismic monitoring active. I can detect illegal mining from shallow earthquake clusters. Social feed and P2P sync online.</div>
-        </div>
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Type your message...">
-            <button id="sendChatBtn">➤</button>
-            <label for="fileUpload" class="file-upload-btn">📎 FILE</label>
-            <input type="file" id="fileUpload" style="display:none;" multiple>
-        </div>
+        <div id="chatMessages" class="chat-messages"><div>🐕 BlueHound: Seismic monitoring active. 3D labels fixed. Map now has fallback providers & free street view.</div></div>
+        <div class="chat-input"><input type="text" id="chatInput" placeholder="Type your message..."><button id="sendChatBtn">➤</button><label for="fileUpload" class="file-upload-btn">📎 FILE</label><input type="file" id="fileUpload" style="display:none;" multiple></div>
         <div class="memory-stats" id="memoryStats">🧠 memory: --</div>
     </div>
 
     <div class="reasoning-panel">
         <div class="reasoning-title">🌀 SEISMIC & ERROR LOG</div>
-        <div id="reasoningLog" class="reasoning-content">
-            Waiting for seismic data...
-        </div>
+        <div id="reasoningLog" class="reasoning-content">Waiting for seismic data...</div>
     </div>
 
-    <!-- Modals (COG, P2P, Map) -->
+    <!-- Modals -->
     <div id="cogModal" class="modal"><div class="modal-content"><span class="close-modal" id="closeCogModal">&times;</span><h2>🌀 COG Token Vault</h2><div id="cogTokenList" class="cog-list">Loading...</div><button id="rewardCogBtn">✨ Reward BlueHound (+10 COG)</button></div></div>
-    <div id="p2pModal" class="modal"><div class="modal-content"><span class="close-modal" id="closeP2PModal">&times;</span><h2>🔗 Peer‑to‑Peer Data Sync</h2><div class="p2p-status" id="p2pStatus">⚡ Not connected</div><button id="createOfferBtn">🌱 Create Session (I am host)</button><button id="answerOfferBtn">🔌 Join Session (Paste Offer)</button><div id="offerContainer" style="display:none;"><div>📋 Copy Offer code:</div><textarea id="localOffer" rows="3" readonly></textarea><div>✉️ Paste Answer:</div><textarea id="remoteAnswer" rows="3" placeholder="Paste answer here..."></textarea><button id="connectAnswerBtn">Connect to Peer</button></div><div id="answerContainer" style="display:none;"><div>📎 Paste Offer code:</div><textarea id="remoteOffer" rows="3" placeholder="Paste offer here..."></textarea><button id="generateAnswerBtn">Generate Answer</button><div id="generatedAnswerArea" style="display:none;"><div>📤 Copy this Answer:</div><textarea id="localAnswer" rows="3" readonly></textarea></div></div></div></div>
-    <div id="mapModal" class="modal"><div class="modal-content"><div style="display: flex; justify-content: flex-end;"><span id="closeMapModal" style="cursor:pointer; font-size:24px;">&times;</span></div><div id="modal-map"></div></div></div>
+    <div id="p2pModal" class="modal"><div class="modal-content"><span class="close-modal" id="closeP2PModal">&times;</span><h2>🔗 Peer‑to‑Peer Data Sync</h2><div class="p2p-status" id="p2pStatus">⚡ Not connected</div><button id="createOfferBtn">🌱 Create Session</button><button id="answerOfferBtn">🔌 Join Session</button><div id="offerContainer" style="display:none;"><div>📋 Copy Offer code:</div><textarea id="localOffer" rows="3" readonly></textarea><div>✉️ Paste Answer:</div><textarea id="remoteAnswer" rows="3" placeholder="Paste answer here..."></textarea><button id="connectAnswerBtn">Connect to Peer</button></div><div id="answerContainer" style="display:none;"><div>📎 Paste Offer code:</div><textarea id="remoteOffer" rows="3" placeholder="Paste offer here..."></textarea><button id="generateAnswerBtn">Generate Answer</button><div id="generatedAnswerArea" style="display:none;"><div>📤 Copy this Answer:</div><textarea id="localAnswer" rows="3" readonly></textarea></div></div></div></div>
+    <div id="mapModal" class="modal"><div class="modal-content"><div style="display: flex; justify-content: flex-end;"><span id="closeMapModal" style="cursor:pointer; font-size:24px;">&times;</span></div><div id="modal-map" style="height: 400px; border-radius: 20px;"></div><div id="streetViewContainer" style="margin-top: 12px;"><div id="streetViewPlaceholder" style="background:#0a1420; border-radius:20px; padding:12px; text-align:center; color:#88aaff;">🌆 Click on the map to see coordinates and open in Street View</div></div></div></div>
 
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
         
-        // ========== INITIALIZATION ==========
         if (window.location.protocol === 'file:') document.getElementById('warningBanner').style.display = 'block';
         
-        // ========== EARTHQUAKE THREAT ANALYSIS (illegal mining detection) ==========
+        // ========== EARTHQUAKE THREAT ANALYSIS ==========
         let earthquakeHistory = [];
         let currentThreat = 0.1;
         const threatSpan = document.getElementById('threatLevel');
@@ -173,47 +155,24 @@
                 if (!res.ok) throw new Error();
                 const data = await res.json();
                 const features = data.features.slice(0, 30);
-                // Store events with depth
-                const events = features.map(f => ({
-                    mag: f.properties.mag,
-                    depth: f.geometry.coordinates[2],
-                    place: f.properties.place,
-                    time: f.properties.time
-                }));
+                const events = features.map(f => ({ mag: f.properties.mag, depth: f.geometry.coordinates[2], place: f.properties.place, time: f.properties.time }));
                 earthquakeHistory = events;
-                
-                // Analyze for shallow, clustered events (illegal mining indicator)
                 const shallowEvents = events.filter(e => e.depth < 5 && e.mag > 1.5);
                 const shallowCount = shallowEvents.length;
                 const hasCluster = shallowCount > 2;
                 const hasModerateMag = shallowEvents.some(e => e.mag > 2.5);
                 let threat = 0.1;
                 let analysis = "";
-                if (hasCluster && hasModerateMag) {
-                    threat = 0.65;
-                    analysis = `⚠️ SEISMIC CLUSTER: ${shallowCount} shallow events (<5km depth) with magnitudes >2.5 – consistent with industrial blasting or illegal mining. Not natural tectonic activity.`;
-                } else if (shallowCount > 1) {
-                    threat = 0.4;
-                    analysis = `🔍 Suspicious shallow activity (${shallowCount} shallow events). Possible small-scale explosions. Monitor area.`;
-                } else if (events.some(e => e.mag > 5 && e.depth > 15)) {
-                    threat = 0.2;
-                    analysis = `🌋 Natural deep earthquake detected. No human cause.`;
-                } else {
-                    analysis = `🌍 Seismic background normal. ${events.length} events in last 24h.`;
-                }
+                if (hasCluster && hasModerateMag) { threat = 0.65; analysis = `⚠️ SEISMIC CLUSTER: ${shallowCount} shallow events (<5km depth) with magnitudes >2.5 – possible illegal mining.`; }
+                else if (shallowCount > 1) { threat = 0.4; analysis = `🔍 Suspicious shallow activity (${shallowCount} shallow events). Possible small-scale explosions.`; }
+                else if (events.some(e => e.mag > 5 && e.depth > 15)) { threat = 0.2; analysis = `🌋 Natural deep earthquake detected.`; }
+                else { analysis = `🌍 Seismic background normal. ${events.length} events in last 24h.`; }
                 currentThreat = Math.min(0.95, threat);
                 threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
                 addReasoning(analysis);
-                // If threat high, speak alert
-                if (threat > 0.6) {
-                    speakNow(`Alert: Possible illegal mining detected. ${shallowCount} shallow seismic events.`);
-                    addChatMessage('🐕 BlueHound', `🚨 ${analysis}`, false);
-                }
+                if (threat > 0.6) { speakNow(`Alert: Possible illegal mining detected. ${shallowCount} shallow seismic events.`); addChatMessage('🐕 BlueHound', `🚨 ${analysis}`, false); }
                 return events;
-            } catch(e) {
-                addReasoning(`Seismic data unavailable: ${e.message}`);
-                return [];
-            }
+            } catch(e) { addReasoning(`Seismic data unavailable: ${e.message}`); return []; }
         }
         
         // ========== CORS PROXY ==========
@@ -224,10 +183,8 @@
         let fixCounter = 0;
         const fixCountSpan = document.getElementById('fixCount');
         function incrementFixCount() { fixCounter++; if (fixCountSpan) fixCountSpan.innerText = fixCounter; }
-        
         window.onerror = (message, source, lineno, colno, error) => { addReasoning(`❗ Runtime error: ${message}`); attemptSelfRepair(message, error); return true; };
         window.addEventListener('unhandledrejection', (event) => { addReasoning(`❗ Unhandled rejection: ${event.reason}`); attemptSelfRepair(event.reason, event.reason); });
-        
         function attemptSelfRepair(errorMsg, errorObj) {
             if ((errorMsg.includes('CORS') || errorMsg.includes('blocked') || errorMsg.includes('fetch')) && !useCorsProxy) {
                 addReasoning(`🧠 CORS issue detected – enabling CORS proxy.`);
@@ -245,96 +202,37 @@
         // ========== SPEECH & LOGGING ==========
         function logToConsole(msg) { console.log(`🐕 [BlueHound] ${msg}`); }
         function speakNow(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.9;
-                speechSynthesis.cancel();
-                speechSynthesis.speak(utterance);
-            }
+            if ('speechSynthesis' in window) { const utterance = new SpeechSynthesisUtterance(text); utterance.rate = 0.9; speechSynthesis.cancel(); speechSynthesis.speak(utterance); }
             logToConsole(`🔊 SPOKEN: ${text}`);
         }
-        
         function addReasoning(text) {
             const logDiv = document.getElementById('reasoningLog');
-            if (logDiv) {
-                const entry = document.createElement('div');
-                entry.innerHTML = `🔍 ${text}`;
-                logDiv.prepend(entry);
-                while (logDiv.children.length > 20) logDiv.removeChild(logDiv.lastChild);
-            }
+            if (logDiv) { const entry = document.createElement('div'); entry.innerHTML = `🔍 ${text}`; logDiv.prepend(entry); while (logDiv.children.length > 20) logDiv.removeChild(logDiv.lastChild); }
             logToConsole(`[REASON] ${text}`);
             if (text && text.length < 300) speakNow(text);
             else if (text && text.length >= 300) speakNow(text.substring(0, 200) + "... (truncated)");
         }
-        
         async function speakRecentLogs() {
             const logDiv = document.getElementById('reasoningLog');
             if (logDiv && logDiv.children.length) {
                 const recent = [];
-                for (let i = 0; i < Math.min(logDiv.children.length, 6); i++) {
-                    let txt = logDiv.children[i].innerText;
-                    if (txt.length > 150) txt = txt.substring(0, 150) + "...";
-                    recent.push(txt);
-                }
+                for (let i = 0; i < Math.min(logDiv.children.length, 6); i++) { let txt = logDiv.children[i].innerText; if (txt.length > 150) txt = txt.substring(0, 150) + "..."; recent.push(txt); }
                 if (recent.length) speakNow(`Recent logs: ${recent.join('. ')}`);
             }
         }
         
-        // ========== COG TOKENS (IndexedDB) ==========
+        // ========== COG TOKENS ==========
         let db;
         const DB_NAME = 'BlueHoundCOG';
         const STORE_NAME = 'tokens';
-        function openDB() {
-            return new Promise((resolve, reject) => {
-                const request = indexedDB.open(DB_NAME, 1);
-                request.onerror = () => reject(request.error);
-                request.onsuccess = () => resolve(request.result);
-                request.onupgradeneeded = (e) => {
-                    const db = e.target.result;
-                    if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-                };
-            });
-        }
-        async function getCOGBalance() {
-            const db = await openDB();
-            return new Promise((resolve) => {
-                const tx = db.transaction(STORE_NAME, 'readonly');
-                const req = tx.objectStore(STORE_NAME).getAll();
-                req.onsuccess = () => resolve(req.result.reduce((s, t) => s + (t.amount||0), 0));
-                req.onerror = () => resolve(0);
-            });
-        }
-        async function addCOG(amount, reason) {
-            const db = await openDB();
-            const tx = db.transaction(STORE_NAME, 'readwrite');
-            tx.objectStore(STORE_NAME).add({ amount, reason, timestamp: Date.now() });
-            await tx.done;
-            updateCOGUI();
-            addChatMessage('🐕 BlueHound', `💰 +${amount} COG: ${reason}`, false);
-            if (window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'cog', amount, reason }));
-            return true;
-        }
-        async function getAllCOG() {
-            const db = await openDB();
-            return new Promise((resolve) => {
-                const tx = db.transaction(STORE_NAME, 'readonly');
-                tx.objectStore(STORE_NAME).getAll().onsuccess = (e) => resolve(e.target.result);
-            });
-        }
-        async function updateCOGUI() {
-            const balance = await getCOGBalance();
-            const cogSpan = document.getElementById('cogBalance');
-            if (cogSpan) cogSpan.innerText = balance;
-            const tokens = await getAllCOG();
-            const listDiv = document.getElementById('cogTokenList');
-            if (listDiv) {
-                if (!tokens.length) listDiv.innerHTML = '<div>No COG tokens yet.</div>';
-                else listDiv.innerHTML = tokens.map(t => `<div class="cog-item"><span>${t.reason}</span><span>+${t.amount} COG</span><span>${new Date(t.timestamp).toLocaleTimeString()}</span></div>`).join('');
-            }
-        }
+        function openDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(DB_NAME, 1); request.onerror = () => reject(request.error); request.onsuccess = () => resolve(request.result); request.onupgradeneeded = (e) => { const db = e.target.result; if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true }); }; }); }
+        async function getCOGBalance() { const db = await openDB(); return new Promise((resolve) => { const tx = db.transaction(STORE_NAME, 'readonly'); const req = tx.objectStore(STORE_NAME).getAll(); req.onsuccess = () => resolve(req.result.reduce((s, t) => s + (t.amount||0), 0)); req.onerror = () => resolve(0); }); }
+        async function addCOG(amount, reason) { const db = await openDB(); const tx = db.transaction(STORE_NAME, 'readwrite'); tx.objectStore(STORE_NAME).add({ amount, reason, timestamp: Date.now() }); await tx.done; updateCOGUI(); addChatMessage('🐕 BlueHound', `💰 +${amount} COG: ${reason}`, false); if (window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'cog', amount, reason })); return true; }
+        async function getAllCOG() { const db = await openDB(); return new Promise((resolve) => { const tx = db.transaction(STORE_NAME, 'readonly'); tx.objectStore(STORE_NAME).getAll().onsuccess = (e) => resolve(e.target.result); }); }
+        async function updateCOGUI() { const balance = await getCOGBalance(); const cogSpan = document.getElementById('cogBalance'); if (cogSpan) cogSpan.innerText = balance; const tokens = await getAllCOG(); const listDiv = document.getElementById('cogTokenList'); if (listDiv) listDiv.innerHTML = (!tokens.length) ? '<div>No COG tokens yet.</div>' : tokens.map(t => `<div class="cog-item"><span>${t.reason}</span><span>+${t.amount} COG</span><span>${new Date(t.timestamp).toLocaleTimeString()}</span></div>`).join(''); }
         await openDB().catch(()=>{}); await updateCOGUI();
         
-        // ========== 3D WORLD (no reflective ground, just subtle grid and floating stars) ==========
+        // ========== 3D WORLD (labels fixed) ==========
         const canvas = document.getElementById('webgl-canvas');
         const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -363,7 +261,6 @@
         const fillLight = new THREE.PointLight(0x44aaff, 0.4); fillLight.position.set(2,1,3); scene.add(fillLight);
         const backLight = new THREE.PointLight(0xffaa66, 0.5); backLight.position.set(-1,1.5,-3); scene.add(backLight);
         
-        // Simple non‑reflective grid helper (no reflective plane)
         const gridHelper = new THREE.GridHelper(16, 20, 0x335588, 0x224466);
         gridHelper.position.y = -1.2;
         gridHelper.material.transparent = true;
@@ -377,13 +274,10 @@
         const ring = new THREE.Mesh(new THREE.TorusGeometry(1.2,0.05,64,200), ringMat);
         ring.rotation.x = Math.PI/2; ring.position.y = 0; ring.castShadow = true; scene.add(ring);
         
-        // Data endpoint stars (for visited URLs)
+        // Data stars
         let endpointFrequency = new Map();
         let starObjects = [];
-        function addEndpointFrequency(key, inc=1) {
-            endpointFrequency.set(key, (endpointFrequency.get(key)||0)+inc);
-            regenerateStars();
-        }
+        function addEndpointFrequency(key, inc=1) { endpointFrequency.set(key, (endpointFrequency.get(key)||0)+inc); regenerateStars(); }
         function regenerateStars() {
             starObjects.forEach(obj => scene.remove(obj)); starObjects = [];
             document.getElementById('starCount').innerText = endpointFrequency.size;
@@ -402,22 +296,35 @@
                 starMesh.userData = { key, freq };
                 starMesh.position.set(x,y,z); starMesh.castShadow = true;
                 scene.add(starMesh); starObjects.push(starMesh);
+                // CSS2D label for star
                 const div = document.createElement('div');
                 div.textContent = `${key.substring(0,20)} (${freq})`;
-                div.style.cssText = 'background:rgba(0,0,0,0.5);color:#fff;padding:2px 4px;border-radius:8px;font-size:8px;';
+                div.style.cssText = 'background:rgba(0,0,0,0.6);color:#fff;padding:2px 6px;border-radius:12px;font-size:8px;border:1px solid #88aaff;';
                 const label = new CSS2DObject(div);
-                label.position.copy(starMesh.position); label.position.y += size+0.15;
-                scene.add(label); starObjects.push(label);
+                label.position.copy(starMesh.position);
+                label.position.y += size + 0.2;
+                scene.add(label);
+                starObjects.push(label);
             });
         }
         
-        // Simple city blocks (non‑reflective)
+        // Buildings with CSS2D labels (fixed)
+        const buildingLabels = [];
         for (let i=-4;i<=4;i++) for (let j=-4;j<=4;j++) if (Math.random()>0.8) {
             const height = 0.3+Math.random()*0.7;
             const cube = new THREE.Mesh(new THREE.BoxGeometry(0.35,height,0.35), new THREE.MeshStandardMaterial({ color:0x44aaff, emissive:0x2266aa, metalness:0.2 }));
             cube.position.set(i, height/2-1.0, j); cube.castShadow = true;
             scene.add(cube);
+            // Add label above each building
+            const div = document.createElement('div');
+            div.textContent = `🏢 ${Math.floor(Math.random()*100)}`;
+            div.style.cssText = 'background:rgba(0,0,0,0.5);color:#ccf4ff;padding:2px 4px;border-radius:8px;font-size:7px;';
+            const label = new CSS2DObject(div);
+            label.position.set(i, height - 0.8, j);
+            scene.add(label);
+            buildingLabels.push(label);
         }
+        
         const starFieldPos = []; for(let i=0;i<1500;i++) starFieldPos.push((Math.random()-0.5)*200, (Math.random()-0.5)*100, (Math.random()-0.5)*100-50);
         const starField = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(starFieldPos),3)), new THREE.PointsMaterial({ color:0xaaccff, size:0.1, transparent:true, opacity:0.6 }));
         scene.add(starField);
@@ -439,237 +346,130 @@
         }
         animate();
         
-        // ========== P2P & POSTS (same as before) ==========
+        // ========== SOCIAL FEED & P2P ==========
         let posts = JSON.parse(localStorage.getItem('bluehound_posts') || '[]');
         let localPeerId = 'user_' + Math.random().toString(36).substring(2, 8);
         function savePosts() { localStorage.setItem('bluehound_posts', JSON.stringify(posts)); renderFeed(); }
-        function addPost(text, author = null, timestamp = null, id = null) {
-            const newPost = { id: id || Date.now() + '_' + Math.random().toString(36).substring(2,6), text: text.substring(0,500), author: author || localPeerId, timestamp: timestamp || Date.now(), likes: 0 };
-            posts.unshift(newPost);
-            if (posts.length > 200) posts.pop();
-            savePosts();
-            if (window.dataChannel && window.dataChannel.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'post', post: newPost }));
-            addReasoning(`📝 New post: "${text.substring(0, 50)}"`);
-            speakNow(`New post from ${newPost.author}`);
-            return newPost;
-        }
+        function addPost(text, author = null, timestamp = null, id = null) { const newPost = { id: id || Date.now() + '_' + Math.random().toString(36).substring(2,6), text: text.substring(0,500), author: author || localPeerId, timestamp: timestamp || Date.now(), likes: 0 }; posts.unshift(newPost); if (posts.length > 200) posts.pop(); savePosts(); if (window.dataChannel && window.dataChannel.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'post', post: newPost })); addReasoning(`📝 New post: "${text.substring(0, 50)}"`); speakNow(`New post from ${newPost.author}`); return newPost; }
         function likePost(postId) { const post = posts.find(p => p.id == postId); if (post) { post.likes++; savePosts(); renderFeed(); } }
-        function renderFeed() {
-            const container = document.getElementById('postsContainer');
-            if (!container) return;
-            container.innerHTML = posts.map(post => `<div class="post"><div class="post-author">🐕 ${post.author}${post.author === localPeerId ? ' (you)' : ''}</div><div class="post-time">${new Date(post.timestamp).toLocaleString()}</div><div class="post-text">${escapeHtml(post.text)}</div><div class="post-actions"><button onclick="window.dispatchEvent(new CustomEvent('likePost', {detail: '${post.id}'}))">❤️ ${post.likes}</button></div></div>`).join('');
-            if (!posts.length) container.innerHTML = '<div style="text-align:center;color:#888;">No posts yet. Be the first!</div>';
-        }
+        function renderFeed() { const container = document.getElementById('postsContainer'); if (!container) return; container.innerHTML = posts.map(post => `<div class="post"><div class="post-author">🐕 ${post.author}${post.author === localPeerId ? ' (you)' : ''}</div><div class="post-time">${new Date(post.timestamp).toLocaleString()}</div><div class="post-text">${escapeHtml(post.text)}</div><div class="post-actions"><button onclick="window.dispatchEvent(new CustomEvent('likePost', {detail: '${post.id}'}))">❤️ ${post.likes}</button></div></div>`).join(''); if (!posts.length) container.innerHTML = '<div style="text-align:center;color:#888;">No posts yet. Be the first!</div>'; }
         function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
         window.addEventListener('likePost', (e) => likePost(e.detail));
         
-        // ========== P2P CHANNEL (with post sync) ==========
+        // P2P setup
         let peerConnection = null;
         window.dataChannel = null;
         let peers = 0;
         const peerCountSpan = document.getElementById('peerCount');
         const p2pConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
         function updatePeerCount() { if (peerCountSpan) peerCountSpan.innerText = peers; document.getElementById('p2pStatus').innerHTML = peers ? `✅ Connected to ${peers} peer(s)` : '⚡ No peers connected.'; }
-        function setupDataChannel(ch) {
-            window.dataChannel = ch;
-            ch.onopen = () => { peers++; updatePeerCount(); addReasoning(`🔗 Data channel open.`); sendFullSync(); };
-            ch.onclose = () => { peers--; updatePeerCount(); window.dataChannel = null; };
-            ch.onmessage = (e) => {
-                const data = JSON.parse(e.data);
-                if (data.type === 'chat') addChatMessage('👤 Peer', data.message, false);
-                else if (data.type === 'post') {
-                    if (!posts.some(p => p.id == data.post.id)) { posts.unshift(data.post); if (posts.length > 200) posts.pop(); savePosts(); addChatMessage('🐕 BlueHound', `New post from peer: ${data.post.text.substring(0, 60)}`, false); speakNow(`New post from peer`); }
-                } else if (data.type === 'sync') {
-                    if (data.posts) { let added=0; for(let p of data.posts) if(!posts.some(ex=>ex.id==p.id)){ posts.push(p); added++; } if(added) savePosts(); addReasoning(`📥 Synced ${added} posts from peer.`); }
-                }
-            };
-        }
+        function setupDataChannel(ch) { window.dataChannel = ch; ch.onopen = () => { peers++; updatePeerCount(); addReasoning(`🔗 Data channel open.`); sendFullSync(); }; ch.onclose = () => { peers--; updatePeerCount(); window.dataChannel = null; }; ch.onmessage = (e) => { const data = JSON.parse(e.data); if (data.type === 'chat') addChatMessage('👤 Peer', data.message, false); else if (data.type === 'post') { if (!posts.some(p => p.id == data.post.id)) { posts.unshift(data.post); if (posts.length > 200) posts.pop(); savePosts(); addChatMessage('🐕 BlueHound', `New post from peer: ${data.post.text.substring(0, 60)}`, false); speakNow(`New post from peer`); } } else if (data.type === 'sync') { if (data.posts) { let added=0; for(let p of data.posts) if(!posts.some(ex=>ex.id==p.id)){ posts.push(p); added++; } if(added) savePosts(); addReasoning(`📥 Synced ${added} posts from peer.`); } } }; }
         function sendFullSync() { if (window.dataChannel && window.dataChannel.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'sync', posts: posts.slice(0,50) })); }
-        // P2P UI handlers (simplified)
-        document.getElementById('createOfferBtn')?.addEventListener('click', async () => {
-            peerConnection = new RTCPeerConnection(p2pConfig);
-            const dc = peerConnection.createDataChannel('bluehound-sync');
-            setupDataChannel(dc);
-            peerConnection.onicecandidate = (e) => { if (e.candidate) document.getElementById('localOffer').value = JSON.stringify(peerConnection.localDescription); };
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-            document.getElementById('localOffer').value = JSON.stringify(offer);
-            document.getElementById('offerContainer').style.display = 'block';
-            document.getElementById('answerContainer').style.display = 'none';
-            addReasoning("🌱 Host session created.");
-        });
-        document.getElementById('connectAnswerBtn')?.addEventListener('click', async () => {
-            const ans = document.getElementById('remoteAnswer').value; if (!ans) return;
-            try { await peerConnection.setRemoteDescription(JSON.parse(ans)); addReasoning("✅ Connected."); speakNow("Peer connected."); } catch(e) { addReasoning(`❌ ${e.message}`); }
-        });
+        document.getElementById('createOfferBtn')?.addEventListener('click', async () => { peerConnection = new RTCPeerConnection(p2pConfig); const dc = peerConnection.createDataChannel('bluehound-sync'); setupDataChannel(dc); peerConnection.onicecandidate = (e) => { if (e.candidate) document.getElementById('localOffer').value = JSON.stringify(peerConnection.localDescription); }; const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer); document.getElementById('localOffer').value = JSON.stringify(offer); document.getElementById('offerContainer').style.display = 'block'; document.getElementById('answerContainer').style.display = 'none'; addReasoning("🌱 Host session created."); });
+        document.getElementById('connectAnswerBtn')?.addEventListener('click', async () => { const ans = document.getElementById('remoteAnswer').value; if (!ans) return; try { await peerConnection.setRemoteDescription(JSON.parse(ans)); addReasoning("✅ Connected."); speakNow("Peer connected."); } catch(e) { addReasoning(`❌ ${e.message}`); } });
         document.getElementById('answerOfferBtn')?.addEventListener('click', () => { document.getElementById('offerContainer').style.display = 'none'; document.getElementById('answerContainer').style.display = 'block'; });
-        document.getElementById('generateAnswerBtn')?.addEventListener('click', async () => {
-            const offer = document.getElementById('remoteOffer').value; if (!offer) return;
-            try {
-                const offerDesc = JSON.parse(offer);
-                peerConnection = new RTCPeerConnection(p2pConfig);
-                peerConnection.ondatachannel = (e) => setupDataChannel(e.channel);
-                await peerConnection.setRemoteDescription(offerDesc);
-                const answer = await peerConnection.createAnswer();
-                await peerConnection.setLocalDescription(answer);
-                document.getElementById('localAnswer').value = JSON.stringify(answer);
-                document.getElementById('generatedAnswerArea').style.display = 'block';
-                addReasoning("📤 Answer generated.");
-            } catch(e) { addReasoning(`❌ ${e.message}`); }
-        });
+        document.getElementById('generateAnswerBtn')?.addEventListener('click', async () => { const offer = document.getElementById('remoteOffer').value; if (!offer) return; try { const offerDesc = JSON.parse(offer); peerConnection = new RTCPeerConnection(p2pConfig); peerConnection.ondatachannel = (e) => setupDataChannel(e.channel); await peerConnection.setRemoteDescription(offerDesc); const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer); document.getElementById('localAnswer').value = JSON.stringify(answer); document.getElementById('generatedAnswerArea').style.display = 'block'; addReasoning("📤 Answer generated."); } catch(e) { addReasoning(`❌ ${e.message}`); } });
         
-        // ========== TALK TO SERVER (with CORS proxy) ==========
+        // ========== TALK TO SERVER ==========
         let requestCount = 0;
         const requestCountSpan = document.getElementById('requestCountSpan');
         window._lastFailedUrl = null;
-        async function talkToServer(url) {
-            requestCount++; if (requestCountSpan) requestCountSpan.innerText = requestCount;
-            addReasoning(`📡 Talking to ${url} ...`);
-            try {
-                let fetchUrl = useCorsProxy ? CORS_PROXY + encodeURIComponent(url) : url;
-                const controller = new AbortController(); setTimeout(() => controller.abort(), 8000);
-                const response = await fetch(fetchUrl, { mode: 'cors', signal: controller.signal });
-                let responseText = '';
-                if (response.headers.get('content-type')?.includes('application/json')) {
-                    const json = await response.json();
-                    responseText = JSON.stringify(json).substring(0,200);
-                } else {
-                    responseText = await response.text();
-                    responseText = responseText.substring(0,200);
-                }
-                addReasoning(`✅ ${url} → ${response.status}`);
-                addChatMessage('🐕 BlueHound', `📞 Talked to ${url} → ${response.status}`, false);
-                speakNow(`Server at ${new URL(url).hostname} responded with status ${response.status}.`);
-                await addCOG(2, `Queried ${new URL(url).hostname}`);
-                addEndpointFrequency(url,1);
-                window._lastFailedUrl = null;
-            } catch (err) {
-                addReasoning(`❌ Failed to talk to ${url}: ${err.message}`);
-                speakNow(`Could not reach server at ${new URL(url).hostname}. ${err.message}`);
-                window._lastFailedUrl = url;
-                attemptSelfRepair(err.message, err);
-            }
-        }
+        async function talkToServer(url) { requestCount++; if (requestCountSpan) requestCountSpan.innerText = requestCount; addReasoning(`📡 Talking to ${url} ...`); try { let fetchUrl = useCorsProxy ? CORS_PROXY + encodeURIComponent(url) : url; const controller = new AbortController(); setTimeout(() => controller.abort(), 8000); const response = await fetch(fetchUrl, { mode: 'cors', signal: controller.signal }); let responseText = ''; if (response.headers.get('content-type')?.includes('application/json')) { const json = await response.json(); responseText = JSON.stringify(json).substring(0,200); } else { responseText = await response.text(); responseText = responseText.substring(0,200); } addReasoning(`✅ ${url} → ${response.status}`); addChatMessage('🐕 BlueHound', `📞 Talked to ${url} → ${response.status}`, false); speakNow(`Server at ${new URL(url).hostname} responded with status ${response.status}.`); await addCOG(2, `Queried ${new URL(url).hostname}`); addEndpointFrequency(url,1); window._lastFailedUrl = null; } catch (err) { addReasoning(`❌ Failed to talk to ${url}: ${err.message}`); speakNow(`Could not reach server at ${new URL(url).hostname}. ${err.message}`); window._lastFailedUrl = url; attemptSelfRepair(err.message, err); } }
         function extractURLsFromMessage(text) { const matches = text.match(/https?:\/\/[^\s\)\]\}]+/gi) || []; return matches.map(u => u.replace(/[.,;:!?)$]+$/, '')); }
         async function handleServerCommand(cmd) { const urls = extractURLsFromMessage(cmd); if(!urls.length) return false; for(const url of urls){ await talkToServer(url); await new Promise(r => setTimeout(r,500)); } return true; }
         
-        // ========== CHAT & CONVERSATION ==========
+        // ========== CHAT ==========
         const chatDiv = document.getElementById('chatMessages');
         const chatInput = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendChatBtn');
         const memoryStatsSpan = document.getElementById('memoryStats');
-        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "version":24}');
+        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "version":26}');
         if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`;
         
-        function addChatMessage(sender, msg, isUser = false) {
-            if (!chatDiv) return;
-            const d = document.createElement('div');
-            d.innerHTML = `<strong>${sender}:</strong> ${msg}`;
-            chatDiv.appendChild(d); chatDiv.scrollTop = chatDiv.scrollHeight;
-            if (!isUser && msg) memory.convos.push({ role: 'BlueHound', content: msg, time: Date.now() });
-            else if (isUser && msg) memory.convos.push({ role: 'User', content: msg, time: Date.now() });
-            if (memory.convos.length > 100) memory.convos.shift();
-            localStorage.setItem('bluehound_memory', JSON.stringify(memory));
-            if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`;
-            logToConsole(`${sender}: ${msg}`);
-            if (sender === '👤 You' && window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'chat', message: msg }));
-        }
+        function addChatMessage(sender, msg, isUser = false) { if (!chatDiv) return; const d = document.createElement('div'); d.innerHTML = `<strong>${sender}:</strong> ${msg}`; chatDiv.appendChild(d); chatDiv.scrollTop = chatDiv.scrollHeight; if (!isUser && msg) memory.convos.push({ role: 'BlueHound', content: msg, time: Date.now() }); else if (isUser && msg) memory.convos.push({ role: 'User', content: msg, time: Date.now() }); if (memory.convos.length > 100) memory.convos.shift(); localStorage.setItem('bluehound_memory', JSON.stringify(memory)); if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`; logToConsole(`${sender}: ${msg}`); if (sender === '👤 You' && window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'chat', message: msg })); }
         
-        async function thinkAndRespond(userMsg) {
-            addReasoning(`User: "${userMsg}"`);
-            if (await handleServerCommand(userMsg)) return "I have talked to the server(s) and spoken their responses.";
-            const lower = userMsg.toLowerCase();
-            if (lower.includes('cog')) return `You have ${await getCOGBalance()} COG tokens.`;
-            if (lower.includes('peers')) return peers ? `Connected to ${peers} peer(s).` : "No peers. Use P2P Sync.";
-            if (lower.includes('seismic') || lower.includes('earthquake') || lower.includes('mining')) {
-                const threat = currentThreat;
-                if (threat > 0.6) return `⚠️ I have detected possible illegal mining activity. ${earthquakeHistory.filter(e=>e.depth<5).length} shallow events in the last 24 hours.`;
-                return `Seismic activity is normal. ${earthquakeHistory.length} earthquakes in the last 24 hours.`;
-            }
-            return "I'm BlueHound. Monitor seismic activity for illegal mining, post to the feed, or talk to servers.";
-        }
+        async function thinkAndRespond(userMsg) { addReasoning(`User: "${userMsg}"`); if (await handleServerCommand(userMsg)) return "I have talked to the server(s) and spoken their responses."; const lower = userMsg.toLowerCase(); if (lower.includes('cog')) return `You have ${await getCOGBalance()} COG tokens.`; if (lower.includes('peers')) return peers ? `Connected to ${peers} peer(s).` : "No peers. Use P2P Sync."; if (lower.includes('seismic') || lower.includes('earthquake') || lower.includes('mining')) { const threat = currentThreat; if (threat > 0.6) return `⚠️ I have detected possible illegal mining activity. ${earthquakeHistory.filter(e=>e.depth<5).length} shallow events in the last 24 hours.`; return `Seismic activity is normal. ${earthquakeHistory.length} earthquakes in the last 24 hours.`; } return "I'm BlueHound. Monitor seismic activity, post to feed, or talk to servers."; }
         
-        async function handleUserMessage(txt) {
-            if (!txt.trim()) return;
-            addChatMessage('👤 You', txt, true);
-            const reply = await thinkAndRespond(txt);
-            addChatMessage('🐕 BlueHound', reply);
-            speakNow(reply);
-            await addCOG(1, 'Conversation');
-            await speakRecentLogs();
-        }
+        async function handleUserMessage(txt) { if (!txt.trim()) return; addChatMessage('👤 You', txt, true); const reply = await thinkAndRespond(txt); addChatMessage('🐕 BlueHound', reply); speakNow(reply); await addCOG(1, 'Conversation'); await speakRecentLogs(); }
         
-        // ========== FILE UPLOAD (EICAR test) ==========
+        // ========== FILE UPLOAD ==========
         const fileInput = document.getElementById('fileUpload');
         const dropZone = document.getElementById('dropZone');
-        async function handleFile(file) {
-            addChatMessage('👤 You', `📎 Uploaded: ${file.name}`, true);
-            const header = await file.slice(0, 4096).arrayBuffer();
-            const content = new TextDecoder().decode(new Uint8Array(header));
-            if (content.includes("X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*")) {
-                addChatMessage('🐕 BlueHound', `⚠️ EICAR test virus detected!`, false);
-                await addCOG(10, 'Detected test virus');
-            } else {
-                addChatMessage('🐕 BlueHound', `File analyzed: no threats.`, false);
-                await addCOG(2, 'File analysis');
-            }
-        }
-        if (dropZone && fileInput) {
-            document.body.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.display = 'flex'; });
-            document.body.addEventListener('dragleave', () => { dropZone.style.display = 'none'; });
-            dropZone.addEventListener('dragover', e => e.preventDefault());
-            dropZone.addEventListener('drop', async e => {
-                e.preventDefault(); dropZone.style.display = 'none';
-                for (const f of Array.from(e.dataTransfer.files)) await handleFile(f);
-            });
-            fileInput.addEventListener('change', async e => {
-                for (const f of Array.from(e.target.files)) await handleFile(f);
-                fileInput.value = '';
-            });
-        }
+        async function handleFile(file) { addChatMessage('👤 You', `📎 Uploaded: ${file.name}`, true); const header = await file.slice(0, 4096).arrayBuffer(); const content = new TextDecoder().decode(new Uint8Array(header)); if (content.includes("X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*")) { addChatMessage('🐕 BlueHound', `⚠️ EICAR test virus detected!`, false); await addCOG(10, 'Detected test virus'); } else { addChatMessage('🐕 BlueHound', `File analyzed: no threats.`, false); await addCOG(2, 'File analysis'); } }
+        if (dropZone && fileInput) { document.body.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.display = 'flex'; }); document.body.addEventListener('dragleave', () => { dropZone.style.display = 'none'; }); dropZone.addEventListener('dragover', e => e.preventDefault()); dropZone.addEventListener('drop', async e => { e.preventDefault(); dropZone.style.display = 'none'; for (const f of Array.from(e.dataTransfer.files)) await handleFile(f); }); fileInput.addEventListener('change', async e => { for (const f of Array.from(e.target.files)) await handleFile(f); fileInput.value = ''; }); }
         
-        // ========== MAP, WEBCAM, VOICE ==========
+        // ========== ROBUST MAP WITH FALLBACK PROVIDERS & STREET VIEW ==========
         const mapModal = document.getElementById('mapModal');
         const openMapBtn = document.getElementById('openMapBtn');
         const closeMapModal = document.getElementById('closeMapModal');
         let map = null;
+        let currentMapLayer = null;
+        const tileProviders = [
+            { name: 'OpenStreetMap', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap' },
+            { name: 'CartoDB Voyager', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', attribution: '© CartoDB' },
+            { name: 'ESRI Satellite', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri' }
+        ];
+        let providerIndex = 0;
+        
         async function initMap() {
             if (map) return;
             if (typeof L === 'undefined') { setTimeout(initMap, 500); return; }
             map = L.map('modal-map').setView([39.8283, -98.5795], 4);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+            loadMapLayer(providerIndex);
+            // Load earthquake markers
             try {
                 const eq = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
                 const data = await eq.json();
                 data.features?.forEach(f => {
                     const coords = f.geometry.coordinates;
-                    L.circleMarker([coords[1], coords[0]], { radius: f.properties.mag*2.5, color: '#ff8844', fillColor: '#ff4400' }).bindPopup(`M${f.properties.mag}`).addTo(map);
+                    L.circleMarker([coords[1], coords[0]], { radius: f.properties.mag*2.5, color: '#ff8844', fillColor: '#ff4400', fillOpacity: 0.6 }).bindPopup(`M${f.properties.mag}<br>${f.properties.place}`).addTo(map);
                 });
             } catch(e) { addReasoning(`Map overlay error: ${e.message}`); }
         }
+        
+        function loadMapLayer(index) {
+            if (!map) return;
+            if (currentMapLayer) map.removeLayer(currentMapLayer);
+            try {
+                const provider = tileProviders[index];
+                currentMapLayer = L.tileLayer(provider.url, { attribution: provider.attribution, maxZoom: 19 }).addTo(map);
+                addReasoning(`🗺️ Map provider: ${provider.name}`);
+            } catch(e) { 
+                addReasoning(`❌ Failed to load ${tileProviders[index].name}, trying next...`);
+                if (index + 1 < tileProviders.length) loadMapLayer(index + 1);
+            }
+        }
+        
+        function updateStreetView(lat, lng) {
+            const container = document.getElementById('streetViewContainer');
+            if (!container) return;
+            container.innerHTML = `<div style="background:#0a1420; border-radius:20px; padding:12px; text-align:center;">
+                <p>📍 Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}</p>
+                <p>🌆 Open in <a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=15" target="_blank" style="color:cyan">OpenStreetMap</a> | 
+                <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="color:cyan">Google Maps</a></p>
+                <p>💡 Ask BlueHound to search for street view images of this location.</p>
+            </div>`;
+        }
+        
+        // Listen for map clicks to show street view
         if (openMapBtn) openMapBtn.onclick = () => { if (mapModal) mapModal.style.display = 'block'; setTimeout(initMap, 100); };
         if (closeMapModal) closeMapModal.onclick = () => { if (mapModal) mapModal.style.display = 'none'; };
         window.onclick = (e) => { if (mapModal && e.target === mapModal) mapModal.style.display = 'none'; };
+        // Lazy: add click handler on map after initialization
+        setTimeout(() => {
+            if (map) {
+                map.on('click', (e) => { updateStreetView(e.latlng.lat, e.latlng.lng); });
+            }
+        }, 2000);
         
+        // ========== WEBCAM & VOICE ==========
         const webcamVideo = document.getElementById('webcamVideo');
         const camBtn = document.getElementById('camBtn');
-        if (camBtn) camBtn.onclick = async () => {
-            try { const stream = await navigator.mediaDevices.getUserMedia({ video: true }); webcamVideo.srcObject = stream; webcamVideo.style.display = 'block'; webcamVideo.play(); addReasoning("📷 Webcam active"); } catch(e) { addReasoning("Webcam denied"); }
-        };
-        
+        if (camBtn) camBtn.onclick = async () => { try { const stream = await navigator.mediaDevices.getUserMedia({ video: true }); webcamVideo.srcObject = stream; webcamVideo.style.display = 'block'; webcamVideo.play(); addReasoning("📷 Webcam active"); } catch(e) { addReasoning("Webcam denied"); } };
         let recognition = null;
         const voiceBtn = document.getElementById('voiceBtn');
-        if ('webkitSpeechRecognition' in window && voiceBtn) {
-            recognition = new webkitSpeechRecognition();
-            recognition.continuous = false; recognition.lang = 'en-US';
-            recognition.onresult = e => { const t = e.results[0][0].transcript; if (chatInput) chatInput.value = t; handleUserMessage(t); };
-            voiceBtn.onclick = () => recognition.start();
-        } else if (voiceBtn) voiceBtn.style.opacity = 0.5;
-        
-        if (sendBtn && chatInput) {
-            sendBtn.onclick = () => { handleUserMessage(chatInput.value); chatInput.value = ''; };
-            chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendBtn.click(); });
-        }
+        if ('webkitSpeechRecognition' in window && voiceBtn) { recognition = new webkitSpeechRecognition(); recognition.continuous = false; recognition.lang = 'en-US'; recognition.onresult = e => { const t = e.results[0][0].transcript; if (chatInput) chatInput.value = t; handleUserMessage(t); }; voiceBtn.onclick = () => recognition.start(); } else if (voiceBtn) voiceBtn.style.opacity = 0.5;
+        if (sendBtn && chatInput) { sendBtn.onclick = () => { handleUserMessage(chatInput.value); chatInput.value = ''; }; chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendBtn.click(); }); }
         
         document.getElementById('openCogModalBtn').onclick = () => { document.getElementById('cogModal').style.display = 'block'; updateCOGUI(); };
         document.getElementById('closeCogModal').onclick = () => document.getElementById('cogModal').style.display = 'none';
@@ -678,12 +478,11 @@
         document.getElementById('closeP2PModal').onclick = () => document.getElementById('p2pModal').style.display = 'none';
         document.getElementById('postBtn').onclick = () => { const text = document.getElementById('postText').value.trim(); if (text) { addPost(text); document.getElementById('postText').value = ''; addChatMessage('🐕 BlueHound', `Posted to feed: "${text.substring(0,60)}"`, false); speakNow(`Post added to feed.`); } };
         
-        // Periodic seismic updates
         fetchSeismicData();
         setInterval(fetchSeismicData, 30000);
         renderFeed();
-        addChatMessage('🐕 BlueHound', `Seismic monitoring active. I can detect illegal mining from shallow earthquake clusters. CORS proxy enabled.`, false);
-        speakNow(`BlueHound seismic sentinel ready.`);
+        addChatMessage('🐕 BlueHound', `3D labels fixed. Map now has fallback tile providers and free street view via map links.`, false);
+        speakNow(`BlueHound seismic sentinel ready. 3D labels visible.`);
     </script>
 </body>
 </html>
