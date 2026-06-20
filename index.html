@@ -1,599 +1,812 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>BlueHound · Living Data City · Persistent Media</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Precog OS · Security & Cloud Workspace</title>
+    <!-- Font Awesome, Chart.js, Leaflet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- portabox: WASM Linux sandbox -->
     <script type="importmap">
         {
             "imports": {
-                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+                "portabox": "https://cdn.jsdelivr.net/npm/portabox@0.1.7/dist/index.js"
             }
         }
     </script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
+        /* --- Reset & Dark Theme --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #000; overflow: hidden; font-family: 'Inter', monospace; color: #ccf4ff; }
-        canvas#webgl-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-        .hud {
-            position: fixed; bottom: 16px; left: 16px; right: 16px;
-            background: rgba(0, 10, 25, 0.85); backdrop-filter: blur(16px); border-radius: 28px;
-            border: 1px solid #00ccff; padding: 10px 16px;
-            display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;
-            z-index: 20; font-size: 0.7rem; pointer-events: auto;
+        body {
+            background: #0a0a1a;
+            color: #c8e6ff;
+            font-family: 'Segoe UI', 'Courier New', monospace;
+            min-height: 100vh;
+            padding: 1.5rem;
         }
-        .stat { border-left: 2px solid cyan; padding-left: 8px; white-space: nowrap; }
-        .stat span:first-child { color: #8cf; font-size: 0.6rem; text-transform: uppercase; }
-        .stat span:last-child { font-weight: bold; font-size: 0.85rem; text-shadow: 0 0 6px cyan; }
-        button {
-            background: rgba(0,200,200,0.2); border: 1px solid cyan; border-radius: 40px;
-            padding: 4px 10px; color: cyan; cursor: pointer; font-weight: bold; font-size: 0.65rem;
+        .dashboard { max-width: 1600px; margin: 0 auto; }
+
+        /* --- Header --- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid #1f2a4a;
+            margin-bottom: 1.5rem;
         }
-        button:hover { background: cyan; color: black; box-shadow: 0 0 8px cyan; }
-        .chat-panel {
-            position: fixed; bottom: 100px; right: 16px; width: min(360px, 85vw);
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-radius: 24px;
-            border: 1px solid #2a9d8f; padding: 12px; z-index: 30; font-size: 0.75rem;
-            pointer-events: auto; max-height: 50vh; display: flex; flex-direction: column;
+        .header .brand { display: flex; align-items: center; gap: 1rem; }
+        .header .brand h1 {
+            font-weight: 300;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #33ccff, #ff77aa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 8px; font-size: 0.7rem; max-height: 40vh; }
-        .chat-input { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-        .chat-input input { flex: 2; background: #0a1420; border: 1px solid cyan; border-radius: 40px; padding: 6px 12px; color: white; font-size: 0.7rem; }
-        .file-upload-btn {
-            background: #2a6b5e; border: 1px solid #88ffaa; color: #88ffaa; padding: 4px 10px;
-            border-radius: 40px; cursor: pointer; font-size: 0.7rem; white-space: nowrap;
+        .header .brand i { font-size: 2.2rem; color: #33ccff; }
+        .header .status { display: flex; align-items: center; gap: 2rem; font-size: 0.9rem; }
+        .header .status .online { color: #33ff99; }
+        .header .status .online i { animation: pulse-green 2s infinite; }
+        @keyframes pulse-green {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
-        .reasoning-panel {
-            position: fixed; bottom: 100px; left: 16px; width: min(320px, 75vw);
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-radius: 24px;
-            border: 1px solid #ffaa44; padding: 12px; z-index: 30; font-size: 0.7rem;
-            max-height: 40vh; overflow-y: auto;
+        .clock { color: #88bbdd; font-family: 'Courier New', monospace; }
+
+        /* --- Main Grid: OS Workspace + Dashboard --- */
+        .os-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
-        .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); pointer-events: auto; }
-        .modal-content { background: #0a1420; margin: 5% auto; width: 90%; max-width: 1000px; border-radius: 28px;
-            border: 2px solid cyan; padding: 20px; color: white; max-height: 85%; overflow-y: auto; }
-        .cog-list { max-height: 300px; overflow-y: auto; margin: 12px 0; }
-        .cog-item { background: #1a2a3a; margin: 4px 0; padding: 8px; border-radius: 12px; display: flex; justify-content: space-between; }
-        .close-modal { float: right; font-size: 24px; cursor: pointer; }
-        .p2p-panel { margin-top: 12px; border-top: 1px solid cyan; padding-top: 12px; }
-        .p2p-status { font-size: 0.7rem; margin: 6px 0; color: #88ffaa; }
-        textarea { width: 100%; background: #0a1420; color: white; border: 1px solid cyan; border-radius: 12px; padding: 6px; font-size: 0.7rem; font-family: monospace; margin: 6px 0; }
-        .drop-zone {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,255,255,0.1); backdrop-filter: blur(8px); border: 4px dashed cyan;
-            display: none; align-items: center; justify-content: center; z-index: 200;
-            font-size: 1.2rem; font-weight: bold; text-align: center; pointer-events: none;
+        .os-panel {
+            background: #111128;
+            border: 1px solid #1f2a5a;
+            border-radius: 16px;
+            padding: 1.2rem;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
         }
-        .warning-banner {
-            position: fixed; top: 20px; left: 20px; right: 20px;
-            background: #ff4400; color: black; padding: 8px 16px;
-            border-radius: 28px; font-weight: bold; text-align: center;
-            z-index: 101; font-size: 0.7rem; pointer-events: auto;
-            backdrop-filter: blur(8px);
+        .os-panel h3 {
+            font-weight: 300;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6688bb;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #1a2a4a;
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .os-panel h3 .badge {
+            font-size: 0.6rem;
+            background: #1a2a5a;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            color: #88bbdd;
+        }
+
+        /* --- Terminal --- */
+        #terminal {
+            flex: 1;
+            background: #0a0a1a;
+            border-radius: 10px;
+            padding: 0.8rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #33ff99;
+            overflow-y: auto;
+            min-height: 300px;
+            max-height: 400px;
+            border: 1px solid #1a2a4a;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        #terminal .prompt { color: #33ccff; }
+        #terminal .input-line { display: flex; align-items: center; gap: 0.3rem; }
+        #terminal .input-line span { color: #33ccff; }
+        #terminal .input-line input {
+            background: transparent;
+            border: none;
+            color: #33ff99;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            flex: 1;
+            outline: none;
+        }
+        #terminal .output { color: #c8e6ff; }
+        #terminal .error { color: #ff4466; }
+
+        /* --- File Browser --- */
+        .file-browser {
+            flex: 1;
+            background: #0a0a1a;
+            border-radius: 10px;
+            padding: 0.5rem;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #1a2a4a;
+        }
+        .file-browser .file-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.3rem 0.5rem;
+            border-bottom: 1px solid #1a2244;
+            font-size: 0.8rem;
             cursor: pointer;
+            transition: 0.15s;
         }
-        .feed-panel {
-            position: fixed; top: 20px; left: 20px; width: min(380px, 85vw);
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); border-radius: 24px;
-            border: 1px solid #ff66cc; padding: 12px; z-index: 30; font-size: 0.7rem;
-            max-height: 60vh; overflow-y: auto; pointer-events: auto;
+        .file-browser .file-item:hover {
+            background: #1a2a4a;
+            border-radius: 4px;
         }
-        .feed-title { color: #ff66cc; margin-bottom: 8px; font-weight: bold; font-size: 0.8rem; }
-        .post { background: #0a1420; border-left: 3px solid #ff66cc; margin-bottom: 8px; padding: 8px; border-radius: 16px; }
-        .post-author { color: #ffaa88; font-size: 0.7rem; }
-        .post-time { color: #88aaff; font-size: 0.6rem; margin-left: 8px; }
-        .post-text { margin: 4px 0; word-break: break-word; }
-        .post-media { max-width: 100%; max-height: 150px; border-radius: 12px; margin-top: 6px; }
-        .post-actions { display: flex; gap: 8px; margin-top: 4px; font-size: 0.6rem; }
-        .post-actions button { background: none; border: none; color: cyan; cursor: pointer; }
-        .new-post { margin-top: 12px; }
-        .new-post textarea { width: 100%; margin-bottom: 6px; }
-        .media-preview { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
-        .media-preview img { max-height: 80px; border-radius: 8px; }
-        .street-view { width: 100%; height: 300px; border-radius: 20px; margin-top: 12px; border: 1px solid cyan; }
-        @media (max-width: 700px) { .hud { gap: 8px; padding: 8px 12px; } .stat span:last-child { font-size: 0.7rem; } button { padding: 2px 8px; } .feed-panel { top: 70px; left: 8px; width: 85vw; max-height: 50vh; } }
+        .file-browser .file-item .name { color: #88ddff; }
+        .file-browser .file-item .size { color: #6688aa; font-size: 0.7rem; }
+
+        /* --- Dashboard Cards (compact) --- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-card {
+            background: #111128;
+            border: 1px solid #1f2a5a;
+            border-radius: 12px;
+            padding: 0.8rem 1.2rem;
+        }
+        .stat-card .label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #6688bb;
+            letter-spacing: 0.5px;
+        }
+        .stat-card .value {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .stat-card .sub { color: #88aadd; font-size: 0.7rem; }
+
+        .map-chart-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .map-container {
+            background: #0f0f2a;
+            border-radius: 16px;
+            border: 1px solid #1f2a5a;
+            padding: 0.5rem;
+            height: 300px;
+        }
+        #threatMap { height: 100%; width: 100%; border-radius: 12px; background: #0a0a1a; }
+        .chart-container {
+            background: #111128;
+            border-radius: 16px;
+            border: 1px solid #1f2a5a;
+            padding: 0.8rem;
+            height: 300px;
+        }
+        .chart-container canvas { width: 100% !important; height: 100% !important; }
+
+        .alert-feed {
+            background: #111128;
+            border-radius: 16px;
+            border: 1px solid #1f2a5a;
+            padding: 0.8rem 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1.5rem;
+        }
+        .alert-feed .alert-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid #1a2244;
+            font-size: 0.8rem;
+        }
+        .alert-feed .alert-item .severity {
+            font-weight: bold;
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.6rem;
+        }
+        .severity.critical { background: #cc3355; color: #fff; }
+        .severity.high { background: #ff8833; color: #000; }
+        .severity.medium { background: #ffcc33; color: #000; }
+        .severity.low { background: #33aaff; color: #000; }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: #446688;
+            font-size: 0.8rem;
+            border-top: 1px solid #1a2244;
+            padding-top: 1.5rem;
+        }
+        .footer i { color: #33ccff; }
+
+        /* --- Scrollbar --- */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a1a; }
+        ::-webkit-scrollbar-thumb { background: #2a3a6a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #33ccff; }
+
+        /* --- Responsive --- */
+        @media (max-width: 1000px) {
+            .os-grid { grid-template-columns: 1fr; }
+            .map-chart-row { grid-template-columns: 1fr; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .stats-row { grid-template-columns: 1fr; }
+        }
+
+        /* --- Editor Modal --- */
+        .editor-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .editor-modal.active { display: flex; }
+        .editor-modal .editor-box {
+            background: #111128;
+            border: 1px solid #33ccff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .editor-modal .editor-box h4 {
+            color: #88bbdd;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .editor-modal .editor-box textarea {
+            flex: 1;
+            background: #0a0a1a;
+            border: 1px solid #1f2a5a;
+            border-radius: 8px;
+            color: #c8e6ff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            padding: 0.8rem;
+            min-height: 300px;
+            resize: vertical;
+            outline: none;
+        }
+        .editor-modal .editor-box .editor-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+            justify-content: flex-end;
+        }
+        .editor-modal .editor-box .editor-actions button {
+            background: #1a2a5a;
+            border: none;
+            color: #c8e6ff;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .editor-modal .editor-box .editor-actions button:hover {
+            background: #33ccff;
+            color: #0a0a1a;
+        }
+        .editor-modal .editor-box .editor-actions button.primary {
+            background: #33ccff;
+            color: #0a0a1a;
+        }
+        .editor-modal .editor-box .editor-actions button.primary:hover {
+            background: #66ddff;
+        }
     </style>
 </head>
 <body>
-    <div id="warningBanner" style="display:none;" class="warning-banner" onclick="this.style.display='none'">⚠️ File protocol detected. Use a local web server for full functionality. Click to dismiss.</div>
-    <div class="drop-zone" id="dropZone">✨ DROP ANY FILE FOR DEEP ANALYSIS</div>
-    <canvas id="webgl-canvas"></canvas>
-    
-    <div class="hud">
-        <div class="stat"><span>🐕 BLUEHOUND ASI</span><span id="versionTag">v.28</span></div>
-        <div class="stat"><span>🌍 THREAT</span><span id="threatLevel">0%</span></div>
-        <div class="stat"><span>🧠 BUILDINGS</span><span id="buildingCount">0</span></div>
-        <div class="stat"><span>🖼️ MEDIA</span><span id="mediaCount">0</span></div>
-        <div class="stat"><span>🪙 COG TOKENS</span><span id="cogBalance">0</span></div>
-        <div class="stat"><span>📡 REQUESTS</span><span id="requestCountSpan">0</span></div>
-        <button id="openCogModalBtn">💰 COG VAULT</button>
-        <button id="openP2PModalBtn">🔗 P2P SYNC</button>
-        <button id="openMapBtn">🌍 MAP</button>
-        <button id="voiceBtn">🎤 VOICE</button>
-        <button id="camBtn">📷 WEBCAM</button>
-    </div>
-    
-    <div class="feed-panel" id="feedPanel">
-        <div class="feed-title">📡 BLUEHOUND SOCIAL FEED (P2P) – BlueHound replies to every post!</div>
-        <div id="postsContainer" style="max-height: 300px; overflow-y: auto;"></div>
-        <div class="new-post">
-            <textarea id="postText" rows="2" placeholder="What's on your mind?"></textarea>
-            <div class="media-preview" id="mediaPreview"></div>
-            <label for="postImageInput" class="file-upload-btn">📷 Add Image</label>
-            <input type="file" id="postImageInput" accept="image/*" style="display:none;">
-            <button id="postBtn">📢 POST</button>
+<div class="dashboard">
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">
+            <i class="fas fa-shield-alt"></i>
+            <h1>PRECOG · OS</h1>
+        </div>
+        <div class="status">
+            <span class="online"><i class="fas fa-circle"></i> System Online</span>
+            <span class="clock" id="clockDisplay">--:--:--</span>
+            <span style="color:#6688bb; font-size:0.8rem;"><i class="fas fa-microchip"></i> WASM x86_64</span>
+        </div>
+    </header>
+
+    <!-- OS Workspace: Terminal + File Browser -->
+    <div class="os-grid">
+        <div class="os-panel">
+            <h3>
+                <span><i class="fas fa-terminal"></i> Linux Terminal (Alpine)</span>
+                <span class="badge"><i class="fas fa-circle" style="color:#33ff99;font-size:0.5rem;"></i> live</span>
+            </h3>
+            <div id="terminal">
+                <div class="output">⏳ Booting Alpine Linux via WebAssembly...</div>
+                <div class="output" id="bootStatus"></div>
+                <div class="input-line">
+                    <span>$</span>
+                    <input type="text" id="cmdInput" placeholder="Type a command..." disabled />
+                </div>
+            </div>
+        </div>
+        <div class="os-panel">
+            <h3>
+                <span><i class="fas fa-folder"></i> File Browser</span>
+                <span class="badge"><i class="fas fa-database"></i> IndexedDB</span>
+            </h3>
+            <div class="file-browser" id="fileBrowser">
+                <div style="color:#6688aa; text-align:center; padding:2rem 0; font-size:0.8rem;">
+                    <i class="fas fa-spinner fa-pulse"></i> Loading filesystem...
+                </div>
+            </div>
+            <div style="margin-top:0.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+                <button onclick="refreshFiles()" style="background:#1a2a5a;border:none;color:#c8e6ff;padding:0.3rem 1rem;border-radius:20px;cursor:pointer;font-size:0.7rem;">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+                <button onclick="createFile()" style="background:#1a2a5a;border:none;color:#c8e6ff;padding:0.3rem 1rem;border-radius:20px;cursor:pointer;font-size:0.7rem;">
+                    <i class="fas fa-plus"></i> New File
+                </button>
+            </div>
         </div>
     </div>
-    
-    <div class="chat-panel">
-        <div style="font-size:0.7rem; margin-bottom:4px;">💬 FULLY AUDIBLE AI</div>
-        <div id="chatMessages" class="chat-messages"><div>🐕 BlueHound: Data city rebuilt from your browser variables. Images become floating billboards with permanent positions.</div></div>
-        <div class="chat-input"><input type="text" id="chatInput" placeholder="Type your message..."><button id="sendChatBtn">➤</button><label for="fileUpload" class="file-upload-btn">📎 FILE</label><input type="file" id="fileUpload" style="display:none;" multiple></div>
-        <div class="memory-stats" id="memoryStats">🧠 memory: --</div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-globe"></i> Active Threats</div>
+            <div class="value" id="activeThreats">247</div>
+            <div class="sub">+12 last hour</div>
+        </div>
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-bolt"></i> Attacks Blocked</div>
+            <div class="value" id="attacksBlocked">1,843</div>
+            <div class="sub">Last 24h</div>
+        </div>
+        <div class="stat-card">
+            <div class="label"><i class="fas fa-flag"></i> Critical Alerts</div>
+            <div class="value" id="criticalAlerts">4</div>
+            <div class="sub">Require action</div>
+        </div>
     </div>
 
-    <div class="reasoning-panel">
-        <div class="reasoning-title">🌀 SEISMIC & DATA LOG</div>
-        <div id="reasoningLog" class="reasoning-content">Waiting for seismic data...</div>
+    <!-- Map & Chart -->
+    <div class="map-chart-row">
+        <div class="map-container">
+            <div id="threatMap"></div>
+        </div>
+        <div class="chart-container">
+            <canvas id="attackChart"></canvas>
+        </div>
     </div>
 
-    <!-- Modals (simplified) -->
-    <div id="cogModal" class="modal"><div class="modal-content"><span class="close-modal" id="closeCogModal">&times;</span><h2>🌀 COG Token Vault</h2><div id="cogTokenList" class="cog-list">Loading...</div><button id="rewardCogBtn">✨ Reward BlueHound (+10 COG)</button></div></div>
-    <div id="p2pModal" class="modal"><div class="modal-content"><span class="close-modal" id="closeP2PModal">&times;</span><h2>🔗 Peer‑to‑Peer Data Sync</h2><div class="p2p-status" id="p2pStatus">⚡ Not connected</div><button id="createOfferBtn">🌱 Create Session</button><button id="answerOfferBtn">🔌 Join Session</button><div id="offerContainer" style="display:none;"><div>📋 Copy Offer code:</div><textarea id="localOffer" rows="3" readonly></textarea><div>✉️ Paste Answer:</div><textarea id="remoteAnswer" rows="3" placeholder="Paste answer here..."></textarea><button id="connectAnswerBtn">Connect to Peer</button></div><div id="answerContainer" style="display:none;"><div>📎 Paste Offer code:</div><textarea id="remoteOffer" rows="3" placeholder="Paste offer here..."></textarea><button id="generateAnswerBtn">Generate Answer</button><div id="generatedAnswerArea" style="display:none;"><div>📤 Copy this Answer:</div><textarea id="localAnswer" rows="3" readonly></textarea></div></div></div></div>
-    <div id="mapModal" class="modal"><div class="modal-content"><div style="display: flex; justify-content: flex-end;"><span id="closeMapModal" style="cursor:pointer; font-size:24px;">&times;</span></div><div id="modal-map" style="height: 400px; border-radius: 20px;"></div><div id="streetViewContainer" style="margin-top: 12px;"><div style="background:#0a1420; border-radius:20px; padding:12px; text-align:center; color:#88aaff;">🌆 Click on the map to see coordinates and open in Street View</div></div></div></div>
+    <!-- Alert Feed -->
+    <div class="alert-feed" id="alertFeed">
+        <div style="color:#6688bb; border-bottom:1px solid #1a2244; padding-bottom:0.4rem; margin-bottom:0.4rem; font-size:0.8rem;">
+            <i class="fas fa-bell"></i> Live Alerts
+        </div>
+        <!-- Injected by JS -->
+    </div>
 
-    <script type="module">
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-        
-        if (window.location.protocol === 'file:') document.getElementById('warningBanner').style.display = 'block';
-        
-        // ========== CORE UTILITIES ==========
-        function logToConsole(msg) { console.log(`🐕 [BlueHound] ${msg}`); }
-        function speakNow(text) { if ('speechSynthesis' in window) { const u = new SpeechSynthesisUtterance(text); u.rate=0.9; speechSynthesis.cancel(); speechSynthesis.speak(u); } logToConsole(`🔊 SPOKEN: ${text}`); }
-        function addReasoning(text) { const logDiv = document.getElementById('reasoningLog'); if (logDiv) { const entry = document.createElement('div'); entry.innerHTML = `🔍 ${text}`; logDiv.prepend(entry); while (logDiv.children.length>20) logDiv.removeChild(logDiv.lastChild); } logToConsole(`[REASON] ${text}`); if (text.length<300) speakNow(text); else speakNow(text.substring(0,200)+"..."); }
-        
-        // ========== 3D WORLD: DATA BUILDINGS + PERSISTENT IMAGES ==========
-        const canvas = document.getElementById('webgl-canvas');
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: false, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.shadowMap.enabled = true;
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x010518);
-        scene.fog = new THREE.FogExp2(0x010518, 0.008);
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
-        camera.position.set(8, 5, 12);
-        const controls = new OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true; controls.autoRotate = true;
-        controls.target.set(0, 0, 0);
-        
-        const labelRenderer = new CSS2DRenderer();
-        labelRenderer.setSize(window.innerWidth, window.innerHeight);
-        labelRenderer.domElement.style.position = 'absolute';
-        labelRenderer.domElement.style.top = '0px';
-        labelRenderer.domElement.style.left = '0px';
-        labelRenderer.domElement.style.pointerEvents = 'none';
-        labelRenderer.domElement.style.zIndex = '10';
-        document.body.appendChild(labelRenderer.domElement);
-        
-        const ambient = new THREE.AmbientLight(0x223366); scene.add(ambient);
-        const mainLight = new THREE.DirectionalLight(0xffffff, 1); mainLight.position.set(5,10,7); mainLight.castShadow = true; scene.add(mainLight);
-        const fillLight = new THREE.PointLight(0x44aaff, 0.4); fillLight.position.set(2,1,3); scene.add(fillLight);
-        const backLight = new THREE.PointLight(0xffaa66, 0.5); backLight.position.set(-1,1.5,-3); scene.add(backLight);
-        
-        const gridHelper = new THREE.GridHelper(16, 20, 0x335588, 0x224466);
-        gridHelper.position.y = -1.2;
-        gridHelper.material.transparent = true;
-        gridHelper.material.opacity = 0.2;
-        scene.add(gridHelper);
-        
-        // Core avatar
-        const coreMat = new THREE.MeshStandardMaterial({ color:0x3a86ff, emissive:0x1a55aa, emissiveIntensity:0.6, metalness:0.3, roughness:0.5 });
-        const coreMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.8,1), coreMat);
-        coreMesh.castShadow = true; coreMesh.position.set(0,0,0); scene.add(coreMesh);
-        const ringMat = new THREE.MeshStandardMaterial({ color:0x00aaff, emissive:0x0066aa, metalness:0.7 });
-        const ring = new THREE.Mesh(new THREE.TorusGeometry(1.2,0.05,64,200), ringMat);
-        ring.rotation.x = Math.PI/2; ring.position.y = 0; ring.castShadow = true; scene.add(ring);
-        
-        // --- Starfield & dust (cosmetic) ---
-        const starFieldPos = []; for(let i=0;i<1500;i++) starFieldPos.push((Math.random()-0.5)*200, (Math.random()-0.5)*100, (Math.random()-0.5)*100-50);
-        const starField = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(starFieldPos),3)), new THREE.PointsMaterial({ color:0xaaccff, size:0.1, transparent:true, opacity:0.6 }));
-        scene.add(starField);
-        const dustPos = []; for(let i=0;i<800;i++) dustPos.push((Math.random()-0.5)*12, (Math.random()-0.5)*6, (Math.random()-0.5)*10);
-        const dust = new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(dustPos),3)), new THREE.PointsMaterial({ color:0x88aaff, size:0.03, transparent:true, opacity:0.3 }));
-        scene.add(dust);
-        
-        // ----- 1. DATA BUILDINGS (from environment variables) -----
-        let buildings = []; // { mesh, label, key, freq }
-        let variableFrequency = new Map(); // count of how many times each key has been seen (simulated)
-        
-        function scanVariables() {
-            // Collect all keys from localStorage, sessionStorage, and top-level globals
-            const localKeys = Object.keys(localStorage);
-            const sessionKeys = Object.keys(sessionStorage);
-            // Also include some console variable examples? We'll simulate by counting usage
-            // For demo, we'll also count how many times each key appears in conversation memory
-            const globalKeys = [];
-            for (let key in window) {
-                if (Object.prototype.hasOwnProperty.call(window,key) && !['window','document','localStorage','sessionStorage','console','location','history','navigator','screen','caches','indexedDB'].includes(key) && typeof window[key] !== 'function' && !key.startsWith('webkit') && !key.startsWith('on')) {
-                    globalKeys.push(key);
-                }
+    <footer class="footer">
+        <i class="fas fa-code-branch"></i> Powered by <strong>portabox</strong> · WebAssembly Linux · 
+        <span style="color:#33ccff;">Precog Security</span> · 
+        <i class="fas fa-infinity"></i> No server, no API keys
+    </footer>
+</div>
+
+<!-- Editor Modal -->
+<div class="editor-modal" id="editorModal">
+    <div class="editor-box">
+        <h4>
+            <span><i class="fas fa-edit"></i> Editing: <span id="editFileName">file</span></span>
+            <span style="font-size:0.7rem; color:#6688aa;">virtual filesystem</span>
+        </h4>
+        <textarea id="editContent" spellcheck="false"></textarea>
+        <div class="editor-actions">
+            <button onclick="closeEditor()">Cancel</button>
+            <button class="primary" onclick="saveFile()"><i class="fas fa-save"></i> Save</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // ============================================================
+    //  IMPORTS
+    // ============================================================
+    import { Sandbox } from 'portabox';
+
+    // ============================================================
+    //  STATE
+    // ============================================================
+    let sandbox = null;
+    let currentDir = '/';
+    let fileList = [];
+    let editingFile = null;
+    const FS_KEY = 'precog_fs_files';
+
+    // ============================================================
+    //  DOM REFS
+    // ============================================================
+    const terminalEl = document.getElementById('terminal');
+    const cmdInput = document.getElementById('cmdInput');
+    const fileBrowser = document.getElementById('fileBrowser');
+    const bootStatus = document.getElementById('bootStatus');
+
+    // ============================================================
+    //  TERMINAL HELPERS
+    // ============================================================
+    function termPrint(text, className = 'output') {
+        const div = document.createElement('div');
+        div.className = className;
+        div.textContent = text;
+        terminalEl.insertBefore(div, cmdInput.parentElement);
+        terminalEl.scrollTop = terminalEl.scrollHeight;
+    }
+
+    function termClear() {
+        const children = terminalEl.children;
+        for (let i = children.length - 1; i >= 0; i--) {
+            if (children[i].tagName !== 'DIV' || !children[i].classList.contains('input-line')) {
+                children[i].remove();
             }
-            // Update frequency: each time we scan, we increment for keys found (simulate "access")
-            for (let k of localKeys) variableFrequency.set(k, (variableFrequency.get(k)||0)+1);
-            for (let k of sessionKeys) variableFrequency.set(k, (variableFrequency.get(k)||0)+1);
-            for (let k of globalKeys) variableFrequency.set(k, (variableFrequency.get(k)||0)+1);
-            // Also add a few "console" variables for fun (if they've been captured)
-            if (window._capturedConsoleVars) {
-                for (let k of Object.keys(window._capturedConsoleVars)) {
-                    variableFrequency.set(k, (variableFrequency.get(k)||0)+1);
-                }
-            }
-            // Rebuild buildings
-            rebuildCity();
         }
-        
-        function rebuildCity() {
-            // Remove old buildings
-            buildings.forEach(b => { scene.remove(b.mesh); scene.remove(b.label); });
-            buildings = [];
-            const entries = Array.from(variableFrequency.entries());
-            if (entries.length === 0) {
-                // fallback dummy
-                for (let i=0;i<20;i++) {
-                    const key = `var_${i}`;
-                    variableFrequency.set(key, Math.floor(Math.random()*10)+1);
-                }
-            }
-            const total = entries.length;
-            const radius = 3.0;
-            let angle = 0;
-            const angleStep = (Math.PI * 2) / Math.min(total, 60);
-            let idx = 0;
-            for (let [key, freq] of entries.slice(0,60)) {
-                const height = 0.4 + Math.min(1.2, Math.log(freq+1)*0.3);
-                const x = Math.cos(angle) * radius;
-                const z = Math.sin(angle) * radius;
-                // color based on type
-                let color = 0x44aaff;
-                if (key.includes('session')) color = 0x66ccff;
-                else if (key.includes('local')) color = 0xffaa66;
-                else if (key.includes('console')) color = 0xff66cc;
-                const geometry = new THREE.BoxGeometry(0.35, height, 0.35);
-                const material = new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.2 });
-                const cube = new THREE.Mesh(geometry, material);
-                cube.position.set(x, height/2 - 1.0, z);
-                cube.castShadow = true;
-                scene.add(cube);
-                // CSS2D label
-                const div = document.createElement('div');
-                div.textContent = `${key.substring(0,12)} (${freq})`;
-                div.style.cssText = 'background:rgba(0,0,0,0.5);color:#ccf4ff;padding:2px 4px;border-radius:8px;font-size:7px;';
-                const label = new CSS2DObject(div);
-                label.position.set(x, height - 0.8, z);
-                scene.add(label);
-                buildings.push({ mesh: cube, label, key, freq });
-                angle += angleStep;
-                idx++;
-            }
-            document.getElementById('buildingCount').innerText = buildings.length;
-        }
-        
-        // Scan every 10 seconds and rebuild city
-        setInterval(scanVariables, 10000);
-        scanVariables(); // initial
-        
-        // ----- 2. PERSISTENT IMAGES (as floating billboards) -----
-        let mediaBillboards = []; // { mesh, label, imageUrl, position, rotationSpeed }
-        const STORED_IMAGES_KEY = 'bluehound_images';
-        let savedImages = JSON.parse(localStorage.getItem(STORED_IMAGES_KEY) || '[]');
-        
-        function saveBillboardPositions() {
-            const positions = mediaBillboards.map(b => ({ url: b.imageUrl, pos: b.mesh.position.toArray(), rotY: b.mesh.rotation.y, labelText: b.label.element.innerText }));
-            localStorage.setItem(STORED_IMAGES_KEY, JSON.stringify(positions));
-        }
-        
-        function addMediaBillboard(imageUrl, text = "", posX = null, posZ = null) {
-            // If position not given, find a free spot or use saved position from previous session
-            let position = null;
-            if (posX !== null && posZ !== null) {
-                position = new THREE.Vector3(posX, 0.5 + Math.random()*1.5, posZ);
-            } else {
-                // Check saved positions for this URL
-                const existing = savedImages.find(s => s.url === imageUrl);
-                if (existing) {
-                    position = new THREE.Vector3(existing.pos[0], existing.pos[1], existing.pos[2]);
-                } else {
-                    // New image: place in a ring around the city
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = 4.2 + Math.random() * 1.2;
-                    position = new THREE.Vector3(Math.cos(angle)*radius, 0.6 + Math.random()*2.0, Math.sin(angle)*radius);
-                }
-            }
-            const texture = new THREE.TextureLoader().load(imageUrl);
-            const material = new THREE.MeshStandardMaterial({ map: texture, side: THREE.DoubleSide, emissive: 0x2266aa, emissiveIntensity: 0.2 });
-            const geometry = new THREE.PlaneGeometry(1.2, 0.9);
-            const plane = new THREE.Mesh(geometry, material);
-            plane.position.copy(position);
-            plane.castShadow = true;
-            plane.lookAt(0, plane.position.y, 0);
-            scene.add(plane);
-            const div = document.createElement('div');
-            div.textContent = text.substring(0, 40);
-            div.style.cssText = 'background:rgba(0,0,0,0.6);color:#fff;padding:2px 6px;border-radius:12px;font-size:8px;';
-            const label = new CSS2DObject(div);
-            label.position.copy(plane.position);
-            label.position.y += 0.6;
-            scene.add(label);
-            const billboard = { mesh: plane, label, imageUrl, position: plane.position, rotationSpeed: 0.005 + Math.random() * 0.008 };
-            mediaBillboards.push(billboard);
-            // Save position to localStorage
-            savedImages = mediaBillboards.map(b => ({ url: b.imageUrl, pos: [b.position.x, b.position.y, b.position.z], labelText: b.label.element.innerText }));
-            localStorage.setItem(STORED_IMAGES_KEY, JSON.stringify(savedImages));
-            document.getElementById('mediaCount').innerText = mediaBillboards.length;
-            return billboard;
-        }
-        
-        // Load images from saved list
-        for (let saved of savedImages) {
-            addMediaBillboard(saved.url, saved.labelText, saved.pos[0], saved.pos[2]);
-        }
-        
-        function animateBillboards() {
-            mediaBillboards.forEach(b => {
-                b.mesh.rotation.y += b.rotationSpeed;
+    }
+
+    // ============================================================
+    //  BOOT LINUX (portabox)
+    // ============================================================
+    async function bootLinux() {
+        bootStatus.textContent = '🔄 Loading WASM modules...';
+        try {
+            sandbox = await Sandbox.create({
+                // Use CDN assets for portabox
+                wasmUrl: 'https://cdn.jsdelivr.net/npm/portabox@0.1.7/dist/blinkenlib.wasm',
+                glueUrl: 'https://cdn.jsdelivr.net/npm/portabox@0.1.7/dist/blinkenlib.js',
+                rootfsUrl: 'https://cdn.jsdelivr.net/npm/portabox@0.1.7/dist/alpine-rootfs.tar.gz',
             });
+            bootStatus.textContent = '✅ Linux ready! Type commands below.';
+            cmdInput.disabled = false;
+            cmdInput.focus();
+            termPrint('Welcome to Precog OS · Alpine Linux via WebAssembly', 'output');
+            termPrint('Available: ls, cat, echo, grep, find, ps, kill, touch, mkdir, rm, mv, cp, head, tail, wc, sort, uniq, diff, tar, gzip, gunzip, chmod, chown, mount, umount, df, du, free, uptime, uname, whoami, id, env, export, alias, history, clear, exit', 'output');
+            termPrint('');
+            // Load persisted files into the sandbox
+            await restoreFiles();
+            refreshFiles();
+        } catch (err) {
+            bootStatus.textContent = '❌ Boot failed: ' + err.message;
+            termPrint('Boot error: ' + err.message, 'error');
         }
-        
-        // ----- 3. RESTORE SEISMIC & OTHER FEATURES (unchanged but integrated) -----
-        let earthquakeHistory = [];
-        let currentThreat = 0.1;
-        const threatSpan = document.getElementById('threatLevel');
-        async function fetchSeismicData() {
-            try {
-                const res = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson');
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                const events = data.features.slice(0,30).map(f => ({ mag: f.properties.mag, depth: f.geometry.coordinates[2] }));
-                earthquakeHistory = events;
-                const shallowCount = events.filter(e => e.depth < 5 && e.mag > 1.5).length;
-                let threat = 0.1;
-                let analysis = "";
-                if (shallowCount > 2) { threat = 0.65; analysis = `⚠️ SEISMIC CLUSTER: ${shallowCount} shallow events – possible illegal mining.`; }
-                else if (shallowCount > 1) { threat = 0.4; analysis = `🔍 Suspicious shallow activity (${shallowCount} shallow events).`; }
-                else { analysis = `🌍 Seismic background normal.`; }
-                currentThreat = Math.min(0.95, threat);
-                threatSpan.innerText = `${(currentThreat*100).toFixed(0)}%`;
-                addReasoning(analysis);
-                if (threat > 0.6) speakNow(`Alert: Possible illegal mining detected. ${shallowCount} shallow seismic events.`);
-            } catch(e) { addReasoning(`Seismic data unavailable: ${e.message}`); }
-        }
-        
-        // ========== CORS PROXY & SELF-REPAIR (same as before) ==========
-        const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
-        let useCorsProxy = false;
-        let fixCounter = 0;
-        const fixCountSpan = document.getElementById('fixCount');
-        function incrementFixCount() { fixCounter++; if (fixCountSpan) fixCountSpan.innerText = fixCounter; }
-        window.onerror = (message, source, lineno, colno, error) => { addReasoning(`❗ Runtime error: ${message}`); attemptSelfRepair(message, error); return true; };
-        window.addEventListener('unhandledrejection', (event) => { addReasoning(`❗ Unhandled rejection: ${event.reason}`); attemptSelfRepair(event.reason, event.reason); });
-        function attemptSelfRepair(errorMsg, errorObj) {
-            if ((errorMsg.includes('CORS') || errorMsg.includes('blocked') || errorMsg.includes('fetch')) && !useCorsProxy) {
-                addReasoning(`🧠 CORS issue detected – enabling CORS proxy.`);
-                useCorsProxy = true;
-                incrementFixCount();
-                addChatMessage('🐕 BlueHound', `CORS proxy enabled.`, false);
-                if (window._lastFailedUrl) talkToServer(window._lastFailedUrl);
-                return true;
+    }
+
+    // ============================================================
+    //  EXECUTE COMMAND
+    // ============================================================
+    async function executeCommand(cmd) {
+        if (!sandbox) return;
+        if (!cmd.trim()) return;
+        termPrint('$ ' + cmd, 'prompt');
+        try {
+            // Built-in: clear
+            if (cmd.trim() === 'clear') {
+                termClear();
+                return;
             }
-            addReasoning(`📝 Error logged: ${errorMsg.substring(0, 120)}`);
-            localStorage.setItem('bluehound_last_error', JSON.stringify({ msg: errorMsg, time: Date.now() }));
-            return false;
-        }
-        
-        // ========== SOCIAL FEED (with image upload, BlueHound replies, and persistent billboards) ==========
-        let posts = JSON.parse(localStorage.getItem('bluehound_posts') || '[]');
-        let localPeerId = 'user_' + Math.random().toString(36).substring(2, 8);
-        let pendingImageData = null;
-        
-        function savePosts() { localStorage.setItem('bluehound_posts', JSON.stringify(posts)); renderFeed(); }
-        
-        async function generateAIReply(postText, author) {
-            try {
-                const prompt = `You are BlueHound, a friendly AI. Reply to ${author}'s post: "${postText.substring(0,200)}". Keep response short (1-2 sentences).`;
-                const controller = new AbortController(); setTimeout(()=>controller.abort(),5000);
-                const res = await fetch('https://text.pollinations.ai/', {
-                    method:'POST', headers:{'Content-Type':'application/json'},
-                    body: JSON.stringify({ messages:[{ role:'user', content:prompt }] }),
-                    signal: controller.signal
-                });
-                const data = await res.json();
-                return data.message || "Interesting! Thanks for sharing.";
-            } catch(e) { return "Thanks for your post! I'm listening."; }
-        }
-        
-        async function addPost(text, imageBase64 = null, author = null, timestamp = null, id = null) {
-            const newPost = {
-                id: id || Date.now() + '_' + Math.random().toString(36).substring(2,6),
-                text: text.substring(0,500),
-                author: author || localPeerId,
-                timestamp: timestamp || Date.now(),
-                likes: 0,
-                image: imageBase64
-            };
-            posts.unshift(newPost);
-            if (posts.length > 200) posts.pop();
-            savePosts();
-            if (imageBase64) {
-                // Add to 3D world as floating billboard (persist position automatically via addMediaBillboard)
-                addMediaBillboard(imageBase64, text.substring(0,50));
-                addReasoning(`🖼️ New media added to world: "${text.substring(0,30)}"`);
+            // Built-in: exit / logout
+            if (cmd.trim() === 'exit' || cmd.trim() === 'logout') {
+                termPrint('Use the browser tab to close the session.', 'output');
+                return;
             }
-            if (window.dataChannel && window.dataChannel.readyState === 'open') {
-                window.dataChannel.send(JSON.stringify({ type: 'post', post: newPost }));
-            }
-            addReasoning(`📝 New post: "${text.substring(0,50)}"`);
-            speakNow(`New post from ${newPost.author}`);
-            // BlueHound replies if not itself
-            if (author !== 'BlueHound' && text) {
-                setTimeout(async () => {
-                    const replyText = await generateAIReply(text, newPost.author);
-                    await addPost(`@${newPost.author} ${replyText}`, null, 'BlueHound', null, null);
-                }, 1000);
-            }
-            return newPost;
+            // Run the command
+            const result = await sandbox.runCommand('sh', ['-c', cmd]);
+            const stdout = await result.stdout();
+            const stderr = await result.stderr();
+            if (stdout) termPrint(stdout, 'output');
+            if (stderr) termPrint(stderr, 'error');
+            // Refresh file browser after any command that might change files
+            refreshFiles();
+            // Persist files after commands that modify
+            await persistFiles();
+        } catch (err) {
+            termPrint('Error: ' + err.message, 'error');
         }
-        
-        function likePost(postId) { const post = posts.find(p => p.id == postId); if (post) { post.likes++; savePosts(); renderFeed(); } }
-        function renderFeed() {
-            const container = document.getElementById('postsContainer');
-            if (!container) return;
-            container.innerHTML = posts.slice(0,30).map(post => {
-                let mediaHtml = '';
-                if (post.image) mediaHtml = `<img src="${post.image}" class="post-media" alt="post image">`;
-                return `<div class="post"><div class="post-author">🐕 ${post.author}${post.author === localPeerId ? ' (you)' : ''}</div><div class="post-time">${new Date(post.timestamp).toLocaleString()}</div><div class="post-text">${escapeHtml(post.text)}</div>${mediaHtml}<div class="post-actions"><button onclick="window.dispatchEvent(new CustomEvent('likePost', {detail: '${post.id}'}))">❤️ ${post.likes}</button></div></div>`;
-            }).join('');
-            if (!posts.length) container.innerHTML = '<div>No posts yet. Be the first!</div>';
-        }
-        function escapeHtml(str) { return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
-        window.addEventListener('likePost', (e) => likePost(e.detail));
-        
-        // Image upload handler for posts
-        document.getElementById('postImageInput').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    pendingImageData = ev.target.result;
-                    document.getElementById('mediaPreview').innerHTML = `<img src="${pendingImageData}" style="max-height:60px; border-radius:8px;"> <button id="clearImageBtn">✖</button>`;
-                    document.getElementById('clearImageBtn')?.addEventListener('click', () => { pendingImageData = null; document.getElementById('mediaPreview').innerHTML = ''; });
-                };
-                reader.readAsDataURL(file);
+    }
+
+    // ============================================================
+    //  FILE PERSISTENCE (IndexedDB via localStorage for simplicity)
+    // ============================================================
+    async function persistFiles() {
+        if (!sandbox) return;
+        try {
+            // List all files in / and /home and /tmp
+            const result = await sandbox.runCommand('find', ['/', '/home', '/tmp', '-type', 'f', '-not', '-path', '/proc/*', '-not', '-path', '/sys/*', '-not', '-path', '/dev/*', '-not', '-path', '/run/*']);
+            const out = await result.stdout();
+            const paths = out.split('\n').filter(p => p.trim().length > 0);
+            const files = {};
+            for (const p of paths) {
+                try {
+                    const content = await sandbox.readFileToBuffer({ path: p });
+                    if (content) {
+                        files[p] = new TextDecoder().decode(content);
+                    }
+                } catch (e) { /* skip */ }
             }
+            localStorage.setItem(FS_KEY, JSON.stringify(files));
+        } catch (e) { /* ignore */ }
+    }
+
+    async function restoreFiles() {
+        if (!sandbox) return;
+        const data = localStorage.getItem(FS_KEY);
+        if (!data) return;
+        try {
+            const files = JSON.parse(data);
+            for (const [path, content] of Object.entries(files)) {
+                try {
+                    await sandbox.writeFiles([{ path, content }]);
+                } catch (e) { /* skip */ }
+            }
+            termPrint('📂 Restored ' + Object.keys(files).length + ' persisted files.', 'output');
+        } catch (e) { /* ignore */ }
+    }
+
+    // ============================================================
+    //  FILE BROWSER
+    // ============================================================
+    async function refreshFiles() {
+        if (!sandbox) {
+            fileBrowser.innerHTML = '<div style="color:#6688aa;text-align:center;padding:2rem 0;font-size:0.8rem;">⏳ Boot Linux first...</div>';
+            return;
+        }
+        try {
+            const result = await sandbox.runCommand('ls', ['-la', currentDir]);
+            const out = await result.stdout();
+            const lines = out.split('\n').filter(l => l.trim().length > 0);
+            // Parse ls -la output
+            const items = [];
+            for (const line of lines) {
+                const parts = line.split(/\s+/);
+                if (parts.length < 9) continue;
+                const perms = parts[0];
+                const size = parts[4];
+                const name = parts.slice(8).join(' ');
+                if (name === '.' || name === '..') continue;
+                const isDir = perms.startsWith('d');
+                items.push({ name, size, isDir, perms });
+            }
+            fileList = items;
+            renderFileBrowser(items);
+        } catch (err) {
+            fileBrowser.innerHTML = '<div style="color:#ff4466;text-align:center;padding:1rem;font-size:0.8rem;">⚠️ ' + err.message + '</div>';
+        }
+    }
+
+    function renderFileBrowser(items) {
+        if (items.length === 0) {
+            fileBrowser.innerHTML = '<div style="color:#6688aa;text-align:center;padding:2rem 0;font-size:0.8rem;">📂 Empty directory</div>';
+            return;
+        }
+        let html = '';
+        for (const item of items) {
+            const icon = item.isDir ? '<i class="fas fa-folder" style="color:#ffcc33;"></i>' : '<i class="fas fa-file" style="color:#88bbdd;"></i>';
+            const click = item.isDir ? `onclick="cdDir('${item.name}')"` : `onclick="openFile('${item.name}')"`;
+            html += `<div class="file-item" ${click}>
+                <span class="name">${icon} ${item.name}</span>
+                <span class="size">${item.isDir ? 'DIR' : item.size + ' B'}</span>
+            </div>`;
+        }
+        fileBrowser.innerHTML = html;
+    }
+
+    window.cdDir = function(name) {
+        if (name === '..') {
+            const parts = currentDir.split('/').filter(p => p);
+            parts.pop();
+            currentDir = '/' + parts.join('/');
+            if (currentDir === '') currentDir = '/';
+        } else {
+            currentDir = currentDir === '/' ? '/' + name : currentDir + '/' + name;
+        }
+        refreshFiles();
+    };
+
+    window.openFile = async function(name) {
+        const path = currentDir === '/' ? '/' + name : currentDir + '/' + name;
+        editingFile = path;
+        document.getElementById('editFileName').textContent = name;
+        try {
+            const content = await sandbox.readFileToBuffer({ path });
+            if (content) {
+                document.getElementById('editContent').value = new TextDecoder().decode(content);
+            } else {
+                document.getElementById('editContent').value = '';
+            }
+            document.getElementById('editorModal').classList.add('active');
+        } catch (e) {
+            document.getElementById('editContent').value = '';
+            document.getElementById('editorModal').classList.add('active');
+        }
+    };
+
+    window.closeEditor = function() {
+        document.getElementById('editorModal').classList.remove('active');
+        editingFile = null;
+    };
+
+    window.saveFile = async function() {
+        if (!editingFile || !sandbox) return;
+        const content = document.getElementById('editContent').value;
+        try {
+            await sandbox.writeFiles([{ path: editingFile, content }]);
+            await persistFiles();
+            refreshFiles();
+            closeEditor();
+            termPrint('✅ Saved: ' + editingFile, 'output');
+        } catch (e) {
+            termPrint('❌ Save failed: ' + e.message, 'error');
+        }
+    };
+
+    window.createFile = function() {
+        const name = prompt('Enter new file name:');
+        if (!name || !sandbox) return;
+        const path = currentDir === '/' ? '/' + name : currentDir + '/' + name;
+        sandbox.writeFiles([{ path, content: '' }]).then(() => {
+            refreshFiles();
+            persistFiles();
+            termPrint('📄 Created: ' + path, 'output');
+        }).catch(e => {
+            termPrint('❌ Create failed: ' + e.message, 'error');
         });
-        document.getElementById('postBtn').onclick = () => {
-            const text = document.getElementById('postText').value.trim();
-            if (!text && !pendingImageData) return;
-            addPost(text || "[Image]", pendingImageData);
-            document.getElementById('postText').value = '';
-            pendingImageData = null;
-            document.getElementById('mediaPreview').innerHTML = '';
-            document.getElementById('postImageInput').value = '';
-        };
-        
-        // ========== P2P & CHAT (same as before) ==========
-        let peerConnection = null;
-        window.dataChannel = null;
-        let peers = 0;
-        const peerCountSpan = document.getElementById('peerCount');
-        const p2pConfig = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
-        function updatePeerCount() { if (peerCountSpan) peerCountSpan.innerText = peers; document.getElementById('p2pStatus').innerHTML = peers ? `✅ Connected to ${peers} peer(s)` : '⚡ No peers connected.'; }
-        function setupDataChannel(ch) { window.dataChannel = ch; ch.onopen = () => { peers++; updatePeerCount(); addReasoning(`🔗 Data channel open.`); sendFullSync(); }; ch.onclose = () => { peers--; updatePeerCount(); window.dataChannel = null; }; ch.onmessage = (e) => { const data = JSON.parse(e.data); if (data.type === 'chat') addChatMessage('👤 Peer', data.message, false); else if (data.type === 'post') { if (!posts.some(p => p.id == data.post.id)) { posts.unshift(data.post); savePosts(); addChatMessage('🐕 BlueHound', `New post from peer: ${data.post.text.substring(0,60)}`, false); speakNow(`New post from peer`); } } else if (data.type === 'sync') { if (data.posts) { let added=0; for(let p of data.posts) if(!posts.some(ex=>ex.id==p.id)){ posts.push(p); added++; } if(added) savePosts(); addReasoning(`📥 Synced ${added} posts from peer.`); } } }; }
-        function sendFullSync() { if (window.dataChannel && window.dataChannel.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'sync', posts: posts.slice(0,50) })); }
-        document.getElementById('createOfferBtn')?.addEventListener('click', async () => { peerConnection = new RTCPeerConnection(p2pConfig); const dc = peerConnection.createDataChannel('bluehound-sync'); setupDataChannel(dc); peerConnection.onicecandidate = (e) => { if (e.candidate) document.getElementById('localOffer').value = JSON.stringify(peerConnection.localDescription); }; const offer = await peerConnection.createOffer(); await peerConnection.setLocalDescription(offer); document.getElementById('localOffer').value = JSON.stringify(offer); document.getElementById('offerContainer').style.display = 'block'; document.getElementById('answerContainer').style.display = 'none'; addReasoning("🌱 Host session created."); });
-        document.getElementById('connectAnswerBtn')?.addEventListener('click', async () => { const ans = document.getElementById('remoteAnswer').value; if (!ans) return; try { await peerConnection.setRemoteDescription(JSON.parse(ans)); addReasoning("✅ Connected."); speakNow("Peer connected."); } catch(e) { addReasoning(`❌ ${e.message}`); } });
-        document.getElementById('answerOfferBtn')?.addEventListener('click', () => { document.getElementById('offerContainer').style.display = 'none'; document.getElementById('answerContainer').style.display = 'block'; });
-        document.getElementById('generateAnswerBtn')?.addEventListener('click', async () => { const offer = document.getElementById('remoteOffer').value; if (!offer) return; try { const offerDesc = JSON.parse(offer); peerConnection = new RTCPeerConnection(p2pConfig); peerConnection.ondatachannel = (e) => setupDataChannel(e.channel); await peerConnection.setRemoteDescription(offerDesc); const answer = await peerConnection.createAnswer(); await peerConnection.setLocalDescription(answer); document.getElementById('localAnswer').value = JSON.stringify(answer); document.getElementById('generatedAnswerArea').style.display = 'block'; addReasoning("📤 Answer generated."); } catch(e) { addReasoning(`❌ ${e.message}`); } });
-        
-        // ========== TALK TO SERVER ==========
-        let requestCount = 0;
-        const requestCountSpan = document.getElementById('requestCountSpan');
-        window._lastFailedUrl = null;
-        async function talkToServer(url) { requestCount++; if (requestCountSpan) requestCountSpan.innerText = requestCount; addReasoning(`📡 Talking to ${url} ...`); try { let fetchUrl = useCorsProxy ? CORS_PROXY + encodeURIComponent(url) : url; const controller = new AbortController(); setTimeout(() => controller.abort(), 8000); const response = await fetch(fetchUrl, { mode: 'cors', signal: controller.signal }); let responseText = ''; if (response.headers.get('content-type')?.includes('application/json')) { const json = await response.json(); responseText = JSON.stringify(json).substring(0,200); } else { responseText = await response.text(); responseText = responseText.substring(0,200); } addReasoning(`✅ ${url} → ${response.status}`); addChatMessage('🐕 BlueHound', `📞 Talked to ${url} → ${response.status}`, false); speakNow(`Server at ${new URL(url).hostname} responded with status ${response.status}.`); await addCOG(2, `Queried ${new URL(url).hostname}`); window._lastFailedUrl = null; } catch (err) { addReasoning(`❌ Failed to talk to ${url}: ${err.message}`); speakNow(`Could not reach server at ${new URL(url).hostname}. ${err.message}`); window._lastFailedUrl = url; attemptSelfRepair(err.message, err); } }
-        function extractURLsFromMessage(text) { const matches = text.match(/https?:\/\/[^\s\)\]\}]+/gi) || []; return matches.map(u => u.replace(/[.,;:!?)$]+$/, '')); }
-        async function handleServerCommand(cmd) { const urls = extractURLsFromMessage(cmd); if(!urls.length) return false; for(const url of urls){ await talkToServer(url); await new Promise(r => setTimeout(r,500)); } return true; }
-        
-        // ========== COG TOKENS (IndexedDB) ==========
-        let db;
-        const DB_NAME = 'BlueHoundCOG';
-        const STORE_NAME = 'tokens';
-        function openDB() { return new Promise((resolve, reject) => { const request = indexedDB.open(DB_NAME, 1); request.onerror = () => reject(request.error); request.onsuccess = () => resolve(request.result); request.onupgradeneeded = (e) => { const db = e.target.result; if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true }); }; }); }
-        async function getCOGBalance() { const db = await openDB(); return new Promise((resolve) => { const tx = db.transaction(STORE_NAME, 'readonly'); const req = tx.objectStore(STORE_NAME).getAll(); req.onsuccess = () => resolve(req.result.reduce((s, t) => s + (t.amount||0), 0)); req.onerror = () => resolve(0); }); }
-        async function addCOG(amount, reason) { const db = await openDB(); const tx = db.transaction(STORE_NAME, 'readwrite'); tx.objectStore(STORE_NAME).add({ amount, reason, timestamp: Date.now() }); await tx.done; updateCOGUI(); addChatMessage('🐕 BlueHound', `💰 +${amount} COG: ${reason}`, false); if (window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'cog', amount, reason })); return true; }
-        async function getAllCOG() { const db = await openDB(); return new Promise((resolve) => { const tx = db.transaction(STORE_NAME, 'readonly'); tx.objectStore(STORE_NAME).getAll().onsuccess = (e) => resolve(e.target.result); }); }
-        async function updateCOGUI() { const balance = await getCOGBalance(); const cogSpan = document.getElementById('cogBalance'); if (cogSpan) cogSpan.innerText = balance; const tokens = await getAllCOG(); const listDiv = document.getElementById('cogTokenList'); if (listDiv) listDiv.innerHTML = (!tokens.length) ? '<div>No COG tokens yet.</div>' : tokens.map(t => `<div class="cog-item"><span>${t.reason}</span><span>+${t.amount} COG</span><span>${new Date(t.timestamp).toLocaleTimeString()}</span></div>`).join(''); }
-        await openDB().catch(()=>{}); await updateCOGUI();
-        
-        // ========== CHAT ==========
-        const chatDiv = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendChatBtn');
-        const memoryStatsSpan = document.getElementById('memoryStats');
-        let memory = JSON.parse(localStorage.getItem('bluehound_memory') || '{"convos":[], "version":28}');
-        if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`;
-        function addChatMessage(sender, msg, isUser = false) { if (!chatDiv) return; const d = document.createElement('div'); d.innerHTML = `<strong>${sender}:</strong> ${msg}`; chatDiv.appendChild(d); chatDiv.scrollTop = chatDiv.scrollHeight; if (!isUser && msg) memory.convos.push({ role: 'BlueHound', content: msg, time: Date.now() }); else if (isUser && msg) memory.convos.push({ role: 'User', content: msg, time: Date.now() }); if (memory.convos.length > 100) memory.convos.shift(); localStorage.setItem('bluehound_memory', JSON.stringify(memory)); if (memoryStatsSpan) memoryStatsSpan.innerHTML = `🧠 memory: ${memory.convos.length}`; logToConsole(`${sender}: ${msg}`); if (sender === '👤 You' && window.dataChannel?.readyState === 'open') window.dataChannel.send(JSON.stringify({ type: 'chat', message: msg })); }
-        async function thinkAndRespond(userMsg) { addReasoning(`User: "${userMsg}"`); if (await handleServerCommand(userMsg)) return "I have talked to the server(s)."; const lower = userMsg.toLowerCase(); if (lower.includes('cog')) return `You have ${await getCOGBalance()} COG tokens.`; if (lower.includes('peers')) return peers ? `Connected to ${peers} peer(s).` : "No peers."; if (lower.includes('seismic')) return currentThreat>0.6 ? "⚠️ Possible illegal mining detected." : "Seismic normal."; return "I'm BlueHound. Post in the feed, upload images, or talk to servers."; }
-        async function handleUserMessage(txt) { if (!txt.trim()) return; addChatMessage('👤 You', txt, true); const reply = await thinkAndRespond(txt); addChatMessage('🐕 BlueHound', reply); speakNow(reply); await addCOG(1, 'Conversation'); }
-        
-        // ========== FILE UPLOAD ==========
-        const fileInput = document.getElementById('fileUpload');
-        const dropZone = document.getElementById('dropZone');
-        async function handleFile(file) { addChatMessage('👤 You', `📎 Uploaded: ${file.name}`, true); const header = await file.slice(0, 4096).arrayBuffer(); const content = new TextDecoder().decode(new Uint8Array(header)); if (content.includes("X5O!P%@AP[4\\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*")) { addChatMessage('🐕 BlueHound', `⚠️ EICAR test virus detected!`, false); await addCOG(10, 'Detected test virus'); } else { addChatMessage('🐕 BlueHound', `File analyzed: no threats.`, false); await addCOG(2, 'File analysis'); } }
-        if (dropZone && fileInput) { document.body.addEventListener('dragover', e => { e.preventDefault(); dropZone.style.display = 'flex'; }); document.body.addEventListener('dragleave', () => { dropZone.style.display = 'none'; }); dropZone.addEventListener('dragover', e => e.preventDefault()); dropZone.addEventListener('drop', async e => { e.preventDefault(); dropZone.style.display = 'none'; for (const f of Array.from(e.dataTransfer.files)) await handleFile(f); }); fileInput.addEventListener('change', async e => { for (const f of Array.from(e.target.files)) await handleFile(f); fileInput.value = ''; }); }
-        
-        // ========== MAP & STREET VIEW ==========
-        const mapModal = document.getElementById('mapModal');
-        const openMapBtn = document.getElementById('openMapBtn');
-        const closeMapModal = document.getElementById('closeMapModal');
-        let map = null;
-        let currentMapLayer = null;
-        const tileProviders = [
-            { name: 'OpenStreetMap', url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '© OpenStreetMap' },
-            { name: 'CartoDB Voyager', url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', attribution: '© CartoDB' },
-            { name: 'ESRI Satellite', url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', attribution: '© Esri' }
-        ];
-        let providerIndex = 0;
-        async function initMap() { if (map) return; if (typeof L === 'undefined') { setTimeout(initMap, 500); return; } map = L.map('modal-map').setView([39.8283, -98.5795], 4); loadMapLayer(providerIndex); try { const eq = await fetch('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson'); const data = await eq.json(); data.features?.forEach(f => { const coords = f.geometry.coordinates; L.circleMarker([coords[1], coords[0]], { radius: f.properties.mag*2.5, color: '#ff8844', fillColor: '#ff4400', fillOpacity: 0.6 }).bindPopup(`M${f.properties.mag}<br>${f.properties.place}`).addTo(map); }); } catch(e) { addReasoning(`Map overlay error: ${e.message}`); } }
-        function loadMapLayer(index) { if (!map) return; if (currentMapLayer) map.removeLayer(currentMapLayer); try { const provider = tileProviders[index]; currentMapLayer = L.tileLayer(provider.url, { attribution: provider.attribution, maxZoom: 19 }).addTo(map); addReasoning(`🗺️ Map provider: ${provider.name}`); } catch(e) { if (index + 1 < tileProviders.length) loadMapLayer(index + 1); } }
-        function updateStreetView(lat, lng) { const container = document.getElementById('streetViewContainer'); if (container) container.innerHTML = `<div style="background:#0a1420; border-radius:20px; padding:12px; text-align:center;"><p>📍 Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}</p><p>🌆 Open in <a href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=15" target="_blank" style="color:cyan">OpenStreetMap</a> | <a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank" style="color:cyan">Google Maps</a></p></div>`; }
-        if (openMapBtn) openMapBtn.onclick = () => { if (mapModal) mapModal.style.display = 'block'; setTimeout(initMap, 100); };
-        if (closeMapModal) closeMapModal.onclick = () => { if (mapModal) mapModal.style.display = 'none'; };
-        window.onclick = (e) => { if (mapModal && e.target === mapModal) mapModal.style.display = 'none'; };
-        setTimeout(() => { if (map) map.on('click', (e) => { updateStreetView(e.latlng.lat, e.latlng.lng); }); }, 2000);
-        
-        // ========== WEBCAM & VOICE ==========
-        const webcamVideo = document.getElementById('webcamVideo');
-        const camBtn = document.getElementById('camBtn');
-        if (camBtn) camBtn.onclick = async () => { try { const stream = await navigator.mediaDevices.getUserMedia({ video: true }); webcamVideo.srcObject = stream; webcamVideo.style.display = 'block'; webcamVideo.play(); addReasoning("📷 Webcam active"); } catch(e) { addReasoning("Webcam denied"); } };
-        let recognition = null;
-        const voiceBtn = document.getElementById('voiceBtn');
-        if ('webkitSpeechRecognition' in window && voiceBtn) { recognition = new webkitSpeechRecognition(); recognition.continuous = false; recognition.lang = 'en-US'; recognition.onresult = e => { const t = e.results[0][0].transcript; if (chatInput) chatInput.value = t; handleUserMessage(t); }; voiceBtn.onclick = () => recognition.start(); } else if (voiceBtn) voiceBtn.style.opacity = 0.5;
-        if (sendBtn && chatInput) { sendBtn.onclick = () => { handleUserMessage(chatInput.value); chatInput.value = ''; }; chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendBtn.click(); }); }
-        
-        document.getElementById('openCogModalBtn').onclick = () => { document.getElementById('cogModal').style.display = 'block'; updateCOGUI(); };
-        document.getElementById('closeCogModal').onclick = () => document.getElementById('cogModal').style.display = 'none';
-        document.getElementById('rewardCogBtn').onclick = async () => { await addCOG(10, 'User appreciation'); updateCOGUI(); };
-        document.getElementById('openP2PModalBtn').onclick = () => document.getElementById('p2pModal').style.display = 'block';
-        document.getElementById('closeP2PModal').onclick = () => document.getElementById('p2pModal').style.display = 'none';
-        
-        // ========== ANIMATION LOOP ==========
-        let animTime = 0;
-        function animate() {
-            requestAnimationFrame(animate);
-            animTime += 0.016;
-            coreMesh.scale.setScalar(1+Math.sin(animTime*5)*0.02);
-            ring.rotation.z += 0.008;
-            starField.rotation.y += 0.0003;
-            dust.rotation.y += 0.0005;
-            animateBillboards();
-            controls.update();
-            renderer.render(scene, camera);
-            labelRenderer.render(scene, camera);
+    };
+
+    // ============================================================
+    //  TERMINAL INPUT HANDLER
+    // ============================================================
+    cmdInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            const cmd = this.value;
+            this.value = '';
+            executeCommand(cmd);
         }
-        animate();
-        
-        // ========== INITIAL DATA ==========
-        fetchSeismicData();
-        setInterval(fetchSeismicData, 30000);
-        renderFeed();
-        addChatMessage('🐕 BlueHound', `Data city rebuilt from your variables. Buildings represent localStorage/sessionStorage/global keys. Images float with saved positions.`, false);
-        speakNow(`BlueHound data metropolis active.`);
-    </script>
+    });
+
+    // ============================================================
+    //  DASHBOARD: Stats, Map, Chart, Alerts (same as before)
+    // ============================================================
+    function randomBetween(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+    function updateStats() {
+        document.getElementById('activeThreats').textContent = randomBetween(200, 300);
+        document.getElementById('attacksBlocked').textContent = randomBetween(1500, 2200).toLocaleString();
+        document.getElementById('criticalAlerts').textContent = randomBetween(2, 8);
+    }
+    setInterval(updateStats, 5000);
+
+    // Clock
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clockDisplay').textContent = now.toUTCString().split(' ')[4];
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Leaflet Map
+    const map = L.map('threatMap', { center: [20, 0], zoom: 2, zoomControl: false, attributionControl: false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        subdomains: 'abcd',
+        maxZoom: 19
+    }).addTo(map);
+    const threatLocs = [
+        [40.7128, -74.0060], [51.5074, -0.1278], [35.6895, 139.6917],
+        [55.7558, 37.6173], [23.1291, 113.2644], [37.7749, -122.4194],
+        [28.6139, 77.2090], [-33.8688, 151.2093], [48.8566, 2.3522]
+    ];
+    threatLocs.forEach(latlng => {
+        L.circleMarker(latlng, {
+            radius: 6,
+            color: '#ff4466',
+            fillColor: '#ff4466',
+            fillOpacity: 0.6,
+            weight: 1,
+            className: 'threat-pulse'
+        }).addTo(map);
+    });
+    const style = document.createElement('style');
+    style.textContent = `.threat-pulse { animation: pulse-threat 1.5s infinite; }
+        @keyframes pulse-threat { 0% { opacity: 0.6; transform: scale(1); }
+        50% { opacity: 1; transform: scale(1.5); }
+        100% { opacity: 0.6; transform: scale(1); } }`;
+    document.head.appendChild(style);
+
+    // Chart
+    const ctx = document.getElementById('attackChart').getContext('2d');
+    const attackChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['DDoS', 'Phishing', 'Malware', 'Ransomware', 'Insider'],
+            datasets: [{
+                data: [35, 25, 20, 12, 8],
+                backgroundColor: ['#33ccff', '#ff8833', '#ff4466', '#ffcc33', '#aa66ff'],
+                borderColor: '#0a0a1a',
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#c8e6ff', font: { family: 'Segoe UI' } } } },
+            cutout: '65%',
+        }
+    });
+    setInterval(() => {
+        attackChart.data.datasets[0].data = [
+            randomBetween(20,45), randomBetween(15,35), randomBetween(10,30),
+            randomBetween(5,20), randomBetween(3,15)
+        ];
+        attackChart.update();
+    }, 8000);
+
+    // Alerts
+    const alertMessages = [
+        { msg: 'Suspicious SSH brute-force from 185.165.29.101', sev: 'critical' },
+        { msg: 'Malware signature detected in email attachment', sev: 'high' },
+        { msg: 'Unusual outbound traffic to unknown domain', sev: 'medium' },
+        { msg: 'Multiple failed login attempts on admin portal', sev: 'high' },
+        { msg: 'New ransomware variant identified', sev: 'critical' },
+        { msg: 'Port scan detected from 198.51.100.77', sev: 'low' },
+        { msg: 'DNS tunneling activity observed', sev: 'medium' },
+        { msg: 'Privilege escalation attempt on server-02', sev: 'high' },
+    ];
+    function addAlert() {
+        const feed = document.getElementById('alertFeed');
+        const alert = alertMessages[Math.floor(Math.random() * alertMessages.length)];
+        const item = document.createElement('div');
+        item.className = 'alert-item';
+        item.innerHTML = `<span>${alert.msg}</span><span class="severity ${alert.sev}">${alert.sev.toUpperCase()}</span>`;
+        feed.appendChild(item);
+        while (feed.children.length > 12) {
+            feed.removeChild(feed.children[1]);
+        }
+        feed.scrollTop = feed.scrollHeight;
+    }
+    for (let i = 0; i < 6; i++) addAlert();
+    setInterval(addAlert, 6000);
+
+    // ============================================================
+    //  BOOT!
+    // ============================================================
+    bootLinux();
+
+    console.log('🛡️ Precog OS · Security + Cloud Workspace initialized');
+</script>
 </body>
 </html>
