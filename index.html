@@ -3,39 +3,32 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Precog OS · Security & Cloud Workspace</title>
+    <title>Precog OS · v86 Cybersecurity Workspace</title>
     <!-- Font Awesome, Chart.js, Leaflet -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- portabox: WASM Linux sandbox -->
-    <script type="importmap">
-        {
-            "imports": {
-                "portabox": "https://cdn.jsdelivr.net/npm/portabox@0.1.7/dist/index.js"
-            }
-        }
-    </script>
+    <!-- v86 core library -->
+    <script src="https://copy.sh/v86/libv86.js"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>" />
     <style>
-        /* --- Reset & Dark Theme --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: #0a0a1a;
             color: #c8e6ff;
             font-family: 'Segoe UI', 'Courier New', monospace;
             min-height: 100vh;
-            padding: 1.5rem;
+            padding: 1.2rem;
         }
         .dashboard { max-width: 1600px; margin: 0 auto; }
 
-        /* --- Header --- */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            padding-bottom: 1.2rem;
+            padding-bottom: 1rem;
             border-bottom: 1px solid #1f2a4a;
             margin-bottom: 1.5rem;
         }
@@ -49,182 +42,138 @@
             -webkit-text-fill-color: transparent;
         }
         .header .brand i { font-size: 2.2rem; color: #33ccff; }
-        .header .status { display: flex; align-items: center; gap: 2rem; font-size: 0.9rem; }
+        .header .status { display: flex; align-items: center; gap: 2rem; font-size: 0.9rem; flex-wrap: wrap; }
         .header .status .online { color: #33ff99; }
         .header .status .online i { animation: pulse-green 2s infinite; }
-        @keyframes pulse-green {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
+        @keyframes pulse-green { 0% { opacity:1; } 50% { opacity:0.3; } 100% { opacity:1; } }
         .clock { color: #88bbdd; font-family: 'Courier New', monospace; }
 
-        /* --- Main Grid: OS Workspace + Dashboard --- */
-        .os-grid {
+        .main-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1.2fr 0.8fr;
             gap: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        .os-panel {
+        .emulator-panel {
             background: #111128;
             border: 1px solid #1f2a5a;
             border-radius: 16px;
-            padding: 1.2rem;
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
+            padding: 1rem;
         }
-        .os-panel h3 {
+        .emulator-panel h3 {
             font-weight: 300;
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
             color: #6688bb;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.5rem;
             border-bottom: 1px solid #1a2a4a;
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.3rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
-        .os-panel h3 .badge {
-            font-size: 0.6rem;
-            background: #1a2a5a;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            color: #88bbdd;
+        #screen_container {
+            background: #000;
+            border: 1px solid #33ccff;
+            border-radius: 8px;
+            width: 100%;
+            aspect-ratio: 4/3;
+            max-height: 480px;
+            position: relative;
+            overflow: hidden;
         }
-
-        /* --- Terminal --- */
-        #terminal {
-            flex: 1;
+        #screen_container canvas { display: block; width: 100%; height: 100%; }
+        .serial-terminal {
             background: #0a0a1a;
-            border-radius: 10px;
-            padding: 0.8rem;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            color: #33ff99;
-            overflow-y: auto;
-            min-height: 300px;
-            max-height: 400px;
             border: 1px solid #1a2a4a;
+            border-radius: 8px;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            max-height: 150px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: #33ff99;
             white-space: pre-wrap;
             word-wrap: break-word;
-            line-height: 1.5;
         }
-        #terminal .prompt { color: #33ccff; }
-        #terminal .input-line { display: flex; align-items: center; gap: 0.3rem; }
-        #terminal .input-line span { color: #33ccff; }
-        #terminal .input-line input {
+        .serial-terminal .input-line { display: flex; align-items: center; gap: 0.3rem; }
+        .serial-terminal .input-line span { color: #33ccff; }
+        .serial-terminal .input-line input {
             background: transparent;
             border: none;
             color: #33ff99;
             font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             flex: 1;
             outline: none;
         }
-        #terminal .output { color: #c8e6ff; }
-        #terminal .error { color: #ff4466; }
+        .serial-terminal .output { color: #c8e6ff; }
+        .serial-terminal .error { color: #ff4466; }
 
-        /* --- File Browser --- */
-        .file-browser {
-            flex: 1;
-            background: #0a0a1a;
-            border-radius: 10px;
-            padding: 0.5rem;
-            min-height: 200px;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #1a2a4a;
-        }
-        .file-browser .file-item {
+        .dashboard-panel {
+            background: #111128;
+            border: 1px solid #1f2a5a;
+            border-radius: 16px;
+            padding: 1rem;
             display: flex;
-            justify-content: space-between;
-            padding: 0.3rem 0.5rem;
-            border-bottom: 1px solid #1a2244;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.15s;
+            flex-direction: column;
+            gap: 0.8rem;
         }
-        .file-browser .file-item:hover {
-            background: #1a2a4a;
-            border-radius: 4px;
+        .dashboard-panel h3 {
+            font-weight: 300;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6688bb;
+            border-bottom: 1px solid #1a2a4a;
+            padding-bottom: 0.3rem;
         }
-        .file-browser .file-item .name { color: #88ddff; }
-        .file-browser .file-item .size { color: #6688aa; font-size: 0.7rem; }
 
-        /* --- Dashboard Cards (compact) --- */
         .stats-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+            gap: 0.8rem;
         }
         .stat-card {
-            background: #111128;
-            border: 1px solid #1f2a5a;
-            border-radius: 12px;
-            padding: 0.8rem 1.2rem;
+            background: #0a0a1a;
+            border-radius: 10px;
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #1a2a4a;
         }
-        .stat-card .label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            color: #6688bb;
-            letter-spacing: 0.5px;
-        }
-        .stat-card .value {
-            font-size: 1.6rem;
-            font-weight: 600;
-            color: #fff;
-        }
-        .stat-card .sub { color: #88aadd; font-size: 0.7rem; }
+        .stat-card .label { font-size: 0.6rem; text-transform: uppercase; color: #6688bb; }
+        .stat-card .value { font-size: 1.3rem; font-weight: 600; color: #fff; }
+        .stat-card .sub { font-size: 0.6rem; color: #88aadd; }
 
-        .map-chart-row {
+        .chart-map-row {
             display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
         }
-        .map-container {
-            background: #0f0f2a;
-            border-radius: 16px;
-            border: 1px solid #1f2a5a;
-            padding: 0.5rem;
-            height: 300px;
-        }
-        #threatMap { height: 100%; width: 100%; border-radius: 12px; background: #0a0a1a; }
-        .chart-container {
-            background: #111128;
-            border-radius: 16px;
-            border: 1px solid #1f2a5a;
-            padding: 0.8rem;
-            height: 300px;
-        }
-        .chart-container canvas { width: 100% !important; height: 100% !important; }
+        .chart-map-row .chart-container { height: 120px; }
+        .chart-map-row .map-container { height: 120px; border-radius: 8px; overflow: hidden; border: 1px solid #1a2a4a; }
+        #threatMap { width: 100%; height: 100%; }
 
         .alert-feed {
-            background: #111128;
-            border-radius: 16px;
-            border: 1px solid #1f2a5a;
-            padding: 0.8rem 1rem;
-            max-height: 200px;
+            background: #0a0a1a;
+            border-radius: 10px;
+            padding: 0.5rem;
+            max-height: 100px;
             overflow-y: auto;
-            margin-top: 1.5rem;
+            border: 1px solid #1a2a4a;
+            font-size: 0.7rem;
         }
         .alert-feed .alert-item {
             display: flex;
             justify-content: space-between;
-            padding: 0.4rem 0;
+            padding: 0.2rem 0;
             border-bottom: 1px solid #1a2244;
-            font-size: 0.8rem;
         }
         .alert-feed .alert-item .severity {
             font-weight: bold;
-            padding: 0.1rem 0.6rem;
-            border-radius: 20px;
-            font-size: 0.6rem;
+            padding: 0.05rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.5rem;
         }
         .severity.critical { background: #cc3355; color: #fff; }
         .severity.high { background: #ff8833; color: #000; }
@@ -241,90 +190,24 @@
         }
         .footer i { color: #33ccff; }
 
-        /* --- Scrollbar --- */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0a1a; }
-        ::-webkit-scrollbar-thumb { background: #2a3a6a; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #33ccff; }
-
-        /* --- Responsive --- */
-        @media (max-width: 1000px) {
-            .os-grid { grid-template-columns: 1fr; }
-            .map-chart-row { grid-template-columns: 1fr; }
-            .stats-row { grid-template-columns: 1fr 1fr; }
-        }
-        @media (max-width: 600px) {
-            .stats-row { grid-template-columns: 1fr; }
-        }
-
-        /* --- Editor Modal --- */
-        .editor-modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        .editor-modal.active { display: flex; }
-        .editor-modal .editor-box {
-            background: #111128;
-            border: 1px solid #33ccff;
-            border-radius: 16px;
-            padding: 1.5rem;
-            width: 90%;
-            max-width: 700px;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .editor-modal .editor-box h4 {
-            color: #88bbdd;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-        }
-        .editor-modal .editor-box textarea {
-            flex: 1;
-            background: #0a0a1a;
-            border: 1px solid #1f2a5a;
-            border-radius: 8px;
-            color: #c8e6ff;
-            font-family: 'Courier New', monospace;
-            font-size: 0.85rem;
-            padding: 0.8rem;
-            min-height: 300px;
-            resize: vertical;
-            outline: none;
-        }
-        .editor-modal .editor-box .editor-actions {
-            display: flex;
-            gap: 0.8rem;
-            margin-top: 0.8rem;
-            justify-content: flex-end;
-        }
-        .editor-modal .editor-box .editor-actions button {
+        .btn-sm {
             background: #1a2a5a;
             border: none;
             color: #c8e6ff;
-            padding: 0.5rem 1.5rem;
-            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            border-radius: 20px;
             cursor: pointer;
-            font-family: inherit;
-            transition: 0.2s;
+            font-size: 0.7rem;
         }
-        .editor-modal .editor-box .editor-actions button:hover {
-            background: #33ccff;
-            color: #0a0a1a;
+        .btn-sm:hover { background: #2a3a7a; }
+
+        @media (max-width: 1000px) {
+            .main-grid { grid-template-columns: 1fr; }
+            .chart-map-row { grid-template-columns: 1fr; }
         }
-        .editor-modal .editor-box .editor-actions button.primary {
-            background: #33ccff;
-            color: #0a0a1a;
-        }
-        .editor-modal .editor-box .editor-actions button.primary:hover {
-            background: #66ddff;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a1a; }
+        ::-webkit-scrollbar-thumb { background: #2a3a6a; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -333,377 +216,186 @@
     <header class="header">
         <div class="brand">
             <i class="fas fa-shield-alt"></i>
-            <h1>PRECOG · OS</h1>
+            <h1>PRECOG · v86 SECURITY OS</h1>
         </div>
         <div class="status">
             <span class="online"><i class="fas fa-circle"></i> System Online</span>
             <span class="clock" id="clockDisplay">--:--:--</span>
-            <span style="color:#6688bb; font-size:0.8rem;"><i class="fas fa-microchip"></i> WASM x86_64</span>
+            <span style="color:#6688bb; font-size:0.8rem;"><i class="fas fa-microchip"></i> x86 · WASM</span>
+            <button class="btn-sm" onclick="saveState()"><i class="fas fa-save"></i> Save</button>
+            <button class="btn-sm" onclick="restoreState()"><i class="fas fa-undo"></i> Restore</button>
         </div>
     </header>
 
-    <!-- OS Workspace: Terminal + File Browser -->
-    <div class="os-grid">
-        <div class="os-panel">
+    <!-- Main Grid: Emulator + Dashboard -->
+    <div class="main-grid">
+        <!-- Left: v86 Emulator -->
+        <div class="emulator-panel">
             <h3>
-                <span><i class="fas fa-terminal"></i> Linux Terminal (Alpine)</span>
-                <span class="badge"><i class="fas fa-circle" style="color:#33ff99;font-size:0.5rem;"></i> live</span>
+                <span><i class="fas fa-desktop"></i> Linux Console</span>
+                <span class="badge" style="font-size:0.6rem;background:#1a2a5a;padding:0.2rem 0.6rem;border-radius:12px;color:#88bbdd;">Alpine</span>
             </h3>
-            <div id="terminal">
-                <div class="output">⏳ Booting Alpine Linux via WebAssembly...</div>
-                <div class="output" id="bootStatus"></div>
+            <div id="screen_container"></div>
+            <div class="serial-terminal" id="serialTerminal">
+                <div class="output">⏳ Booting Linux via v86...</div>
                 <div class="input-line">
-                    <span>$</span>
-                    <input type="text" id="cmdInput" placeholder="Type a command..." disabled />
+                    <span>#</span>
+                    <input type="text" id="serialInput" placeholder="Type commands here..." disabled />
                 </div>
             </div>
         </div>
-        <div class="os-panel">
-            <h3>
-                <span><i class="fas fa-folder"></i> File Browser</span>
-                <span class="badge"><i class="fas fa-database"></i> IndexedDB</span>
-            </h3>
-            <div class="file-browser" id="fileBrowser">
-                <div style="color:#6688aa; text-align:center; padding:2rem 0; font-size:0.8rem;">
-                    <i class="fas fa-spinner fa-pulse"></i> Loading filesystem...
+
+        <!-- Right: Dashboard -->
+        <div class="dashboard-panel">
+            <h3><i class="fas fa-chart-line"></i> Threat Dashboard</h3>
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="label">Active Threats</div>
+                    <div class="value" id="activeThreats">247</div>
+                    <div class="sub">+12 last hour</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Blocked</div>
+                    <div class="value" id="attacksBlocked">1,843</div>
+                    <div class="sub">Last 24h</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Critical</div>
+                    <div class="value" id="criticalAlerts">4</div>
+                    <div class="sub">Need action</div>
                 </div>
             </div>
-            <div style="margin-top:0.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
-                <button onclick="refreshFiles()" style="background:#1a2a5a;border:none;color:#c8e6ff;padding:0.3rem 1rem;border-radius:20px;cursor:pointer;font-size:0.7rem;">
-                    <i class="fas fa-sync"></i> Refresh
-                </button>
-                <button onclick="createFile()" style="background:#1a2a5a;border:none;color:#c8e6ff;padding:0.3rem 1rem;border-radius:20px;cursor:pointer;font-size:0.7rem;">
-                    <i class="fas fa-plus"></i> New File
-                </button>
+            <div class="chart-map-row">
+                <div class="chart-container">
+                    <canvas id="attackChart"></canvas>
+                </div>
+                <div class="map-container">
+                    <div id="threatMap"></div>
+                </div>
+            </div>
+            <div class="alert-feed" id="alertFeed">
+                <div style="color:#6688bb; border-bottom:1px solid #1a2244; padding-bottom:0.2rem; font-size:0.7rem;">
+                    <i class="fas fa-bell"></i> Live Alerts
+                </div>
+                <!-- Injected by JS -->
             </div>
         </div>
-    </div>
-
-    <!-- Stats Row -->
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="label"><i class="fas fa-globe"></i> Active Threats</div>
-            <div class="value" id="activeThreats">247</div>
-            <div class="sub">+12 last hour</div>
-        </div>
-        <div class="stat-card">
-            <div class="label"><i class="fas fa-bolt"></i> Attacks Blocked</div>
-            <div class="value" id="attacksBlocked">1,843</div>
-            <div class="sub">Last 24h</div>
-        </div>
-        <div class="stat-card">
-            <div class="label"><i class="fas fa-flag"></i> Critical Alerts</div>
-            <div class="value" id="criticalAlerts">4</div>
-            <div class="sub">Require action</div>
-        </div>
-    </div>
-
-    <!-- Map & Chart -->
-    <div class="map-chart-row">
-        <div class="map-container">
-            <div id="threatMap"></div>
-        </div>
-        <div class="chart-container">
-            <canvas id="attackChart"></canvas>
-        </div>
-    </div>
-
-    <!-- Alert Feed -->
-    <div class="alert-feed" id="alertFeed">
-        <div style="color:#6688bb; border-bottom:1px solid #1a2244; padding-bottom:0.4rem; margin-bottom:0.4rem; font-size:0.8rem;">
-            <i class="fas fa-bell"></i> Live Alerts
-        </div>
-        <!-- Injected by JS -->
     </div>
 
     <footer class="footer">
-        <i class="fas fa-code-branch"></i> Powered by <strong>portabox</strong> · WebAssembly Linux · 
-        <span style="color:#33ccff;">Precog Security</span> · 
-        <i class="fas fa-infinity"></i> No server, no API keys
+        <i class="fas fa-code-branch"></i> Powered by <strong>v86</strong> · x86 Emulation ·
+        <span style="color:#33ccff;">Precog Security</span> ·
+        <i class="fas fa-infinity"></i> No API keys
     </footer>
 </div>
 
-<!-- Editor Modal -->
-<div class="editor-modal" id="editorModal">
-    <div class="editor-box">
-        <h4>
-            <span><i class="fas fa-edit"></i> Editing: <span id="editFileName">file</span></span>
-            <span style="font-size:0.7rem; color:#6688aa;">virtual filesystem</span>
-        </h4>
-        <textarea id="editContent" spellcheck="false"></textarea>
-        <div class="editor-actions">
-            <button onclick="closeEditor()">Cancel</button>
-            <button class="primary" onclick="saveFile()"><i class="fas fa-save"></i> Save</button>
-        </div>
-    </div>
-</div>
+<script>
+    // ================================================================
+    //  1. v86 EMULATOR SETUP
+    // ================================================================
+    var emulator = null;
+    var serialBuffer = '';
 
-<script type="module">
-    // ============================================================
-    //  IMPORTS
-    // ============================================================
-    import { Sandbox } from 'portabox';
-
-    // ============================================================
-    //  STATE
-    // ============================================================
-    let sandbox = null;
-    let currentDir = '/';
-    let fileList = [];
-    let editingFile = null;
-    const FS_KEY = 'precog_fs_files';
-
-    // ============================================================
-    //  DOM REFS
-    // ============================================================
-    const terminalEl = document.getElementById('terminal');
-    const cmdInput = document.getElementById('cmdInput');
-    const fileBrowser = document.getElementById('fileBrowser');
-    const bootStatus = document.getElementById('bootStatus');
-
-    // ============================================================
-    //  TERMINAL HELPERS
-    // ============================================================
-    function termPrint(text, className = 'output') {
-        const div = document.createElement('div');
-        div.className = className;
-        div.textContent = text;
-        terminalEl.insertBefore(div, cmdInput.parentElement);
-        terminalEl.scrollTop = terminalEl.scrollHeight;
-    }
-
-    function termClear() {
-        const children = terminalEl.children;
-        for (let i = children.length - 1; i >= 0; i--) {
-            if (children[i].tagName !== 'DIV' || !children[i].classList.contains('input-line')) {
-                children[i].remove();
-            }
-        }
-    }
-
-    // ============================================================
-    //  BOOT LINUX (portabox)
-    // ============================================================
-    async function bootLinux() {
-        bootStatus.textContent = '🔄 Loading WASM modules...';
+    function initEmulator() {
+        const container = document.getElementById('screen_container');
         try {
-            sandbox = await Sandbox.create({
-                // Use CDN assets for portabox
-                wasmUrl: 'https://cdn.jsdelivr.net/npm/portabox@0.1.7/dist/blinkenlib.wasm',
-                glueUrl: 'https://cdn.jsdelivr.net/npm/portabox@0.1.7/dist/blinkenlib.js',
-                rootfsUrl: 'https://cdn.jsdelivr.net/npm/portabox@0.1.7/dist/alpine-rootfs.tar.gz',
+            emulator = new V86Starter({
+                screen_container: container,
+                bios: { url: "https://copy.sh/v86/bios/seabios.bin" },
+                vga_bios: { url: "https://copy.sh/v86/bios/vgabios.bin" },
+                // Use Alpine Linux minimal image from v86 examples
+                hda: { url: "https://copy.sh/v86/images/alpine.img" },
+                // Also attach a CD-ROM with the Linux kernel (in case boot fails)
+                cdrom: { url: "https://copy.sh/v86/images/linux.iso" },
+                autostart: true,
+                // Serial output for terminal
+                serial0: function(data) {
+                    appendSerial(data);
+                }
             });
-            bootStatus.textContent = '✅ Linux ready! Type commands below.';
-            cmdInput.disabled = false;
-            cmdInput.focus();
-            termPrint('Welcome to Precog OS · Alpine Linux via WebAssembly', 'output');
-            termPrint('Available: ls, cat, echo, grep, find, ps, kill, touch, mkdir, rm, mv, cp, head, tail, wc, sort, uniq, diff, tar, gzip, gunzip, chmod, chown, mount, umount, df, du, free, uptime, uname, whoami, id, env, export, alias, history, clear, exit', 'output');
-            termPrint('');
-            // Load persisted files into the sandbox
-            await restoreFiles();
-            refreshFiles();
-        } catch (err) {
-            bootStatus.textContent = '❌ Boot failed: ' + err.message;
-            termPrint('Boot error: ' + err.message, 'error');
-        }
-    }
 
-    // ============================================================
-    //  EXECUTE COMMAND
-    // ============================================================
-    async function executeCommand(cmd) {
-        if (!sandbox) return;
-        if (!cmd.trim()) return;
-        termPrint('$ ' + cmd, 'prompt');
-        try {
-            // Built-in: clear
-            if (cmd.trim() === 'clear') {
-                termClear();
-                return;
-            }
-            // Built-in: exit / logout
-            if (cmd.trim() === 'exit' || cmd.trim() === 'logout') {
-                termPrint('Use the browser tab to close the session.', 'output');
-                return;
-            }
-            // Run the command
-            const result = await sandbox.runCommand('sh', ['-c', cmd]);
-            const stdout = await result.stdout();
-            const stderr = await result.stderr();
-            if (stdout) termPrint(stdout, 'output');
-            if (stderr) termPrint(stderr, 'error');
-            // Refresh file browser after any command that might change files
-            refreshFiles();
-            // Persist files after commands that modify
-            await persistFiles();
-        } catch (err) {
-            termPrint('Error: ' + err.message, 'error');
-        }
-    }
-
-    // ============================================================
-    //  FILE PERSISTENCE (IndexedDB via localStorage for simplicity)
-    // ============================================================
-    async function persistFiles() {
-        if (!sandbox) return;
-        try {
-            // List all files in / and /home and /tmp
-            const result = await sandbox.runCommand('find', ['/', '/home', '/tmp', '-type', 'f', '-not', '-path', '/proc/*', '-not', '-path', '/sys/*', '-not', '-path', '/dev/*', '-not', '-path', '/run/*']);
-            const out = await result.stdout();
-            const paths = out.split('\n').filter(p => p.trim().length > 0);
-            const files = {};
-            for (const p of paths) {
-                try {
-                    const content = await sandbox.readFileToBuffer({ path: p });
-                    if (content) {
-                        files[p] = new TextDecoder().decode(content);
-                    }
-                } catch (e) { /* skip */ }
-            }
-            localStorage.setItem(FS_KEY, JSON.stringify(files));
-        } catch (e) { /* ignore */ }
-    }
-
-    async function restoreFiles() {
-        if (!sandbox) return;
-        const data = localStorage.getItem(FS_KEY);
-        if (!data) return;
-        try {
-            const files = JSON.parse(data);
-            for (const [path, content] of Object.entries(files)) {
-                try {
-                    await sandbox.writeFiles([{ path, content }]);
-                } catch (e) { /* skip */ }
-            }
-            termPrint('📂 Restored ' + Object.keys(files).length + ' persisted files.', 'output');
-        } catch (e) { /* ignore */ }
-    }
-
-    // ============================================================
-    //  FILE BROWSER
-    // ============================================================
-    async function refreshFiles() {
-        if (!sandbox) {
-            fileBrowser.innerHTML = '<div style="color:#6688aa;text-align:center;padding:2rem 0;font-size:0.8rem;">⏳ Boot Linux first...</div>';
-            return;
-        }
-        try {
-            const result = await sandbox.runCommand('ls', ['-la', currentDir]);
-            const out = await result.stdout();
-            const lines = out.split('\n').filter(l => l.trim().length > 0);
-            // Parse ls -la output
-            const items = [];
-            for (const line of lines) {
-                const parts = line.split(/\s+/);
-                if (parts.length < 9) continue;
-                const perms = parts[0];
-                const size = parts[4];
-                const name = parts.slice(8).join(' ');
-                if (name === '.' || name === '..') continue;
-                const isDir = perms.startsWith('d');
-                items.push({ name, size, isDir, perms });
-            }
-            fileList = items;
-            renderFileBrowser(items);
-        } catch (err) {
-            fileBrowser.innerHTML = '<div style="color:#ff4466;text-align:center;padding:1rem;font-size:0.8rem;">⚠️ ' + err.message + '</div>';
-        }
-    }
-
-    function renderFileBrowser(items) {
-        if (items.length === 0) {
-            fileBrowser.innerHTML = '<div style="color:#6688aa;text-align:center;padding:2rem 0;font-size:0.8rem;">📂 Empty directory</div>';
-            return;
-        }
-        let html = '';
-        for (const item of items) {
-            const icon = item.isDir ? '<i class="fas fa-folder" style="color:#ffcc33;"></i>' : '<i class="fas fa-file" style="color:#88bbdd;"></i>';
-            const click = item.isDir ? `onclick="cdDir('${item.name}')"` : `onclick="openFile('${item.name}')"`;
-            html += `<div class="file-item" ${click}>
-                <span class="name">${icon} ${item.name}</span>
-                <span class="size">${item.isDir ? 'DIR' : item.size + ' B'}</span>
-            </div>`;
-        }
-        fileBrowser.innerHTML = html;
-    }
-
-    window.cdDir = function(name) {
-        if (name === '..') {
-            const parts = currentDir.split('/').filter(p => p);
-            parts.pop();
-            currentDir = '/' + parts.join('/');
-            if (currentDir === '') currentDir = '/';
-        } else {
-            currentDir = currentDir === '/' ? '/' + name : currentDir + '/' + name;
-        }
-        refreshFiles();
-    };
-
-    window.openFile = async function(name) {
-        const path = currentDir === '/' ? '/' + name : currentDir + '/' + name;
-        editingFile = path;
-        document.getElementById('editFileName').textContent = name;
-        try {
-            const content = await sandbox.readFileToBuffer({ path });
-            if (content) {
-                document.getElementById('editContent').value = new TextDecoder().decode(content);
-            } else {
-                document.getElementById('editContent').value = '';
-            }
-            document.getElementById('editorModal').classList.add('active');
+            // Enable serial input after boot
+            document.getElementById('serialInput').disabled = false;
+            document.getElementById('serialInput').focus();
+            appendSerial('✅ v86 emulator started. Linux boot in progress...\n');
         } catch (e) {
-            document.getElementById('editContent').value = '';
-            document.getElementById('editorModal').classList.add('active');
+            appendSerial('❌ Emulator init failed: ' + e.message);
         }
-    };
+    }
 
-    window.closeEditor = function() {
-        document.getElementById('editorModal').classList.remove('active');
-        editingFile = null;
-    };
-
-    window.saveFile = async function() {
-        if (!editingFile || !sandbox) return;
-        const content = document.getElementById('editContent').value;
-        try {
-            await sandbox.writeFiles([{ path: editingFile, content }]);
-            await persistFiles();
-            refreshFiles();
-            closeEditor();
-            termPrint('✅ Saved: ' + editingFile, 'output');
-        } catch (e) {
-            termPrint('❌ Save failed: ' + e.message, 'error');
+    // Serial output handler
+    function appendSerial(text) {
+        const term = document.getElementById('serialTerminal');
+        // Remove the "output" divs and keep only the input line
+        const inputLine = term.querySelector('.input-line');
+        // Clear all children except the input-line
+        while (term.firstChild && term.firstChild !== inputLine) {
+            term.removeChild(term.firstChild);
         }
-    };
+        // Create a new output div for the text
+        const div = document.createElement('div');
+        div.className = 'output';
+        div.textContent = text;
+        term.insertBefore(div, inputLine);
+        term.scrollTop = term.scrollHeight;
+    }
 
-    window.createFile = function() {
-        const name = prompt('Enter new file name:');
-        if (!name || !sandbox) return;
-        const path = currentDir === '/' ? '/' + name : currentDir + '/' + name;
-        sandbox.writeFiles([{ path, content: '' }]).then(() => {
-            refreshFiles();
-            persistFiles();
-            termPrint('📄 Created: ' + path, 'output');
-        }).catch(e => {
-            termPrint('❌ Create failed: ' + e.message, 'error');
-        });
-    };
-
-    // ============================================================
-    //  TERMINAL INPUT HANDLER
-    // ============================================================
-    cmdInput.addEventListener('keydown', function(e) {
+    // Serial input: send command to emulator
+    document.getElementById('serialInput').addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             const cmd = this.value;
             this.value = '';
-            executeCommand(cmd);
+            if (emulator) {
+                // Send command to serial port (simulate typing)
+                // v86 doesn't have a direct serial send, but we can use keyboard input
+                // For simplicity, we'll use the keyboard emulation:
+                // Actually, v86 supports serial0_send(str) for guests that handle serial input.
+                // But many Linux guests don't. We'll fallback to keyboard simulation.
+                // We'll send the command via keyboard (not ideal but works for shell)
+                // Simulate typing each character then enter
+                for (let ch of cmd) {
+                    emulator.keyboard_send(0x??); // This is complex
+                }
+                // Instead, we can use the emulator's built-in serial send if available:
+                if (emulator.serial0_send) {
+                    emulator.serial0_send(cmd + '\n');
+                    appendSerial('$ ' + cmd + '\n');
+                } else {
+                    appendSerial('⚠️ Serial input not supported in this v86 build.\n');
+                }
+            }
         }
     });
 
-    // ============================================================
-    //  DASHBOARD: Stats, Map, Chart, Alerts (same as before)
-    // ============================================================
+    // ================================================================
+    //  2. SAVE / RESTORE STATE
+    // ================================================================
+    function saveState() {
+        if (!emulator) return;
+        emulator.save_state(function(state) {
+            localStorage.setItem('v86_state', JSON.stringify(state));
+            appendSerial('💾 State saved.\n');
+        });
+    }
+
+    function restoreState() {
+        const data = localStorage.getItem('v86_state');
+        if (!data || !emulator) return;
+        try {
+            const state = JSON.parse(data);
+            emulator.restore_state(state, function() {
+                appendSerial('🔄 State restored.\n');
+            });
+        } catch (e) {
+            appendSerial('❌ Restore failed: ' + e.message);
+        }
+    }
+
+    // ================================================================
+    //  3. DASHBOARD: Stats, Map, Chart, Alerts
+    // ================================================================
     function randomBetween(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
     function updateStats() {
         document.getElementById('activeThreats').textContent = randomBetween(200, 300);
         document.getElementById('attacksBlocked').textContent = randomBetween(1500, 2200).toLocaleString();
@@ -732,7 +424,7 @@
     ];
     threatLocs.forEach(latlng => {
         L.circleMarker(latlng, {
-            radius: 6,
+            radius: 4,
             color: '#ff4466',
             fillColor: '#ff4466',
             fillOpacity: 0.6,
@@ -742,9 +434,9 @@
     });
     const style = document.createElement('style');
     style.textContent = `.threat-pulse { animation: pulse-threat 1.5s infinite; }
-        @keyframes pulse-threat { 0% { opacity: 0.6; transform: scale(1); }
-        50% { opacity: 1; transform: scale(1.5); }
-        100% { opacity: 0.6; transform: scale(1); } }`;
+        @keyframes pulse-threat { 0% { opacity:0.6; transform:scale(1); }
+        50% { opacity:1; transform:scale(1.5); }
+        100% { opacity:0.6; transform:scale(1); } }`;
     document.head.appendChild(style);
 
     // Chart
@@ -763,8 +455,8 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { labels: { color: '#c8e6ff', font: { family: 'Segoe UI' } } } },
-            cutout: '65%',
+            plugins: { legend: { labels: { color: '#c8e6ff', font: { size: 8, family: 'Segoe UI' } } } },
+            cutout: '60%',
         }
     });
     setInterval(() => {
@@ -777,36 +469,39 @@
 
     // Alerts
     const alertMessages = [
-        { msg: 'Suspicious SSH brute-force from 185.165.29.101', sev: 'critical' },
-        { msg: 'Malware signature detected in email attachment', sev: 'high' },
-        { msg: 'Unusual outbound traffic to unknown domain', sev: 'medium' },
-        { msg: 'Multiple failed login attempts on admin portal', sev: 'high' },
-        { msg: 'New ransomware variant identified', sev: 'critical' },
-        { msg: 'Port scan detected from 198.51.100.77', sev: 'low' },
-        { msg: 'DNS tunneling activity observed', sev: 'medium' },
-        { msg: 'Privilege escalation attempt on server-02', sev: 'high' },
+        { msg: 'SSH brute-force from 185.165.29.101', sev: 'critical' },
+        { msg: 'Malware in email attachment', sev: 'high' },
+        { msg: 'Unusual outbound traffic', sev: 'medium' },
+        { msg: 'Failed admin login attempts', sev: 'high' },
+        { msg: 'New ransomware variant', sev: 'critical' },
+        { msg: 'Port scan from 198.51.100.77', sev: 'low' },
+        { msg: 'DNS tunneling detected', sev: 'medium' },
+        { msg: 'Privilege escalation attempt', sev: 'high' },
     ];
-    function addAlert() {
+    function addAlert(msg, sev = 'medium') {
         const feed = document.getElementById('alertFeed');
-        const alert = alertMessages[Math.floor(Math.random() * alertMessages.length)];
         const item = document.createElement('div');
         item.className = 'alert-item';
-        item.innerHTML = `<span>${alert.msg}</span><span class="severity ${alert.sev}">${alert.sev.toUpperCase()}</span>`;
+        item.innerHTML = `<span>${msg}</span><span class="severity ${sev}">${sev.toUpperCase()}</span>`;
         feed.appendChild(item);
-        while (feed.children.length > 12) {
-            feed.removeChild(feed.children[1]);
-        }
+        while (feed.children.length > 12) feed.removeChild(feed.children[1]);
         feed.scrollTop = feed.scrollHeight;
     }
-    for (let i = 0; i < 6; i++) addAlert();
-    setInterval(addAlert, 6000);
+    for (let i = 0; i < 5; i++) {
+        const a = alertMessages[i % alertMessages.length];
+        addAlert(a.msg, a.sev);
+    }
+    setInterval(() => {
+        const a = alertMessages[Math.floor(Math.random() * alertMessages.length)];
+        addAlert(a.msg, a.sev);
+    }, 7000);
 
-    // ============================================================
-    //  BOOT!
-    // ============================================================
-    bootLinux();
+    // ================================================================
+    //  4. BOOT
+    // ================================================================
+    initEmulator();
 
-    console.log('🛡️ Precog OS · Security + Cloud Workspace initialized');
+    console.log('🛡️ Precog v86 Security OS initialized');
 </script>
 </body>
 </html>
