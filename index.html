@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#0a0e1a" />
     <title>Precog Security · Live Threat Platform</title>
 
     <!-- Libraries -->
@@ -17,18 +16,9 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js">
     </script>
-    <!-- DayJS UTC plugin -->
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/plugin/utc.js">
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js">
-    </script>
-    <!-- v86 emulator -->
-    <script src="https://copy.sh/v86/libv86.js">
-    </script>
-
-    <script>
-        // Extend dayjs with UTC plugin
-        dayjs.extend(window.dayjs_plugin_utc);
     </script>
 
     <style>
@@ -367,82 +357,14 @@
             color: var(--dim);
         }
 
-        /* ---- Linux Terminal ---- */
-        #screen_container {
-            background: #000;
+        /* ---- WebVM Terminal (iframe) ---- */
+        .terminal-iframe {
+            width: 100%;
+            height: 360px;
             border: 1px solid var(--accent);
             border-radius: 8px;
-            width: 100%;
-            aspect-ratio: 4/3;
-            max-height: 280px;
-            position: relative;
-            overflow: hidden;
-        }
-        #screen_container canvas {
+            background: #000;
             display: block;
-            width: 100%;
-            height: 100%;
-        }
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            gap: 0.3rem;
-            color: var(--accent);
-            font-size: 0.7rem;
-            z-index: 10;
-        }
-        .loading-overlay .spinner {
-            border: 3px solid #1a2a4a;
-            border-top: 3px solid var(--accent);
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .serial-terminal {
-            background: rgba(10, 10, 26, 0.8);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 0.3rem;
-            margin-top: 0.3rem;
-            max-height: 80px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            font-size: 0.6rem;
-            color: #33ff99;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .serial-terminal .input-line {
-            display: flex;
-            align-items: center;
-            gap: 0.2rem;
-        }
-        .serial-terminal .input-line span {
-            color: var(--accent);
-        }
-        .serial-terminal .input-line input {
-            background: transparent;
-            border: none;
-            color: #33ff99;
-            font-family: 'Courier New', monospace;
-            font-size: 0.6rem;
-            flex: 1;
-            outline: none;
         }
 
         /* ---- Modal ---- */
@@ -543,8 +465,8 @@
             .panel {
                 padding: 0.5rem;
             }
-            #screen_container {
-                max-height: 200px;
+            .terminal-iframe {
+                height: 260px;
             }
             body {
                 padding: 0.4rem;
@@ -602,7 +524,7 @@
                 <span class="online"><i class="fas fa-circle"></i> <span id="statusText">Online</span></span>
                 <span class="clock" id="clockDisplay">--:--:--</span>
                 <span style="color:var(--dim);font-size:0.6rem;"><i class="fas fa-globe"></i> <span id="apiStatus">APIs OK</span></span>
-                <button class="btn-sm" onclick="refreshAllData()"><i class="fas fa-sync"></i> Sync</button>
+                <button class="btn-sm" onclick="window.refreshAllData()"><i class="fas fa-sync"></i> Sync</button>
                 <button class="btn-sm" onclick="document.getElementById('evidModal').classList.add('active')"><i class="fas fa-fingerprint"></i> Evidence</button>
             </div>
         </header>
@@ -615,23 +537,14 @@
             <div class="stat-card"><div class="label">Sources</div><div class="value" id="sourceCount">—</div><div class="sub">online</div></div>
         </div>
 
-        <!-- Main Grid: Emulator + Dashboard -->
+        <!-- Main Grid: WebVM Terminal + Dashboard -->
         <div class="main-grid">
-            <!-- Left: v86 -->
+            <!-- Left: WebVM Terminal -->
             <div class="panel">
-                <h3><span><i class="fas fa-desktop"></i> Alpine Linux (x86)</span><span class="badge">v86 · real</span></h3>
-                <div id="screen_container" style="position:relative;">
-                    <div class="loading-overlay" id="loadingOverlay">
-                        <div class="spinner"></div>
-                        <span>Booting Linux...</span>
-                    </div>
-                </div>
-                <div class="serial-terminal" id="serialTerminal">
-                    <div class="output" id="bootMsg">⏳ Loading emulator...</div>
-                    <div class="input-line">
-                        <span>#</span>
-                        <input type="text" id="serialInput" placeholder="Enter Linux command..." disabled />
-                    </div>
+                <h3><span><i class="fas fa-desktop"></i> Linux Terminal (Debian)</span><span class="badge">WebVM · real</span></h3>
+                <iframe class="terminal-iframe" src="https://webvm.io" title="WebVM Linux Terminal"></iframe>
+                <div style="margin-top:0.3rem;font-size:0.55rem;color:var(--dim);">
+                    <i class="fas fa-info-circle"></i> Full Linux shell – run <kbd>apt update</kbd> &amp; <kbd>apt install kali-tools</kbd>
                 </div>
             </div>
 
@@ -659,7 +572,7 @@
             <div class="tool-card">
                 <h4><i class="fas fa-network-wired"></i> IP Scan</h4>
                 <input type="text" id="scanInput" placeholder="IP address" />
-                <button class="btn-sm" onclick="scanIP()"><i class="fas fa-play"></i> Scan</button>
+                <button class="btn-sm" onclick="window.scanIP()"><i class="fas fa-play"></i> Scan</button>
                 <div class="result-box" id="scanResult"><span class="label">🔍 Enter IP to check</span></div>
             </div>
             <div class="tool-card">
@@ -670,20 +583,20 @@
             <div class="tool-card">
                 <h4><i class="fas fa-bug"></i> CVE Lookup</h4>
                 <input type="text" id="cveInput" placeholder="CVE-2025-xxxx" />
-                <button class="btn-sm" onclick="lookupCVE()"><i class="fas fa-search"></i> Check</button>
+                <button class="btn-sm" onclick="window.lookupCVE()"><i class="fas fa-search"></i> Check</button>
                 <div class="result-box" id="cveResult"><span class="label">📋 Enter CVE ID</span></div>
             </div>
             <div class="tool-card">
                 <h4><i class="fas fa-shield-virus"></i> Breach Check</h4>
                 <input type="text" id="breachInput" placeholder="email@domain.com" />
-                <button class="btn-sm" onclick="checkBreach()"><i class="fas fa-search"></i> Check</button>
+                <button class="btn-sm" onclick="window.checkBreach()"><i class="fas fa-search"></i> Check</button>
                 <div class="result-box" id="breachResult"><span class="label">📧 Enter email</span></div>
             </div>
         </div>
 
         <!-- Footer -->
         <footer class="footer">
-            <i class="fas fa-code-branch"></i> Powered by <strong>AlienVault OTX</strong> · <strong>NVD</strong> · <strong>Have I Been Pwned</strong> · <strong>v86</strong> · <span style="color:var(--accent);">Precog Security</span> · <i class="fas fa-infinity"></i> Live Data
+            <i class="fas fa-code-branch"></i> Powered by <strong>WebVM</strong> · <strong>AlienVault OTX</strong> · <strong>NVD</strong> · <strong>Have I Been Pwned</strong> · <span style="color:var(--accent);">Precog Security</span> · <i class="fas fa-infinity"></i> Live Data
         </footer>
     </div>
 
@@ -695,7 +608,7 @@
             <textarea id="evidEntry" placeholder="Describe the incident..."></textarea>
             <div class="actions">
                 <button class="btn-sm" onclick="document.getElementById('evidModal').classList.remove('active')">Cancel</button>
-                <button class="btn-primary" onclick="logEvidence()"><i class="fas fa-save"></i> Seal & Save</button>
+                <button class="btn-primary" onclick="window.logEvidence()"><i class="fas fa-save"></i> Seal & Save</button>
             </div>
             <div id="evidFeedback" style="margin-top:0.4rem;font-size:0.7rem;color:#33ff99;"></div>
             <div id="evidLog" style="margin-top:0.4rem;max-height:120px;overflow-y:auto;font-size:0.55rem;color:#88bbdd;border-top:1px solid var(--border);padding-top:0.3rem;"></div>
@@ -711,6 +624,17 @@
 
     <script>
         // ================================================================
+        //  SAFELY EXTEND DAYJS WITH UTC
+        // ================================================================
+        if (typeof dayjs !== 'undefined' && typeof dayjs_plugin_utc !== 'undefined') {
+            dayjs.extend(dayjs_plugin_utc);
+        } else {
+            if (!dayjs.utc) {
+                dayjs.utc = function(date) { return dayjs(date); };
+            }
+        }
+
+        // ================================================================
         //  GLOBALS
         // ================================================================
         const APP = {
@@ -718,8 +642,6 @@
             intelData: [],
             alerts: [],
             evidenceLog: JSON.parse(localStorage.getItem('precog_evidence') || '[]'),
-            emulator: null,
-            emulatorReady: false,
             map: null,
             chart: null,
             threatMarkers: []
@@ -872,7 +794,7 @@
         }
 
         // ================================================================
-        //  TOOL FUNCTIONS (Real Data)
+        //  TOOL FUNCTIONS (Real Data) – Exposed globally
         // ================================================================
 
         window.scanIP = async function() {
@@ -999,9 +921,6 @@
             }
         };
 
-        // ================================================================
-        //  REFRESH ALL DATA
-        // ================================================================
         window.refreshAllData = async function() {
             document.getElementById('statusText').textContent = 'Syncing...';
             document.getElementById('apiStatus').textContent = '⏳';
@@ -1139,79 +1058,14 @@
         }
 
         // ================================================================
-        //  v86 EMULATOR (Real Linux)
-        // ================================================================
-        function initEmulator() {
-            const container = document.getElementById('screen_container');
-            const overlay = document.getElementById('loadingOverlay');
-            try {
-                APP.emulator = new V86Starter({
-                    screen_container: container,
-                    bios: { url: "https://copy.sh/v86/bios/seabios.bin" },
-                    vga_bios: { url: "https://copy.sh/v86/bios/vgabios.bin" },
-                    hda: { url: "https://copy.sh/v86/images/alpine.img" },
-                    cdrom: { url: "https://copy.sh/v86/images/linux.iso" },
-                    autostart: true,
-                    serial0: function(data) {
-                        appendSerial(data);
-                    },
-                    on_message: function(type, data) {
-                        if (type === 'emulator-ready') {
-                            overlay.style.display = 'none';
-                            document.getElementById('serialInput').disabled = false;
-                            document.getElementById('serialInput').focus();
-                            APP.emulatorReady = true;
-                            document.getElementById('bootMsg').textContent = '✅ Linux ready. Type commands.';
-                            showToast('Linux Ready', 'Alpine Linux is booted and ready.');
-                        }
-                    }
-                });
-                setTimeout(() => {
-                    if (overlay.style.display !== 'none') {
-                        overlay.style.display = 'none';
-                        document.getElementById('serialInput').disabled = false;
-                    }
-                }, 18000);
-            } catch (e) {
-                overlay.innerHTML = '<span style="color:#ff4466;">❌ Error: ' + e.message + '</span>';
-                showToast('Emulator Error', e.message, true);
-            }
-        }
-
-        function appendSerial(text) {
-            const term = document.getElementById('serialTerminal');
-            const inputLine = term.querySelector('.input-line');
-            while (term.firstChild && term.firstChild !== inputLine) term.removeChild(term.firstChild);
-            const div = document.createElement('div');
-            div.className = 'output';
-            div.textContent = text;
-            term.insertBefore(div, inputLine);
-            term.scrollTop = term.scrollHeight;
-        }
-
-        document.getElementById('serialInput').addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                const cmd = this.value;
-                this.value = '';
-                if (APP.emulator && APP.emulator.serial0_send) {
-                    APP.emulator.serial0_send(cmd + '\n');
-                    appendSerial('$ ' + cmd + '\n');
-                    if (cmd.includes('nmap') || cmd.includes('scan') || cmd.includes('grep')) {
-                        addAlert('Security command executed in Linux: ' + cmd.substring(0, 30), 'medium');
-                    }
-                } else {
-                    appendSerial('⚠️ Serial not available.\n');
-                }
-            }
-        });
-
-        // ================================================================
         //  INIT
         // ================================================================
         async function init() {
-            // Clock – use UTC with plugin
+            // Clock – use UTC with fallback
             function updateClock() {
-                document.getElementById('clockDisplay').textContent = dayjs().utc().format('HH:mm:ss');
+                const now = dayjs();
+                const utc = now.utc ? now.utc() : now;
+                document.getElementById('clockDisplay').textContent = utc.format('HH:mm:ss');
             }
             setInterval(updateClock, 1000);
             updateClock();
@@ -1237,10 +1091,17 @@
                 addAlert('Some data sources unavailable', 'medium');
             }
 
-            // Boot Linux emulator
-            initEmulator();
-
             // Auto-refresh every 5 minutes
             setInterval(() => {
                 fetchOTX().catch(() => {});
-                fetchCVEs(5).c
+                fetchCVEs(5).catch(() => {});
+            }, 300000);
+
+            console.log('🛡️ Precog Security v' + APP.version + ' loaded with real data and WebVM terminal');
+        }
+
+        // Start the app
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
