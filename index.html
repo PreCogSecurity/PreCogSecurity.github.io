@@ -17,10 +17,18 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js">
     </script>
+    <!-- DayJS UTC plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/plugin/utc.js">
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js">
     </script>
     <!-- v86 emulator -->
     <script src="https://copy.sh/v86/libv86.js">
+    </script>
+
+    <script>
+        // Extend dayjs with UTC plugin
+        dayjs.extend(window.dayjs_plugin_utc);
     </script>
 
     <style>
@@ -1201,7 +1209,7 @@
         //  INIT
         // ================================================================
         async function init() {
-            // Clock
+            // Clock – use UTC with plugin
             function updateClock() {
                 document.getElementById('clockDisplay').textContent = dayjs().utc().format('HH:mm:ss');
             }
@@ -1235,14 +1243,4 @@
             // Auto-refresh every 5 minutes
             setInterval(() => {
                 fetchOTX().catch(() => {});
-                fetchCVEs(5).catch(() => {});
-            }, 300000);
-
-            console.log('🛡️ Precog Security v' + APP.version + ' loaded with real data');
-        }
-
-        // Start the app
-        document.addEventListener('DOMContentLoaded', init);
-    </script>
-</body>
-</html>
+                fetchCVEs(5).c
