@@ -4,30 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#0a0e1a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Precog Security · Live Threat Platform</title>
 
-    <!-- PWA Manifest (inline) -->
-    <script>
-        const manifest = {
-            name: 'Precog Security',
-            short_name: 'Precog',
-            description: 'Live threat intelligence & protection platform',
-            start_url: '.',
-            display: 'standalone',
-            background_color: '#0a0e1a',
-            theme_color: '#0a0e1a',
-            icons: [
-                { src: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90" fill="%2333ccff">🛡️</text></svg>', sizes: '192x192', type: 'image/svg+xml' }
-            ]
-        };
-        const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-        const manifestURL = URL.createObjectURL(blob);
-        document.write(`<link rel="manifest" href="${manifestURL}">`);
-    </script>
-
-    <!-- External Libraries -->
+    <!-- Libraries -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
@@ -40,31 +19,17 @@
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js">
     </script>
-
-    <!-- Service Worker (inline registration) -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', e => {
-                    e.waitUntil(caches.open('precog-v1').then(c => c.addAll(['./'])));
-                    self.skipWaiting();
-                });
-                self.addEventListener('activate', e => e.waitUntil(clients.claim()));
-                self.addEventListener('fetch', e => {
-                    e.respondWith(
-                        caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response('Offline')))
-                    );
-                });
-            `;
-            const swBlob = new Blob([swCode], { type: 'application/javascript' });
-            const swURL = URL.createObjectURL(swBlob);
-            navigator.serviceWorker.register(swURL, { scope: './' });
-        }
+    <!-- v86 emulator -->
+    <script src="https://copy.sh/v86/libv86.js">
     </script>
 
     <style>
         /* ---- Reset & Theme ---- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         :root {
             --bg: #0a0e1a;
             --bg-card: rgba(17, 17, 40, 0.85);
@@ -74,24 +39,31 @@
             --accent: #33ccff;
             --purple: #a855f7;
             --radius: 14px;
-            --shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
         }
-        html, body { height: 100%; }
+        html,
         body {
+            height: 100%;
             background: var(--bg);
             color: var(--text);
             font-family: 'Segoe UI', 'Inter', 'Courier New', monospace;
             padding: 0.8rem;
             overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
         }
-        a, button, input, select { font-family: inherit; }
-        ::-webkit-scrollbar { width: 5px; height: 5px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-
-        /* ---- Layout ---- */
-        .dashboard { max-width: 1600px; margin: 0 auto; }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
 
         /* ---- Header ---- */
         .header {
@@ -104,7 +76,11 @@
             border-bottom: 1px solid var(--border);
             margin-bottom: 1rem;
         }
-        .header .brand { display: flex; align-items: center; gap: 0.6rem; }
+        .header .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
         .header .brand h1 {
             font-weight: 300;
             font-size: 1.4rem;
@@ -114,7 +90,10 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        .header .brand i { font-size: 1.8rem; color: var(--accent); }
+        .header .brand i {
+            font-size: 1.8rem;
+            color: var(--accent);
+        }
         .header .status {
             display: flex;
             align-items: center;
@@ -122,10 +101,26 @@
             font-size: 0.7rem;
             flex-wrap: wrap;
         }
-        .header .status .online { color: #33ff99; }
-        .header .status .online i { animation: pulse-green 1.8s infinite; }
-        @keyframes pulse-green { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        .clock { color: var(--dim); font-family: 'Courier New', monospace; font-size: 0.7rem; }
+        .header .status .online {
+            color: #33ff99;
+        }
+        .header .status .online i {
+            animation: pulse-green 1.8s infinite;
+        }
+        @keyframes pulse-green {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+        .clock {
+            color: var(--dim);
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+        }
         .badge {
             font-size: 0.5rem;
             background: var(--border);
@@ -143,7 +138,9 @@
             font-size: 0.6rem;
             transition: 0.2s;
         }
-        .btn-sm:hover { background: #2a3a7a; }
+        .btn-sm:hover {
+            background: #2a3a7a;
+        }
         .btn-primary {
             background: linear-gradient(135deg, var(--accent), var(--purple));
             border: none;
@@ -155,8 +152,10 @@
             font-weight: 600;
             transition: 0.2s;
         }
-        .btn-primary:hover { opacity: 0.85; transform: scale(1.02); }
-        .btn-danger { background: #cc3355; border: none; color: #fff; padding: 0.25rem 1rem; border-radius: 20px; cursor: pointer; font-size: 0.65rem; }
+        .btn-primary:hover {
+            opacity: 0.85;
+            transform: scale(1.02);
+        }
 
         /* ---- Grids ---- */
         .main-grid {
@@ -172,7 +171,6 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 0.7rem 0.8rem;
-            box-shadow: var(--shadow);
         }
         .panel h3 {
             font-weight: 300;
@@ -201,9 +199,20 @@
             padding: 0.3rem 0.5rem;
             border: 1px solid var(--border);
         }
-        .stat-card .label { font-size: 0.5rem; text-transform: uppercase; color: var(--dim); }
-        .stat-card .value { font-size: 1.1rem; font-weight: 600; color: #fff; }
-        .stat-card .sub { font-size: 0.45rem; color: #88aadd; }
+        .stat-card .label {
+            font-size: 0.5rem;
+            text-transform: uppercase;
+            color: var(--dim);
+        }
+        .stat-card .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        .stat-card .sub {
+            font-size: 0.45rem;
+            color: #88aadd;
+        }
 
         /* ---- Map & Chart ---- */
         .chart-map-row {
@@ -212,9 +221,19 @@
             gap: 0.5rem;
             margin-bottom: 0.6rem;
         }
-        .chart-map-row .chart-container { height: 90px; }
-        .chart-map-row .map-container { height: 90px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
-        #threatMap { width: 100%; height: 100%; }
+        .chart-map-row .chart-container {
+            height: 90px;
+        }
+        .chart-map-row .map-container {
+            height: 90px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        #threatMap {
+            width: 100%;
+            height: 100%;
+        }
 
         /* ---- Alerts ---- */
         .alert-feed {
@@ -238,10 +257,22 @@
             border-radius: 10px;
             font-size: 0.45rem;
         }
-        .severity.critical { background: #cc3355; color: #fff; }
-        .severity.high { background: #ff8833; color: #000; }
-        .severity.medium { background: #ffcc33; color: #000; }
-        .severity.low { background: #33aaff; color: #000; }
+        .severity.critical {
+            background: #cc3355;
+            color: #fff;
+        }
+        .severity.high {
+            background: #ff8833;
+            color: #000;
+        }
+        .severity.medium {
+            background: #ffcc33;
+            color: #000;
+        }
+        .severity.low {
+            background: #33aaff;
+            color: #000;
+        }
 
         /* ---- Intel Feed ---- */
         .intel-feed {
@@ -260,9 +291,24 @@
             border-bottom: 1px solid #1a2244;
             align-items: center;
         }
-        .intel-feed .intel-item .source { color: var(--dim); min-width: 50px; font-size: 0.5rem; }
-        .intel-feed .intel-item .ioc { color: #33ff99; font-family: 'Courier New', monospace; font-size: 0.6rem; word-break: break-all; }
-        .intel-feed .intel-item .type { color: #ffcc33; font-size: 0.45rem; background: #1a2a4a; padding: 0.05rem 0.4rem; border-radius: 8px; }
+        .intel-feed .intel-item .source {
+            color: var(--dim);
+            min-width: 50px;
+            font-size: 0.5rem;
+        }
+        .intel-feed .intel-item .ioc {
+            color: #33ff99;
+            font-family: 'Courier New', monospace;
+            font-size: 0.6rem;
+            word-break: break-all;
+        }
+        .intel-feed .intel-item .type {
+            color: #ffcc33;
+            font-size: 0.45rem;
+            background: #1a2a4a;
+            padding: 0.05rem 0.4rem;
+            border-radius: 8px;
+        }
 
         /* ---- Tools ---- */
         .tools-grid {
@@ -277,7 +323,11 @@
             border-radius: 10px;
             padding: 0.4rem 0.6rem;
         }
-        .tool-card h4 { font-size: 0.6rem; color: #88bbdd; margin-bottom: 0.15rem; }
+        .tool-card h4 {
+            font-size: 0.6rem;
+            color: #88bbdd;
+            margin-bottom: 0.15rem;
+        }
         .tool-card input,
         .tool-card select {
             width: 100%;
@@ -290,7 +340,9 @@
             outline: none;
             margin-bottom: 0.15rem;
         }
-        .tool-card input:focus { border-color: var(--accent); }
+        .tool-card input:focus {
+            border-color: var(--accent);
+        }
         .tool-card .result-box {
             background: rgba(10, 10, 26, 0.8);
             padding: 0.25rem;
@@ -303,9 +355,11 @@
             max-height: 60px;
             overflow-y: auto;
         }
-        .tool-card .result-box .label { color: var(--dim); }
+        .tool-card .result-box .label {
+            color: var(--dim);
+        }
 
-        /* ---- Linux Terminal (v86) ---- */
+        /* ---- Linux Terminal ---- */
         #screen_container {
             background: #000;
             border: 1px solid var(--accent);
@@ -316,7 +370,11 @@
             position: relative;
             overflow: hidden;
         }
-        #screen_container canvas { display: block; width: 100%; height: 100%; }
+        #screen_container canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
         .loading-overlay {
             position: absolute;
             top: 0;
@@ -341,7 +399,11 @@
             height: 30px;
             animation: spin 1s linear infinite;
         }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 
         .serial-terminal {
             background: rgba(10, 10, 26, 0.8);
@@ -357,8 +419,14 @@
             white-space: pre-wrap;
             word-wrap: break-word;
         }
-        .serial-terminal .input-line { display: flex; align-items: center; gap: 0.2rem; }
-        .serial-terminal .input-line span { color: var(--accent); }
+        .serial-terminal .input-line {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+        .serial-terminal .input-line span {
+            color: var(--accent);
+        }
         .serial-terminal .input-line input {
             background: transparent;
             border: none;
@@ -383,7 +451,9 @@
             align-items: center;
             padding: 1rem;
         }
-        .modal.active { display: flex; }
+        .modal.active {
+            display: flex;
+        }
         .modal .modal-box {
             background: var(--bg-card);
             border: 1px solid var(--accent);
@@ -394,7 +464,11 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        .modal .modal-box h3 { color: #88bbdd; margin-bottom: 0.5rem; font-size: 1rem; }
+        .modal .modal-box h3 {
+            color: #88bbdd;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
         .modal .modal-box textarea {
             width: 100%;
             min-height: 100px;
@@ -408,7 +482,13 @@
             outline: none;
             resize: vertical;
         }
-        .modal .modal-box .actions { display: flex; gap: 0.8rem; margin-top: 0.8rem; justify-content: flex-end; flex-wrap: wrap; }
+        .modal .modal-box .actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 0.8rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
 
         /* ---- Footer ---- */
         .footer {
@@ -419,38 +499,56 @@
             border-top: 1px solid var(--border);
             padding-top: 0.8rem;
         }
-        .footer i { color: var(--accent); }
+        .footer i {
+            color: var(--accent);
+        }
 
         /* ---- Responsive ---- */
         @media (max-width: 900px) {
-            .main-grid { grid-template-columns: 1fr; }
-            .tools-grid { grid-template-columns: 1fr 1fr; }
-            .stats-row { grid-template-columns: 1fr 1fr; }
-            .chart-map-row { grid-template-columns: 1fr; }
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .chart-map-row {
+                grid-template-columns: 1fr;
+            }
         }
         @media (max-width: 500px) {
-            .tools-grid { grid-template-columns: 1fr; }
-            .stats-row { grid-template-columns: 1fr 1fr; }
-            .header .brand h1 { font-size: 1.1rem; }
-            .header .status { gap: 0.5rem; font-size: 0.6rem; }
-            .panel { padding: 0.5rem; }
-            #screen_container { max-height: 200px; }
-            body { padding: 0.4rem; }
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .header .brand h1 {
+                font-size: 1.1rem;
+            }
+            .header .status {
+                gap: 0.5rem;
+                font-size: 0.6rem;
+            }
+            .panel {
+                padding: 0.5rem;
+            }
+            #screen_container {
+                max-height: 200px;
+            }
+            body {
+                padding: 0.4rem;
+            }
         }
         @media (max-width: 380px) {
-            .stats-row { grid-template-columns: 1fr; }
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
         }
 
-        /* ---- Loading shimmer ---- */
-        .shimmer {
-            background: linear-gradient(90deg, var(--bg) 25%, #1a2a4a 50%, var(--bg) 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
-            border-radius: 4px;
-        }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
-        /* ---- Toast notification ---- */
+        /* ---- Toast ---- */
         .toast {
             position: fixed;
             bottom: 1rem;
@@ -463,13 +561,24 @@
             color: var(--text);
             z-index: 2000;
             max-width: 300px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
             transform: translateY(120%);
             transition: transform 0.4s ease;
         }
-        .toast.show { transform: translateY(0); }
-        .toast .toast-title { font-weight: 600; color: var(--accent); }
-        .toast .toast-close { background: none; border: none; color: var(--dim); cursor: pointer; float: right; }
+        .toast.show {
+            transform: translateY(0);
+        }
+        .toast .toast-title {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .toast .toast-close {
+            background: none;
+            border: none;
+            color: var(--dim);
+            cursor: pointer;
+            float: right;
+        }
     </style>
 </head>
 <body>
@@ -628,7 +737,6 @@
         // 1. ALIENVAULT OTX – Threat Intelligence (free, no key required for basic pulses)
         async function fetchOTX() {
             try {
-                // Fetch recent pulses (threat intelligence)
                 const resp = await axios.get('https://otx.alienvault.com/api/v1/pulses/subscribed', {
                     params: { limit: 20 }
                 });
@@ -654,7 +762,6 @@
                 return iocs;
             } catch (e) {
                 console.warn('OTX fetch failed:', e);
-                // Fallback: use AbuseIPDB or local
                 return [];
             }
         }
@@ -671,7 +778,6 @@
                 });
                 const vulns = resp.data.vulnerabilities || [];
                 document.getElementById('cveCount').textContent = vulns.length > 0 ? vulns.length + '+' : '—';
-                // Add to alerts
                 vulns.slice(0, 3).forEach(v => {
                     const cveId = v.cve.id;
                     const score = v.cve.metrics?.cvssMetricV31?.[0]?.cvssData?.baseScore || 'N/A';
@@ -699,10 +805,8 @@
         }
 
         // 4. ABUSEIPDB – check IP reputation (free key required, but we'll use a demo key)
-        //    We'll use the public check endpoint with a demo key
         async function checkAbuseIPDB(ip) {
             try {
-                // Using a public demo key – for production, user should register their own
                 const resp = await axios.get('https://api.abuseipdb.com/api/v2/check', {
                     params: { ipAddress: ip, maxAgeInDays: 90 },
                     headers: { 'Key': 'YOUR_DEMO_KEY_HERE', 'Accept': 'application/json' }
@@ -717,23 +821,11 @@
         async function checkHIBP(email) {
             try {
                 const resp = await axios.get('https://haveibeenpwned.com/api/v3/breachedaccount/' + encodeURIComponent(email), {
-                    headers: { 'hibp-api-key': '' } // No key needed for public
+                    headers: { 'hibp-api-key': '' }
                 });
                 return resp.data;
             } catch (e) {
                 if (e.response && e.response.status === 404) return [];
-                return null;
-            }
-        }
-
-        // 6. SHODAN – host info (free key required, we'll use a demo key)
-        async function shodanLookup(ip) {
-            try {
-                const resp = await axios.get('https://api.shodan.io/shodan/host/' + ip, {
-                    params: { key: 'YOUR_DEMO_KEY_HERE' }
-                });
-                return resp.data;
-            } catch (e) {
                 return null;
             }
         }
@@ -752,16 +844,12 @@
             APP.intelData.slice(0, 12).forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'intel-item';
-                div.innerHTML = `
-                    <span class="source">${item.source || 'OTX'}</span>
-                    <span class="ioc">${item.ioc}</span>
-                    <span class="type">${item.type || 'IOC'}</span>
-                `;
+                div.innerHTML =
+                    `<span class="source">${item.source || 'OTX'}</span><span class="ioc">${item.ioc}</span><span class="type">${item.type || 'IOC'}</span>`;
                 feed.appendChild(div);
             });
         }
 
-        // Alerts
         function addAlert(msg, sev = 'low') {
             const feed = document.getElementById('alertFeed');
             const item = document.createElement('div');
@@ -785,9 +873,7 @@
             if (!ip) { res.innerHTML = '<span class="label">Enter an IP.</span>'; return; }
             res.innerHTML = '<span class="label">⏳ Scanning ' + ip + '...</span>';
             try {
-                // Check AbuseIPDB
                 const abuse = await checkAbuseIPDB(ip);
-                // Check IP geolocation
                 const geo = await lookupIP(ip);
                 let html = '';
                 if (geo && geo.status === 'success') {
@@ -806,7 +892,6 @@
                 }
                 res.innerHTML = html;
                 addAlert('Scanned IP: ' + ip, 'low');
-                // Check if in intel
                 const inIntel = APP.intelData.some(i => i.ioc === ip);
                 if (inIntel) {
                     res.innerHTML += '<br><span style="color:#ff4466;">⚠️ IP found in threat intelligence!</span>';
@@ -817,7 +902,6 @@
             }
         };
 
-        // IP Lookup with real data
         document.getElementById('ipInput').addEventListener('keydown', async function(e) {
             if (e.key !== 'Enter') return;
             const ip = this.value.trim();
@@ -832,12 +916,10 @@
                     html += `<span class="label">🏢 ${geo.isp} (${geo.org || ''})</span><br>`;
                     html += `<span class="label">⏰ ${geo.timezone || 'N/A'}</span>`;
                     res.innerHTML = html;
-                    // Cross-check with OTX
                     const inIntel = APP.intelData.some(i => i.ioc === ip);
                     if (inIntel) {
                         res.innerHTML += '<br><span style="color:#ff4466;">⚠️ This IP is in threat intelligence feeds.</span>';
                     }
-                    // Check AbuseIPDB
                     const abuse = await checkAbuseIPDB(ip);
                     if (abuse && abuse.data && abuse.data.abuseConfidenceScore > 0) {
                         res.innerHTML += `<br><span style="color:#ff8833;">⚠️ Abuse Score: ${abuse.data.abuseConfidenceScore}%</span>`;
@@ -851,7 +933,6 @@
             }
         });
 
-        // CVE Lookup
         window.lookupCVE = async function() {
             const cve = document.getElementById('cveInput').value.trim();
             const res = document.getElementById('cveResult');
@@ -877,13 +958,13 @@
                 html += `<span class="label">${desc.substring(0, 150)}...</span><br>`;
                 html += `<span class="label">📅 Published: ${data.published || 'N/A'}</span>`;
                 res.innerHTML = html;
-                addAlert('CVE lookup: ' + data.id + ' (Score: ' + score + ')', score >= 7 ? 'critical' : score >= 4 ? 'high' : 'low');
+                addAlert('CVE lookup: ' + data.id + ' (Score: ' + score + ')', score >= 7 ? 'critical' : score >= 4 ? 'high' :
+                    'low');
             } catch (e) {
                 res.innerHTML = '<span class="label">⚠️ Error: ' + e.message + '</span>';
             }
         };
 
-        // Breach Check (Have I Been Pwned)
         window.checkBreach = async function() {
             const email = document.getElementById('breachInput').value.trim();
             const res = document.getElementById('breachResult');
@@ -896,7 +977,8 @@
                 const data = await checkHIBP(email);
                 if (data && data.length > 0) {
                     const breaches = data.map(b => b.Name).join(', ');
-                    res.innerHTML = `<span style="color:#ff4466;">⚠️ Found in ${data.length} breaches:</span><br><span class="label">${breaches}</span>`;
+                    res.innerHTML =
+                        `<span style="color:#ff4466;">⚠️ Found in ${data.length} breaches:</span><br><span class="label">${breaches}</span>`;
                     addAlert('Breach found for ' + email + ' (' + data.length + ' breaches)', 'critical');
                 } else if (data === null) {
                     res.innerHTML = '<span class="label">⚠️ API rate limit. Try again later.</span>';
@@ -974,7 +1056,6 @@
         //  DASHBOARD: Map, Chart
         // ================================================================
 
-        // Map (Leaflet)
         function initMap() {
             APP.map = L.map('threatMap', {
                 center: [20, 0],
@@ -986,7 +1067,6 @@
                 subdomains: 'abcd',
                 maxZoom: 19
             }).addTo(APP.map);
-            // Add some threat markers (will be updated from real data later)
             const locations = [
                 [40.7, -74.0],
                 [51.5, -0.1],
@@ -1012,7 +1092,6 @@
             });
         }
 
-        // Chart (Chart.js)
         function initChart() {
             const ctx = document.getElementById('attackChart').getContext('2d');
             APP.chart = new Chart(ctx, {
@@ -1037,7 +1116,6 @@
                     cutout: '55%'
                 }
             });
-            // Update chart periodically with real data
             setInterval(() => {
                 if (APP.chart) {
                     APP.chart.data.datasets[0].data = [
@@ -1110,7 +1188,6 @@
                 if (APP.emulator && APP.emulator.serial0_send) {
                     APP.emulator.serial0_send(cmd + '\n');
                     appendSerial('$ ' + cmd + '\n');
-                    // Check for security-related commands
                     if (cmd.includes('nmap') || cmd.includes('scan') || cmd.includes('grep')) {
                         addAlert('Security command executed in Linux: ' + cmd.substring(0, 30), 'medium');
                     }
@@ -1144,7 +1221,6 @@
                 ]);
                 document.getElementById('statusText').textContent = 'Online';
                 document.getElementById('apiStatus').textContent = '✅ Live';
-                // Initial alerts
                 addAlert('System initialized with live data', 'low');
                 addAlert('Connected to OTX + NVD + HIBP', 'low');
             } catch (e) {
