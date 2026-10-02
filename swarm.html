@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PreCog Swarm HQ — Autonomous Enterprise Simulation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --bg-panel: #0d121f;
+            --bg-panel-hover: #141b2d;
+            --primary: #00f0ff;
+            --accent: #ff0055;
+            --gold: #ffd700;
+            --emerald: #10b981;
+            --purple: #a855f7;
+            --blue: #3b82f6;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header Bar */
+        header {
+            background: rgba(13, 18, 31, 0.95);
+            border-bottom: 1px solid var(--border);
+            padding: 10px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 20;
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 800;
+            font-size: 1.15rem;
+        }
+
+        .crest {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #07090e;
+        }
+
+        /* Treasury Stats Ticker */
+        .treasury-ticker {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 6px 18px;
+            border-radius: 30px;
+            border: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+        }
+
+        .ticker-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-val { font-weight: 700; }
+
+        /* Sim Controls */
+        .sim-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ctrl-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .ctrl-btn:hover, .ctrl-btn.active {
+            background: var(--primary);
+            color: #07090e;
+            border-color: var(--primary);
+        }
+
+        /* Main Layout */
+        .workspace {
+            display: flex;
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Left Side: Agent Rosters */
+        .sidebar-left {
+            width: 310px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .panel-title {
+            padding: 14px 18px;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .agent-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .agent-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 4px solid var(--agent-color, var(--primary));
+        }
+
+        .agent-card:hover, .agent-card.selected {
+            background: rgba(255,255,255,0.06);
+            border-color: var(--agent-color, var(--primary));
+            transform: translateX(3px);
+        }
+
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .agent-name {
+            font-weight: 700;
+            font-size: 0.92rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .agent-role {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .sims-meters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .meter-box {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .meter-bar-bg {
+            background: rgba(0,0,0,0.5);
+            height: 5px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 2px;
+        }
+
+        .meter-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .agent-task {
+            margin-top: 8px;
+            font-size: 0.75rem;
+            color: #d1d5db;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Center Canvas: The Sims / Free Enterprise HQ */
+        .simulation-view {
+            flex: 1;
+            position: relative;
+            background: #05070c;
+        }
+
+        #hqCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Overlay Room Tags */
+        .room-overlay {
+            position: absolute;
+            pointer-events: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: rgba(0,0,0,0.6);
+            padding: 3px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Right Panel: Telemetry & Inspector */
+        .sidebar-right {
+            width: 340px;
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .inspector-body {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .inspector-agent-hero {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+
+        .inspector-avatar {
+            width: 52px; height: 52px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            border: 2px solid var(--primary);
+        }
+
+        .thought-bubble {
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 18px;
+            position: relative;
+            font-size: 0.85rem;
+            color: #e0f2fe;
+            line-height: 1.4;
+        }
+
+        .thought-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -6px; left: 20px;
+            width: 10px; height: 10px;
+            background: rgba(0, 240, 255, 0.08);
+            border-right: 1px solid rgba(0, 240, 255, 0.3);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+            transform: rotate(45deg);
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.4);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .stat-card-title {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .stat-card-val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            margin-top: 2px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Action Directives Box */
+        .directives-area h4 {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            letter-spacing: 0.8px;
+        }
+
+        .directive-btn {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+        }
+
+        .directive-btn:hover {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Bottom Activity Feed */
+        .bottom-feed {
+            height: 90px;
+            background: #04060a;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+        }
+
+        .feed-header {
+            padding: 4px 16px;
+            background: rgba(255,255,255,0.03);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .feed-logs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .log-entry {
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-time { color: var(--text-muted); }
+        .log-agent { font-weight: 700; }
+        .log-text { color: #d1d5db; }
+    </style>
+</head>
+<body>
+    <!-- Top Header -->
+    <header>
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="index.html" class="brand-area">
+                <div class="crest">P</div>
+                PreCog Swarm Simulation HQ
+            </a>
+            <span style="font-size: 0.75rem; color: var(--emerald); font-family: 'JetBrains Mono', monospace; background: rgba(16,185,129,0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--emerald);">
+                ● 6 AGENTS SYNCHRONIZED
+            </span>
+        </div>
+
+        <!-- Treasury Ticker -->
+        <div class="treasury-ticker">
+            <div class="ticker-stat">
+                <span style="color:var(--text-muted);">TREASURY:</span>
+                <span class="stat-val" id="treasuryVal" style="color:var(--gold);">$100,267.22</span>
+            </div>
+            <div class="ticker-stat">
+                <span style="color:var(--text-muted);">BTC:</span>
+                <span class="stat-val" id="btcVal" style="color:#f59e0b;">0.842 BTC</span>
+            </div>
+            <div class="ticker-stat">
+                <span style="color:var(--text-muted);">ETH:</span>
+                <span class="stat-val" id="ethVal" style="color:#a855f7;">14.20 ETH</span>
+            </div>
+            <div class="ticker-stat">
+                <span style="color:var(--text-muted);">ECOCASH:</span>
+                <span class="stat-val" id="ecoVal" style="color:var(--emerald);">$1,450.00</span>
+            </div>
+            <div class="ticker-stat">
+                <span style="color:var(--text-muted);">OPS/HR:</span>
+                <span class="stat-val" id="opsHrVal" style="color:var(--primary);">+384 Tasks</span>
+            </div>
+        </div>
+
+        <!-- Speed & Audio Controls -->
+        <div class="sim-controls">
+            <button class="ctrl-btn" id="btnSound" onclick="toggleAudio()">🔊 SFX: ON</button>
+            <button class="ctrl-btn" onclick="setSpeed(0, this)">⏸ Pause</button>
+            <button class="ctrl-btn active" onclick="setSpeed(1, this)">1x</button>
+            <button class="ctrl-btn" onclick="setSpeed(2, this)">2x</button>
+            <button class="ctrl-btn" onclick="setSpeed(5, this)">5x Turbo</button>
+            <button class="ctrl-btn" style="background:var(--accent); border-color:var(--accent); color:white;" onclick="triggerSwarmSurge()">⚡ Swarm Surge</button>
+            <a href="index.html" class="ctrl-btn" style="text-decoration:none;">Exit HQ</a>
+        </div>
+    </header>
+
+    <!-- Simulation Workspace -->
+    <div class="workspace">
+        <!-- Left Sidebar: Agent Roster -->
+        <div class="sidebar-left">
+            <div class="panel-title">
+                <span>SWARM ROSTER</span>
+                <span style="color:var(--primary);" id="activeCount">6 ACTIVE</span>
+            </div>
+            <div class="agent-list" id="agentList">
+                <!-- Agent cards rendered via JS -->
+            </div>
+        </div>
+
+        <!-- Center: Interactive Simulation Canvas -->
+        <div class="simulation-view">
+            <canvas id="hqCanvas"></canvas>
+
+            <!-- Room Labels -->
+            <div class="room-overlay" style="top: 25px; left: 35px;">🏛️ Boardroom & Treasury (BlueHound CFO)</div>
+            <div class="room-overlay" style="top: 25px; right: 40px;">📡 Threat & Bounty Radar War Room</div>
+            <div class="room-overlay" style="top: 48%; left: 35px;">⚙️ Engineering & Testing Foundry</div>
+            <div class="room-overlay" style="top: 48%; right: 40px;">💼 Client Outreach & Deal Suite</div>
+            <div class="room-overlay" style="bottom: 25px; left: 35px;">🔬 Alpha Research & Market Lab</div>
+            <div class="room-overlay" style="bottom: 25px; right: 40px;">🛍️ E-Commerce & Dropship Bay</div>
+            <div class="room-overlay" style="top: 48%; left: 46%; transform: translate(-50%, -50%);">☕ Break & Resource Mesh</div>
+        </div>
+
+        <!-- Right Sidebar: Inspector & Directives -->
+        <div class="sidebar-right">
+            <div class="panel-title">
+                <span>AGENT INSPECTOR</span>
+                <span id="inspectorStatus" style="color:var(--emerald);">RUNNING</span>
+            </div>
+            <div class="inspector-body" id="inspectorContent">
+                <!-- Inspector populated via JS on agent selection -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Log & Collaboration Feed -->
+    <div class="bottom-feed">
+        <div class="feed-header">
+            <span>REAL-TIME MULTI-AGENT COLLABORATION & TELEMETRY STREAM</span>
+            <span>OPERATOR: BLUEHOUND</span>
+        </div>
+        <div class="feed-logs" id="feedLogs">
+            <!-- Real-time logs inserted dynamically -->
+        </div>
+    </div>
+
+    <script>
+        // --- Web Audio Synthesizer for Retro Game SFX ---
+        let audioCtx = null;
+        let soundEnabled = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playBeep(freq = 440, type = 'sine', duration = 0.08) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e){}
+        }
+
+        function playCashChime() {
+            if (!soundEnabled) return;
+            playBeep(587.33, 'triangle', 0.1);
+            setTimeout(() => playBeep(880, 'triangle', 0.15), 80);
+            setTimeout(() => playBeep(1174.66, 'sine', 0.25), 160);
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('btnSound').innerText = soundEnabled ? '🔊 SFX: ON' : '🔈 SFX: OFF';
+        }
+
+        // --- Swarm Agents State Data (The Sims Style) ---
+        const AGENTS = [
+            {
+                id: 'bluehound',
+                name: 'BlueHound',
+                role: 'CFO & Sovereign Operator',
+                icon: '🛡️',
+                color: '#ffd700',
+                room: 'boardroom',
+                x: 180, y: 140,
+                targetX: 180, targetY: 140,
+                energy: 98,
+                focus: 100,
+                revenueGenerated: '$54,200',
+                activeTask: 'Balancing multi-rail liquidity (BTC/ETH/EcoCash)',
+                thought: 'Verifying payout audit ledger. Treasury runway is infinite.',
+                tools: ['Treasury Ledger', 'Taproot Router', 'Audit Gate'],
+                history: [
+                    'Approved automated ETH batch transfer to blessed destination',
+                    'Allocated 150,000 compute tokens to CodeSmith for triage',
+                    'Logged daily reconciliation to payout-approvals.json'
+                ]
+            },
+            {
+                id: 'radar',
+                name: 'BountyRadar',
+                role: 'Bounty & Vulnerability Hunter',
+                icon: '🎯',
+                color: '#ff0055',
+                room: 'warroom',
+                x: 620, y: 140,
+                targetX: 620, targetY: 140,
+                energy: 92,
+                focus: 95,
+                revenueGenerated: '$28,400',
+                activeTask: 'Scanning Algora, Opire & GitHub feeds for EV > $40',
+                thought: 'Found 19 funded issues. Filtered crowded rivals; queuing quick wins.',
+                tools: ['Score Evaluator', 'Competition Analyzer', 'Opire /try Dispatcher'],
+                history: [
+                    'Identified tenstorrent/tt-metal #58951 bounty opportunity',
+                    'Dispatched /try signal on flowese/UdioWrapper to claim queue',
+                    'Passed clean vulnerability target to CodeSmith'
+                ]
+            },
+            {
+                id: 'codesmith',
+                name: 'CodeSmith',
+                role: 'Autonomous Engineering Agent',
+                icon: '⚡',
+                color: '#3b82f6',
+                room: 'foundry',
+                x: 180, y: 340,
+                targetX: 180, targetY: 340,
+                energy: 88,
+                focus: 99,
+                revenueGenerated: '$32,100',
+                activeTask: 'Running pytest + ruff test gates on AST patch',
+                thought: 'Evidence gate enforced. Never submitting without passing local suite.',
+                tools: ['Worktree Engine', 'Evidence Gate', 'PR Submitter'],
+                history: [
+                    'Synthesized fix for CVE-2026 vulnerability in sandbox',
+                    'Passed 241 unit tests across suite in 28.8s',
+                    'Dispatched verified PR #58951 with all checks green'
+                ]
+            },
+            {
+                id: 'nexus',
+                name: 'Nexus',
+                role: 'Client Outreach & Negotiator',
+                icon: '✉️',
+                color: '#ec4899',
+                room: 'dealsuite',
+                x: 620, y: 340,
+                targetX: 620, targetY: 340,
+                energy: 94,
+                focus: 90,
+                revenueGenerated: '$18,900',
+                activeTask: 'Drafting enterprise web design proposals on Fiverr/Upwork',
+                thought: 'Negotiating $1,500 branding package within 10% rate card policy.',
+                tools: ['Browser Email Mesh', 'Rate Card Validator', 'CRM Logger'],
+                history: [
+                    'Followed up with 4 enterprise design leads from AlphaScout',
+                    'Logged negotiated engagement to .swarm/ledger/outreach',
+                    'Updated client terms to include EcoCash & BTC settlement'
+                ]
+            },
+            {
+                id: 'alphascout',
+                name: 'AlphaScout',
+                role: 'Deep Research & Market Intel',
+                icon: '🔬',
+                color: '#10b981',
+                room: 'researchlab',
+                x: 180, y: 540,
+                targetX: 180, targetY: 540,
+                energy: 90,
+                focus: 92,
+                revenueGenerated: '$12,600',
+                activeTask: 'Evaluating 2026 dropship niches & freelance market gaps',
+                thought: 'Contra and Fiverr offer highest margin for our full-stack web kits.',
+                tools: ['Exa Web Scanner', 'Market Ranking Engine', 'Lead Scraper'],
+                history: [
+                    'Compiled top 10 freelance platforms report in .swarm/research',
+                    'Identified high-conversion Shopify dropshipping product gaps',
+                    'Scouted 15 local business leads needing web modernization'
+                ]
+            },
+            {
+                id: 'vanguard',
+                name: 'Vanguard',
+                role: 'Storefront & Logistics Operator',
+                icon: '🛍️',
+                color: '#a855f7',
+                room: 'commercebay',
+                x: 620, y: 540,
+                targetX: 620, targetY: 540,
+                energy: 95,
+                focus: 94,
+                revenueGenerated: '$16,400',
+                activeTask: 'Synchronizing GitHub Pages & Shopify storefront catalogs',
+                thought: 'Deploying high-speed static store template under tim777z/stores.',
+                tools: ['Shopify Automation', 'GitHub Pages Deployer', 'Inventory Sync'],
+                history: [
+                    'Launched multi-product store showcase on GitHub Pages',
+                    'Integrated supplier fulfillment API with auto-tracking',
+                    'Synchronized live pricing with BlueHound treasury rates'
+                ]
+            }
+        ];
+
+        // --- Room Waypoints & Definitions ---
+        const ROOMS = {
+            boardroom:   { x: 180, y: 140, name: 'Executive Treasury', icon: '🏛️' },
+            warroom:     { x: 620, y: 140, name: 'Threat Radar Room', icon: '📡' },
+            foundry:     { x: 180, y: 340, name: 'Engineering Foundry', icon: '⚙️' },
+            dealsuite:   { x: 620, y: 340, name: 'Outreach & Deal Room', icon: '💼' },
+            researchlab: { x: 180, y: 540, name: 'Alpha Research Lab', icon: '🔬' },
+            commercebay: { x: 620, y: 540, name: 'E-Commerce Logistics', icon: '🛍️' },
+            breakroom:   { x: 400, y: 340, name: 'Coffee & Resource Mesh', icon: '☕' }
+        };
+
+        let selectedAgent = AGENTS[0];
+        let simSpeed = 1;
+        let simTime = 0;
+        let resourceParticles = [];
+        let collaborationLinks = [];
+
+        // --- Canvas Initialization ---
+        const canvas = document.getElementById('hqCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // --- Render Agent Cards in Sidebar ---
+        function renderRoster() {
+            const list = document.getElementById('agentList');
+            list.innerHTML = '';
+            AGENTS.forEach(agent => {
+                const card = document.createElement('div');
+                card.className = `agent-card ${selectedAgent.id === agent.id ? 'selected' : ''}`;
+                card.style.setProperty('--agent-color', agent.color);
+                card.onclick = () => selectAgent(agent.id);
+
+                card.innerHTML = `
+                    <div class="agent-header">
+                        <span class="agent-name">${agent.icon} ${agent.name}</span>
+                        <span class="agent-role">${agent.role.split('&')[0]}</span>
+                    </div>
+                    <div class="sims-meters">
+                        <div class="meter-box">
+                            <span>ENERGY ${Math.round(agent.energy)}%</span>
+                            <div class="meter-bar-bg">
+                                <div class="meter-bar-fill" style="width:${agent.energy}%; background:var(--emerald);"></div>
+                            </div>
+                        </div>
+                        <div class="meter-box">
+                            <span>FOCUS ${Math.round(agent.focus)}%</span>
+                            <div class="meter-bar-bg">
+                                <div class="meter-bar-fill" style="width:${agent.focus}%; background:var(--primary);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agent-task">${agent.activeTask}</div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // --- Select & Inspect Agent ---
+        function selectAgent(id) {
+            selectedAgent = AGENTS.find(a => a.id === id);
+            playBeep(600, 'sine', 0.05);
+            renderRoster();
+            renderInspector();
+        }
+
+        function renderInspector() {
+            const insp = document.getElementById('inspectorContent');
+            const a = selectedAgent;
+            insp.innerHTML = `
+                <div class="inspector-agent-hero">
+                    <div class="inspector-avatar" style="border-color:${a.color};">${a.icon}</div>
+                    <div>
+                        <h3 style="color:white; font-size:1.15rem;">${a.name}</h3>
+                        <div style="color:${a.color}; font-size:0.78rem; font-family:'JetBrains Mono',monospace;">${a.role}</div>
+                    </div>
+                </div>
+
+                <div class="thought-bubble">
+                    <strong>THOUGHT:</strong> "${a.thought}"
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-card-title">Cumulative Value</div>
+                        <div class="stat-card-val" style="color:var(--gold);">${a.revenueGenerated}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">Location / Station</div>
+                        <div class="stat-card-val" style="font-size:0.85rem; color:var(--primary);">${ROOMS[a.room].name}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">Compute Allocation</div>
+                        <div class="stat-card-val" style="color:var(--emerald);">Unlimited Free</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-title">Autonomy Status</div>
+                        <div class="stat-card-val" style="color:#a855f7;">Full Sovereign</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:18px;">
+                    <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Current Pipeline</div>
+                    <div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; border:1px solid var(--border); font-size:0.82rem; font-family:'JetBrains Mono',monospace; color:#d1d5db;">
+                        ${a.activeTask}
+                    </div>
+                </div>
+
+                <div class="directives-area">
+                    <h4>Direct Swarm Action</h4>
+                    <button class="directive-btn" onclick="issueDirective('${a.id}', 'surge')">
+                        <span>⚡ Prioritize High-Yield Tasks</span>
+                        <span>&rarr;</span>
+                    </button>
+                    <button class="directive-btn" onclick="issueDirective('${a.id}', 'collab')">
+                        <span>🤝 Mesh Resources with Swarm</span>
+                        <span>&rarr;</span>
+                    </button>
+                    <button class="directive-btn" onclick="issueDirective('${a.id}', 'recharge')">
+                        <span>☕ Route to Recharge & Coffee</span>
+                        <span>&rarr;</span>
+                    </button>
+                </div>
+            `;
+        }
+
+        function issueDirective(agentId, type) {
+            const agent = AGENTS.find(a => a.id === agentId);
+            if (!agent) return;
+            playBeep(800, 'square', 0.1);
+
+            if (type === 'recharge') {
+                agent.room = 'breakroom';
+                agent.activeTask = 'Recharging compute & exchanging resource tokens';
+                agent.thought = 'Grabbing espresso and sharing AST cache with peers.';
+                agent.energy = Math.min(100, agent.energy + 20);
+                addLog(agent.name, 'Moved to Break Room for compute recharge', '#10b981');
+            } else if (type === 'surge') {
+                agent.focus = 100;
+                agent.thought = 'Executing turbocharged high-yield operations at maximum throughput.';
+                addLog(agent.name, 'Initiated high-yield task surge', '#ffd700');
+                playCashChime();
+            } else if (type === 'collab') {
+                const partner = AGENTS.find(other => other.id !== agent.id);
+                triggerCollab(agent, partner, 'Compute & Lead Handshake');
+            }
+
+            renderRoster();
+            renderInspector();
+        }
+
+        function triggerCollab(a1, a2, label) {
+            collaborationLinks.push({
+                from: a1,
+                to: a2,
+                label: label,
+                life: 180
+            });
+            playBeep(720, 'triangle', 0.12);
+            addLog('SWARM COLLAB', `${a1.name} ⇄ ${a2.name}: ${label}`, '#00f0ff');
+        }
+
+        function addLog(agent, msg, color = '#d1d5db') {
+            const container = document.getElementById('feedLogs');
+            const now = new Date();
+            const timeStr = now.toTimeString().split(' ')[0];
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.innerHTML = `
+                <span class="log-time">[${timeStr}]</span>
+                <span class="log-agent" style="color:${color};">${agent}:</span>
+                <span class="log-text">${msg}</span>
+            `;
+            container.prepend(div);
+            if (container.children.length > 30) {
+                container.removeChild(container.lastChild);
+            }
+        }
+
+        // --- Speed Controls ---
+        function setSpeed(s, btn) {
+            simSpeed = s;
+            document.querySelectorAll('.sim-controls .ctrl-btn').forEach(b => {
+                if (b.innerText.includes('x') || b.innerText.includes('Pause')) b.classList.remove('active');
+            });
+            if (btn) btn.classList.add('active');
+            playBeep(400 + s * 100, 'sine', 0.05);
+        }
+
+        function triggerSwarmSurge() {
+            playCashChime();
+            addLog('BLUEHOUND', '⚡ TRIGGERED SWARM-WIDE REVENUE SURGE ACROSS ALL SECTORS', '#ffd700');
+            AGENTS.forEach(a => {
+                a.energy = 100;
+                a.focus = 100;
+            });
+            // Create cross-collab links
+            for (let i = 0; i < AGENTS.length; i++) {
+                const next = AGENTS[(i + 1) % AGENTS.length];
+                triggerCollab(AGENTS[i], next, 'High-Frequency Resource Mesh');
+            }
+            // Increment treasury slightly
+            const cur = parseFloat(document.getElementById('treasuryVal').innerText.replace(/[$,]/g, ''));
+            const newT = cur + 1250;
+            document.getElementById('treasuryVal').innerText = '$' + newT.toLocaleString(undefined, {minimumFractionDigits:2});
+            renderRoster();
+            renderInspector();
+        }
+
+        // --- Canvas Drawing Simulation Loop ---
+        function drawRoom(x, y, w, h, name, icon, color) {
+            // Isometric / modern grid room box
+            ctx.fillStyle = 'rgba(14, 20, 35, 0.75)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, h, 14);
+            ctx.fill();
+            ctx.stroke();
+
+            // Room accent header
+            ctx.fillStyle = color + '15';
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, 32, [14, 14, 0, 0]);
+            ctx.fill();
+
+            ctx.fillStyle = color;
+            ctx.font = 'bold 12px "JetBrains Mono", monospace';
+            ctx.fillText(`${icon} ${name}`, x + 12, y + 21);
+
+            // Tech floor grid inside room
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+            ctx.lineWidth = 1;
+            for (let gx = x + 20; gx < x + w; gx += 25) {
+                ctx.beginPath(); ctx.moveTo(gx, y + 32); ctx.lineTo(gx, y + h); ctx.stroke();
+            }
+            for (let gy = y + 45; gy < y + h; gy += 25) {
+                ctx.beginPath(); ctx.moveTo(x, gy); ctx.lineTo(x + w, gy); ctx.stroke();
+            }
+        }
+
+        function drawAgent(agent) {
+            const isSelected = selectedAgent.id === agent.id;
+
+            // Target positioning interpolation
+            const target = ROOMS[agent.room];
+            agent.x += (target.x - agent.x) * 0.05 * (simSpeed || 0.1);
+            agent.y += (target.y - agent.y) * 0.05 * (simSpeed || 0.1);
+
+            // Subtle bobbing animation
+            const bob = Math.sin(simTime * 0.05 + agent.id.length) * 3;
+
+            // Selection Glow
+            if (isSelected) {
+                ctx.strokeStyle = agent.color;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(agent.x, agent.y + bob, 26, 0, Math.PI * 2);
+                ctx.stroke();
+
+                ctx.fillStyle = agent.color + '33';
+                ctx.beginPath();
+                ctx.arc(agent.x, agent.y + bob, 26, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Sims Plumbob (Diamond above head)
+            const plumbobY = agent.y + bob - 36;
+            ctx.fillStyle = agent.energy > 50 ? '#10b981' : '#f59e0b';
+            ctx.beginPath();
+            ctx.moveTo(agent.x, plumbobY - 10);
+            ctx.lineTo(agent.x + 6, plumbobY);
+            ctx.lineTo(agent.x, plumbobY + 10);
+            ctx.lineTo(agent.x - 6, plumbobY);
+            ctx.closePath();
+            ctx.fill();
+
+            // Agent Body Avatar
+            ctx.fillStyle = '#0f172a';
+            ctx.strokeStyle = agent.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(agent.x, agent.y + bob, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Agent Icon Emoji
+            ctx.font = '16px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(agent.icon, agent.x, agent.y + bob + 1);
+
+            // Agent Name Badge
+            ctx.font = 'bold 10px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(agent.name, agent.x, agent.y + bob + 28);
+        }
+
+        function drawConnections() {
+            // Draw collaboration beam lines
+            collaborationLinks = collaborationLinks.filter(link => {
+                link.life -= (simSpeed || 1);
+                if (link.life <= 0) return false;
+
+                const alpha = Math.min(1, link.life / 60);
+                ctx.strokeStyle = `rgba(0, 240, 255, ${alpha * 0.6})`;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.lineDashOffset = -simTime;
+
+                ctx.beginPath();
+                ctx.moveTo(link.from.x, link.from.y);
+                ctx.lineTo(link.to.x, link.to.y);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Midpoint text badge
+                const midX = (link.from.x + link.to.x) / 2;
+                const midY = (link.from.y + link.to.y) / 2;
+                ctx.fillStyle = `rgba(7, 9, 14, ${alpha * 0.9})`;
+                ctx.fillRect(midX - 50, midY - 10, 100, 20);
+                ctx.strokeStyle = `rgba(0, 240, 255, ${alpha * 0.5})`;
+                ctx.strokeRect(midX - 50, midY - 10, 100, 20);
+
+                ctx.fillStyle = `rgba(0, 240, 255, ${alpha})`;
+                ctx.font = '9px "JetBrains Mono", monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('🤝 ' + link.label.slice(0, 12), midX, midY);
+
+                return true;
+            });
+        }
+
+        // Interactive Click on Canvas Agents
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const clickY = e.clientY - rect.top;
+
+            // Check if agent clicked
+            for (const agent of AGENTS) {
+                const dist = Math.hypot(clickX - agent.x, clickY - agent.y);
+                if (dist < 30) {
+                    selectAgent(agent.id);
+                    return;
+                }
+            }
+
+            // Check if room clicked to move selected agent
+            for (const [key, r] of Object.entries(ROOMS)) {
+                const dist = Math.hypot(clickX - r.x, clickY - r.y);
+                if (dist < 80) {
+                    selectedAgent.room = key;
+                    playBeep(520, 'sine', 0.08);
+                    addLog(selectedAgent.name, `Relocated station to ${r.name}`, selectedAgent.color);
+                    renderInspector();
+                    renderRoster();
+                    return;
+                }
+            }
+        });
+
+        // --- Main Simulation Loop ---
+        let lastAutoEvent = 0;
+        const SIM_EVENTS = [
+            { agent: 'BlueHound', text: 'Scanned Ethereum cold rail; treasury in optimal balance', color: '#ffd700' },
+            { agent: 'BountyRadar', text: 'Detected new Opire reward on active repository', color: '#ff0055' },
+            { agent: 'CodeSmith', text: 'Verified test suite passed (241/241 assertions)', color: '#3b82f6' },
+            { agent: 'Nexus', text: 'Received inbound lead inquiry for full-stack redesign', color: '#ec4899' },
+            { agent: 'AlphaScout', text: 'Identified $500/mo high-converting dropshipping niche', color: '#10b981' },
+            { agent: 'Vanguard', text: 'Updated static web storefront assets on GitHub Pages', color: '#a855f7' }
+        ];
+
+        function loop() {
+            simTime += (simSpeed || 0);
+
+            // Resize if needed
+            if (canvas.width !== canvas.parentElement.clientWidth || canvas.height !== canvas.parentElement.clientHeight) {
+                resizeCanvas();
+            }
+
+            // Clear Background
+            ctx.fillStyle = '#05070c';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Responsive Scaling coordinates
+            const w = canvas.width;
+            const h = canvas.height;
+            const rw = Math.min(260, w * 0.28);
+            const rh = Math.min(160, h * 0.26);
+
+            // Update room center anchors based on canvas size
+            ROOMS.boardroom.x   = w * 0.22; ROOMS.boardroom.y   = h * 0.20;
+            ROOMS.warroom.x     = w * 0.78; ROOMS.warroom.y     = h * 0.20;
+            ROOMS.foundry.x     = w * 0.22; ROOMS.foundry.y     = h * 0.50;
+            ROOMS.dealsuite.x   = w * 0.78; ROOMS.dealsuite.y   = h * 0.50;
+            ROOMS.researchlab.x = w * 0.22; ROOMS.researchlab.y = h * 0.80;
+            ROOMS.commercebay.x = w * 0.78; ROOMS.commercebay.y = h * 0.80;
+            ROOMS.breakroom.x   = w * 0.50; ROOMS.breakroom.y   = h * 0.50;
+
+            // Draw Rooms
+            drawRoom(ROOMS.boardroom.x - rw/2,   ROOMS.boardroom.y - rh/2,   rw, rh, 'Treasury & Executive', '🏛️', '#ffd700');
+            drawRoom(ROOMS.warroom.x - rw/2,     ROOMS.warroom.y - rh/2,     rw, rh, 'Threat Radar Room', '📡', '#ff0055');
+            drawRoom(ROOMS.foundry.x - rw/2,     ROOMS.foundry.y - rh/2,     rw, rh, 'Engineering Foundry', '⚙️', '#3b82f6');
+            drawRoom(ROOMS.dealsuite.x - rw/2,   ROOMS.dealsuite.y - rh/2,   rw, rh, 'Client Deal Suite', '💼', '#ec4899');
+            drawRoom(ROOMS.researchlab.x - rw/2, ROOMS.researchlab.y - rh/2, rw, rh, 'Alpha Research Lab', '🔬', '#10b981');
+            drawRoom(ROOMS.commercebay.x - rw/2, ROOMS.commercebay.y - rh/2, rw, rh, 'E-Commerce Logistics', '🛍️', '#a855f7');
+            drawRoom(ROOMS.breakroom.x - rw/2.5, ROOMS.breakroom.y - rh/2.5, rw*0.8, rh*0.8, 'Resource Mesh & Break', '☕', '#00f0ff');
+
+            // Draw Collab Lines
+            drawConnections();
+
+            // Draw Agents
+            AGENTS.forEach(drawAgent);
+
+            // Spontaneous Simulation Events
+            if (simSpeed > 0 && simTime - lastAutoEvent > (300 / simSpeed)) {
+                lastAutoEvent = simTime;
+                const ev = SIM_EVENTS[Math.floor(Math.random() * SIM_EVENTS.length)];
+                addLog(ev.agent, ev.text, ev.color);
+                
+                // Random cross-collaboration
+                if (Math.random() > 0.4) {
+                    const idx1 = Math.floor(Math.random() * AGENTS.length);
+                    let idx2 = Math.floor(Math.random() * AGENTS.length);
+                    if (idx1 === idx2) idx2 = (idx1 + 1) % AGENTS.length;
+                    triggerCollab(AGENTS[idx1], AGENTS[idx2], 'Sync Task');
+                }
+            }
+
+            requestAnimationFrame(loop);
+        }
+
+        // Initialize UI
+        renderRoster();
+        renderInspector();
+        addLog('SYSTEM', 'Autonomous Swarm Simulation Initialized. Operator: BlueHound.', '#00f0ff');
+        addLog('BLUEHOUND', 'All treasury rails, bounty feeds, and client pipelines active.', '#ffd700');
+
+        loop();
+    </script>
+</body>
+</html>

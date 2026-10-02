@@ -3,116 +3,449 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://formsubmit.co;">
-    <meta name="description" content="Explore PreCog Security consulting, threat detection, incident response, and compliance services.">
-    <title>Services - PreCog Security</title>
-    <link rel="stylesheet" href="assets/services.css">
+    <title>Enterprise Services & Rates — PreCog Holdings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --bg-card: #0e131f;
+            --bg-card-hover: #141b2d;
+            --primary: #00f0ff;
+            --accent: #ff0055;
+            --gold: #ffd700;
+            --emerald: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(7, 9, 14, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .brand-crest {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #07090e;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .hero {
+            padding: 160px 0 80px;
+            text-align: center;
+            background: linear-gradient(135deg, #07090e 0%, #0d1527 50%, #150920 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .sector-section {
+            padding: 80px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sector-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .sector-icon {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            border: 1px solid var(--border);
+        }
+
+        .sector-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+        }
+
+        .service-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .service-price {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 20px;
+        }
+
+        .service-price small {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .service-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 25px;
+            border-top: 1px solid var(--border);
+            padding-top: 15px;
+        }
+
+        .service-features li {
+            font-size: 0.88rem;
+            color: #d1d5db;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .service-features li::before {
+            content: '✓';
+            color: var(--emerald);
+            font-weight: bold;
+        }
+
+        .btn-order {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: 700;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: block;
+        }
+
+        .btn-order:hover {
+            background: var(--primary);
+            color: #07090e;
+        }
+
+        .popular-badge {
+            background: var(--accent);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        /* Footer */
+        footer {
+            background: #04060a;
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
+    <nav>
+        <a href="index.html" class="nav-brand">
+            <div class="brand-crest">P</div>
+            PreCog Holdings
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html#divisions">Divisions</a></li>
+            <li><a href="swarm.html">Swarm Simulation</a></li>
+            <li><a href="services.html" style="color:var(--primary);">Services & Rates</a></li>
+            <li><a href="index.html#treasury">Treasury</a></li>
+            <li><a href="try.html" style="background:var(--primary); color:#07090e; padding:8px 18px; border-radius:6px; font-weight:700;">Client Portal</a></li>
+        </ul>
+    </nav>
+
     <div class="hero">
-        <h1>Security Services</h1>
-        <p>Professional security consulting powered by AI. We find the threats others miss.</p>
-    </div>
-
-    <div class="container">
-        <h2 class="section-heading">Our Services</h2>
-        <div class="services">
-            <div class="service">
-                <h3>Security Audit</h3>
-                <p>Comprehensive code review using AI-powered static analysis. We scan for vulnerabilities, insecure defaults, and architectural weaknesses across your entire codebase.</p>
-            </div>
-            <div class="service">
-                <h3>Threat Detection Setup</h3>
-                <p>Deploy AI-powered threat detection in your environment. Real-time monitoring, anomaly detection, and automated alerting for security events.</p>
-            </div>
-            <div class="service">
-                <h3>Social Intelligence (SOCMINT)</h3>
-                <p>Analyze social media for brand threats, credential leaks, and reputational risks. Network mapping and influence analysis.</p>
-            </div>
-            <div class="service">
-                <h3>Code Security Review</h3>
-                <p>Pre-release security review of critical code paths. Authentication, authorization, input validation, and secret handling hardening.</p>
-            </div>
-            <div class="service">
-                <h3>Incident Response</h3>
-                <p>Rapid response to security incidents. Forensic analysis, containment, and recovery. Available 24/7 for critical issues.</p>
-            </div>
-            <div class="service">
-                <h3>Compliance Consulting</h3>
-                <p>SOC 2, GDPR, HIPAA compliance guidance. Security policy development and implementation support.</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <h2 class="pricing-heading">Pricing</h2>
-        <p class="pricing-intro">Transparent pricing. No hidden fees. Cancel anytime.</p>
-        <div class="pricing">
-            <div class="plan">
-                <h3>Starter</h3>
-                <div class="price">$500<small> / scan</small></div>
-                <ul>
-                    <li>Single repository audit</li>
-                    <li>Security score + report</li>
-                    <li>Top 10 vulnerabilities</li>
-                    <li>Remediation guidance</li>
-                    <li>3-day turnaround</li>
-                </ul>
-                <a href="mailto:timlangeveldt@gmail.com?subject=Starter%20Security%20Audit" class="cta-outline">Get Started</a>
-            </div>
-            <div class="plan popular">
-                <h3>Professional</h3>
-                <div class="price">$2,000<small> / engagement</small></div>
-                <ul>
-                    <li>Full codebase audit (up to 500K LOC)</li>
-                    <li>Deep dependency analysis</li>
-                    <li>Architecture review</li>
-                    <li>CI/CD security pipeline</li>
-                    <li>30-day remediation support</li>
-                    <li>Slack channel with our team</li>
-                </ul>
-                <a href="mailto:timlangeveldt@gmail.com?subject=Professional%20Security%20Audit" class="cta">Book Now</a>
-            </div>
-            <div class="plan">
-                <h3>Enterprise</h3>
-                <div class="price">$5,000<small> / month</small></div>
-                <ul>
-                    <li>Ongoing security monitoring</li>
-                    <li>Weekly vulnerability scans</li>
-                    <li>Incident response (24/7)</li>
-                    <li>Compliance consulting</li>
-                    <li>Quarterly security reviews</li>
-                    <li>Dedicated security engineer</li>
-                </ul>
-                <a href="mailto:timlangeveldt@gmail.com?subject=Enterprise%20Security%20Retainer" class="cta-outline">Contact Us</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="cases">
         <div class="container">
-            <h2 class="section-heading">Case Studies</h2>
-            <div class="case">
-                <h4>Fintech Startup — Pre-Launch Audit</h4>
-                <p>Found 3 critical authentication flaws in payment processing code before production launch. Prevented potential $50K+ breach.</p>
-                <div class="metric">3 critical vulnerabilities found</div>
-            </div>
-            <div class="case">
-                <h4>SaaS Platform — CI/CD Security Pipeline</h4>
-                <p>Deployed automated security scanning in GitHub Actions. Reduced vulnerability detection time from weeks to minutes.</p>
-                <div class="metric">94% faster detection</div>
-            </div>
-            <div class="case">
-                <h4>E-commerce — Social Intelligence Monitoring</h4>
-                <p>Identified credential leaks on dark web forums within 2 hours. Prevented unauthorized access to customer database.</p>
-                <div class="metric">2-hour detection time</div>
-            </div>
+            <h1>Enterprise Rate Card & Services</h1>
+            <p>
+                Multi-sector solutions powered by autonomous AI intelligence, predictive security, and full-stack creative execution.
+            </p>
         </div>
     </div>
 
-    <div class="footer">
-        <p>Contact: <a href="mailto:timlangeveldt@gmail.com">timlangeveldt@gmail.com</a></p>
-        <p class="copyright">&copy; 2026 PreCog Security. All rights reserved.</p>
+    <div class="container">
+        <!-- Sector 1: Cybersecurity -->
+        <section id="cyber" class="sector-section">
+            <div class="sector-header">
+                <div class="sector-icon">🛡️</div>
+                <div>
+                    <h2 class="sector-title">Cybersecurity & Threat Intelligence</h2>
+                    <p style="color:var(--text-muted);">Predictive vulnerability scanning, code security audits, and automated patch delivery.</p>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="service-card">
+                    <div>
+                        <h3>Single Repo Audit</h3>
+                        <p>Comprehensive automated AST code review, secret leak scanning, and vulnerability scoring.</p>
+                        <div class="service-price">$500 <small>/ audit</small></div>
+                        <ul class="service-features">
+                            <li>Static & dynamic code analysis</li>
+                            <li>Secret & credential leak detection</li>
+                            <li>Dependency vulnerability assessment</li>
+                            <li>Actionable remediation patch</li>
+                            <li>3-day delivery turnaround</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=Single%20Repo%20Audit%20Order" class="btn-order">Order Security Audit &rarr;</a>
+                </div>
+
+                <div class="service-card" style="border-color:var(--accent);">
+                    <div>
+                        <span class="popular-badge">Most Requested</span>
+                        <h3>Enterprise Codebase Hardening</h3>
+                        <p>Deep multi-repository architecture review, CI/CD security gate installation, and active threat modeling.</p>
+                        <div class="service-price">$2,000 <small>/ engagement</small></div>
+                        <ul class="service-features">
+                            <li>Full codebase audit up to 500k LOC</li>
+                            <li>Automated finish & evidence gate setup</li>
+                            <li>Cognitive OpenCog threat modeling</li>
+                            <li>Direct developer channel support</li>
+                            <li>30-day continuous re-scanning</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=Enterprise%20Codebase%20Hardening" class="btn-order" style="background:var(--accent); color:white; border-color:var(--accent);">Engage Enterprise Security &rarr;</a>
+                </div>
+
+                <div class="service-card">
+                    <div>
+                        <h3>Autonomous Bounty Radar Mesh</h3>
+                        <p>Continuous automated vulnerability hunt on your open-source repositories with validated PR fixes.</p>
+                        <div class="service-price">$1,200 <small>/ month</small></div>
+                        <ul class="service-features">
+                            <li>24/7 automated bug bounty monitoring</li>
+                            <li>Self-supervised fix synthesis & PR creation</li>
+                            <li>Zero-regression verified test suites</li>
+                            <li>Monthly security executive briefing</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=Autonomous%20Bounty%20Radar%20Mesh" class="btn-order">Deploy Continuous Radar &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sector 2: Digital Studio & Web Design -->
+        <section id="creative" class="sector-section">
+            <div class="sector-header">
+                <div class="sector-icon">🎨</div>
+                <div>
+                    <h2 class="sector-title">Web Design & Graphic Architecture</h2>
+                    <p style="color:var(--text-muted);">High-converting web applications, brand identity systems, and UI/UX engineering.</p>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="service-card">
+                    <div>
+                        <h3>High-Impact Landing Page</h3>
+                        <p>Fast, high-converting, modern landing page with glassmorphic visuals, responsive styling, and lead capture.</p>
+                        <div class="service-price">$350 <small>/ page</small></div>
+                        <ul class="service-features">
+                            <li>Custom bespoke UI/UX design</li>
+                            <li>Mobile & tablet perfection</li>
+                            <li>SEO & performance optimization</li>
+                            <li>Interactive forms & CRM hookups</li>
+                            <li>48-hour delivery</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=Landing%20Page%20Order" class="btn-order">Request Landing Page &rarr;</a>
+                </div>
+
+                <div class="service-card">
+                    <div>
+                        <span class="popular-badge" style="background:var(--primary); color:#07090e;">High Value</span>
+                        <h3>Full Brand & Digital Identity Kit</h3>
+                        <p>Complete corporate visual package including vector logos, typography systems, and social asset kits.</p>
+                        <div class="service-price">$500 <small>/ brand kit</small></div>
+                        <ul class="service-features">
+                            <li>3 original logo design concepts</li>
+                            <li>Full vector SVG/PNG asset packages</li>
+                            <li>Social media kit for all platforms</li>
+                            <li>Brand guidelines document</li>
+                            <li>Unlimited revisions until approved</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=Brand%20Identity%20Kit%20Order" class="btn-order">Build Brand Identity &rarr;</a>
+                </div>
+
+                <div class="service-card">
+                    <div>
+                        <h3>Multi-Page Web Platform</h3>
+                        <p>Complete corporate website or web application with custom design, dynamic CMS, and hosting setup.</p>
+                        <div class="service-price">$1,200 <small>/ project</small></div>
+                        <ul class="service-features">
+                            <li>Up to 10 custom designed pages</li>
+                            <li>GitHub Pages or Cloudflare deployment</li>
+                            <li>Interactive client portals & widgets</li>
+                            <li>Full source code & ownership</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=Multi-Page%20Web%20Platform%20Order" class="btn-order">Launch Web Platform &rarr;</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sector 3: E-Commerce & Storefronts -->
+        <section id="ecommerce" class="sector-section">
+            <div class="sector-header">
+                <div class="sector-icon">🛍️</div>
+                <div>
+                    <h2 class="sector-title">E-Commerce & Dropshipping Holdings</h2>
+                    <p style="color:var(--text-muted);">Turnkey digital retail storefronts, supplier dropship pipelines, and dynamic conversion optimization.</p>
+                </div>
+            </div>
+
+            <div class="cards-grid">
+                <div class="service-card">
+                    <div>
+                        <h3>Turnkey Shopify Storefront</h3>
+                        <p>Fully configured Shopify dropshipping store with curated products, supplier integrations, and payment setup.</p>
+                        <div class="service-price">$850 <small>/ store</small></div>
+                        <ul class="service-features">
+                            <li>Niche market & product research</li>
+                            <li>Automated supplier order routing</li>
+                            <li>High-converting theme customization</li>
+                            <li>Payment gateway & crypto rails ready</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=Turnkey%20Shopify%20Store%20Order" class="btn-order">Launch Shopify Store &rarr;</a>
+                </div>
+
+                <div class="service-card">
+                    <div>
+                        <h3>Zero-Fee GitHub Pages Store</h3>
+                        <p>Blazing-fast, zero-monthly-hosting-fee static e-commerce store hosted directly on GitHub Pages.</p>
+                        <div class="service-price">$600 <small>/ setup</small></div>
+                        <ul class="service-features">
+                            <li>100% free hosting forever</li>
+                            <li>Integrated Stripe, PayPal & Crypto checkout</li>
+                            <li>Ultra-fast static loading speeds</li>
+                            <li>Automated product catalog updates</li>
+                        </ul>
+                    </div>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=GitHub%20Pages%20Store%20Order" class="btn-order">Launch Static Store &rarr;</a>
+                </div>
+            </div>
+        </section>
     </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 PreCog Holdings & Security Global. Operator: BlueHound · Founding Principal: Timmins Edgar Langeveldt</p>
+            <p style="margin-top: 8px; font-family:'JetBrains Mono',monospace; font-size:0.8rem;">Settlement: BTC (Taproot) · ETH · EcoCash/WorldRemit (+263 77 491 7252) · Stripe</p>
+        </div>
+    </footer>
 </body>
 </html>

@@ -3,45 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://formsubmit.co;">
-    <meta name="description" content="Request free security scanning access from PreCog Security.">
-    <title>Try PreCog Security Free</title>
-    <link rel="stylesheet" href="assets/try.css">
+    <title>Client Onboarding & Audit Intake — PreCog Holdings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --bg-card: #0e131f;
+            --primary: #00f0ff;
+            --accent: #ff0055;
+            --gold: #ffd700;
+            --emerald: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .intake-box {
+            max-width: 680px;
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .brand-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .crest {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            color: #07090e;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #d1d5db;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), #0077ff);
+            color: #07090e;
+            font-weight: 800;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            cursor: pointer;
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.35);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.6);
+        }
+
+        .rails-info {
+            margin-top: 30px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .nav-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .nav-back:hover { color: var(--primary); }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Scan Your Code Free</h1>
-        <p class="subtitle">5 free security scans per month. No credit card required.</p>
+    <div style="max-width: 680px; width: 100%;">
+        <a href="index.html" class="nav-back">&larr; Back to PreCog Holdings</a>
+    </div>
 
-        <div class="features">
-            <div class="feature"><span class="check">✓</span> Security vulnerability detection</div>
-            <div class="feature"><span class="check">✓</span> Secret leak scanning</div>
-            <div class="feature"><span class="check">✓</span> Dependency analysis</div>
-            <div class="feature"><span class="check">✓</span> Security score & report</div>
-            <div class="feature"><span class="check">✓</span> AI-powered remediation tips</div>
+    <div class="intake-box">
+        <div class="brand-header">
+            <div class="crest">P</div>
+            <h1>Client & Enterprise Intake</h1>
+            <p class="subtitle">Submit your engagement details. Our autonomous swarm or engineering desk will respond within 24 hours.</p>
         </div>
 
-        <form action="https://formsubmit.co/timlangeveldt@gmail.com" method="POST" accept-charset="UTF-8" autocomplete="on" referrerpolicy="no-referrer" aria-describedby="privacy-note">
-            <input type="hidden" name="_subject" value="PreCog Security - Free Account Request">
-            <input type="hidden" name="_captcha" value="true">
+        <form action="https://formsubmit.co/timlangeveldt@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="PreCog Holdings - New Client Engagement Request">
+            <input type="hidden" name="_captcha" value="false">
+
             <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" name="name" autocomplete="name" maxlength="100" required>
+                <label for="name">Your Name / Organization</label>
+                <input type="text" id="name" name="name" placeholder="e.g. Acme Corp / Alex Mercer" required>
             </div>
+
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" autocomplete="email" maxlength="254" aria-describedby="privacy-note" required>
+                <label for="email">Contact Email</label>
+                <input type="email" id="email" name="email" placeholder="contact@example.com" required>
             </div>
+
             <div class="form-group">
-                <label for="github">GitHub Username (optional)</label>
-                <input type="text" id="github" name="github" autocomplete="username" maxlength="39" pattern="[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?" title="Use a valid GitHub username (letters, numbers, and hyphens)." placeholder="your-username">
+                <label for="sector">Service Sector of Interest</label>
+                <select id="sector" name="sector" required>
+                    <option value="cybersecurity">Cybersecurity Audit & Threat Scanning ($500 - $2,000)</option>
+                    <option value="web_design">Web Design & High-Impact Landing Page ($350 - $1,200)</option>
+                    <option value="brand_identity">Brand Identity, Logo & Social Growth Kit ($500)</option>
+                    <option value="ecommerce">E-Commerce / Shopify / Dropshipping Storefront ($600 - $850)</option>
+                    <option value="swarm_automation">Custom Autonomous AI Swarm Deployment ($1,200+)</option>
+                    <option value="other">General Enterprise Advisory / Other</option>
+                </select>
             </div>
-            <button type="submit" class="btn">Get Free Access</button>
+
+            <div class="form-group">
+                <label for="details">Project Scope / Repository URL (Optional)</label>
+                <textarea id="details" name="details" rows="4" placeholder="Briefly describe your requirements or provide a GitHub repository URL for automated code security scanning..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Submit Engagement Request &rarr;</button>
         </form>
 
-        <p id="privacy-note" class="privacy-note">Use this form only to request access. Never submit passwords, API keys, tokens, or other secrets.</p>
-
-        <p class="footer">We'll send you API access within 24 hours.</p>
+        <div class="rails-info">
+            <div>ACCEPTED PAYMENT RAILS:</div>
+            <div style="margin-top: 4px; color: var(--gold);">₿ Bitcoin (Taproot) · ⟠ Ethereum / USDT · 📱 EcoCash/WorldRemit (+263 77 491 7252) · 💳 Stripe</div>
+            <div style="margin-top: 8px; font-size: 0.75rem; color: #6b7280;">OPERATOR: BLUEHOUND · PRINCIPAL: TIMMINS EDGAR LANGEVELDT</div>
+        </div>
     </div>
 </body>
 </html>
