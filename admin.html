@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>PreCog Executive Portal — Restricted Access</title>
+    <meta name="description" content="Restricted executive portal. Google account verification required.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #07090e;
+            --bg-card: #0e131f;
+            --bg-card-hover: #141b2d;
+            --primary: #00f0ff;
+            --primary-glow: rgba(0, 240, 255, 0.25);
+            --accent: #ff0055;
+            --gold: #ffd700;
+            --emerald: #10b981;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 240, 255, 0.3);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image:
+                linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none; z-index: 0;
+        }
+        .glow-orb {
+            position: absolute; border-radius: 50%; filter: blur(120px);
+            pointer-events: none; z-index: 0;
+        }
+        nav {
+            position: sticky; top: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(7, 9, 14, 0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none; color: var(--text-main);
+            font-weight: 800; font-size: 1.05rem;
+        }
+        .brand-crest {
+            width: 34px; height: 34px; border-radius: 8px;
+            background: linear-gradient(135deg, var(--primary), #a855f7);
+            display: flex; align-items: center; justify-content: center;
+            color: #07090e; font-weight: 800;
+        }
+        .nav-links { display: flex; gap: 26px; list-style: none; align-items: center; }
+        .nav-links a {
+            color: var(--text-muted); text-decoration: none;
+            font-size: 0.92rem; font-weight: 500; transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--primary); }
+        .nav-links a.active { color: var(--primary); }
+        .nav-cta {
+            background: var(--primary); color: #07090e !important;
+            padding: 9px 18px; border-radius: 8px; font-weight: 700 !important;
+        }
+        .nav-cta:hover { box-shadow: 0 0 20px var(--primary-glow); }
+        .badge-live {
+            background: rgba(16, 185, 129, 0.15); color: var(--emerald);
+            padding: 3px 10px; border-radius: 20px; font-size: 0.72rem;
+            font-weight: 700; letter-spacing: 0.06em; margin-right: 8px;
+        }
+        main { flex: 1; position: relative; z-index: 1; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+        .portal-hero { padding: 70px 0 30px; text-align: center; }
+        .section-tag {
+            display: inline-block; font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--accent); background: rgba(255, 0, 85, 0.1);
+            padding: 6px 14px; border-radius: 30px; border: 1px solid rgba(255, 0, 85, 0.3);
+            margin-bottom: 18px;
+        }
+        .portal-hero h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; }
+        .portal-hero h1 span { color: var(--primary); }
+        .portal-hero p { color: var(--text-muted); max-width: 640px; margin: 14px auto 0; }
+        .panel {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 18px; padding: 36px; margin-bottom: 28px;
+            position: relative; overflow: hidden;
+        }
+        .panel::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+        }
+        .panel h2 { font-size: 1.35rem; margin-bottom: 8px; }
+        .panel .sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px; }
+        #g_id_signin { display: flex; justify-content: center; margin: 26px 0 10px; }
+        .auth-error {
+            display: none; margin-top: 16px; padding: 12px 16px;
+            background: rgba(255, 0, 85, 0.1); border: 1px solid rgba(255, 0, 85, 0.4);
+            color: #ff7aa2; border-radius: 10px; font-size: 0.9rem; font-weight: 600;
+        }
+        .sec-note {
+            margin-top: 22px; padding: 14px 16px; border-radius: 10px;
+            background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.2);
+            color: var(--text-muted); font-size: 0.83rem; line-height: 1.7;
+        }
+        .sec-note code, .vault-meta { font-family: 'JetBrains Mono', monospace; }
+        #app { display: none; }
+        .toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 14px; flex-wrap: wrap; margin-bottom: 26px;
+        }
+        .whoami {
+            font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+            color: var(--emerald); display: flex; align-items: center; gap: 8px;
+        }
+        .whoami::before { content: '●'; color: var(--emerald); }
+        .btn-ghost {
+            background: transparent; border: 1px solid var(--border);
+            color: var(--text-muted); padding: 8px 16px; border-radius: 8px;
+            cursor: pointer; font-weight: 600; font-size: 0.85rem;
+        }
+        .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+        .vault-form { display: flex; gap: 12px; flex-wrap: wrap; }
+        .vault-form input {
+            flex: 1; min-width: 260px; padding: 13px 16px;
+            background: var(--bg-dark); border: 1px solid var(--border);
+            border-radius: 10px; color: var(--text-main);
+            font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;
+        }
+        .vault-form input:focus { outline: none; border-color: var(--border-glow); box-shadow: 0 0 12px var(--primary-glow); }
+        .btn-primary {
+            background: var(--primary); color: #07090e; border: none;
+            padding: 13px 26px; border-radius: 10px; font-weight: 800;
+            cursor: pointer; font-size: 0.95rem;
+        }
+        .btn-primary:hover { box-shadow: 0 0 20px var(--primary-glow); }
+        .vault-status { margin-top: 12px; font-size: 0.88rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+        .vault-status.ok { color: var(--emerald); }
+        .vault-status.err { color: #ff7aa2; }
+        .vault-meta {
+            font-size: 0.78rem; color: var(--accent); letter-spacing: 0.08em;
+            text-transform: uppercase; margin: 30px 0 18px;
+        }
+        .vault-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+        .vault-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 22px;
+        }
+        .vault-card h3 {
+            font-size: 0.95rem; color: var(--primary); margin-bottom: 12px;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .vault-body { font-size: 0.88rem; color: #d1d5db; }
+        .vault-body ul { padding-left: 18px; }
+        .vault-body li { margin-bottom: 7px; }
+        .vault-row { margin-bottom: 9px; }
+        .vault-row strong { color: var(--text-main); }
+        .vault-obj { display: block; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--gold); margin-top: 4px; }
+        footer {
+            border-top: 1px solid var(--border); padding: 40px 0 28px;
+            background: rgba(7, 9, 14, 0.6); position: relative; z-index: 1;
+        }
+        .footer-bottom {
+            display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+            border-top: 1px solid var(--border); margin-top: 28px; padding-top: 20px;
+            color: var(--text-muted); font-size: 0.82rem;
+        }
+        .footer-bottom a { color: var(--primary); text-decoration: none; }
+        @media (max-width: 760px) {
+            nav { padding: 14px 18px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="glow-orb" style="top: 5%; left: 20%; width: 420px; height: 420px; background: rgba(255, 0, 85, 0.07);"></div>
+    <div class="glow-orb" style="top: 35%; right: 8%; width: 520px; height: 520px; background: rgba(0, 240, 255, 0.07);"></div>
+
+    <nav>
+        <a href="index.html" class="nav-brand">
+            <div class="brand-crest">P</div>
+            PreCog Holdings &amp; Security
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html#divisions">Divisions</a></li>
+            <li><a href="swarm.html"><span class="badge-live">Live</span> Swarm Visualizer</a></li>
+            <li><a href="services.html">Services &amp; Pricing</a></li>
+            <li><a href="index.html#treasury">Global Treasury</a></li>
+            <li><a href="admin.html" class="nav-cta active">Executive Portal</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <div class="container">
+            <section class="portal-hero">
+                <span class="section-tag">Restricted · Executive Only</span>
+                <h1>Executive <span>Portal</span></h1>
+                <p>
+                    Confidential business intelligence for PreCog Holdings. Access requires a
+                    Google sign-in verified against Google's signing keys, an allowlisted admin
+                    account, and the executive vault passphrase.
+                </p>
+            </section>
+
+            <noscript>
+                <div class="panel"><h2>JavaScript required</h2><p class="sub">This portal verifies Google identity tokens cryptographically in the browser. Enable JavaScript.</p></div>
+            </noscript>
+
+            <section id="auth-gate" class="panel" style="display:none;">
+                <h2>Sign in to continue</h2>
+                <p class="sub">
+                    Only the operator's Google account is authorized. Anyone else is rejected
+                    automatically after cryptographic verification of the identity token.
+                </p>
+                <div id="g_id_signin"></div>
+                <div id="auth-error" class="auth-error"></div>
+                <div class="sec-note">
+                    <strong>How access is enforced:</strong> the identity token's RS256 signature is
+                    verified against Google's published JWKS, then checked for issuer, audience,
+                    expiry and a verified <code>timlangeveldt@gmail.com</code> claim. Confidential data
+                    additionally lives encrypted at rest (AES-256-GCM) and only decrypts with the
+                    executive passphrase — even repo access cannot read it.
+                </div>
+            </section>
+
+            <section id="app">
+                <div class="panel">
+                    <div class="toolbar">
+                        <div class="whoami">Signed in as <strong id="whoami"></strong></div>
+                        <button id="signout" class="btn-ghost" type="button">Sign out</button>
+                    </div>
+                    <h2>Executive Vault</h2>
+                    <p class="sub">Encrypted at rest. Enter the vault passphrase to decrypt and render.</p>
+                    <form id="vault-form" class="vault-form" autocomplete="off">
+                        <input id="vault-pass" type="password" placeholder="Vault passphrase" autocomplete="current-password" required>
+                        <button class="btn-primary" type="submit">Unlock Vault</button>
+                    </form>
+                    <div id="vault-status" class="vault-status"></div>
+                    <div id="vault-content"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <div>&copy; 2026 PreCog Holdings &amp; Security Global. All rights reserved.</div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+                    EXECUTIVE PORTAL · <a href="index.html">Back to main site</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="js/admin.js" defer></script>
+</body>
+</html>
