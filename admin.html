@@ -6,6 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>PreCog Executive Portal — Restricted Access</title>
     <meta name="description" content="Restricted executive portal. Google account verification required.">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none' 'self' https://accounts.google.com https://www.gstatic.com; style-src 'self' https://fonts.googleapis.com; style-src-elem 'unsafe-inline'; style-src-attr 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.googleapis.com https://accounts.google.com; object-src 'none'; base-uri 'none'; form-action 'self'">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -47,6 +48,10 @@
             position: absolute; border-radius: 50%; filter: blur(120px);
             pointer-events: none; z-index: 0;
         }
+        .orb-a { top: 5%; left: 20%; width: 420px; height: 420px; background: rgba(255, 0, 85, 0.07); }
+        .orb-b { top: 35%; right: 8%; width: 520px; height: 520px; background: rgba(0, 240, 255, 0.07); }
+        #auth-gate { display: none; }
+        .footer-mono { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; }
         nav {
             position: sticky; top: 0; z-index: 100;
             display: flex; align-items: center; justify-content: space-between;
@@ -189,8 +194,8 @@
 </head>
 <body>
     <div class="bg-grid"></div>
-    <div class="glow-orb" style="top: 5%; left: 20%; width: 420px; height: 420px; background: rgba(255, 0, 85, 0.07);"></div>
-    <div class="glow-orb" style="top: 35%; right: 8%; width: 520px; height: 520px; background: rgba(0, 240, 255, 0.07);"></div>
+    <div class="glow-orb orb-a"></div>
+    <div class="glow-orb orb-b"></div>
 
     <nav>
         <a href="index.html" class="nav-brand">
@@ -222,7 +227,7 @@
                 <div class="panel"><h2>JavaScript required</h2><p class="sub">This portal verifies Google identity tokens cryptographically in the browser. Enable JavaScript.</p></div>
             </noscript>
 
-            <section id="auth-gate" class="panel" style="display:none;">
+            <section id="auth-gate" class="panel">
                 <h2>Sign in to continue</h2>
                 <p class="sub">
                     Only the operator's Google account is authorized. Anyone else is rejected
@@ -247,8 +252,9 @@
                     </div>
                     <h2>Executive Vault</h2>
                     <p class="sub">Encrypted at rest. Enter the vault passphrase to decrypt and render.</p>
-                    <form id="vault-form" class="vault-form" autocomplete="off">
-                        <input id="vault-pass" type="password" placeholder="Vault passphrase" autocomplete="current-password" required>
+                    <form id="vault-form" class="vault-form" autocomplete="off" method="post" action="#vault-status">
+                        <input id="vault-pass" type="password" placeholder="Vault passphrase" autocomplete="current-password" maxlength="128" required>
+                        <input type="hidden" name="_captcha" value="true">
                         <button class="btn-primary" type="submit">Unlock Vault</button>
                     </form>
                     <div id="vault-status" class="vault-status"></div>
@@ -262,7 +268,7 @@
         <div class="container">
             <div class="footer-bottom">
                 <div>&copy; 2026 PreCog Holdings &amp; Security Global. All rights reserved.</div>
-                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;">
+                <div class="footer-mono">
                     EXECUTIVE PORTAL · <a href="index.html">Back to main site</a>
                 </div>
             </div>
