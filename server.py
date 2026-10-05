@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""PreCog Swarm Visualizer & Holdings Web Server.
+"""PreCog Security & Holdings Swarm Visualizer Web Server.
 
-Serves the PreCog Holdings website and provides real-time agent telemetry,
+Serves the PreCog Security & Holdings website and provides real-time agent telemetry,
 Sims-style HQ simulation feeds, and collaboration status over HTTP & SSE.
 """
 
@@ -114,7 +114,7 @@ def main():
     socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), SwarmHandler) as httpd:
         print(f"============================================================")
-        print(f"  PRECOG HOLDINGS & SWARM SIMULATION WEB SERVER")
+        print(f"  PRECOG SECURITY & HOLDINGS - SWARM SIMULATION WEB SERVER")
         print(f"  Operator: BlueHound | Founding Principal: Timmins Langeveldt")
         print(f"  URL: http://localhost:{PORT}")
         print(f"  Swarm HQ: http://localhost:{PORT}/swarm.html")
