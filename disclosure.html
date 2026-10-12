@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsible Disclosure Policy — PreCog Security</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#0a0e17; --text:#f1f5f9; --muted:#94a3b8; --accent:#0ea5e9; --border:#1e293b; --green:#10b981; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+        .container { max-width:720px; margin:0 auto; padding:40px 24px; }
+        nav { border-bottom:1px solid var(--border); padding:14px 0; }
+        .nav-inner { max-width:1120px; margin:0 auto; padding:0 24px; }
+        .nav-inner a { color:var(--text); font-weight:700; text-decoration:none; }
+        h1 { font-size:2rem; margin:40px 0 8px; }
+        .updated { color:var(--muted); font-size:0.85rem; margin-bottom:32px; }
+        h2 { font-size:1.2rem; margin:32px 0 12px; }
+        p, li { color:var(--muted); font-size:0.95rem; margin-bottom:12px; }
+        ul { padding-left:20px; }
+        a { color:var(--accent); }
+        .scope { background:#111827; border:1px solid var(--border); border-radius:12px; padding:24px; margin:24px 0; }
+        .scope h3 { color:var(--text); font-size:1rem; margin-bottom:12px; }
+        .scope ul { margin:0; }
+        .severity { display:inline-block; padding:2px 8px; border-radius:4px; font-size:0.78rem; font-weight:700; }
+        .sev-critical { background:rgba(239,68,68,0.15); color:#ef4444; }
+        .sev-high { background:rgba(245,158,11,0.15); color:#f59e0b; }
+        .sev-medium { background:rgba(14,165,233,0.15); color:#0ea5e9; }
+        .sev-low { background:rgba(16,185,129,0.15); color:#10b981; }
+        footer { border-top:1px solid var(--border); margin-top:60px; padding:24px; text-align:center; color:var(--muted); font-size:0.8rem; }
+    </style>
+</head>
+<body>
+<nav><div class="nav-inner"><a href="index.html">PreCog Security</a></div></nav>
+<div class="container">
+    <h1>Responsible Disclosure Policy</h1>
+    <p class="updated">Last updated: October 2026</p>
+
+    <h2>Our Commitment</h2>
+    <p>PreCog Security is committed to working with security researchers to protect our users and infrastructure. We welcome responsible reports of vulnerabilities in our systems and the open-source projects we maintain.</p>
+
+    <div class="scope">
+        <h3>Scope</h3>
+        <ul>
+            <li>All repositories under the <a href="https://github.com/PreCogSecurity">PreCogSecurity</a> GitHub organization</li>
+            <li>The <a href="https://precogsecurity.github.io">precogsecurity.github.io</a> website</li>
+            <li>Publicly accessible infrastructure operated by PreCog Security</li>
+        </ul>
+    </div>
+
+    <h2>How to Report</h2>
+    <p>Email <a href="mailto:timlangeveldt@gmail.com">timlangeveldt@gmail.com</a> with:</p>
+    <ul>
+        <li>Description of the vulnerability</li>
+        <li>Steps to reproduce</li>
+        <li>Potential impact</li>
+        <li>Any suggested fixes (optional)</li>
+    </ul>
+
+    <h2>Severity Classification</h2>
+    <p>We use CVSS v3.1 as a baseline:</p>
+    <ul>
+        <li><span class="severity sev-critical">CRITICAL</span> — RCE, auth bypass, full system compromise</li>
+        <li><span class="severity sev-high">HIGH</span> — Privilege escalation, significant data exposure</li>
+        <li><span class="severity sev-medium">MEDIUM</span> — Limited data exposure, CSRF, XSS</li>
+        <li><span class="severity sev-low">LOW</span> — Information disclosure, minor issues</li>
+    </ul>
+
+    <h2>What to Expect</h2>
+    <ul>
+        <li><strong>Acknowledgment</strong> within 48 hours</li>
+        <li><strong>Initial assessment</strong> within 5 business days</li>
+        <li><strong>Regular updates</strong> every 14 days until resolution</li>
+        <li><strong>Credit</strong> in the advisory (unless you prefer anonymity)</li>
+    </ul>
+
+    <h2>Safe Harbor</h2>
+    <p>We consider research conducted in accordance with this policy to be authorized. We will not pursue legal action against researchers who:</p>
+    <ul>
+        <li>Make a good faith effort to avoid privacy violations and service disruption</li>
+        <li>Only interact with accounts you own or with explicit permission</li>
+        <li>Do not access, modify, or delete user data</li>
+        <li>Report vulnerabilities promptly</li>
+    </ul>
+
+    <h2>Bounty Eligibility</h2>
+    <p>While we do not currently run a paid bounty program for our own infrastructure, we actively contribute to and maintain bounty programs on <a href="https://console.algora.io">Algora</a> and <a href="https://opire.dev">Opire</a>. Reports against those platforms' funded issues qualify for platform bounties.</p>
+
+    <h2>Out of Scope</h2>
+    <ul>
+        <li>Vulnerabilities in third-party services we use (GitHub, etc.)</li>
+        <li>Social engineering of PreCog Security personnel</li>
+        <li>Denial-of-service attacks</li>
+        <li>Automated scanner findings without manual verification</li>
+    </ul>
+</div>
+<footer>&copy; 2026 PreCog Security</footer>
+</body>
+</html>
