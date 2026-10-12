@@ -431,19 +431,21 @@
             </span>
         </div>
 
-        <!-- Treasury Ticker -->
+        <!-- Treasury Ticker with Live On-Chain Data -->
         <div class="treasury-ticker">
             <div class="ticker-stat">
                 <span style="color:var(--text-muted);">TREASURY:</span>
                 <span class="stat-val" id="treasuryVal" style="color:var(--gold);">$100,267.22</span>
             </div>
-            <div class="ticker-stat">
+            <div class="ticker-stat" title="Live balance from blockchain.info">
                 <span style="color:var(--text-muted);">BTC:</span>
-                <span class="stat-val" id="btcVal" style="color:#f59e0b;">0.842 BTC</span>
+                <span class="stat-val" id="btcVal" style="color:#f59e0b;">Loading...</span>
+                <span id="btcLiveDot" style="color:var(--text-muted); font-size:0.65rem;">○</span>
             </div>
-            <div class="ticker-stat">
+            <div class="ticker-stat" title="Live balance from ethplorer.io">
                 <span style="color:var(--text-muted);">ETH:</span>
-                <span class="stat-val" id="ethVal" style="color:#a855f7;">14.20 ETH</span>
+                <span class="stat-val" id="ethVal" style="color:#a855f7;">Loading...</span>
+                <span id="ethLiveDot" style="color:var(--text-muted); font-size:0.65rem;">○</span>
             </div>
             <div class="ticker-stat">
                 <span style="color:var(--text-muted);">ECOCASH:</span>
@@ -1132,6 +1134,40 @@
         renderInspector();
         addLog('SYSTEM', 'Autonomous Swarm Simulation Initialized. Operator: BlueHound.', '#00f0ff');
         addLog('BLUEHOUND', 'All treasury rails, bounty feeds, and client pipelines active.', '#ffd700');
+
+        // --- Live On-Chain Treasury Balances ---
+        const BTC_ADDRESS = 'bc1qhtnzal6wupj4xg049juwarkqmle7lqxemyezrw';
+        const ETH_ADDRESS = '0xa71b83C6CC50665E4B67fDCEecD63D5100cCf988';
+
+        async function fetchLiveBalances() {
+            try {
+                const btcResp = await fetch(`https://blockchain.info/q/addressbalance/${BTC_ADDRESS}`);
+                const btcSatoshis = await btcResp.text();
+                const btc = parseInt(btcSatoshis) / 100000000;
+                document.getElementById('btcVal').textContent = btc.toFixed(8) + ' BTC';
+                document.getElementById('btcLiveDot').textContent = '●';
+                document.getElementById('btcLiveDot').style.color = 'var(--emerald)';
+            } catch (e) {
+                document.getElementById('btcVal').textContent = 'Error';
+                document.getElementById('btcLiveDot').textContent = '●';
+                document.getElementById('btcLiveDot').style.color = 'var(--accent)';
+            }
+            try {
+                const ethResp = await fetch(`https://api.ethplorer.io/getAddressInfo/${ETH_ADDRESS}?apiKey=freekey`);
+                const ethData = await ethResp.json();
+                const eth = parseFloat(ethData.ETH.balance);
+                document.getElementById('ethVal').textContent = eth.toFixed(4) + ' ETH';
+                document.getElementById('ethLiveDot').textContent = '●';
+                document.getElementById('ethLiveDot').style.color = 'var(--emerald)';
+            } catch (e) {
+                document.getElementById('ethVal').textContent = 'Error';
+                document.getElementById('ethLiveDot').textContent = '●';
+                document.getElementById('ethLiveDot').style.color = 'var(--accent)';
+            }
+        }
+
+        fetchLiveBalances();
+        setInterval(fetchLiveBalances, 60000);
 
         loop();
     </script>

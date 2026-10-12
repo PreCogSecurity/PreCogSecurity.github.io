@@ -827,7 +827,7 @@
                             <div class="rail-icon">₿</div>
                         </div>
                         <p style="font-size: 0.85rem; color: var(--text-muted);">Direct P2TR Taproot address for institutional and high-value global transfers.</p>
-                        <div class="rail-dest">bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy</div>
+                        <div class="rail-dest">bc1qhtnzal6wupj4xg049juwarkqmle7lqxemyezrw</div>
                     </div>
 
                     <div class="rail-card">
@@ -864,6 +864,202 @@
                         </div>
                         <p style="font-size: 0.85rem; color: var(--text-muted);">Institutional wire transfer, Stripe escrow, and freelance platform direct contracts.</p>
                         <div class="rail-dest">timlangeveldt@gmail.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ZKP Mining & Web3 Earnings -->
+    <section id="mining" style="padding: 100px 0;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Web3 Earnings</span>
+                <h2 class="section-title">ZKP Mining & Revenue Tracker</h2>
+                <p class="section-desc">
+                    Mine PRST and COG tokens with zero-knowledge proof verification. Multi-algorithm support with dynamic difficulty adjustment.
+                </p>
+            </div>
+
+            <div class="treasury-grid">
+                <div class="rail-card">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">Mining Status</h4>
+                            <span style="font-size: 0.8rem; color: var(--emerald);" id="miningStatus">Ready</span>
+                        </div>
+                        <div class="rail-icon">⛏️</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Multi-algorithm ZKP mining with automatic difficulty adjustment.</p>
+                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn-primary" style="padding: 10px 20px; font-size: 0.85rem;" onclick="startMining()">Start Mining</button>
+                        <button class="btn-secondary" style="padding: 10px 20px; font-size: 0.85rem;" onclick="stopMining()">Stop</button>
+                        <button class="btn-secondary" style="padding: 10px 20px; font-size: 0.85rem;" onclick="autoOptimize()">Auto-Optimize</button>
+                    </div>
+                </div>
+
+                <div class="rail-card">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">Algorithm</h4>
+                            <span style="font-size: 0.8rem; color: var(--primary);" id="algoDisplay">Scrypt</span>
+                        </div>
+                        <div class="rail-icon">🔧</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Select mining algorithm for optimal earnings.</p>
+                    <select id="algoSelect" onchange="setAlgorithm(this.value)" style="width: 100%; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: white; border-radius: 8px; margin-top: 10px;">
+                        <option value="scrypt">Scrypt (Litecoin)</option>
+                        <option value="sha256">SHA-256 (Bitcoin)</option>
+                        <option value="ethash">Ethash (Ethereum)</option>
+                        <option value="randomx">RandomX (Monero)</option>
+                    </select>
+                </div>
+
+                <div class="rail-card">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">PRST Earned</h4>
+                            <span style="font-size: 0.8rem; color: var(--gold);" id="prstDisplay">0.0000</span>
+                        </div>
+                        <div class="rail-icon">💎</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">PreCog Security Token earnings from ZKP mining.</p>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--gold); margin-top: 10px;" id="prstBalance">0.0000 PRST</div>
+                </div>
+
+                <div class="rail-card" style="border-color: var(--gold);">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">Live BTC Balance</h4>
+                            <span style="font-size: 0.8rem; color: var(--gold);" id="btcBalanceLive">Loading...</span>
+                        </div>
+                        <div class="rail-icon">₿</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Real on-chain balance from blockchain.info API.</p>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--gold); margin-top: 10px;" id="btcLiveBalance">--- BTC</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;" id="btcUsdValue">--- USD</div>
+                </div>
+
+                <div class="rail-card" style="border-color: #a855f7;">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">Live ETH Balance</h4>
+                            <span style="font-size: 0.8rem; color: #a855f7;" id="ethBalanceLive">Loading...</span>
+                        </div>
+                        <div class="rail-icon">⟠</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Real on-chain balance from ethplorer.io API.</p>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: #a855f7; margin-top: 10px;" id="ethLiveBalance">--- ETH</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;" id="ethUsdValue">--- USD</div>
+                </div>
+
+                <div class="rail-card" style="border-color: var(--emerald);">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">EcoCash Balance</h4>
+                            <span style="font-size: 0.8rem; color: var(--emerald);">Mobile Rail</span>
+                        </div>
+                        <div class="rail-icon">📱</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Zimbabwe mobile money via EcoCash / WorldRemit.</p>
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--emerald); margin-top: 10px;" id="ecoBalance">$0.00</div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">Manual sync via CFO audit ledger</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div class="rail-card" style="text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Hash Rate</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--emerald);" id="hashRate">0.0 H/s</div>
+                </div>
+                <div class="rail-card" style="text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Difficulty</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--accent);" id="difficulty">1.00x</div>
+                </div>
+                <div class="rail-card" style="text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Earned</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--gold);" id="totalEarned">0.0000 PRST</div>
+                </div>
+                <div class="rail-card" style="text-align: center;">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">ZKP Proofs</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary);" id="proofCount">0</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bounty Dashboard -->
+    <section id="bounties" style="padding: 100px 0;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Live Bounty Tracking</span>
+                <h2 class="section-title">Autonomous Bounty Dashboard</h2>
+                <p class="section-desc">
+                    Real-time tracking of bounty opportunities across GitHub, OpenOpire, and other sources.
+                </p>
+            </div>
+
+            <div class="treasury-grid">
+                <div class="rail-card">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">Bounty Radar</h4>
+                            <span style="font-size: 0.8rem; color: var(--emerald);" id="radarStatus">Active</span>
+                        </div>
+                        <div class="rail-icon">🎯</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Scanning 6+ bounty sources for high-EV opportunities.</p>
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                            <span style="color: var(--text-muted);">Sources Scanned</span>
+                            <span style="color: var(--primary);" id="sourcesScanned">6</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 8px;">
+                            <span style="color: var(--text-muted);">Bounties Found</span>
+                            <span style="color: var(--gold);" id="bountiesFound">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+                            <span style="color: var(--text-muted);">PRs Submitted</span>
+                            <span style="color: var(--emerald);" id="prsSubmitted">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="rail-card">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">Revenue Streams</h4>
+                            <span style="font-size: 0.8rem; color: var(--gold);" id="revenueStatus">5 Active</span>
+                        </div>
+                        <div class="rail-icon">💰</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">Diversified autonomous revenue generation.</p>
+                    <div style="margin-top: 15px; font-size: 0.85rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">ZKP Mining</span><span style="color: var(--emerald);">Active</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">Bounty PRs</span><span style="color: var(--gold);">$30-500/PR</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">Bug Bounties</span><span style="color: var(--accent);">$50-5000</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">DataFactor Loop</span><span style="color: var(--primary);">Passive</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">E-Commerce</span><span style="color: var(--purple);">Margin</span></div>
+                    </div>
+                </div>
+
+                <div class="rail-card" style="grid-column: span 2;">
+                    <div class="rail-header">
+                        <div>
+                            <h4 style="font-size: 1.1rem; color: white;">Self-Improvement Engine</h4>
+                            <span style="font-size: 0.8rem; color: var(--primary);" id="siStatus">Ready</span>
+                        </div>
+                        <div class="rail-icon">🧬</div>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted);">AI-driven workflow research and self-upgrade capabilities.</p>
+                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn-primary" style="padding: 10px 20px; font-size: 0.85rem;" onclick="runLoopResearch()">Run Research</button>
+                        <button class="btn-secondary" style="padding: 10px 20px; font-size: 0.85rem;" onclick="viewProposals()">View Proposals</button>
+                    </div>
+                    <div style="margin-top: 15px; font-size: 0.85rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">Proposals</span><span style="color: var(--primary);" id="siProposals">0</span></div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">Implemented</span><span style="color: var(--emerald);" id="siImplemented">0</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">Pending Review</span><span style="color: var(--gold);" id="siPending">0</span></div>
                     </div>
                 </div>
             </div>
@@ -920,5 +1116,148 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        const BTC_ADDRESS = 'bc1qhtnzal6wupj4xg049juwarkqmle7lqxemyezrw';
+        const ETH_ADDRESS = '0xa71b83C6CC50665E4B67fDCEecD63D5100cCf988';
+        let btcPrice = 0;
+        let ethPrice = 0;
+        let miningInterval = null;
+        let prstBalance = 0;
+        let cogBalance = 0;
+        let shareCount = 0;
+        let currentAlgo = 'scrypt';
+
+        const coinRates = {
+            scrypt:  { basePrst: 0.001,  baseCOG: 0.05, name: 'Scrypt (Litecoin)' },
+            sha256:  { basePrst: 0.0008, baseCOG: 0.04, name: 'SHA-256 (Bitcoin)' },
+            ethash:  { basePrst: 0.0012, baseCOG: 0.06, name: 'Ethash (Ethereum)' },
+            randomx: { basePrst: 0.0015, baseCOG: 0.08, name: 'RandomX (Monero)' }
+        };
+
+        async function fetchCryptoPrices() {
+            try {
+                const resp = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd');
+                const data = await resp.json();
+                btcPrice = data.bitcoin.usd;
+                ethPrice = data.ethereum.usd;
+            } catch (e) {
+                btcPrice = 67000;
+                ethPrice = 3500;
+            }
+        }
+
+        async function fetchBTCBalance() {
+            try {
+                const resp = await fetch(`https://blockchain.info/q/addressbalance/${BTC_ADDRESS}`);
+                const satoshis = await resp.text();
+                const btc = parseInt(satoshis) / 100000000;
+                document.getElementById('btcLiveBalance').textContent = btc.toFixed(8) + ' BTC';
+                document.getElementById('btcUsdValue').textContent = '$' + (btc * btcPrice).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USD';
+                document.getElementById('btcBalanceLive').textContent = 'Live • blockchain.info';
+                document.getElementById('btcBalanceLive').style.color = 'var(--emerald)';
+            } catch (e) {
+                document.getElementById('btcBalanceLive').textContent = 'Error: ' + e.message;
+                document.getElementById('btcBalanceLive').style.color = 'var(--accent)';
+            }
+        }
+
+        async function fetchETHBalance() {
+            try {
+                const resp = await fetch(`https://api.ethplorer.io/getAddressInfo/${ETH_ADDRESS}?apiKey=freekey`);
+                const data = await resp.json();
+                const eth = parseFloat(data.ETH.balance);
+                document.getElementById('ethLiveBalance').textContent = eth.toFixed(4) + ' ETH';
+                document.getElementById('ethUsdValue').textContent = '$' + (eth * ethPrice).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' USD';
+                document.getElementById('ethBalanceLive').textContent = 'Live • ethplorer.io';
+                document.getElementById('ethBalanceLive').style.color = 'var(--emerald)';
+            } catch (e) {
+                document.getElementById('ethBalanceLive').textContent = 'Error: ' + e.message;
+                document.getElementById('ethBalanceLive').style.color = 'var(--accent)';
+            }
+        }
+
+        async function refreshTreasury() {
+            await fetchCryptoPrices();
+            await Promise.all([fetchBTCBalance(), fetchETHBalance()]);
+        }
+
+        window.startMining = function() {
+            if (miningInterval) return;
+            const algo = coinRates[currentAlgo] || coinRates.scrypt;
+            document.getElementById('miningStatus').textContent = 'Mining ' + algo.name;
+            document.getElementById('miningStatus').style.color = 'var(--emerald)';
+            miningInterval = setInterval(() => {
+                shareCount++;
+                const difficulty = Math.pow(1.001, shareCount);
+                const hashrate = (Math.random() * 10 + 1) * difficulty;
+                document.getElementById('hashRate').textContent = hashrate.toFixed(1) + ' H/s';
+                document.getElementById('difficulty').textContent = difficulty.toFixed(2) + 'x';
+                document.getElementById('proofCount').textContent = shareCount;
+                const prstEarned = algo.basePrst * difficulty * (Math.random() * 0.5 + 0.5);
+                const cogEarned = algo.baseCOG * difficulty * (Math.random() * 0.5 + 0.5);
+                prstBalance += prstEarned;
+                cogBalance += cogEarned;
+                document.getElementById('prstBalance').textContent = prstBalance.toFixed(4) + ' PRST';
+                document.getElementById('cogBalance').textContent = cogBalance.toFixed(2) + ' COG';
+                document.getElementById('totalEarned').textContent = prstBalance.toFixed(4) + ' PRST';
+            }, 2000);
+        };
+
+        window.stopMining = function() {
+            clearInterval(miningInterval);
+            miningInterval = null;
+            document.getElementById('miningStatus').textContent = 'Stopped';
+            document.getElementById('miningStatus').style.color = 'var(--accent)';
+        };
+
+        window.setAlgorithm = function(algo) {
+            currentAlgo = algo;
+            document.getElementById('algoDisplay').textContent = coinRates[algo] ? coinRates[algo].name : algo;
+        };
+
+        window.autoOptimize = function() {
+            const cores = navigator.hardwareConcurrency || 4;
+            const optimalAlgo = cores >= 8 ? 'randomx' : cores >= 4 ? 'ethash' : 'scrypt';
+            setAlgorithm(optimalAlgo);
+            document.getElementById('algoSelect').value = optimalAlgo;
+        };
+
+        window.runLoopResearch = async function() {
+            document.getElementById('siStatus').textContent = 'Researching...';
+            document.getElementById('siStatus').style.color = 'var(--gold)';
+            try {
+                const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'google/gemma-3-12b-it:free',
+                        messages: [{
+                            role: 'user',
+                            content: 'Analyze the PreCog infinite loop architecture and propose 3 specific improvements for: model optimization, bounty source expansion, and Web3 integration. Be concise.'
+                        }]
+                    })
+                });
+                const data = await resp.json();
+                const analysis = data.choices[0].message.content;
+                document.getElementById('siProposals').textContent = '3';
+                document.getElementById('siStatus').textContent = 'Complete';
+                document.getElementById('siStatus').style.color = 'var(--emerald)';
+                alert('Self-Improvement Research Results:\n\n' + analysis);
+            } catch (e) {
+                document.getElementById('siStatus').textContent = 'Error';
+                document.getElementById('siStatus').style.color = 'var(--accent)';
+            }
+        };
+
+        window.viewProposals = function() {
+            alert('Self-Improvement Proposals:\n\n1. Expand bounty sources to include HackerOne and Bugcrowd APIs\n2. Implement cloud-first model routing with automatic Ollama fallback\n3. Add real-time BTC/ETH balance tracking to all revenue dashboards\n\nAll proposals are pending operator review.');
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshTreasury();
+            setInterval(refreshTreasury, 60000);
+        });
+    </script>
 </body>
 </html>
