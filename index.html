@@ -4,21 +4,19 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https://formsubmit.co;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PreCog Security — Autonomous Red Team, Blue Team & Offensive Security</title>
-    <meta name="description" content="PreCog Security runs continuous autonomous red team and blue team operations against your systems: verified findings with working exploits, fixes with regression tests, and the detections that catch the activity. Engagements from $500.">
+    <title>PreCog Security — We Break In, Then We Ship the Fix</title>
+    <meta name="description" content="Autonomous red team and blue team operations against your systems. Verified findings with working exploits, the patch as a diff, the detection that catches it, and the regression test that proves it stays fixed. Free scan, engagements from $500.">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="PreCog Security — Autonomous Red Team & Blue Team">
-    <meta property="og:description" content="Continuous adversary simulation, verified findings, and the fixes and detections that follow.">
+    <meta property="og:title" content="PreCog Security — We Break In, Then We Ship the Fix">
+    <meta property="og:description" content="Continuous adversary simulation, verified findings, and the fix, the detection and the test that follow.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://precogsecurity.github.io/">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="PreCog Security — Autonomous Red Team & Blue Team">
-    <meta name="twitter:description" content="Continuous adversary simulation, verified findings, and the fixes and detections that follow.">
+    <meta name="twitter:title" content="PreCog Security — We Break In, Then We Ship the Fix">
+    <meta name="twitter:description" content="Continuous adversary simulation, verified findings, and the fix, the detection and the test that follow.">
     <meta name="theme-color" content="#0a0e17">
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/fonts.css">
     <link rel="stylesheet" href="assets/site.css">
     <script type="application/ld+json">
     {
@@ -26,19 +24,45 @@
         "@type": "Organization",
         "name": "PreCog Security",
         "url": "https://precogsecurity.github.io",
-        "description": "AI-driven vulnerability research, autonomous red team and blue team operations, and predictive threat intelligence for modern software teams.",
+        "logo": "https://precogsecurity.github.io/assets/favicon.svg",
+        "description": "Autonomous red team and blue team operations: verified findings with working exploits, the patch, the detection that catches it, and the regression test that keeps it fixed.",
         "email": "timlangeveldt@gmail.com",
         "telephone": "+263774917252",
-        "sameAs": ["https://github.com/PreCogSecurity"],
+        "foundingDate": "2026",
+        "sameAs": [
+            "https://github.com/PreCogSecurity",
+            "https://github.com/tim777z"
+        ],
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "sales",
+            "email": "timlangeveldt@gmail.com",
+            "telephone": "+263774917252",
+            "availableLanguage": ["en"],
+            "areaServed": "Worldwide"
+        },
         "hasOfferCatalog": {
             "@type": "OfferCatalog",
             "name": "Security Engagements",
             "itemListElement": [
-                { "@type": "Offer", "name": "Focused Audit", "price": "500", "priceCurrency": "USD" },
-                { "@type": "Offer", "name": "Full Penetration Test", "price": "1500", "priceCurrency": "USD" },
-                { "@type": "Offer", "name": "Continuous Autonomous Monitoring", "price": "1200", "priceCurrency": "USD" }
+                { "@type": "Offer", "name": "Free Automated Scan", "price": "0", "priceCurrency": "USD", "description": "Verified findings, the patch as a diff, and a detection rule for one repository or application." },
+                { "@type": "Offer", "name": "Focused Audit", "price": "500", "priceCurrency": "USD", "description": "One application or repository, attacked to a defined depth, with fixes and a ranked backlog." },
+                { "@type": "Offer", "name": "Full Penetration Test", "price": "1500", "priceCurrency": "USD", "description": "Full adversary simulation against a scoped target, with command evidence and a tested detection backlog." },
+                { "@type": "Offer", "name": "Continuous Monitoring", "price": "1200", "priceCurrency": "USD", "description": "Autonomous scanning and retesting on a clock, so a fix that regresses is caught before an attacker finds it again." }
             ]
         }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "name": "Autonomous Red Team and Blue Team Operations",
+        "serviceType": "Penetration testing and continuous security monitoring",
+        "provider": { "@type": "Organization", "name": "PreCog Security" },
+        "areaServed": "Worldwide",
+        "description": "Continuous adversary emulation against scoped targets. Every finding is reproduced, patched, converted into a detection, and covered by a regression test.",
+        "offers": { "@type": "Offer", "price": "500", "priceCurrency": "USD" }
     }
     </script>
     <script type="application/ld+json">
@@ -47,15 +71,21 @@
         "@type": "FAQPage",
         "mainEntity": [
             { "@type": "Question", "name": "Do you need access to our source code?",
-              "acceptedAnswer": { "@type": "Answer", "text": "No. Black box testing against the running application is the default and the more honest test. If white box access would produce a materially better result we will say so and scope it separately." } },
+              "acceptedAnswer": { "@type": "Answer", "text": "No. Black box testing against the running application is the default and the more honest test. If white box access would produce a materially better result we will say so and scope it separately - we do not quietly ask for credentials we do not need." } },
             { "@type": "Question", "name": "Will you disrupt our production?",
-              "acceptedAnswer": { "@type": "Answer", "text": "No. Availability is treated as a production dependency. No denial of service, no destructive action, no wiping. Destructive effects are simulated and rules of engagement are agreed in writing first." } },
+              "acceptedAnswer": { "@type": "Answer", "text": "No. Availability is treated as a production dependency, not a test resource. No denial of service, no destructive action, no wiping. Where an engagement needs a destructive effect we simulate it instead, and we agree the rules of engagement with you in writing first." } },
             { "@type": "Question", "name": "What do we get at the end?",
-              "acceptedAnswer": { "@type": "Answer", "text": "A report with an executive summary, findings with exact paths and working exploits, fixes as diffs with regression tests, and the detections that would have caught the activity, plus the raw evidence." } },
+              "acceptedAnswer": { "@type": "Answer", "text": "A report a CTO can act on: an executive summary, the findings with exact paths and working exploits, the fixes as diffs with regression tests, and the detections that would have caught the activity. Plus the raw evidence, so anyone on your side can reproduce every claim." } },
             { "@type": "Question", "name": "How fast can you start?",
-              "acceptedAnswer": { "@type": "Answer", "text": "The free initial review is scoped within 48 hours of your request. Engagement start dates depend on scope." } },
+              "acceptedAnswer": { "@type": "Answer", "text": "The free scan is scoped within 48 hours of your request. Engagement start dates depend on scope, and we will tell you the real date rather than a hopeful one." } },
             { "@type": "Question", "name": "Can you keep our findings confidential?",
-              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Confidentiality is the norm and coordinated disclosure is standard practice. We do not publish a finding before the responsible party has had a fair chance to fix it." } }
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Disclosing to the vendor is the default because it is what actually gets you fixed, but confidentiality is the norm and coordinated disclosure is standard practice - we do not publish a finding before the responsible party has had a fair chance to fix it." } },
+            { "@type": "Question", "name": "Why not just point an LLM at our codebase?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A model can read your code and describe a vulnerability, which is genuinely useful. What it cannot do on its own is prove the attack path works, ship a patch that passes your own test suite, write the detection that fires on the activity, and prove the fix did not regress. That loop is the product." } },
+            { "@type": "Question", "name": "What happens if you find nothing?",
+              "acceptedAnswer": { "@type": "Answer", "text": "You get a clean report that says what was tested, how it was tested, and what was not covered. That document is evidence of coverage, and it is yours to keep and audit." } },
+            { "@type": "Question", "name": "Do you use our code or our data to train models?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No. Your code, traffic and data are used only to test your target for the engagement, and are never used to train a model or shared with a third party. We can put that in the engagement letter." } }
         ]
     }
     </script>
@@ -72,11 +102,11 @@
         <ul class="nav-links">
             <li><a href="#services">Services</a></li>
             <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#compare">Compare</a></li>
             <li><a href="#methodology">Method</a></li>
-            <li><a href="#why-us">Why Us</a></li>
+            <li><a href="#research">Research</a></li>
             <li><a href="#faq">FAQ</a></li>
-            <li><a href="swarm.html">Research</a></li>
-            <li><a href="#contact" class="nav-cta">Contact</a></li>
+            <li><a href="#freescan" class="nav-cta">Free Scan</a></li>
         </ul>
     </div>
 </nav>
@@ -86,19 +116,50 @@
     <div class="container">
         <div class="hero-badge">
             <span class="dot"></span>
-            Autonomous security operations
+            Autonomous red team and blue team &mdash; running every day
         </div>
-        <h1>Find vulnerabilities<br><span>before attackers do.</span></h1>
+        <h1>We break in.<br><span>Then we ship the fix.</span></h1>
         <p>
-            A red team and a blue team that never sleep. Our agents run adversary
-            emulation against your systems, then turn every technique they land
-            into a fix and a detection - continuously, not once a quarter.
+            Most security vendors hand you a report and an invoice. We attack
+            your systems continuously, prove what we actually found, and hand
+            back the patch, the detection that catches it, and the test that
+            stops it coming back.
         </p>
         <div class="hero-actions">
-            <a href="#contact" class="btn btn-primary">Request an Assessment</a>
-            <a href="#methodology" class="btn btn-outline">How It Works</a>
+            <a href="#freescan" class="btn btn-primary">Get a Free Automated Scan</a>
+            <a href="#anatomy" class="btn btn-outline">See What a Finding Looks Like</a>
         </div>
-        <p class="hero-note">Scoping call within 48 hours. Engagements from $500.</p>
+        <p class="hero-note">
+            Free scan of your repository or deployment within 48 hours.
+            Engagements from $500. No account, no sales call.
+        </p>
+        <div class="loop-strip">
+            <div class="loop-step">
+                <span class="loop-name">01 ATTACK</span>
+                <strong>Adversary emulation</strong>
+                <span>Chained techniques against a real target, not a checklist.</span>
+            </div>
+            <div class="loop-step">
+                <span class="loop-name">02 VERIFY</span>
+                <strong>Reproduced end to end</strong>
+                <span>If we cannot execute the attack path, it is not a finding.</span>
+            </div>
+            <div class="loop-step">
+                <span class="loop-name">03 PATCH</span>
+                <strong>The fix, as a diff</strong>
+                <span>Landed in your repository, passing your own test suite.</span>
+            </div>
+            <div class="loop-step">
+                <span class="loop-name">04 DETECT</span>
+                <strong>The rule that catches it</strong>
+                <span>Detection engineering, tested before we call it done.</span>
+            </div>
+            <div class="loop-step is-terminal">
+                <span class="loop-name">05 PROVE</span>
+                <strong>Regression test</strong>
+                <span>Fails before the patch, passes after. The fix is closed.</span>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -106,60 +167,269 @@
 <div class="container">
     <div class="stats-bar">
         <div class="stat">
-            <div class="stat-value">6</div>
-            <div class="stat-label">Bounty Sources Monitored</div>
+            <div class="stat-value">379</div>
+            <div class="stat-label">Security assertions on our own code</div>
+            <span class="stat-source">automated gate, every commit</span>
         </div>
         <div class="stat">
             <div class="stat-value">24/7</div>
-            <div class="stat-label">Autonomous Scanning</div>
+            <div class="stat-label">Continuous adversary emulation</div>
+            <span class="stat-source">not a quarterly window</span>
         </div>
         <div class="stat">
-            <div class="stat-value">&lt;4h</div>
-            <div class="stat-label">Avg. Time to First Report</div>
+            <div class="stat-value">&lt;48h</div>
+            <div class="stat-label">Free scan, request to report</div>
+            <span class="stat-source">no account required</span>
         </div>
         <div class="stat">
-            <div class="stat-value">0</div>
-            <div class="stat-label">False Positives Pushed</div>
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Findings shipped with a fix</div>
+            <span class="stat-source">plus detection and test</span>
         </div>
     </div>
 </div>
 
-<!-- Proof: what we can actually demonstrate, and what it is worth -->
+<!-- Proof: verified, not asserted -->
 <section class="proof-band">
     <div class="container">
-        <span class="section-label">Why trust an autonomous team</span>
-        <h2 class="section-title">The same gate that screens your code runs on ours</h2>
+        <span class="section-label">Proof</span>
+        <h2 class="section-title">Verified, not asserted</h2>
         <p class="section-desc">
-            We do not ask you to take our word for it. Our own engineering runs
-            under the same automated controls we bring to your engagements.
+            A claim you cannot check is a slogan. Every promise on this page
+            points at something you can open, run, or hold us to.
         </p>
         <div class="proof-grid">
             <div class="proof-item">
-                <strong>Every change is gated before it ships</strong>
-                <span>Our improvement loop runs a security gate over its own diffs
-                before anything is committed. A change that introduces a known
-                vulnerable pattern is blocked and the tree is rolled back. The
-                same gate is what protects your codebase during an engagement.</span>
+                <strong>The gate that screens your code screens ours</strong>
+                <span>Our own engineering runs through an automated security
+                gate: hundreds of assertions over every diff, a blocked and
+                rolled-back change if one trips, and a published check that
+                the gate still passes. We sell the gate because we run it on
+                ourselves first.</span>
+                <a href="swarm.html" class="verify-link">See the live operations log &rarr;</a>
             </div>
             <div class="proof-item">
-                <strong>Findings carry a working exploit, not a theory</strong>
-                <span>Every issue we report comes with the exact path, a concrete
-                attack path, the business impact, and a regression test that would
-                have caught it. If we cannot build the attack path, it is not a
-                finding and we say so.</span>
+                <strong>Our rules of engagement are written down</strong>
+                <span>Every target we touch is registered with its scope class
+                before a single request is sent. What we may test, what we
+                will not touch, and how a third party is off-limits are all
+                fixed in advance &mdash; in writing, before the engagement
+                starts, not after something goes wrong.</span>
+                <a href="disclosure.html" class="verify-link">Read the disclosure policy &rarr;</a>
             </div>
             <div class="proof-item">
-                <strong>Techniques become detections</strong>
-                <span>An adversary simulation that ends at the intrusion is half a
-                job. Every technique that lands must leave behind a hardening
-                control and a detection that fires, and we test that it fires.</span>
+                <strong>You can reproduce every claim yourself</strong>
+                <span>Findings ship with the exact request and response, the
+                command output, and the reproduction steps. If our evidence
+                does not convince you, it is not evidence &mdash; so we give
+                you all of it and let you run it.</span>
+                <a href="#anatomy" class="verify-link">See the evidence format &rarr;</a>
             </div>
             <div class="proof-item">
-                <strong>You own the work, and the evidence</strong>
-                <span>You get the command logs, the reproduction steps, and the
-                fixes in your repository. We keep no lock-in: the report and the
-                remediation are yours to keep, audit and re-run.</span>
+                <strong>Our tooling is public</strong>
+                <span>The validator, the gates and the research tooling we use
+                on ourselves are open source. You can read the controls before
+                you trust us with anything, and you can hold them to the same
+                standard you hold your own suppliers to.</span>
+                <a href="https://github.com/PreCogSecurity" class="verify-link">Open the GitHub organisation &rarr;</a>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- Free scan: the low-friction product -->
+<section id="freescan" class="scan-band">
+    <div class="container">
+        <span class="scan-badge">&#x2713; Free &mdash; no account, no sales call</span>
+        <h2 class="section-title">Point the scanner at your repository.<br>Get something real back.</h2>
+        <p class="section-desc">
+            Send us a public repository or a deployment URL. You get a verified
+            report &mdash; attack paths we actually executed, the evidence, the
+            patch, and the detection &mdash; at no cost, with nobody asking you
+            to book a meeting.
+        </p>
+        <div class="scan-grid">
+            <div class="scan-form">
+                <form action="https://formsubmit.co/timlangeveldt@gmail.com" method="POST">
+                    <input type="hidden" name="_captcha" value="true">
+                    <input type="hidden" name="_subject" value="Free automated security scan request">
+                    <input type="hidden" name="_template" value="table">
+                    <div class="form-group">
+                        <label for="scan-email">Where should we send the report?</label>
+                        <input type="email" id="scan-email" name="email" required maxlength="254" autocomplete="email" placeholder="you@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="scan-target">Repository URL or target</label>
+                        <input type="text" id="scan-target" name="target" required maxlength="500" placeholder="https://github.com/your-org/your-app">
+                    </div>
+                    <div class="form-group">
+                        <label for="scan-note">Anything we should know? (optional)</label>
+                        <input type="text" id="scan-note" name="note" maxlength="1000" placeholder="Stack, the part you are worried about, a test account">
+                    </div>
+                    <button type="submit" class="btn btn-primary form-submit">Request the Free Scan</button>
+                </form>
+                <p class="scan-form-note">
+                    We only use what you send to test the target you named.
+                    It is never used to train a model and never shared. Read the
+                    <a href="privacy.html">privacy policy</a>.
+                </p>
+            </div>
+            <div>
+                <span class="section-label">What arrives</span>
+                <ul class="scan-list">
+                    <li>
+                        <div class="why-check">&#x2713;</div>
+                        <div><strong>A verified finding, not a scanner guess</strong>
+                        Every issue we report was reproduced against the running
+                        target. If we could not execute it, it is not in the report.</div>
+                    </li>
+                    <li>
+                        <div class="why-check">&#x2713;</div>
+                        <div><strong>The exact request that reproduced it</strong>
+                        The request, the response, the status code and the bytes
+                        &mdash; copy-pasteable, so you can confirm it in one command.</div>
+                    </li>
+                    <li>
+                        <div class="why-check">&#x2713;</div>
+                        <div><strong>A patch, not a paragraph about a patch</strong>
+                        The fix as a diff against your code, tested against your
+                        own suite before we send it.</div>
+                    </li>
+                    <li>
+                        <div class="why-check">&#x2713;</div>
+                        <div><strong>The detection that would have caught it</strong>
+                        The rule your SIEM needs, plus the test proving the rule
+                        fires on the activity you actually generate.</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- The objection -->
+<section id="why-not">
+    <div class="container">
+        <span class="section-label">The honest question</span>
+        <div class="objection-head">
+            <h2 class="section-title">Why not just point an LLM at your repo?</h2>
+        </div>
+        <div class="objection-quote">
+            You are right to ask, and we should answer it before you ask it.
+            A good model can read your code and describe a vulnerability. That
+            is genuinely useful, it is fast, and it is not nothing.
+        </div>
+        <div class="objection-grid">
+            <div class="objection-col is-them">
+                <h3>A model on its own</h3>
+                <ul>
+                    <li><strong>Describes</strong> a plausible vulnerability in code it has read, without a running system to prove it against.</li>
+                    <li><strong>Cannot execute</strong> the attack path, so a theoretical issue and a live breach look identical in the output.</li>
+                    <li><strong>Cannot run your suite</strong>, so the fix it proposes is unproven against the code you actually ship.</li>
+                    <li><strong>Leaves you with prose.</strong> A paragraph about the fix is not a fix, and no detection is written to catch the next attempt.</li>
+                    <li><strong>Has no memory</strong> between runs, so the same regression is re-discovered every quarter at full price.</li>
+                </ul>
+            </div>
+            <div class="objection-col is-us">
+                <h3>An autonomous team, with a gate</h3>
+                <ul>
+                    <li><strong>Executes</strong> the attack against your running system and keeps the raw request and response as evidence.</li>
+                    <li><strong>Refuses to report</strong> anything it could not reproduce &mdash; a finding is a proven path, not a suspicion.</li>
+                    <li><strong>Lands the patch</strong> in your repository as a diff, and runs your own test suite before it reaches you.</li>
+                    <li><strong>Writes the detection</strong> and proves it fires, because a fix without a detection is a fix that silently regresses.</li>
+                    <li><strong>Remembers.</strong> Every fix we ship is re-tested on a clock, so a regression is caught by us before an attacker catches it again.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="trust-note">
+            <strong>We are an LLM shop. We are just not an LLM only.</strong>
+            The models do the reading, the writing and the reasoning. What makes
+            the difference is everything around them: the scope registry, the
+            evidence requirement, the gate that blocks a bad diff, and the
+            refusal to call something a finding until it has been proven. That
+            machinery is the product, and it is the part you are buying.
+        </div>
+    </div>
+</section>
+
+<!-- Worked example -->
+<section id="anatomy" class="section-alt">
+    <div class="container">
+        <span class="section-label">Worked example</span>
+        <h2 class="section-title">One finding, end to end</h2>
+        <p class="section-desc">
+            A redacted example from a real engagement class: a cross-tenant read
+            in a multi-tenant API. This is the shape of every finding we ship.
+            The report is one page &mdash; the other four artefacts are what make
+            it worth paying for.
+        </p>
+        <div class="anatomy">
+            <div class="anatomy-step">
+                <div class="anatomy-num">01 &mdash; ATTACK</div>
+                <h3>We reach it</h3>
+                <p>The object identifier is ours to change. We change it and watch what the service says.</p>
+                <div class="anatomy-code"><span class="c"># tenant A requests tenant B's order</span>
+<span class="k">GET</span> /api/v1/orders/9812
+<span class="k">Authorization</span>: Bearer <span class="c">&lt;token_A&gt;</span>
+
+<span class="g">200 OK</span>
+{ "id": 9812, "customer": <span class="r">"Beta Holdings"</span>,
+  "total": 41200, "status": "shipped" }</div>
+            </div>
+            <div class="anatomy-step">
+                <div class="anatomy-num">02 &mdash; VERIFY</div>
+                <h3>We prove it</h3>
+                <p>One request, no retries, no race condition, no fluke. It returns another customer's data, every time.</p>
+                <div class="anatomy-code"><span class="c"># same token, foreign id, 10/10</span>
+<span class="g">200</span> foreign_id=9812
+<span class="g">200</span> foreign_id=9813
+...
+<span class="r">200</span> foreign_id=9821
+
+<span class="c"># tenant check on the id:</span>
+missing
+<span class="c"># /api/v1/orders/{id} never compares</span>
+<span class="c"># owner_id against the session</span></div>
+            </div>
+            <div class="anatomy-step">
+                <div class="anatomy-num">03 &mdash; PATCH</div>
+                <h3>We fix it</h3>
+                <p>A diff against your code, in your repository, passing your own test suite. Not a paragraph about a diff.</p>
+                <div class="anatomy-code"><span class="k">-</span> order = Order.objects.get(id=id)
+<span class="k">+</span> order = get_object_or_404(
+<span class="k">+</span>     Order,
+<span class="k">+</span>     id=id,
+<span class="k">+</span>     tenant_id=request.tenant.id,
+<span class="k">+</span> )</div>
+            </div>
+            <div class="anatomy-step">
+                <div class="anatomy-num">04 &mdash; DETECT</div>
+                <h3>We make it visible</h3>
+                <p>A fix without a detection is a fix that silently regresses. We ship the rule and prove it fires.</p>
+                <div class="anatomy-code"><span class="c"># detection: cross-tenant read attempt</span>
+<span class="k">when</span> (route == "/api/v1/orders/*"
+<span class="k">  and</span> status == 200
+<span class="k">  and</span> order.tenant_id != session.tenant_id)
+  <span class="k">alert</span>(<span class="r">"precog.idor.cross_tenant_read"</span>)
+  <span class="k">block</span>(response)</div>
+            </div>
+            <div class="anatomy-step">
+                <div class="anatomy-num">05 &mdash; PROVE</div>
+                <h3>We close it</h3>
+                <p>The regression test fails before the patch and passes after. Then we re-test it on every future cycle.</p>
+                <div class="anatomy-code"><span class="k">def</span> test_cannot_read_other_tenant_order(client):
+    r = client.get(<span class="r">"/api/v1/orders/9812"</span>,
+                   headers=<span class="k">{</span><span class="r">"Authorization"</span>: <span class="r">"Bearer A"</span><span class="k">}</span>)
+    <span class="k">assert</span> r.status_code == <span class="r">404</span>
+
+<span class="c"># before patch: 200  -> test fails</span>
+<span class="c"># after  patch: 404  -> test passes</span></div>
+            </div>
+        </div>
+        <div class="trust-note">
+            <strong>That is the whole product.</strong> Not a dashboard, not a
+            monthly PDF, not a severity score. A proven path, a fix, a
+            detection and a test &mdash; and the evidence for all four, in your
+            repository, where your team owns it.
         </div>
     </div>
 </section>
@@ -168,104 +438,131 @@
 <section id="services">
     <div class="container">
         <span class="section-label">What We Do</span>
-        <h2 class="section-title">Security Services</h2>
+        <h2 class="section-title">Security services</h2>
         <p class="section-desc">
-            End-to-end vulnerability research powered by autonomous agents that never sleep.
+            Every service below runs the same loop: attack, verify, patch,
+            detect, prove. The difference is the scope and the depth.
         </p>
         <div class="services-grid">
             <div class="service-card">
                 <div class="service-icon">&#x1F50D;</div>
-                <h3>Autonomous Bug Bounty</h3>
+                <h3>Penetration Testing</h3>
                 <p>
-                    Our agents continuously scan public bounty platforms (Algora, Opire, Polar,
-                    GitHub), rank opportunities by expected value, and autonomously produce
-                    verified fixes as pull requests.
+                    Adversary emulation against a scoped target &mdash; web, API,
+                    cloud, network or mobile. Chained techniques, not a checklist
+                    scan, with every finding reproduced before it is reported.
                 </p>
-                <span class="service-tag">Continuous</span>
+                <span class="service-tag">From $500</span>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">&#x1F6E1;</div>
+                <h3>Continuous Red Teaming</h3>
+                <p>
+                    The same attacks, on a clock, against the surface you
+                    actually run. A fix that regresses is caught by us before
+                    an attacker catches it again.
+                </p>
+                <span class="service-tag">24/7</span>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">&#x1F512;</div>
+                <h3>Blue Team &amp; Detection Engineering</h3>
+                <p>
+                    The other half of the loop. We write the rules that catch
+                    the activity, test that they fire, and tune them against
+                    your real telemetry instead of a generic rule pack.
+                </p>
+                <span class="service-tag">Detection as code</span>
             </div>
             <div class="service-card">
                 <div class="service-icon">&#x1F4E6;</div>
                 <h3>Supply Chain Auditing</h3>
                 <p>
-                    Static and dynamic analysis of dependency graphs, build pipelines, and
-                    package registries. We identify compromised packages, typosquatting risks,
-                    and insecure build configurations before they reach production.
+                    Static and dynamic analysis of dependency graphs, build
+                    pipelines and package registries. Compromised packages,
+                    typosquatting and insecure build configuration &mdash; found
+                    before they reach production.
                 </p>
-                <span class="service-tag">CI/CD Integrated</span>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">&#x1F6E1;</div>
-                <h3>Predictive Threat Intelligence</h3>
-                <p>
-                    Machine learning models trained on CVE databases, exploit repositories,
-                    and dark web feeds to predict which vulnerabilities in your stack are
-                    most likely to be weaponized in the next 30 days.
-                </p>
-                <span class="service-tag">ML-Powered</span>
+                <span class="service-tag">CI/CD integrated</span>
             </div>
             <div class="service-card">
                 <div class="service-icon">&#x1F4BB;</div>
                 <h3>Code Review as a Service</h3>
                 <p>
-                    AI-assisted pull request review that catches security anti-patterns,
-                    injection risks, authentication flaws, and cryptographic misconfigurations
-                    before code merges.
+                    AI-assisted pull request review that catches security
+                    anti-patterns, injection risks, authentication flaws and
+                    cryptographic misconfiguration &mdash; before the merge, not
+                    after the incident.
                 </p>
-                <span class="service-tag">GitHub Integration</span>
-            </div>
-            <div class="service-card">
-                <div class="service-icon">&#x1F512;</div>
-                <h3>Responsible Disclosure Program</h3>
-                <p>
-                    We run and manage responsible disclosure programs for open-source projects
-                    and startups, including triage, severity classification, and coordinated
-                    disclosure workflows.
-                </p>
-                <span class="service-tag">Managed</span>
+                <span class="service-tag">GitHub integration</span>
             </div>
             <div class="service-card">
                 <div class="service-icon">&#x2699;</div>
                 <h3>Security Tooling Development</h3>
                 <p>
-                    Custom fuzzers, static analyzers, and CI security gates tailored to your
-                    tech stack. Open-source components are published under our GitHub
-                    organization.
+                    Custom fuzzers, static analysers and CI security gates
+                    tailored to your stack. The components we build for clients
+                    are published under our GitHub organisation.
                 </p>
-                <span class="service-tag">Open Source</span>
+                <span class="service-tag">Open source</span>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Pricing anchors: the first thing a buyer compares, so it belongs here -->
-<section id="pricing">
+<!-- Pricing -->
+<section id="pricing" class="section-alt">
     <div class="container">
         <span class="section-label">Engagements</span>
         <h2 class="section-title">Priced in the open</h2>
         <p class="section-desc">
-            No discovery invoice, no surprise retainer. Fixed scopes, published
-            rates, and a free initial review so you know what you are buying.
+            No discovery invoice, no hourly billing surprise, no retainer you
+            cannot cancel. Fixed scopes, published rates, and a free first
+            scan so you know what you are buying before you buy it.
         </p>
         <div class="offer-grid">
             <div class="offer-card">
-                <h4>Initial Assessment</h4>
-                <div class="price">Free <small>/ first review</small></div>
-                <p>We scope your attack surface, read the code we can reach, and
-                tell you the three things most worth fixing. Within 48 hours.</p>
-                <a href="#contact">Start with the free review &rarr;</a>
+                <h4>Free Automated Scan</h4>
+                <div class="price">$0 <small>/ first scan</small></div>
+                <p>One repository or deployment, scanned and attacked by our
+                own agents, with everything we find verified.</p>
+                <ul class="offer-includes">
+                    <li>Verified findings with the exact reproduction</li>
+                    <li>The patch as a diff</li>
+                    <li>A detection rule for what you find</li>
+                    <li>No account, no call, no obligation</li>
+                </ul>
+                <div class="offer-meta">Delivered within 48 hours</div>
+                <a href="#freescan">Start with the free scan &rarr;</a>
             </div>
             <div class="offer-card">
                 <h4>Focused Audit</h4>
                 <div class="price">$500 <small>/ audit</small></div>
-                <p>One repository or one application, reviewed and attacked to a
-                defined depth, with verified findings and fixes.</p>
+                <p>One repository or one application, attacked to a defined
+                depth, with the fixes and a ranked backlog.</p>
+                <ul class="offer-includes">
+                    <li>Everything in the free scan, plus full attack-path mapping</li>
+                    <li>Dependency and secret exposure analysis</li>
+                    <li>A ranked fix backlog you can schedule</li>
+                    <li>A walkthrough with the engineer who did the work</li>
+                </ul>
+                <div class="offer-meta">3&ndash;5 working days &middot; 1 application</div>
                 <a href="#contact">Book an audit &rarr;</a>
             </div>
-            <div class="offer-card">
+            <div class="offer-card is-featured">
+                <span class="offer-badge">Most requested</span>
                 <h4>Full Penetration Test</h4>
                 <div class="price">$1,500+ <small>/ engagement</small></div>
                 <p>A full red team engagement against a scoped target, with
-                adversary simulation, command evidence, and a detection backlog.</p>
+                adversary simulation, command evidence and a tested detection
+                backlog.</p>
+                <ul class="offer-includes">
+                    <li>Everything in the audit, plus full adversary simulation</li>
+                    <li>Command evidence for every finding</li>
+                    <li>Detection engineering with tested rules</li>
+                    <li>A retest of every fix we ship</li>
+                </ul>
+                <div class="offer-meta">1&ndash;2 weeks &middot; web, API, cloud or network</div>
                 <a href="#contact">Scope an engagement &rarr;</a>
             </div>
             <div class="offer-card">
@@ -273,6 +570,13 @@
                 <div class="price">$1,200 <small>/ month</small></div>
                 <p>Autonomous scanning and retesting on a clock, so a fix that
                 regresses is caught before an attacker finds it again.</p>
+                <ul class="offer-includes">
+                    <li>Everything in the penetration test, on a clock</li>
+                    <li>Automated re-testing of every fix</li>
+                    <li>New attack surface triaged daily</li>
+                    <li>A monthly detection backlog</li>
+                </ul>
+                <div class="offer-meta">Rolling &middot; cancel any time</div>
                 <a href="#contact">Set up monitoring &rarr;</a>
             </div>
         </div>
@@ -285,116 +589,209 @@
     </div>
 </section>
 
-<!-- Methodology -->
+<!-- Comparison -->
+<section id="compare">
+    <div class="container">
+        <span class="section-label">How we compare</span>
+        <h2 class="section-title">You have three realistic options</h2>
+        <p class="section-desc">
+            A consultancy, a scanner, or an autonomous team that does both and
+            ships the fix. Here is the honest comparison, including where the
+            other two are the better answer.
+        </p>
+        <div class="compare-wrap">
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th scope="col">&nbsp;</th>
+                        <th scope="col">Classic consultancy</th>
+                        <th scope="col">Point scanner</th>
+                        <th scope="col" class="is-us">PreCog Security</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">First report delivered in</th>
+                        <td>Weeks, after scoping</td>
+                        <td>Minutes, unverified</td>
+                        <td class="is-us">48 hours, every finding reproduced</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Who does the work</th>
+                        <td>One consultant, in a time window</td>
+                        <td>A rule engine</td>
+                        <td class="is-us">An autonomous team, every day</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Proves the attack path works</th>
+                        <td><span class="yes">Yes</span></td>
+                        <td><span class="no">No</span></td>
+                        <td class="is-us"><span class="yes">Yes</span> &mdash; or we do not report it</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Fix included in the work</th>
+                        <td><span class="no">No</span></td>
+                        <td><span class="no">No</span></td>
+                        <td class="is-us"><span class="yes">Yes</span> &mdash; as a diff in your repo</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Detection shipped</th>
+                        <td>Sometimes, untested</td>
+                        <td><span class="no">No</span></td>
+                        <td class="is-us"><span class="yes">Yes</span> &mdash; and proven to fire</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Regression test included</th>
+                        <td><span class="no">No</span></td>
+                        <td><span class="no">No</span></td>
+                        <td class="is-us"><span class="yes">Yes</span></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Re-tested later</th>
+                        <td>Another engagement</td>
+                        <td>Another scan</td>
+                        <td class="is-us">Every cycle, automatically</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Cost for one application</th>
+                        <td>Quoted per engagement</td>
+                        <td>Subscription or free tier</td>
+                        <td class="is-us">$500, published</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Where the output lands</th>
+                        <td>A PDF</td>
+                        <td>A dashboard</td>
+                        <td class="is-us">Your repository, yours to keep</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="compare-note">
+            Where the other two are the better answer: if you need a specific
+            compliance attestation with a certificate behind it, or you need a
+            named human to sign off for your board, book a consultancy. We do
+            not issue those. Where you need an attack that is actually proven,
+            a fix that is actually applied, and a detection that is actually
+            tested, this table is the shortlist.
+        </p>
+    </div>
+</section>
+<!-- Method -->
 <section id="methodology" class="section-alt">
     <div class="container">
-        <span class="section-label">How It Works</span>
-        <h2 class="section-title">Autonomous Methodology</h2>
+        <span class="section-label">How an engagement runs</span>
+        <h2 class="section-title">Six steps, and none of them is "write a report"</h2>
         <p class="section-desc">
-            A closed-loop pipeline that discovers, triages, exploits, and reports — without human bottlenecks.
+            The same pipeline every time, whether the engagement is a $500 audit
+            or a continuous engagement. You always know which step you are in.
         </p>
         <div class="method-grid">
             <div class="method-step">
-                <div class="method-num">01 — DISCOVER</div>
-                <h4>Multi-Source Scanning</h4>
-                <p>Agents poll bounty APIs, GitHub search, and watchlists every cycle. Duplicate bounties across platforms are merged and deduplicated.</p>
+                <div class="method-num">01 &mdash; SCOPE</div>
+                <h4>Written rules of engagement</h4>
+                <p>What we may touch, what we will not, and how we contact you if something unexpected happens. Agreed in writing before a single request is sent.</p>
             </div>
             <div class="method-step">
-                <div class="method-num">02 — RANK</div>
-                <h4>Expected Value Scoring</h4>
-                <p>Each bounty is scored on payout size, repo merge rate, rival PR count, and age. Only opportunities with positive EV survive the filter.</p>
+                <div class="method-num">02 &mdash; ATTACK</div>
+                <h4>Adversary emulation</h4>
+                <p>Chained techniques executed against your running system, using the paths a real attacker would take &mdash; not a signature checklist against a copy.</p>
             </div>
             <div class="method-step">
-                <div class="method-num">03 — TRIAGE</div>
-                <h4>LLM-Assisted Triage</h4>
-                <p>Large language models assess feasibility, difficulty, and scope fit before any code is written. Low-confidence candidates are discarded early.</p>
+                <div class="method-num">03 &mdash; VERIFY</div>
+                <h4>Reproduce or discard</h4>
+                <p>Every candidate finding is executed end to end. If the path does not work, it is not a finding &mdash; it is discarded, and it does not reach your dashboard.</p>
             </div>
             <div class="method-step">
-                <div class="method-num">04 — EXPLOIT</div>
-                <h4>Automated Fix Generation</h4>
-                <p>Coding agents clone the target repo, implement a fix in an isolated workspace, and run the project's own test suite before submission.</p>
+                <div class="method-num">04 &mdash; FIX</div>
+                <h4>The patch, in your repository</h4>
+                <p>The fix lands as a diff against your code, in a branch you control, and is run against your own test suite before you ever see it.</p>
             </div>
             <div class="method-step">
-                <div class="method-num">05 — SUBMIT</div>
-                <h4>Verified PR Submission</h4>
-                <p>Pull requests are opened from a fork with a structured description linking the issue. Only verified, test-passing changes are pushed.</p>
+                <div class="method-num">05 &mdash; DETECT</div>
+                <h4>The rule that catches it</h4>
+                <p>For every technique that landed, a detection is written and tested against real activity. We do not close a finding until the rule fires.</p>
             </div>
             <div class="method-step">
-                <div class="method-num">06 — LEARN</div>
-                <h4>Feedback Loop</h4>
-                <p>PR outcomes (merged/closed) feed back into merge-rate estimates. Repos that reject external contributions are deprioritized automatically.</p>
+                <div class="method-num">06 &mdash; PROVE</div>
+                <h4>Regression test and retest</h4>
+                <p>A test that fails before the fix and passes after it, plus a re-test of every fix we have shipped, so nothing quietly comes back.</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Why Us -->
-<section id="why-us">
+<!-- Research -->
+<section id="research">
     <div class="container">
-        <span class="section-label">Why PreCog</span>
-        <h2 class="section-title">Built Different</h2>
-        <div class="why-grid">
-            <div>
-                <ul class="why-list">
-                    <li>
-                        <div class="why-check">&#x2713;</div>
-                        <div>
-                            <strong>Zero false-positive PRs</strong>
-                            <span>Every submission is gated by the target's own test suite. If tests don't pass, nothing is pushed.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="why-check">&#x2713;</div>
-                        <div>
-                            <strong>Local LLM inference</strong>
-                            <span>Triage and coding run on local models (Phi-4, Qwen2.5-Coder) with cloud fallback. No data leaves your infrastructure for the core loop.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="why-check">&#x2713;</div>
-                        <div>
-                            <strong>Transparent EV scoring</strong>
-                            <span>Every bounty decision is logged with its expected value calculation. You can audit exactly why something was pursued or skipped.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="why-check">&#x2713;</div>
-                        <div>
-                            <strong>Circuit breakers &amp; kill switches</strong>
-                            <span>Automatic halt on repeated failures. File-based kill switch for instant manual override. Spend caps enforced per-hour.</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="why-check">&#x2713;</div>
-                        <div>
-                            <strong>Multi-platform coverage</strong>
-                            <span>Algora, Opire, Polar, Boss Bounty, and GitHub-native bounty labels — all scanned, merged, and deduplicated.</span>
-                        </div>
-                    </li>
-                </ul>
+        <span class="section-label">Research</span>
+        <h2 class="section-title">Our machine publishes its own work</h2>
+        <p class="section-desc">
+            Most security vendors show you case studies written by a marketing
+            team. We publish the operations log of the autonomous team that
+            does the work &mdash; what it found, what it shipped, and what it
+            changed this month.
+        </p>
+        <div class="research-grid">
+            <div class="research-card">
+                <span class="research-kind">Live operations</span>
+                <h3>The swarm's public operations log</h3>
+                <p>Every agent, every target class, every finding and every
+                shipped fix &mdash; published as it happens, not case-studied
+                six months later.</p>
+                <a href="swarm.html">Open the operations log &rarr;</a>
             </div>
-            <div class="why-panel">
-                <h4>Sample Cycle Output</h4>
-                <div class="terminal">
-<span class="prompt">$</span> <span class="cmd">bounty-radar cycle --dry-run</span><br><br>
-<span class="output">scan found 155 unique funded issues</span><br>
-<span class="output">38 clear the floor (global $30, opire $15)</span><br>
-<span class="output">skip tt-metal#49307: assigned to @morhimanshu</span><br>
-<span class="output">skip trovu#329: 3 rivals -> 25% of pot;</span><br>
-<span class="output">  merge rate 38%; EV $3 below floor</span><br>
-<span class="output">attempted=5 submitted=0 failed=0</span><br>
-<span class="output">skips=assigned:5, below_ev_floor:20,</span><br>
-<span class="output">  cycle_budget:13</span><br><br>
-<span class="prompt">$</span> <span class="cmd"># only positive-EV, unassigned,</span><br>
-<span class="cmd"># test-passing fixes get submitted</span>
-                </div>
+            <div class="research-card">
+                <span class="research-kind">Method</span>
+                <h3>How we decide what to attack</h3>
+                <p>The triage rules, the evidence bar, the scope classes and
+                the promotion criteria we use on ourselves &mdash; written down
+                so you can audit them before you trust them.</p>
+                <a href="swarm.html#method">Read the method &rarr;</a>
+            </div>
+            <div class="research-card">
+                <span class="research-kind">Programme</span>
+                <h3>Coordinated disclosure</h3>
+                <p>How we handle a vulnerability in someone else's code: triage,
+                severity, timelines, and the rule that we do not publish
+                before the responsible party has had a fair chance to fix it.</p>
+                <a href="disclosure.html">Read the disclosure policy &rarr;</a>
+            </div>
+        </div>
+        <div class="ship-strip">
+            <div class="ship-item">
+                <span class="ship-when">OCT 2026</span>
+                <strong>Model health probe now samples the rotation</strong>
+                <span>It was probing all 367 models on every fifth pass, which
+                burned eighteen minutes of blocking work to answer a question
+                the head of the list could answer.</span>
+            </div>
+            <div class="ship-item">
+                <span class="ship-when">OCT 2026</span>
+                <strong>Session store compacted: 48.7 GB to 6.1 GB</strong>
+                <span>42.6 GB of it was free pages from deleted rows. The
+                compaction runs automatically at startup, on our own machine,
+                with the same gate every change gets.</span>
+            </div>
+            <div class="ship-item">
+                <span class="ship-when">OCT 2026</span>
+                <strong>A rate limit is no longer read as a dead model</strong>
+                <span>Our own traffic was getting a healthy model cooled and
+                the rotation drained. A busy model now stays in rotation.</span>
+            </div>
+            <div class="ship-item">
+                <span class="ship-when">OCT 2026</span>
+                <strong>Competitive-intelligence lane added to the loop</strong>
+                <span>The team now reads its own market every cycle and
+                proposes the change as a pull request, gated like any other
+                change. It never pushes directly.</span>
             </div>
         </div>
     </div>
 </section>
 
 <!-- FAQ -->
-<section id="faq">
+<section id="faq" class="section-alt">
     <div class="container">
         <span class="section-label">Before you ask</span>
         <h2 class="section-title">Straight answers</h2>
@@ -404,8 +801,8 @@
                 <p>No. Black box testing against the running application is the
                 default, and it is the more honest test. If white box access
                 would produce a materially better result we will say so and
-                scope it separately - we do not quietly ask for credentials we
-                do not need.</p>
+                scope it separately &mdash; we do not quietly ask for
+                credentials we do not need.</p>
             </div>
             <div class="faq-item">
                 <h4>Will you disrupt our production?</h4>
@@ -424,18 +821,39 @@
                 reproduce every claim.</p>
             </div>
             <div class="faq-item">
+                <h4>Why not just point an LLM at our codebase?</h4>
+                <p>Because a model can describe a vulnerability but cannot prove
+                the attack path works, cannot run your test suite, cannot write
+                the detection, and cannot remember what it fixed last quarter.
+                <a href="#why-not">The full answer is here</a>.</p>
+            </div>
+            <div class="faq-item">
+                <h4>What happens if you find nothing?</h4>
+                <p>You get a clean report that says exactly what was tested, how
+                it was tested, and what was out of scope. That document is
+                evidence of coverage, it is yours to keep, and it is more
+                useful than a long list of theoretical issues.</p>
+            </div>
+            <div class="faq-item">
                 <h4>How fast can you start?</h4>
-                <p>The free initial review is scoped within 48 hours of your
-                request. Engagement start dates depend on scope, and we will
-                tell you the real date rather than a hopeful one.</p>
+                <p>The free scan is scoped within 48 hours of your request.
+                Engagement start dates depend on scope, and we will tell you
+                the real date rather than a hopeful one.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Do you train models on our code or our data?</h4>
+                <p>No. What you send is used only to test the target you named,
+                for your engagement. It is never used to train a model and
+                never shared with a third party. We will put that in the
+                engagement letter.</p>
             </div>
             <div class="faq-item">
                 <h4>Can you keep our findings confidential?</h4>
                 <p>Yes. Disclosing to the vendor is the default because it is
                 what actually gets you fixed, but confidentiality is the norm
-                and coordinated disclosure is standard practice - we do not
-                publish a finding before the responsible party has had a fair
-                chance to fix it.</p>
+                and coordinated disclosure is standard practice &mdash; we do
+                not publish a finding before the responsible party has had a
+                fair chance to fix it.</p>
             </div>
         </div>
     </div>
@@ -444,15 +862,17 @@
 <!-- Contact -->
 <section id="contact" class="contact-section">
     <div class="container">
-        <span class="section-label">Get In Touch</span>
-        <h2 class="section-title">Request an Assessment</h2>
+        <span class="section-label">Get in touch</span>
+        <h2 class="section-title">Request an engagement</h2>
         <p class="section-desc">
-            Tell us about your project. We'll scope a free initial review within 48 hours.
+            Tell us about the target and the deadline. We will scope it, price
+            it against the published rate card, and tell you the real start
+            date.
         </p>
         <div class="contact-grid">
             <form class="contact-form" action="https://formsubmit.co/timlangeveldt@gmail.com" method="POST">
                 <input type="hidden" name="_captcha" value="true">
-                <input type="hidden" name="_subject" value="New PreCog Security assessment request">
+                <input type="hidden" name="_subject" value="New PreCog Security engagement request">
                 <input type="hidden" name="_template" value="table">
                 <div class="form-row">
                     <div class="form-group">
@@ -460,26 +880,33 @@
                         <input type="text" id="name" name="name" required maxlength="120" autocomplete="name" placeholder="Your name">
                     </div>
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email">Work email</label>
                         <input type="email" id="email" name="email" required maxlength="254" autocomplete="email" placeholder="you@company.com">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="service">Service Interest</label>
-                    <select id="service" name="service">
-                        <option value="assessment">Security Assessment</option>
-                        <option value="pentest">Penetration Test</option>
-                        <option value="redteam">Red Team Engagement</option>
-                        <option value="blueteam">Blue Team / Detection Engineering</option>
-                        <option value="supply-chain">Supply Chain Audit</option>
-                        <option value="code-review">Code Review</option>
-                        <option value="disclosure">Disclosure Program</option>
-                        <option value="other">Other</option>
-                    </select>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="company">Company</label>
+                        <input type="text" id="company" name="company" maxlength="160" autocomplete="organization" placeholder="Your company">
+                    </div>
+                    <div class="form-group">
+                        <label for="service">Service interest</label>
+                        <select id="service" name="service">
+                            <option value="scan">Free automated scan</option>
+                            <option value="audit">Focused Audit &mdash; $500</option>
+                            <option value="pentest">Full Penetration Test &mdash; $1,500+</option>
+                            <option value="monitoring">Continuous Monitoring &mdash; $1,200/mo</option>
+                            <option value="blueteam">Blue Team / Detection Engineering</option>
+                            <option value="supply-chain">Supply Chain Audit</option>
+                            <option value="code-review">Code Review</option>
+                            <option value="disclosure">Disclosure Programme</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label for="message">Project Details</label>
-                    <textarea id="message" name="message" required maxlength="4000" placeholder="Describe your project, tech stack, and security concerns..."></textarea>
+                    <label for="message">Target, stack and deadline</label>
+                    <textarea id="message" name="message" required maxlength="4000" placeholder="What are we testing, what is it built on, and when do you need to know?"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary form-submit">Send Request</button>
             </form>
@@ -501,29 +928,29 @@
                 <div class="contact-item">
                     <div class="contact-icon">&#x1F4B0;</div>
                     <div>
-                        <strong>Payment Rails</strong>
-                        <span>PayPal, EcoCash, bank transfer, BTC and ETH. Details on the invoice - never sent by email.</span>
+                        <strong>Payment rails</strong>
+                        <span>PayPal, EcoCash, bank transfer, BTC and ETH. Details are on the invoice &mdash; never sent by email.</span>
                     </div>
                 </div>
                 <div class="contact-item">
                     <div class="contact-icon">&#x1F310;</div>
                     <div>
-                        <strong>GitHub</strong>
+                        <strong>Open source</strong>
                         <span><a href="https://github.com/PreCogSecurity">github.com/PreCogSecurity</a></span>
                     </div>
                 </div>
                 <div class="contact-item">
                     <div class="contact-icon">&#x23F1;</div>
                     <div>
-                        <strong>Response Time</strong>
-                        <span>Within 48 hours for scoping requests</span>
+                        <strong>Response time</strong>
+                        <span>Within 48 hours for scoping requests, free scan included</span>
                     </div>
                 </div>
                 <div class="contact-item">
                     <div class="contact-icon">&#x1F512;</div>
                     <div>
                         <strong>Discretion</strong>
-                        <span>Under NDA on request. Coordinated disclosure is standard practice.</span>
+                        <span>Under NDA on request. Coordinated disclosure is standard practice, and we never publish before you have had a fair chance to fix.</span>
                     </div>
                 </div>
             </div>
@@ -540,32 +967,40 @@
                     <div class="logo-icon">&#x1F6E1;</div>
                     PreCog Security
                 </a>
-                <p>Autonomous vulnerability research and AI-driven security operations for modern software teams.</p>
+                <p>Autonomous red team and blue team operations. We break in, we ship the fix, and we prove it stays fixed.</p>
+                <div class="pill-row">
+                    <span class="pill">$500 published rates</span>
+                    <span class="pill">Free scan in 48h</span>
+                    <span class="pill">Fix included</span>
+                </div>
             </div>
             <div class="footer-col">
                 <h4>Services</h4>
                 <ul>
-                    <li><a href="#services">Bug Bounty</a></li>
-                    <li><a href="#services">Supply Chain</a></li>
-                    <li><a href="#services">Code Review</a></li>
-                    <li><a href="#services">Disclosure</a></li>
+                    <li><a href="#services">Penetration testing</a></li>
+                    <li><a href="#services">Continuous red teaming</a></li>
+                    <li><a href="#services">Detection engineering</a></li>
+                    <li><a href="#services">Supply chain</a></li>
+                    <li><a href="#services">Code review</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Engagements</h4>
                 <ul>
                     <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="services.html">Rate card</a></li>
+                    <li><a href="#compare">How we compare</a></li>
+                    <li><a href="#methodology">Method</a></li>
+                    <li><a href="services.html">Full rate card</a></li>
                     <li><a href="#faq">FAQ</a></li>
-                    <li><a href="#contact">Request an assessment</a></li>
                 </ul>
             </div>
             <div class="footer-col">
                 <h4>Resources</h4>
                 <ul>
-                    <li><a href="swarm.html">Research</a></li>
+                    <li><a href="swarm.html">Operations log</a></li>
                     <li><a href="https://github.com/PreCogSecurity">GitHub</a></li>
                     <li><a href="https://github.com/tim777z">Ecosystem</a></li>
+                    <li><a href="#freescan">Free scan</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -574,6 +1009,7 @@
                     <li><a href="privacy.html">Privacy Policy</a></li>
                     <li><a href="terms.html">Terms of Service</a></li>
                     <li><a href="disclosure.html">Disclosure Policy</a></li>
+                    <li><a href=".well-known/security.txt">security.txt</a></li>
                 </ul>
             </div>
         </div>

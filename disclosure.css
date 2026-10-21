@@ -1,0 +1,22 @@
+:root { --bg:#0a0e17; --text:#f1f5f9; --muted:#94a3b8; --accent:#0ea5e9; --border:#1e293b; --green:#10b981; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); line-height:1.7; }
+        .container { max-width:720px; margin:0 auto; padding:40px 24px; }
+        nav { border-bottom:1px solid var(--border); padding:14px 0; }
+        .nav-inner { max-width:1120px; margin:0 auto; padding:0 24px; }
+        .nav-inner a { color:var(--text); font-weight:700; text-decoration:none; }
+        h1 { font-size:2rem; margin:40px 0 8px; }
+        .updated { color:var(--muted); font-size:0.85rem; margin-bottom:32px; }
+        h2 { font-size:1.2rem; margin:32px 0 12px; }
+        p, li { color:var(--muted); font-size:0.95rem; margin-bottom:12px; }
+        ul { padding-left:20px; }
+        a { color:var(--accent); }
+        .scope { background:#111827; border:1px solid var(--border); border-radius:12px; padding:24px; margin:24px 0; }
+        .scope h3 { color:var(--text); font-size:1rem; margin-bottom:12px; }
+        .scope ul { margin:0; }
+        .severity { display:inline-block; padding:2px 8px; border-radius:4px; font-size:0.78rem; font-weight:700; }
+        .sev-critical { background:rgba(239,68,68,0.15); color:#ef4444; }
+        .sev-high { background:rgba(245,158,11,0.15); color:#f59e0b; }
+        .sev-medium { background:rgba(14,165,233,0.15); color:#0ea5e9; }
+        .sev-low { background:rgba(16,185,129,0.15); color:#10b981; }
+        footer { border-top:1px solid var(--border); margin-top:60px; padding:24px; text-align:center; color:var(--muted); font-size:0.8rem; }

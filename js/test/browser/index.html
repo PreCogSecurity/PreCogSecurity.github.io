@@ -1,58 +1,28 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https://formsubmit.co;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none' 'self' https://unpkg.com; style-src 'self' https://unpkg.com; img-src 'self' data: https:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/svg+xml" href="../../../assets/favicon.svg">
   <meta charset="utf-8">
   <title>Mocha</title>
   <script src="https://unpkg.com/mocha@^3.2.0/mocha.js"></script>
-  <script>mocha.setup('bdd');</script>
+
+<script src="index-script1.js"></script>
+
   <link rel="stylesheet" href="https://unpkg.com/mocha@^3.2.0/mocha.css">
 </head>
 <body data-onload="mocha.run()">
   <div id="mocha"></div>
-  <script>
-    function assert(expr, msg) {
-      if (!expr) throw new Error(msg || 'failed');
-    }
-  </script>
+
+<script src="index-script2.js"></script>
+
   <script src="../../browser.js"></script>
   <script src="./browser.test.js"></script>
 
-<script>
-// Delegated event handling. The validator forbids inline event handler
-// attributes (onclick, onload); these listeners give the same behaviour
-// without any inline JavaScript.
-(function () {
-  function runAction(el, spec) {
-    var m = /^([A-Za-z_$][A-Za-z0-9_$]*)\s*\((.*)\)$/.exec(String(spec || '').trim());
-    if (!m) return;
-    var fn = window[m[1]];
-    if (typeof fn !== 'function') return;
-    var args = [];
-    var raw = m[2].trim();
-    if (raw) {
-      raw.split(',').forEach(function (a) {
-        a = a.trim();
-        if (a === 'this') { args.push(el); }
-        else if (/^-?\d+(\.\d+)?$/.test(a)) { args.push(Number(a)); }
-        else if (/^(['"]).*\1$/.test(a)) { args.push(a.slice(1, -1)); }
-        else { args.push(a); }
-      });
-    }
-    fn.apply(el, args);
-  }
-  document.addEventListener('click', function (e) {
-    var el = e.target.closest('[data-action]');
-    if (el) runAction(el, el.getAttribute('data-action'));
-  });
-  window.addEventListener('load', function () {
-    document.querySelectorAll('[data-onload]').forEach(function (el) {
-      runAction(el, el.getAttribute('data-onload'));
-    });
-  });
-})();
-</script>
+
+<script src="index-script3.js"></script>
+
 
 </body>
 </html>
