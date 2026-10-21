@@ -142,3 +142,80 @@ harness is `D:\PreCog\.swarm\web\check-site.mjs`.
 - `services.html`, `try.html` and the older pages still carry their original
   copy and layout. They were repaired (they now render), not redesigned. The
   rate card there is the reference; the homepage prices are the headline.
+
+---
+
+# Part two — what the deployment taught us
+
+Three things only became visible once the change was actually live.
+
+## 1. `.well-known/security.txt` was 404 on the live site
+
+The file was committed, the validator was happy, the PR passed CI — and the
+canonical security contact URL returned 404 to every crawler.
+
+The Pages deployment is GitHub's built-in **Jekyll** build, and Jekyll
+ignores any file or directory whose name starts with a dot unless it is
+listed in `include`. The fix is `_config.yml`:
+
+```yaml
+include:
+  - .well-known
+```
+
+`exclude` had to be written out in full at the same time, because specifying
+`exclude` **replaces** Jekyll's default list rather than adding to it — so
+`node_modules`, `vendor` and the `Gemfile` entries had to be repeated by
+hand. `docs/` is excluded too: the competitive analysis is a working
+document for the team, not a page for the public.
+
+A copy is also published at `/security.txt`, because tools look in both
+places. Both now return HTTP 200.
+
+**The lesson:** the validator checks the repository, not the deployment. A
+green CI run says nothing about whether GitHub's Jekyll pass kept your file.
+That is a second gap the tests cannot see, and the only way it was caught was
+by requesting the URL that the page linked to.
+
+## 2. The research article was an orphan, and it contradicted us
+
+`blog/why-security-scanning-matters.html` existed, was 3.2 KB of competent
+copy, and was linked from **nothing**. Nobody could reach it.
+
+Worse, it advertised a scanner API with a 0-100 score and "5 free scans per
+month" — while the new homepage positions us against exactly that, a point
+scanner that finds and leaves. We do sell that scanner, so the contradiction
+was ours to resolve rather than to hide.
+
+The article was rewritten to say the honest thing in full: scanning is
+cheap, fast and worth having, and here are the three things it cannot do —
+prove the attack path, apply the fix and prove it did not regress, leave a
+detection that catches the next attempt. The comparison table now says
+plainly that we sell a scanner, that it is the on-ramp rather than the
+product, and that it cannot do the rest of the table.
+
+The homepage links it from the research section and the footer, and a new
+assertion **fails the build** if the article ever becomes unreachable from
+the homepage again. `blog.css` was rewritten on the site's own dark tokens,
+because the article rendered on a light theme and read as a page from another
+company.
+
+## 3. A credential in the local remote URL
+
+`git remote -v` shows the origin URL with a classic GitHub PAT embedded in
+it:
+
+```
+https://tim777z:ghp_...@github.com/PreCogSecurity/PreCogSecurity.github.io.git
+```
+
+It is **not** in the working tree and **not** in the git history (verified
+across the last 400 commits), so nothing was published. But it is a
+`repo`-scoped token sitting in plaintext in `.git/config`, and it was echoed
+into this session's logs. It should be moved to a credential helper and the
+token rotated.
+
+`gh` itself is also authenticated, but against a keyring entry whose token
+**cannot create pull requests** — `gh pr create` fails with "Resource not
+accessible by personal access token". Every PR in this round was opened
+through the REST API with the remote's token instead.
