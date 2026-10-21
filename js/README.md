@@ -40,7 +40,7 @@
     + [`likely`](#likely)
 - [Neural Network Types](#neural-network-types)
     + [Why different Neural Network Types?](#why-different-neural-network-types)
-    
+
 # Examples
 Here's an example showcasing how to approximate the XOR function using `brain.js`:
 More info on config [here](https://github.com/BrainJS/brain.js/blob/develop/src/neural-network.js#L31).
@@ -317,7 +317,7 @@ var net = new brain.NeuralNetwork({
 ```
 
 ### activation
-This parameter lets you specify which activation function your neural network should use. There are currently four supported activation functions, **sigmoid** being the default: 
+This parameter lets you specify which activation function your neural network should use. There are currently four supported activation functions, **sigmoid** being the default:
 
 - [sigmoid](https://www.wikiwand.com/en/Sigmoid_function)
 - [relu](https://www.wikiwand.com/en/Rectifier_(neural_networks))

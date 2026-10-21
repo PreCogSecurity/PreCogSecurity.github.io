@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PreCog Security">
+  <title>PreCog Security</title>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#6366f1"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#g)" d="M32 3 8 12v20c0 14.2 9.7 25.7 24 29 14.3-3.3 24-14.8 24-29V12L32 3z"/>
+  <path fill="#0a0e17" d="M32 13.5 18 18.6v13.1c0 9.1 5.7 16.6 14 19.3 8.3-2.7 14-10.2 14-19.3V18.6L32 13.5z"/>
+  <circle cx="32" cy="31" r="8" fill="none" stroke="#10b981" stroke-width="2.5"/>
+  <circle cx="32" cy="31" r="2.6" fill="#10b981"/>
+</svg>

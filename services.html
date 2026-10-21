@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https://formsubmit.co;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enterprise Services & Rates — PreCog Security</title>
@@ -8,6 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+.ih-0{color:var(--primary);}
+.ih-1{background:var(--primary); color:#07090e; padding:8px 18px; border-radius:6px; font-weight:700;}
+.ih-2{color:var(--text-muted);}
+.ih-3{border-color:var(--accent);}
+.ih-4{background:var(--accent); color:white; border-color:var(--accent);}
+.ih-5{background:var(--primary); color:#07090e;}
+.ih-6{margin-top: 8px; font-family:'JetBrains Mono',monospace; font-size:0.8rem;}
+
         :root {
             --bg-dark: #07090e;
             --bg-card: #0e131f;
@@ -259,9 +268,9 @@
         <ul class="nav-links">
             <li><a href="index.html#divisions">Divisions</a></li>
             <li><a href="swarm.html">Swarm Simulation</a></li>
-            <li><a href="services.html" style="color:var(--primary);">Services & Rates</a></li>
+            <li><a href="services.html" class="ih-0">Services & Rates</a></li>
             <li><a href="index.html#treasury">Treasury</a></li>
-            <li><a href="try.html" style="background:var(--primary); color:#07090e; padding:8px 18px; border-radius:6px; font-weight:700;">Client Portal</a></li>
+            <li><a href="try.html" class="ih-1">Client Portal</a></li>
         </ul>
     </nav>
 
@@ -281,7 +290,7 @@
                 <div class="sector-icon">🛡️</div>
                 <div>
                     <h2 class="sector-title">Cybersecurity & Threat Intelligence</h2>
-                    <p style="color:var(--text-muted);">Predictive vulnerability scanning, code security audits, and automated patch delivery.</p>
+                    <p class="ih-2">Predictive vulnerability scanning, code security audits, and automated patch delivery.</p>
                 </div>
             </div>
 
@@ -302,7 +311,7 @@
                     <a href="mailto:timlangeveldt@gmail.com?subject=Single%20Repo%20Audit%20Order" class="btn-order">Order Security Audit &rarr;</a>
                 </div>
 
-                <div class="service-card" style="border-color:var(--accent);">
+                <div class="service-card ih-3" >
                     <div>
                         <span class="popular-badge">Most Requested</span>
                         <h3>Enterprise Codebase Hardening</h3>
@@ -316,7 +325,7 @@
                             <li>30-day continuous re-scanning</li>
                         </ul>
                     </div>
-                    <a href="mailto:timlangeveldt@gmail.com?subject=Enterprise%20Codebase%20Hardening" class="btn-order" style="background:var(--accent); color:white; border-color:var(--accent);">Engage Enterprise Security &rarr;</a>
+                    <a href="mailto:timlangeveldt@gmail.com?subject=Enterprise%20Codebase%20Hardening" class="btn-order ih-4" >Engage Enterprise Security &rarr;</a>
                 </div>
 
                 <div class="service-card">
@@ -342,7 +351,7 @@
                 <div class="sector-icon">🎨</div>
                 <div>
                     <h2 class="sector-title">Web Design & Graphic Architecture</h2>
-                    <p style="color:var(--text-muted);">High-converting web applications, brand identity systems, and UI/UX engineering.</p>
+                    <p class="ih-2">High-converting web applications, brand identity systems, and UI/UX engineering.</p>
                 </div>
             </div>
 
@@ -365,7 +374,7 @@
 
                 <div class="service-card">
                     <div>
-                        <span class="popular-badge" style="background:var(--primary); color:#07090e;">High Value</span>
+                        <span class="popular-badge ih-5" >High Value</span>
                         <h3>Full Brand & Digital Identity Kit</h3>
                         <p>Complete corporate visual package including vector logos, typography systems, and social asset kits.</p>
                         <div class="service-price">$500 <small>/ brand kit</small></div>
@@ -403,7 +412,7 @@
                 <div class="sector-icon">🛍️</div>
                 <div>
                     <h2 class="sector-title">E-Commerce & Dropshipping Holdings</h2>
-                    <p style="color:var(--text-muted);">Turnkey digital retail storefronts, supplier dropship pipelines, and dynamic conversion optimization.</p>
+                    <p class="ih-2">Turnkey digital retail storefronts, supplier dropship pipelines, and dynamic conversion optimization.</p>
                 </div>
             </div>
 
@@ -444,7 +453,7 @@
     <footer>
         <div class="container">
             <p>&copy; 2026 PreCog Security Global. Operator: BlueHound · Founding Principal: Timmins Edgar Langeveldt</p>
-            <p style="margin-top: 8px; font-family:'JetBrains Mono',monospace; font-size:0.8rem;">Settlement: BTC (Taproot) · ETH · EcoCash/WorldRemit (+263 77 491 7252) · Stripe</p>
+            <p class="ih-6">Settlement: BTC (Taproot) · ETH · EcoCash/WorldRemit (+263 77 491 7252) · Stripe</p>
         </div>
     </footer>
 </body>

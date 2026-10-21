@@ -2,300 +2,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https://formsubmit.co;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PreCog Security — Autonomous Threat Intelligence & Offensive Security</title>
-    <meta name="description" content="PreCog Security delivers AI-driven vulnerability research, autonomous bug bounty operations, and predictive threat intelligence for modern software teams.">
+    <title>PreCog Security — Autonomous Red Team, Blue Team & Offensive Security</title>
+    <meta name="description" content="PreCog Security runs continuous autonomous red team and blue team operations against your systems: verified findings with working exploits, fixes with regression tests, and the detections that catch the activity. Engagements from $500.">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="PreCog Security — Autonomous Threat Intelligence">
-    <meta property="og:description" content="AI-driven vulnerability research and autonomous bug bounty operations.">
+    <meta property="og:title" content="PreCog Security — Autonomous Red Team & Blue Team">
+    <meta property="og:description" content="Continuous adversary simulation, verified findings, and the fixes and detections that follow.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://precogsecurity.github.io/">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡</text></svg>">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="PreCog Security — Autonomous Red Team & Blue Team">
+    <meta name="twitter:description" content="Continuous adversary simulation, verified findings, and the fixes and detections that follow.">
+    <meta name="theme-color" content="#0a0e17">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-        :root {
-            --bg: #0a0e17;
-            --bg-card: #111827;
-            --bg-elevated: #1f2937;
-            --border: #1e293b;
-            --border-hover: #334155;
-            --text: #f1f5f9;
-            --text-muted: #94a3b8;
-            --accent: #0ea5e9;
-            --accent-dim: #0284c7;
-            --green: #10b981;
-            --amber: #f59e0b;
-            --red: #ef4444;
-            --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            --mono: 'JetBrains Mono', monospace;
-        }
-
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: var(--font);
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        a { color: var(--accent); text-decoration: none; }
-        a:hover { text-decoration: underline; }
-
-        .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
-
-        /* ── Nav ─────────────────────────────────────── */
-        nav {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(10,14,23,0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 0;
-        }
-        .nav-inner {
-            display: flex; align-items: center; justify-content: space-between;
-            max-width: 1120px; margin: 0 auto; padding: 0 24px;
-        }
-        .logo {
-            display: flex; align-items: center; gap: 10px;
-            font-weight: 700; font-size: 1.1rem; color: var(--text);
-            text-decoration: none;
-        }
-        .logo:hover { text-decoration: none; }
-        .logo-icon {
-            width: 32px; height: 32px; border-radius: 8px;
-            background: linear-gradient(135deg, var(--accent), #6366f1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem;
-        }
-        .nav-links { display: flex; gap: 28px; list-style: none; align-items: center; }
-        .nav-links a { color: var(--text-muted); font-size: 0.9rem; font-weight: 500; }
-        .nav-links a:hover { color: var(--text); text-decoration: none; }
-        .nav-cta {
-            background: var(--accent) !important; color: #fff !important;
-            padding: 8px 18px; border-radius: 8px; font-weight: 600 !important;
-        }
-        .nav-cta:hover { background: var(--accent-dim) !important; }
-
-        /* ── Hero ────────────────────────────────────── */
-        .hero { padding: 120px 0 80px; text-align: center; }
-        .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(14,165,233,0.1); border: 1px solid rgba(14,165,233,0.25);
-            padding: 6px 16px; border-radius: 999px;
-            font-size: 0.8rem; font-weight: 600; color: var(--accent);
-            margin-bottom: 28px;
-        }
-        .hero-badge .dot {
-            width: 6px; height: 6px; border-radius: 50%;
-            background: var(--green); animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.4 } }
-
-        .hero h1 {
-            font-size: clamp(2.4rem, 5vw, 3.8rem);
-            font-weight: 800; letter-spacing: -0.03em;
-            line-height: 1.1; margin-bottom: 20px;
-        }
-        .hero h1 span { color: var(--accent); }
-        .hero p {
-            font-size: 1.15rem; color: var(--text-muted);
-            max-width: 640px; margin: 0 auto 36px; line-height: 1.7;
-        }
-        .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-        .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 28px; border-radius: 10px;
-            font-size: 0.95rem; font-weight: 600; cursor: pointer;
-            border: none; transition: all 0.2s; text-decoration: none;
-        }
-        .btn:hover { text-decoration: none; }
-        .btn-primary { background: var(--accent); color: #fff; }
-        .btn-primary:hover { background: var(--accent-dim); }
-        .btn-outline {
-            background: transparent; color: var(--text);
-            border: 1px solid var(--border-hover);
-        }
-        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-        /* ── Stats Bar ───────────────────────────────── */
-        .stats-bar {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1px; background: var(--border);
-            border: 1px solid var(--border); border-radius: 14px;
-            overflow: hidden; margin: 60px auto;
-        }
-        .stat {
-            background: var(--bg-card); padding: 28px 24px; text-align: center;
-        }
-        .stat-value {
-            font-size: 1.8rem; font-weight: 800; color: var(--accent);
-            font-family: var(--mono);
-        }
-        .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-
-        /* ── Sections ────────────────────────────────── */
-        section { padding: 80px 0; }
-        .section-label {
-            display: inline-block; font-size: 0.78rem; font-weight: 700;
-            color: var(--accent); text-transform: uppercase;
-            letter-spacing: 0.1em; margin-bottom: 12px;
-        }
-        .section-title {
-            font-size: clamp(1.8rem, 3vw, 2.4rem); font-weight: 800;
-            letter-spacing: -0.02em; margin-bottom: 16px;
-        }
-        .section-desc { color: var(--text-muted); font-size: 1.05rem; max-width: 600px; }
-
-        /* ── Services ────────────────────────────────── */
-        .services-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px; margin-top: 48px;
-        }
-        .service-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 14px; padding: 32px;
-            transition: border-color 0.2s, transform 0.2s;
-        }
-        .service-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-        .service-icon {
-            width: 44px; height: 44px; border-radius: 10px;
-            background: rgba(14,165,233,0.1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; margin-bottom: 18px;
-        }
-        .service-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; }
-        .service-card p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.7; }
-        .service-tag {
-            display: inline-block; margin-top: 14px;
-            background: rgba(14,165,233,0.08); color: var(--accent);
-            padding: 4px 10px; border-radius: 6px;
-            font-size: 0.75rem; font-weight: 600;
-        }
-
-        /* ── Methodology ─────────────────────────────── */
-        .method-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px; margin-top: 48px;
-        }
-        .method-step {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 14px; padding: 28px; position: relative;
-        }
-        .method-num {
-            font-family: var(--mono); font-size: 0.8rem; font-weight: 700;
-            color: var(--accent); margin-bottom: 12px;
-        }
-        .method-step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
-        .method-step p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
-
-        /* ── Why Us ──────────────────────────────────── */
-        .why-grid {
-            display: grid; grid-template-columns: 1fr 1fr;
-            gap: 60px; align-items: center; margin-top: 48px;
-        }
-        .why-list { list-style: none; display: flex; flex-direction: column; gap: 18px; }
-        .why-list li {
-            display: flex; gap: 14px; align-items: flex-start;
-        }
-        .why-check {
-            width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
-            background: rgba(16,185,129,0.15); color: var(--green);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.8rem; margin-top: 2px;
-        }
-        .why-list strong { display: block; font-size: 0.95rem; margin-bottom: 2px; }
-        .why-list span { font-size: 0.88rem; color: var(--text-muted); }
-        .why-panel {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 14px; padding: 32px;
-        }
-        .why-panel h4 {
-            font-size: 0.85rem; font-weight: 700; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 20px;
-        }
-        .terminal {
-            background: #0d1117; border: 1px solid var(--border);
-            border-radius: 10px; padding: 20px; font-family: var(--mono);
-            font-size: 0.8rem; line-height: 1.8; color: var(--text-muted);
-        }
-        .terminal .prompt { color: var(--green); }
-        .terminal .cmd { color: var(--text); }
-        .terminal .output { color: var(--accent); }
-
-        /* ── Contact ─────────────────────────────────── */
-        .contact-section { background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-        .contact-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 48px;
-        }
-        .contact-form { display: flex; flex-direction: column; gap: 16px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .form-group label {
-            display: block; font-size: 0.82rem; font-weight: 600;
-            color: var(--text-muted); margin-bottom: 6px;
-        }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%; padding: 11px 14px;
-            background: var(--bg); border: 1px solid var(--border);
-            border-radius: 8px; color: var(--text); font-size: 0.92rem;
-            font-family: var(--font); transition: border-color 0.2s;
-        }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            outline: none; border-color: var(--accent);
-        }
-        .form-group textarea { min-height: 120px; resize: vertical; }
-        .contact-info { display: flex; flex-direction: column; gap: 24px; }
-        .contact-item { display: flex; gap: 14px; align-items: flex-start; }
-        .contact-icon {
-            width: 40px; height: 40px; border-radius: 10px;
-            background: rgba(14,165,233,0.1);
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-        .contact-item strong { display: block; font-size: 0.9rem; margin-bottom: 2px; }
-        .contact-item span { font-size: 0.85rem; color: var(--text-muted); }
-        .contact-item a { color: var(--accent); }
-
-        /* ── Footer ──────────────────────────────────── */
-        footer { padding: 60px 0 30px; }
-        .footer-grid {
-            display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
-            gap: 40px; margin-bottom: 40px;
-        }
-        .footer-brand p { color: var(--text-muted); font-size: 0.9rem; margin-top: 12px; max-width: 280px; }
-        .footer-col h4 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; color: var(--text); }
-        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-        .footer-col a { color: var(--text-muted); font-size: 0.88rem; }
-        .footer-col a:hover { color: var(--text); }
-        .footer-bottom {
-            border-top: 1px solid var(--border); padding-top: 24px;
-            display: flex; justify-content: space-between; align-items: center;
-            font-size: 0.8rem; color: var(--text-muted); flex-wrap: wrap; gap: 12px;
-        }
-        .footer-bottom a { color: var(--text-muted); }
-        .footer-bottom a:hover { color: var(--text); }
-
-        /* ── Responsive ──────────────────────────────── */
-        @media (max-width: 768px) {
-            .nav-links { display: none; }
-            .hero { padding: 80px 0 60px; }
-            .why-grid, .contact-grid { grid-template-columns: 1fr; }
-            .form-row { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr 1fr; }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/site.css">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Organization",
         "name": "PreCog Security",
         "url": "https://precogsecurity.github.io",
-        "description": "AI-driven vulnerability research and autonomous bug bounty operations",
-        "email": "timlangeveldt@gmail.com"
+        "description": "AI-driven vulnerability research, autonomous red team and blue team operations, and predictive threat intelligence for modern software teams.",
+        "email": "timlangeveldt@gmail.com",
+        "telephone": "+263774917252",
+        "sameAs": ["https://github.com/PreCogSecurity"],
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Security Engagements",
+            "itemListElement": [
+                { "@type": "Offer", "name": "Focused Audit", "price": "500", "priceCurrency": "USD" },
+                { "@type": "Offer", "name": "Full Penetration Test", "price": "1500", "priceCurrency": "USD" },
+                { "@type": "Offer", "name": "Continuous Autonomous Monitoring", "price": "1200", "priceCurrency": "USD" }
+            ]
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            { "@type": "Question", "name": "Do you need access to our source code?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No. Black box testing against the running application is the default and the more honest test. If white box access would produce a materially better result we will say so and scope it separately." } },
+            { "@type": "Question", "name": "Will you disrupt our production?",
+              "acceptedAnswer": { "@type": "Answer", "text": "No. Availability is treated as a production dependency. No denial of service, no destructive action, no wiping. Destructive effects are simulated and rules of engagement are agreed in writing first." } },
+            { "@type": "Question", "name": "What do we get at the end?",
+              "acceptedAnswer": { "@type": "Answer", "text": "A report with an executive summary, findings with exact paths and working exploits, fixes as diffs with regression tests, and the detections that would have caught the activity, plus the raw evidence." } },
+            { "@type": "Question", "name": "How fast can you start?",
+              "acceptedAnswer": { "@type": "Answer", "text": "The free initial review is scoped within 48 hours of your request. Engagement start dates depend on scope." } },
+            { "@type": "Question", "name": "Can you keep our findings confidential?",
+              "acceptedAnswer": { "@type": "Answer", "text": "Yes. Confidentiality is the norm and coordinated disclosure is standard practice. We do not publish a finding before the responsible party has had a fair chance to fix it." } }
+        ]
     }
     </script>
 </head>
@@ -310,8 +71,10 @@
         </a>
         <ul class="nav-links">
             <li><a href="#services">Services</a></li>
-            <li><a href="#methodology">Methodology</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="#methodology">Method</a></li>
             <li><a href="#why-us">Why Us</a></li>
+            <li><a href="#faq">FAQ</a></li>
             <li><a href="swarm.html">Research</a></li>
             <li><a href="#contact" class="nav-cta">Contact</a></li>
         </ul>
@@ -327,14 +90,15 @@
         </div>
         <h1>Find vulnerabilities<br><span>before attackers do.</span></h1>
         <p>
-            PreCog Security combines AI-driven code analysis with autonomous bounty-hunting
-            agents to continuously discover, validate, and report vulnerabilities across
-            your software supply chain.
+            A red team and a blue team that never sleep. Our agents run adversary
+            emulation against your systems, then turn every technique they land
+            into a fix and a detection - continuously, not once a quarter.
         </p>
         <div class="hero-actions">
             <a href="#contact" class="btn btn-primary">Request an Assessment</a>
             <a href="#methodology" class="btn btn-outline">How It Works</a>
         </div>
+        <p class="hero-note">Scoping call within 48 hours. Engagements from $500.</p>
     </div>
 </section>
 
@@ -359,6 +123,46 @@
         </div>
     </div>
 </div>
+
+<!-- Proof: what we can actually demonstrate, and what it is worth -->
+<section class="proof-band">
+    <div class="container">
+        <span class="section-label">Why trust an autonomous team</span>
+        <h2 class="section-title">The same gate that screens your code runs on ours</h2>
+        <p class="section-desc">
+            We do not ask you to take our word for it. Our own engineering runs
+            under the same automated controls we bring to your engagements.
+        </p>
+        <div class="proof-grid">
+            <div class="proof-item">
+                <strong>Every change is gated before it ships</strong>
+                <span>Our improvement loop runs a security gate over its own diffs
+                before anything is committed. A change that introduces a known
+                vulnerable pattern is blocked and the tree is rolled back. The
+                same gate is what protects your codebase during an engagement.</span>
+            </div>
+            <div class="proof-item">
+                <strong>Findings carry a working exploit, not a theory</strong>
+                <span>Every issue we report comes with the exact path, a concrete
+                attack path, the business impact, and a regression test that would
+                have caught it. If we cannot build the attack path, it is not a
+                finding and we say so.</span>
+            </div>
+            <div class="proof-item">
+                <strong>Techniques become detections</strong>
+                <span>An adversary simulation that ends at the intrusion is half a
+                job. Every technique that lands must leave behind a hardening
+                control and a detection that fires, and we test that it fires.</span>
+            </div>
+            <div class="proof-item">
+                <strong>You own the work, and the evidence</strong>
+                <span>You get the command logs, the reproduction steps, and the
+                fixes in your repository. We keep no lock-in: the report and the
+                remediation are yours to keep, audit and re-run.</span>
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- Services -->
 <section id="services">
@@ -433,8 +237,56 @@
     </div>
 </section>
 
+<!-- Pricing anchors: the first thing a buyer compares, so it belongs here -->
+<section id="pricing">
+    <div class="container">
+        <span class="section-label">Engagements</span>
+        <h2 class="section-title">Priced in the open</h2>
+        <p class="section-desc">
+            No discovery invoice, no surprise retainer. Fixed scopes, published
+            rates, and a free initial review so you know what you are buying.
+        </p>
+        <div class="offer-grid">
+            <div class="offer-card">
+                <h4>Initial Assessment</h4>
+                <div class="price">Free <small>/ first review</small></div>
+                <p>We scope your attack surface, read the code we can reach, and
+                tell you the three things most worth fixing. Within 48 hours.</p>
+                <a href="#contact">Start with the free review &rarr;</a>
+            </div>
+            <div class="offer-card">
+                <h4>Focused Audit</h4>
+                <div class="price">$500 <small>/ audit</small></div>
+                <p>One repository or one application, reviewed and attacked to a
+                defined depth, with verified findings and fixes.</p>
+                <a href="#contact">Book an audit &rarr;</a>
+            </div>
+            <div class="offer-card">
+                <h4>Full Penetration Test</h4>
+                <div class="price">$1,500+ <small>/ engagement</small></div>
+                <p>A full red team engagement against a scoped target, with
+                adversary simulation, command evidence, and a detection backlog.</p>
+                <a href="#contact">Scope an engagement &rarr;</a>
+            </div>
+            <div class="offer-card">
+                <h4>Continuous Monitoring</h4>
+                <div class="price">$1,200 <small>/ month</small></div>
+                <p>Autonomous scanning and retesting on a clock, so a fix that
+                regresses is caught before an attacker finds it again.</p>
+                <a href="#contact">Set up monitoring &rarr;</a>
+            </div>
+        </div>
+        <p class="section-desc offer-note">
+            Also available: supply chain and CI/CD audit, cloud and container
+            posture review, blue team detection engineering, dirty room malware
+            analysis, and clean room reimplementation.
+            <a href="services.html">Full rate card &rarr;</a>
+        </p>
+    </div>
+</section>
+
 <!-- Methodology -->
-<section id="methodology" style="background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+<section id="methodology" class="section-alt">
     <div class="container">
         <span class="section-label">How It Works</span>
         <h2 class="section-title">Autonomous Methodology</h2>
@@ -541,6 +393,54 @@
     </div>
 </section>
 
+<!-- FAQ -->
+<section id="faq">
+    <div class="container">
+        <span class="section-label">Before you ask</span>
+        <h2 class="section-title">Straight answers</h2>
+        <div class="faq-list">
+            <div class="faq-item">
+                <h4>Do you need access to our source code?</h4>
+                <p>No. Black box testing against the running application is the
+                default, and it is the more honest test. If white box access
+                would produce a materially better result we will say so and
+                scope it separately - we do not quietly ask for credentials we
+                do not need.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Will you disrupt our production?</h4>
+                <p>No. Availability is treated as a production dependency, not a
+                test resource. No denial of service, no destructive action, no
+                wiping. Where an engagement needs a destructive effect we
+                simulate it instead, and we agree the rules of engagement with
+                you in writing first.</p>
+            </div>
+            <div class="faq-item">
+                <h4>What do we get at the end?</h4>
+                <p>A report a CTO can act on: an executive summary, the findings
+                with exact paths and working exploits, the fixes as diffs with
+                regression tests, and the detections that would have caught the
+                activity. Plus the raw evidence, so anyone on your side can
+                reproduce every claim.</p>
+            </div>
+            <div class="faq-item">
+                <h4>How fast can you start?</h4>
+                <p>The free initial review is scoped within 48 hours of your
+                request. Engagement start dates depend on scope, and we will
+                tell you the real date rather than a hopeful one.</p>
+            </div>
+            <div class="faq-item">
+                <h4>Can you keep our findings confidential?</h4>
+                <p>Yes. Disclosing to the vendor is the default because it is
+                what actually gets you fixed, but confidentiality is the norm
+                and coordinated disclosure is standard practice - we do not
+                publish a finding before the responsible party has had a fair
+                chance to fix it.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Contact -->
 <section id="contact" class="contact-section">
     <div class="container">
@@ -550,22 +450,27 @@
             Tell us about your project. We'll scope a free initial review within 48 hours.
         </p>
         <div class="contact-grid">
-            <form class="contact-form" action="mailto:timlangeveldt@gmail.com" method="POST" enctype="text/plain">
+            <form class="contact-form" action="https://formsubmit.co/timlangeveldt@gmail.com" method="POST">
+                <input type="hidden" name="_captcha" value="true">
+                <input type="hidden" name="_subject" value="New PreCog Security assessment request">
+                <input type="hidden" name="_template" value="table">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="name">Name</label>
-                        <input type="text" id="name" name="name" required placeholder="Your name">
+                        <input type="text" id="name" name="name" required maxlength="120" autocomplete="name" placeholder="Your name">
                     </div>
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" required placeholder="you@company.com">
+                        <input type="email" id="email" name="email" required maxlength="254" autocomplete="email" placeholder="you@company.com">
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="service">Service Interest</label>
                     <select id="service" name="service">
                         <option value="assessment">Security Assessment</option>
-                        <option value="bounty">Bug Bounty Program</option>
+                        <option value="pentest">Penetration Test</option>
+                        <option value="redteam">Red Team Engagement</option>
+                        <option value="blueteam">Blue Team / Detection Engineering</option>
                         <option value="supply-chain">Supply Chain Audit</option>
                         <option value="code-review">Code Review</option>
                         <option value="disclosure">Disclosure Program</option>
@@ -574,9 +479,9 @@
                 </div>
                 <div class="form-group">
                     <label for="message">Project Details</label>
-                    <textarea id="message" name="message" required placeholder="Describe your project, tech stack, and security concerns..."></textarea>
+                    <textarea id="message" name="message" required maxlength="4000" placeholder="Describe your project, tech stack, and security concerns..."></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary" style="align-self: flex-start;">Send Request</button>
+                <button type="submit" class="btn btn-primary form-submit">Send Request</button>
             </form>
             <div class="contact-info">
                 <div class="contact-item">
@@ -584,6 +489,20 @@
                     <div>
                         <strong>Email</strong>
                         <span><a href="mailto:timlangeveldt@gmail.com">timlangeveldt@gmail.com</a></span>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">&#x260E;</div>
+                    <div>
+                        <strong>Phone / WhatsApp</strong>
+                        <span><a href="tel:+263774917252">+263 774 917 252</a> &middot; <a href="https://wa.me/263774917252">WhatsApp</a></span>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">&#x1F4B0;</div>
+                    <div>
+                        <strong>Payment Rails</strong>
+                        <span>PayPal, EcoCash, bank transfer, BTC and ETH. Details on the invoice - never sent by email.</span>
                     </div>
                 </div>
                 <div class="contact-item">
@@ -601,10 +520,10 @@
                     </div>
                 </div>
                 <div class="contact-item">
-                    <div class="contact-icon">&#x1F4B0;</div>
+                    <div class="contact-icon">&#x1F512;</div>
                     <div>
-                        <strong>Payment Rails</strong>
-                        <span>BTC, ETH, bank transfer, Stripe</span>
+                        <strong>Discretion</strong>
+                        <span>Under NDA on request. Coordinated disclosure is standard practice.</span>
                     </div>
                 </div>
             </div>
@@ -630,6 +549,15 @@
                     <li><a href="#services">Supply Chain</a></li>
                     <li><a href="#services">Code Review</a></li>
                     <li><a href="#services">Disclosure</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Engagements</h4>
+                <ul>
+                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="services.html">Rate card</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">Request an assessment</a></li>
                 </ul>
             </div>
             <div class="footer-col">
