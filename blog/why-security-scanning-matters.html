@@ -2,61 +2,254 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https://formsubmit.co;">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Why Security Scanning Matters in 2026 — And What It Still Cannot Do | PreCog Security</title>
+    <meta name="description" content="Scanning finds candidates. It cannot prove the attack path works, apply the fix, or leave a detection behind. What changed in 2026, what did not, and the five questions to ask any security vendor.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Why Security Scanning Matters in 2026 — And What It Still Cannot Do">
+    <meta property="og:description" content="Scanning finds candidates. It cannot prove the attack path works, apply the fix, or leave a detection behind.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://precogsecurity.github.io/blog/why-security-scanning-matters.html">
+    <meta name="theme-color" content="#0a0e17">
     <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://formsubmit.co;">
-    <title>Why Security Scanning Matters in 2026 | PreCog Security</title>
-    <meta name="description" content="Learn why automated security scanning is essential for modern software development. Discover how AI-powered tools can protect your codebase.">
+    <link rel="stylesheet" href="../assets/fonts.css">
     <link rel="stylesheet" href="../assets/blog.css">
 </head>
 <body>
-    <div class="hero">
-        <h1>Why Security Scanning Matters in 2026</h1>
-        <p>By PreCog Security | September 2026</p>
-    </div>
+
+<div class="hero">
     <div class="container">
-        <h2>The Cost of Ignoring Security</h2>
-        <p>In 2025 alone, security breaches cost companies an average of $4.88 million per incident. For startups and small businesses, a single vulnerability can mean the end.</p>
-        <p>The problem? Most teams only discover security issues after they've been exploited. Manual code reviews miss things. Traditional scanners are slow and produce false positives.</p>
-
-        <h2>Enter AI-Powered Scanning</h2>
-        <p>Modern security scanning uses artificial intelligence to:</p>
-        <ul>
-            <li>Detect vulnerabilities in real-time</li>
-            <li>Understand code context (not just pattern matching)</li>
-            <li>Prioritize findings by actual risk</li>
-            <li>Suggest fixes, not just problems</li>
-        </ul>
-
-        <h2>What We Built</h2>
-        <p>At PreCog Security, we built an API that scans any GitHub repository in seconds. It checks for:</p>
-        <ul>
-            <li>Security vulnerabilities (using Bandit)</li>
-            <li>Secret leaks (API keys, passwords, tokens)</li>
-            <li>Dependency issues (unpinned packages)</li>
-            <li>Best practice violations</li>
-        </ul>
-        <p>The result is a security score from 0-100 with actionable recommendations.</p>
-
-        <h2>Try It Free</h2>
-        <p>We offer 5 free scans per month. No credit card required.</p>
-        <a href="https://github.com/tim777z/precog-api" class="cta">Get Started Free</a>
-
-        <h2>When to Scan</h2>
-        <p>Scan your code:</p>
-        <ul>
-            <li>Before every release</li>
-            <li>After merging major changes</li>
-            <li>When onboarding new dependencies</li>
-            <li>Weekly (automated)</li>
-        </ul>
-
-        <h2>Conclusion</h2>
-        <p>Security scanning isn't optional anymore. It's a competitive advantage. Companies that ship secure code faster win.</p>
-        <p>Start scanning today: <a href="https://github.com/tim777z/precog-api">PreCog Security API</a></p>
+        <span class="kicker">Research</span>
+        <h1>Why security scanning matters in 2026 &mdash; and what it still cannot do</h1>
+        <p class="standfirst">
+            Scanning is the cheapest security control you will ever buy, and it
+            is worth having. It is also, on its own, the control that finds
+            things and leaves them there. This is the gap, in plain terms.
+        </p>
+        <p class="byline">By PreCog Security &middot; October 2026</p>
     </div>
-    <div class="footer">
-        <p><a href="https://precogsecurity.github.io">PreCog Security</a> | <a href="mailto:timlangeveldt@gmail.com">Contact</a></p>
+</div>
+
+<article class="container">
+
+    <h2>The cost of ignoring it</h2>
+
+    <p>
+        The widely-cited global average cost of a data breach is $4.88 million
+        (IBM&rsquo;s annual <em>Cost of a Data Breach</em> study). For an
+        enterprise, that is a bad quarter. For a fifteen-person company, one
+        exploited vulnerability can be the end. The arithmetic is not
+        complicated: the expected cost of an incident is the probability
+        times the damage, and you cannot reduce the damage of a breach you
+        never discovered.
+    </p>
+
+    <p>
+        The uncomfortable part is not the price. It is the timing. Most teams
+        find out what they had from an attacker, not from a tool, and the
+        interval between exposure and discovery is where the real loss
+        happens.
+    </p>
+
+    <h2>What scanning is genuinely good at</h2>
+
+    <p>
+        Let us be clear about this first, because the rest of the article is
+        often misread as an attack on scanners. Scanning is good at three
+        things, and it is good at all three:
+    </p>
+
+    <ul class="checklist">
+        <li><strong>It is fast.</strong> A repository-wide pass in seconds means it can run on every commit, and a control you can run continuously beats one you run quarterly.</li>
+        <li><strong>It is wide.</strong> One pass covers every file, every dependency and every secret, including the parts of the codebase nobody remembers writing.</li>
+        <li><strong>It is cheap and repeatable.</strong> This is the part that matters. The value of a control is not its accuracy, it is how often you run it.</li>
+    </ul>
+
+    <p>
+        If you run nothing, you have no chance of finding the vulnerability
+        that gets exploited. So run something. We publish ours as a free,
+        open-source API, and the honest recommendation is to point it at every
+        repository you own, today, at no cost.
+    </p>
+
+    <blockquote>
+        A scanner tells you <em>where</em> a bug might be. Everything that
+        follows &mdash; deciding whether it is real, fixing it, and stopping
+        it coming back &mdash; is still a human problem. The interesting
+        question is how much of that a machine can do for you now.
+    </blockquote>
+
+    <h2>The three things a scan cannot do</h2>
+
+    <p>
+        Here is the gap, stated precisely. A scan, however good, produces a
+        list. Three things have to happen after that list exists, and a scan
+        does none of them.
+    </p>
+
+    <h3>1. Prove the attack path actually works</h3>
+
+    <p>
+        A pattern match finds code that <em>looks</em> wrong. A reachable
+        vulnerability in production is a different thing: it depends on the
+        configuration, the deployment, the data, and the path to it. The
+        difference between the two is exactly the difference between a
+        report that gets triaged for a week and a breach.
+    </p>
+
+    <p>
+        Proving it means executing the path against the running system and
+        keeping the request and the response. A scanner cannot do that. A
+        team that attacks can.
+    </p>
+
+    <h3>2. Apply the fix and prove it did not break anything</h3>
+
+    <p>
+        A finding you have to fix yourself is a finding you will postpone.
+        And a patch is not a fix until it passes the test suite of the
+        codebase it lives in &mdash; a change that silences the scanner and
+        breaks a legitimate flow is a regression with a clean scan result.
+    </p>
+
+    <h3>3. Leave a detection that catches the next attempt</h3>
+
+    <p>
+        This is the one almost nobody closes. If an attacker reached the
+        vulnerable path once, they will try it again, and the only reason
+        their second attempt is expensive is that your logging noticed. A
+        finding without a detection is a finding that has not been closed,
+        only documented.
+    </p>
+
+    <div class="callout">
+        <span class="callout-label">The difference in one line</span>
+        A scanner finds candidates. A security team <strong>proves</strong>,
+        <strong>patches</strong>, <strong>detects</strong> and
+        <strong>remembers</strong>. The first is a filter. The second is a
+        closed loop.
     </div>
+
+    <h2>What changed in 2026, and what did not</h2>
+
+    <p>
+        Models genuinely improved the reading part. A model understands code
+        context rather than matching patterns, so it catches the odd
+        business-logic flaw that a rule never will, and it ranks findings by
+        how they are actually reachable instead of by which rule fired. That
+        is a real gain and it is why <em>AI-assisted</em> scanning is worth
+        having.
+    </p>
+
+    <p>
+        What did not change is the ability to execute. A model reading your
+        code has never sent a request to your API, never seen what your
+        authorisation middleware actually does, and never watched a payload
+        come back. The three gaps above are not implementation details. They
+        are the difference between reading about an attack and performing one.
+    </p>
+
+    <h2>What we do instead</h2>
+
+    <p>
+        We run the loop. Attack the target, reproduce the finding end to end,
+        land the fix as a diff that passes your suite, write the detection and
+        prove it fires, then re-test the fix on a clock so a regression is
+        caught by us before an attacker catches it again.
+    </p>
+
+    <p>
+        One redacted example, so you can see the shape of it. A cross-tenant
+        read in a multi-tenant API:
+    </p>
+
+    <pre>01 ATTACK   GET /api/v1/orders/9812
+             Authorization: Bearer &lt;tenant-A token&gt;
+             -&gt; 200 OK, tenant B's order
+
+02 VERIFY   10/10 foreign ids return 200 with another tenant's data
+             no owner_id comparison on the route
+
+03 PATCH    - order = Order.objects.get(id=id)
+             + order = get_object_or_404(Order, id=id,
+             +     tenant_id=request.tenant.id)
+
+04 DETECT   when route == "/api/v1/orders/*"
+               and status == 200
+               and order.tenant_id != session.tenant_id:
+                 alert("precog.idor.cross_tenant_read")
+                 block(response)
+
+05 PROVE    def test_cannot_read_other_tenant_order(client):
+                 r = client.get("/api/v1/orders/9812", headers=A)
+                 assert r.status_code == 404
+             # before patch: 200 -&gt; test fails
+             # after  patch: 404 -&gt; test passes</pre>
+
+    <p>
+        Four artefacts per finding: the attack, the reproduction, the patch
+        and the test &mdash; plus the detection. The <a href="../index.html#anatomy">worked
+        example on our site</a> shows the full format with the raw evidence.
+    </p>
+
+    <h2>Five questions to ask any security vendor</h2>
+
+    <p>
+        Including us. If a vendor cannot answer these plainly, the answers
+        you are getting are marketing.
+    </p>
+
+    <ol>
+        <li><strong>What happens to a finding you cannot reproduce?</strong> If the answer is "it still goes on the list", the list is a list of suspects, not of vulnerabilities.</li>
+        <li><strong>Does the fix come back as a diff that passes our test suite?</strong> If the answer is "we will describe the fix", you are doing the work.</li>
+        <li><strong>Which detection ships with it, and how do you know it fires?</strong> If the answer is "your SIEM will pick it up", it will not.</li>
+        <li><strong>What happens to the fixes you shipped, six months later?</strong> If the answer is "re-scan and hope", the fixes are unowned.</li>
+        <li><strong>Who did the work, and can I see it?</strong> "An automated platform" is not an answer unless you can also see its evidence.</li>
+    </ol>
+
+    <h2>What to do on Monday</h2>
+
+    <ul class="checklist">
+        <li><strong>Scan every repository you own.</strong> Free, fast, and the baseline you are currently missing. Use the <a href="https://github.com/tim777z/precog-api">open-source scanner API</a>, or run it in CI.</li>
+        <li><strong>Wire it into the pipeline.</strong> A scan on every commit beats a scan at release. If it is slow, it will be skipped.</li>
+        <li><strong>Re-scan after every dependency change.</strong> Most new exposure arrives through a version bump, not through new code.</li>
+        <li><strong>Pick three findings.</strong> Do you have the reproduction, the patch and the detection? If any of the three is missing, that finding is not closed.</li>
+        <li><strong>Check your logs for the last attempt.</strong> If you cannot tell whether anyone tried the same path before, you have no detection either.</li>
+    </ul>
+
+    <h2>The short version</h2>
+
+    <p>
+        Run a scanner. It is cheap, it is fast, and it is the only way you
+      find out what you have. Then understand what it does not do, because
+        the gap between &ldquo;found&rdquo; and &ldquo;fixed&rdquo; is where
+        every breach actually lives. And if you want that gap closed rather
+        than just logged, that is a different kind of service, and it is what
+        we do.
+    </p>
+
+    <p>
+        <a href="../index.html#freescan" class="cta">Get a Free Automated Scan</a>
+        <a href="../index.html#pricing" class="cta secondary">See what an engagement includes</a>
+    </p>
+
+    <p>
+        Prefer the scanner API on your own infrastructure? It is open source
+        and free: <a href="https://github.com/tim777z/precog-api">tim777z/precog-api</a>.
+        Found something in your codebase that you want a second opinion on,
+        or a vulnerability in ours? <a href="mailto:timlangeveldt@gmail.com">Tell us</a>
+        &mdash; our coordinated disclosure policy is
+        <a href="../disclosure.html">published here</a>.
+    </p>
+
+</article>
+
+<div class="footer">
+    <p class="footer-brand">PreCog Security</p>
+    <p>Autonomous red team and blue team operations. We break in, we ship the fix, and we prove it stays fixed.</p>
+    <p><a href="../index.html">Home</a> &middot; <a href="../index.html#pricing">Pricing</a> &middot; <a href="../index.html#freescan">Free scan</a> &middot; <a href="../swarm.html">Operations log</a> &middot; <a href="../disclosure.html">Disclosure</a></p>
+</div>
+
 </body>
 </html>

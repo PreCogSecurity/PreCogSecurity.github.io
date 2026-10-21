@@ -232,3 +232,20 @@ test("the operations page is a real page, not an empty shell", () => {
     assert.ok(source.length > 8000, "swarm.html must carry real content");
     assert.ok(!/<canvas\b/i.test(source), "swarm.html must not depend on a canvas the policy would let it draw but never drive");
 });
+
+test("the research article is reachable from the homepage", () => {
+    // An article that nothing links to is an orphan: it gets no traffic, it
+    // goes stale, and it quietly stops describing what the company does.
+    const source = readPage("index.html");
+
+    assert.match(
+        source,
+        /href=["']blog\/why-security-scanning-matters\.html["']/,
+        "index.html must link the research article",
+    );
+    assert.match(
+        source,
+        /id=["']research["'][\s\S]*?blog\/why-security-scanning-matters\.html/,
+        "the research section must surface the article",
+    );
+});
