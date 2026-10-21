@@ -1,1 +1,33 @@
+# Jekyll configuration for the GitHub Pages build.
+#
+# The Pages deployment is GitHub's built-in Jekyll build, and Jekyll has two
+# defaults that quietly break this site:
+#
+#   1. It IGNORES files and directories whose name starts with a dot or an
+#      underscore, unless they are listed in `include` below. That is why
+#      .well-known/security.txt was in the repository but 404s on the live
+#      site - a security company publishing a machine-readable security
+#      contact that nobody can fetch.
+#
+#   2. `exclude` REPLACES Jekyll's default exclude list rather than adding to
+#      it, so the defaults have to be repeated here. docs/ is excluded
+#      because it holds the internal competitive analysis, which is a working
+#      document for the team, not a page for the public.
+#
+# Nothing else about the build changes.
+
 theme: jekyll-theme-time-machine
+
+include:
+  - .well-known
+
+exclude:
+  - docs
+  - node_modules
+  - vendor
+  - Gemfile
+  - Gemfile.lock
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
