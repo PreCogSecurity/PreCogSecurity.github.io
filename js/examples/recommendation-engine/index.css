@@ -1,0 +1,18 @@
+.articleImage {
+		width:180px;
+	}
+
+	.ratingItem {
+		padding-bottom: 30px;
+	}
+
+	.suggestedItems {
+		display: flex;
+		flex-wrap: wrap;
+		width:650px;
+	}
+
+	.suggestionItem {
+		padding-right:15px;
+		padding-top: 30px;
+	}

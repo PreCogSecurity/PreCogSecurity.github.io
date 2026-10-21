@@ -1,0 +1,7 @@
+Contact: mailto:timlangeveldt@gmail.com
+Contact: https://github.com/PreCogSecurity
+Expires: 2027-10-21T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://precogsecurity.github.io/.well-known/security.txt
+Policy: https://precogsecurity.github.io/disclosure.html
+Hiring: https://precogsecurity.github.io/contact

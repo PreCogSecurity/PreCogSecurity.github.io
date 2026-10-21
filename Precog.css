@@ -1,0 +1,32 @@
+@page {  }
+	table { border-collapse:collapse; border-spacing:0; empty-cells:show }
+	td, th { vertical-align:top; font-size:10pt;}
+	h1, h2, h3, h4, h5, h6 { clear:both }
+	ol, ul { margin:0; padding:0;}
+	li { list-style: none; margin:0; padding:0;}
+	<!-- "li span.odfLiEnd" - IE 7 issue-->
+	li span. { clear: both; line-height:0; width:0; height:0; margin:0; padding:0; }
+	span.footnodeNumber { padding-right:1em; }
+	span.annotation_style_by_filter { font-size:95%; font-family:Arial; background-color:#fff000;  margin:0; border:0; padding:0;  }
+	* { margin:0;}
+	.gr1 { font-size:12pt; writing-mode:page; }
+	.P1 { text-align:center ! important; }
+	.ta1 { writing-mode:lr-tb; }
+	.Default { font-family:Liberation Sans; }
+	.ce1 { font-family:Liberation Sans; background-color:#ffcc00; text-align:left ! important; margin-left:0pt; font-size:18pt; text-shadow:1pt 1pt; }
+	.ce2 { font-family:Liberation Sans; background-color:#000000; }
+	.ce3 { font-family:Liberation Sans; background-color:#ff0000; font-size:16pt; }
+	.ce4 { font-family:Liberation Sans; background-color:#00ccff; font-size:16pt; }
+	.ce5 { font-family:Liberation Sans; background-color:#ffff00; font-size:16pt; }
+	.ce6 { font-family:Liberation Sans; background-color:#00ff66; font-size:16pt; }
+	.ce7 { font-family:Liberation Sans; background-color:transparent; font-size:16pt; }
+	.ce8 { font-family:Liberation Sans; }
+	.ce9 { font-family:Liberation Sans; }
+	.co1 { width:139.69pt; }
+	.co2 { width:64.01pt; }
+	.co3 { width:115pt; }
+	.ro1 { height:22.05pt; }
+	.ro2 { height:12.81pt; }
+	.ro3 { height:19.7pt; }
+	<!-- ODF styles with no properties representable as CSS -->
+	 { }

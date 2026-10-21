@@ -1,0 +1,62 @@
+/*
+ * fonts.css - self-hosted webfonts.
+ *
+ * WHY THIS FILE EXISTS
+ * --------------------
+ * These pages used to pull Inter, JetBrains Mono and Plus Jakarta Sans from
+ * fonts.googleapis.com. Our own Content-Security-Policy sets
+ * `style-src 'self'`, which does not include fonts.googleapis.com, so that
+ * stylesheet was BLOCKED in every browser that honoured the policy - and
+ * fonts.gstatic.com was blocked by `default-src 'self'` as well. The result
+ * was a render-blocking third-party request that could never succeed, and a
+ * site that silently fell back to whatever font the operating system
+ * happened to have.
+ *
+ * Self-hosting fixes three things at once:
+ *   1. the fonts actually load, so the design is the one that was intended;
+ *   2. no third-party origin is contacted, so the strict CSP can stay strict;
+ *   3. no extra DNS, TLS and handshake on the critical path.
+ *
+ * The policy was NOT widened to accommodate a third party. The dependency was
+ * removed instead.
+ *
+ * The files are the official variable woff2 builds from the Google Fonts
+ * project, latin subset, served from this origin.
+ *
+ *   Inter              - SIL Open Font License 1.1
+ *   JetBrains Mono     - SIL Open Font License 1.1
+ *   Plus Jakarta Sans  - SIL Open Font License 1.1
+ */
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('fonts/inter-var.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+        U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    font-style: normal;
+    font-weight: 100 800;
+    font-display: swap;
+    src: url('fonts/jetbrains-mono-var.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+        U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 200 800;
+    font-display: swap;
+    src: url('fonts/plus-jakarta-var.woff2') format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+        U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+        U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
