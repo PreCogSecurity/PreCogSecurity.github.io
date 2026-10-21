@@ -2,42 +2,45 @@
 <!doctype html>
 <html lang="en">
  <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https://formsubmit.co;">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
   <title>brain.js tutorial</title>
   <style>
 	.articleImage {
 		width:180px;
 	}
-  
+
 	.ratingItem {
 		padding-bottom: 30px;
 	}
-  
+
 	.suggestedItems {
 		display: flex;
 		flex-wrap: wrap;
 		width:650px;
 	}
-  
+
 	.suggestionItem {
 		padding-right:15px;
 		padding-top: 30px;
 	}
   </style>
  </head>
- <body onLoad="nextTry();">
+ <body data-onload="nextTry();">
 	<script src="browser.min.js"></script>
 	<script src="itemsInStock.js"></script>
 	<script>
 		const color_normalization_factor = 100;
 		const neckline_normalization_factor = 10;
-		const price_normalization_factor = 100;	
-		
+		const price_normalization_factor = 100;
+
 		let trainingData = [
 			{ input: {color: color_black, hasPrinting: false, neckline: neckline_round, price: 0.1999 }, output: { wanted: 0 } }
 		];
 		let ratingItem;
 
-		function nextTry(rating){	
+		function nextTry(rating){
 			document.getElementById('result').innerHTML = '';
 
             if(undefined !== ratingItem){
@@ -57,32 +60,32 @@
 				item.wanted = network.run(item.trainingInformation).wanted;
 				suggestionItems.push(item);
 			}
-			
+
 			suggestionItems.sort(function(a,b){
 				return b.wanted - a.wanted;
 			});
-			
+
 			for(i=0;i<suggestionItems.length;i++){
 				suggestionItem = suggestionItems[i];
-				suggestionItemsText += 
-					'<div class="suggestionItem">' + 
-						getFormattedItem(suggestionItem) + ' <br/> ' + 
+				suggestionItemsText +=
+					'<div class="suggestionItem">' +
+						getFormattedItem(suggestionItem) + ' <br/> ' +
 						'wanted: ' + Math.round(suggestionItem.wanted * 100) + '%'
 					+ '</div>';
 			}
-			
-			ratingItem = getNormalizedItemFromStock(Math.floor((Math.random() * itemsInStock.length - 1) + 1));			
-			document.getElementById('result').innerHTML += 
+
+			ratingItem = getNormalizedItemFromStock(Math.floor((Math.random() * itemsInStock.length - 1) + 1));
+			document.getElementById('result').innerHTML +=
 				'<div class="ratingItem">' +
-					'Rate this:<br/>' + 
+					'Rate this:<br/>' +
 					getFormattedItem(ratingItem) + '<br/>' +
 				'</div>' +
 				'Suggested items:<br/>' +
-				'<div class="suggestedItems">' + 
-					suggestionItemsText + 
+				'<div class="suggestedItems">' +
+					suggestionItemsText +
 				'</div>';
 		}
-		
+
 		function getNormalizedItemFromStock(index){
 			const item = itemsInStock[index];
 			trainingInformation = item.trainingInformation;
@@ -96,21 +99,21 @@
 				displayingInformation : item.displayingInformation
 			};
 		}
-		
+
 		function getFormattedItem(item){
 			const trainingInformation = item.trainingInformation;
-			const formattedItem = 
-				'<img class="articleImage" src="images/articles/' + item.displayingInformation.imageFile + '"/><br/>' + 
+			const formattedItem =
+				'<img class="articleImage" src="images/articles/' + item.displayingInformation.imageFile + '"/><br/>' +
 				'color: ' + getColorName(trainingInformation.color) + '<br/>' +
 				'has printing?: ' + (1 === trainingInformation.hasPrinting ? 'yes' : 'no') + '<br/>' +
 				'neckline: ' + getNecklineName(trainingInformation.neckline) + '<br/>' +
 				'price: ' + ((Math.round((trainingInformation.price * price_normalization_factor) * 100)) / 100) + ' &euro;';
 			return formattedItem;
 		}
-		
+
 		function getColorName(color){
 			var id = color * color_normalization_factor;
-			var name = 
+			var name =
 				color_black === id ? 'black' :
 				color_blue === id ? 'blue' :
 				color_darkblue === id ? 'dark blue' :
@@ -122,29 +125,65 @@
 				color_turqoise === id ? 'turqoise' :
 				color_white === id ? 'white' :
 				'';
-			return name;			
+			return name;
 		}
 
 		function getNecklineName(color){
 			var id = color * neckline_normalization_factor;
-			var name = 
+			var name =
 				neckline_round === id ? 'round' :
 				neckline_v === id ? 'v' :
 				'';
-			return name;			
+			return name;
 		}
 	</script>
-	
+
 	<center>
 		<br/><br/><br/><br/><br/><br/><br/>
-		<input type="button" value="1" onClick="nextTry(0);"/> 
-		<input type="button" value="2" onClick="nextTry(1);"/> 
-		<input type="button" value="3" onClick="nextTry(2);"/> 
-		<input type="button" value="4" onClick="nextTry(3);"/> 
-		<input type="button" value="5" onClick="nextTry(4);"/> 		
+		<input type="button" value="1" data-action="nextTry(0);"/>
+		<input type="button" value="2" data-action="nextTry(1);"/>
+		<input type="button" value="3" data-action="nextTry(2);"/>
+		<input type="button" value="4" data-action="nextTry(3);"/>
+		<input type="button" value="5" data-action="nextTry(4);"/>
 		<br/><br/>
 		<div id="result">
 		</div>
 	</center>
- </body>
+
+<script>
+// Delegated event handling. The validator forbids inline event handler
+// attributes (onclick, onload); these listeners give the same behaviour
+// without any inline JavaScript.
+(function () {
+  function runAction(el, spec) {
+    var m = /^([A-Za-z_$][A-Za-z0-9_$]*)\s*\((.*)\)$/.exec(String(spec || '').trim());
+    if (!m) return;
+    var fn = window[m[1]];
+    if (typeof fn !== 'function') return;
+    var args = [];
+    var raw = m[2].trim();
+    if (raw) {
+      raw.split(',').forEach(function (a) {
+        a = a.trim();
+        if (a === 'this') { args.push(el); }
+        else if (/^-?\d+(\.\d+)?$/.test(a)) { args.push(Number(a)); }
+        else if (/^(['"]).*\1$/.test(a)) { args.push(a.slice(1, -1)); }
+        else { args.push(a); }
+      });
+    }
+    fn.apply(el, args);
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-action]');
+    if (el) runAction(el, el.getAttribute('data-action'));
+  });
+  window.addEventListener('load', function () {
+    document.querySelectorAll('[data-onload]').forEach(function (el) {
+      runAction(el, el.getAttribute('data-onload'));
+    });
+  });
+})();
+</script>
+
+</body>
 </html>

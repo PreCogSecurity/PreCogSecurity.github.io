@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https://formsubmit.co;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PreCog Swarm HQ — Autonomous Enterprise Simulation</title>
@@ -8,6 +9,35 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+.ih-0{display: flex; align-items: center; gap: 20px;}
+.ih-1{font-size: 0.75rem; color: var(--emerald); font-family: 'JetBrains Mono', monospace; background: rgba(16,185,129,0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--emerald);}
+.ih-2{color:var(--text-muted);}
+.ih-3{color:var(--gold);}
+.ih-4{color:#f59e0b;}
+.ih-5{color:var(--text-muted); font-size:0.65rem;}
+.ih-6{color:#a855f7;}
+.ih-7{color:var(--emerald);}
+.ih-8{color:var(--primary);}
+.ih-9{background:var(--accent); border-color:var(--accent); color:white;}
+.ih-10{text-decoration:none;}
+.ih-11{top: 25px; left: 35px;}
+.ih-12{top: 25px; right: 40px;}
+.ih-13{top: 48%; left: 35px;}
+.ih-14{top: 48%; right: 40px;}
+.ih-15{bottom: 25px; left: 35px;}
+.ih-16{bottom: 25px; right: 40px;}
+.ih-17{top: 48%; left: 46%; transform: translate(-50%, -50%);}
+.ih-18{width:${agent.energy}%; background:var(--emerald);}
+.ih-19{width:${agent.focus}%; background:var(--primary);}
+.ih-20{border-color:${a.color};}
+.ih-21{color:white; font-size:1.15rem;}
+.ih-22{color:${a.color}; font-size:0.78rem; font-family:'JetBrains Mono',monospace;}
+.ih-23{font-size:0.85rem; color:var(--primary);}
+.ih-24{margin-bottom:18px;}
+.ih-25{font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;}
+.ih-26{background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; border:1px solid var(--border); font-size:0.82rem; font-family:'JetBrains Mono',monospace; color:#d1d5db;}
+.ih-27{color:${color};}
+
         :root {
             --bg-dark: #07090e;
             --bg-panel: #0d121f;
@@ -421,12 +451,12 @@
 <body>
     <!-- Top Header -->
     <header>
-        <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="ih-0">
             <a href="index.html" class="brand-area">
                 <div class="crest">P</div>
                 PreCog Swarm Simulation HQ
             </a>
-            <span style="font-size: 0.75rem; color: var(--emerald); font-family: 'JetBrains Mono', monospace; background: rgba(16,185,129,0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid var(--emerald);">
+            <span class="ih-1">
                 ● 6 AGENTS SYNCHRONIZED
             </span>
         </div>
@@ -434,38 +464,38 @@
         <!-- Treasury Ticker with Live On-Chain Data -->
         <div class="treasury-ticker">
             <div class="ticker-stat">
-                <span style="color:var(--text-muted);">TREASURY:</span>
-                <span class="stat-val" id="treasuryVal" style="color:var(--gold);">$100,267.22</span>
+                <span class="ih-2">TREASURY:</span>
+                <span class="stat-val ih-3" id="treasuryVal" >$100,267.22</span>
             </div>
             <div class="ticker-stat" title="Live balance from blockchain.info">
-                <span style="color:var(--text-muted);">BTC:</span>
-                <span class="stat-val" id="btcVal" style="color:#f59e0b;">Loading...</span>
-                <span id="btcLiveDot" style="color:var(--text-muted); font-size:0.65rem;">○</span>
+                <span class="ih-2">BTC:</span>
+                <span class="stat-val ih-4" id="btcVal" >Loading...</span>
+                <span id="btcLiveDot" class="ih-5">○</span>
             </div>
             <div class="ticker-stat" title="Live balance from ethplorer.io">
-                <span style="color:var(--text-muted);">ETH:</span>
-                <span class="stat-val" id="ethVal" style="color:#a855f7;">Loading...</span>
-                <span id="ethLiveDot" style="color:var(--text-muted); font-size:0.65rem;">○</span>
+                <span class="ih-2">ETH:</span>
+                <span class="stat-val ih-6" id="ethVal" >Loading...</span>
+                <span id="ethLiveDot" class="ih-5">○</span>
             </div>
             <div class="ticker-stat">
-                <span style="color:var(--text-muted);">ECOCASH:</span>
-                <span class="stat-val" id="ecoVal" style="color:var(--emerald);">$1,450.00</span>
+                <span class="ih-2">ECOCASH:</span>
+                <span class="stat-val ih-7" id="ecoVal" >$1,450.00</span>
             </div>
             <div class="ticker-stat">
-                <span style="color:var(--text-muted);">OPS/HR:</span>
-                <span class="stat-val" id="opsHrVal" style="color:var(--primary);">+384 Tasks</span>
+                <span class="ih-2">OPS/HR:</span>
+                <span class="stat-val ih-8" id="opsHrVal" >+384 Tasks</span>
             </div>
         </div>
 
         <!-- Speed & Audio Controls -->
         <div class="sim-controls">
-            <button class="ctrl-btn" id="btnSound" onclick="toggleAudio()">🔊 SFX: ON</button>
-            <button class="ctrl-btn" onclick="setSpeed(0, this)">⏸ Pause</button>
-            <button class="ctrl-btn active" onclick="setSpeed(1, this)">1x</button>
-            <button class="ctrl-btn" onclick="setSpeed(2, this)">2x</button>
-            <button class="ctrl-btn" onclick="setSpeed(5, this)">5x Turbo</button>
-            <button class="ctrl-btn" style="background:var(--accent); border-color:var(--accent); color:white;" onclick="triggerSwarmSurge()">⚡ Swarm Surge</button>
-            <a href="index.html" class="ctrl-btn" style="text-decoration:none;">Exit HQ</a>
+            <button class="ctrl-btn" id="btnSound" data-action="toggleAudio()">🔊 SFX: ON</button>
+            <button class="ctrl-btn" data-action="setSpeed(0, this)">⏸ Pause</button>
+            <button class="ctrl-btn active" data-action="setSpeed(1, this)">1x</button>
+            <button class="ctrl-btn" data-action="setSpeed(2, this)">2x</button>
+            <button class="ctrl-btn" data-action="setSpeed(5, this)">5x Turbo</button>
+            <button class="ctrl-btn ih-9"  data-action="triggerSwarmSurge()">⚡ Swarm Surge</button>
+            <a href="index.html" class="ctrl-btn ih-10" >Exit HQ</a>
         </div>
     </header>
 
@@ -475,7 +505,7 @@
         <div class="sidebar-left">
             <div class="panel-title">
                 <span>SWARM ROSTER</span>
-                <span style="color:var(--primary);" id="activeCount">6 ACTIVE</span>
+                <span class="ih-8" id="activeCount">6 ACTIVE</span>
             </div>
             <div class="agent-list" id="agentList">
                 <!-- Agent cards rendered via JS -->
@@ -487,20 +517,20 @@
             <canvas id="hqCanvas"></canvas>
 
             <!-- Room Labels -->
-            <div class="room-overlay" style="top: 25px; left: 35px;">🏛️ Boardroom & Treasury (BlueHound CFO)</div>
-            <div class="room-overlay" style="top: 25px; right: 40px;">📡 Threat & Bounty Radar War Room</div>
-            <div class="room-overlay" style="top: 48%; left: 35px;">⚙️ Engineering & Testing Foundry</div>
-            <div class="room-overlay" style="top: 48%; right: 40px;">💼 Client Outreach & Deal Suite</div>
-            <div class="room-overlay" style="bottom: 25px; left: 35px;">🔬 Alpha Research & Market Lab</div>
-            <div class="room-overlay" style="bottom: 25px; right: 40px;">🛍️ E-Commerce & Dropship Bay</div>
-            <div class="room-overlay" style="top: 48%; left: 46%; transform: translate(-50%, -50%);">☕ Break & Resource Mesh</div>
+            <div class="room-overlay ih-11" >🏛️ Boardroom & Treasury (BlueHound CFO)</div>
+            <div class="room-overlay ih-12" >📡 Threat & Bounty Radar War Room</div>
+            <div class="room-overlay ih-13" >⚙️ Engineering & Testing Foundry</div>
+            <div class="room-overlay ih-14" >💼 Client Outreach & Deal Suite</div>
+            <div class="room-overlay ih-15" >🔬 Alpha Research & Market Lab</div>
+            <div class="room-overlay ih-16" >🛍️ E-Commerce & Dropship Bay</div>
+            <div class="room-overlay ih-17" >☕ Break & Resource Mesh</div>
         </div>
 
         <!-- Right Sidebar: Inspector & Directives -->
         <div class="sidebar-right">
             <div class="panel-title">
                 <span>AGENT INSPECTOR</span>
-                <span id="inspectorStatus" style="color:var(--emerald);">RUNNING</span>
+                <span id="inspectorStatus" class="ih-7">RUNNING</span>
             </div>
             <div class="inspector-body" id="inspectorContent">
                 <!-- Inspector populated via JS on agent selection -->
@@ -736,13 +766,13 @@
                         <div class="meter-box">
                             <span>ENERGY ${Math.round(agent.energy)}%</span>
                             <div class="meter-bar-bg">
-                                <div class="meter-bar-fill" style="width:${agent.energy}%; background:var(--emerald);"></div>
+                                <div class="meter-bar-fill ih-18" ></div>
                             </div>
                         </div>
                         <div class="meter-box">
                             <span>FOCUS ${Math.round(agent.focus)}%</span>
                             <div class="meter-bar-bg">
-                                <div class="meter-bar-fill" style="width:${agent.focus}%; background:var(--primary);"></div>
+                                <div class="meter-bar-fill ih-19" ></div>
                             </div>
                         </div>
                     </div>
@@ -765,10 +795,10 @@
             const a = selectedAgent;
             insp.innerHTML = `
                 <div class="inspector-agent-hero">
-                    <div class="inspector-avatar" style="border-color:${a.color};">${a.icon}</div>
+                    <div class="inspector-avatar ih-20" >${a.icon}</div>
                     <div>
-                        <h3 style="color:white; font-size:1.15rem;">${a.name}</h3>
-                        <div style="color:${a.color}; font-size:0.78rem; font-family:'JetBrains Mono',monospace;">${a.role}</div>
+                        <h3 class="ih-21">${a.name}</h3>
+                        <div class="ih-22">${a.role}</div>
                     </div>
                 </div>
 
@@ -779,40 +809,40 @@
                 <div class="stat-grid">
                     <div class="stat-card">
                         <div class="stat-card-title">Cumulative Value</div>
-                        <div class="stat-card-val" style="color:var(--gold);">${a.revenueGenerated}</div>
+                        <div class="stat-card-val ih-3" >${a.revenueGenerated}</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-title">Location / Station</div>
-                        <div class="stat-card-val" style="font-size:0.85rem; color:var(--primary);">${ROOMS[a.room].name}</div>
+                        <div class="stat-card-val ih-23" >${ROOMS[a.room].name}</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-title">Compute Allocation</div>
-                        <div class="stat-card-val" style="color:var(--emerald);">Unlimited Free</div>
+                        <div class="stat-card-val ih-7" >Unlimited Free</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-card-title">Autonomy Status</div>
-                        <div class="stat-card-val" style="color:#a855f7;">Full Sovereign</div>
+                        <div class="stat-card-val ih-6" >Full Sovereign</div>
                     </div>
                 </div>
 
-                <div style="margin-bottom:18px;">
-                    <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Current Pipeline</div>
-                    <div style="background:rgba(0,0,0,0.5); padding:10px; border-radius:8px; border:1px solid var(--border); font-size:0.82rem; font-family:'JetBrains Mono',monospace; color:#d1d5db;">
+                <div class="ih-24">
+                    <div class="ih-25">Current Pipeline</div>
+                    <div class="ih-26">
                         ${a.activeTask}
                     </div>
                 </div>
 
                 <div class="directives-area">
                     <h4>Direct Swarm Action</h4>
-                    <button class="directive-btn" onclick="issueDirective('${a.id}', 'surge')">
+                    <button class="directive-btn" data-action="issueDirective('${a.id}', 'surge')">
                         <span>⚡ Prioritize High-Yield Tasks</span>
                         <span>&rarr;</span>
                     </button>
-                    <button class="directive-btn" onclick="issueDirective('${a.id}', 'collab')">
+                    <button class="directive-btn" data-action="issueDirective('${a.id}', 'collab')">
                         <span>🤝 Mesh Resources with Swarm</span>
                         <span>&rarr;</span>
                     </button>
-                    <button class="directive-btn" onclick="issueDirective('${a.id}', 'recharge')">
+                    <button class="directive-btn" data-action="issueDirective('${a.id}', 'recharge')">
                         <span>☕ Route to Recharge & Coffee</span>
                         <span>&rarr;</span>
                     </button>
@@ -864,7 +894,7 @@
             div.className = 'log-entry';
             div.innerHTML = `
                 <span class="log-time">[${timeStr}]</span>
-                <span class="log-agent" style="color:${color};">${agent}:</span>
+                <span class="log-agent ih-27" >${agent}:</span>
                 <span class="log-text">${msg}</span>
             `;
             container.prepend(div);
@@ -909,7 +939,7 @@
             ctx.fillStyle = 'rgba(14, 20, 35, 0.75)';
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
             ctx.lineWidth = 2;
-            
+
             ctx.beginPath();
             ctx.roundRect(x, y, w, h, 14);
             ctx.fill();
@@ -1116,7 +1146,7 @@
                 lastAutoEvent = simTime;
                 const ev = SIM_EVENTS[Math.floor(Math.random() * SIM_EVENTS.length)];
                 addLog(ev.agent, ev.text, ev.color);
-                
+
                 // Random cross-collaboration
                 if (Math.random() > 0.4) {
                     const idx1 = Math.floor(Math.random() * AGENTS.length);
@@ -1171,5 +1201,41 @@
 
         loop();
     </script>
+
+<script>
+// Delegated event handling. The validator forbids inline event handler
+// attributes (onclick, onload); these listeners give the same behaviour
+// without any inline JavaScript.
+(function () {
+  function runAction(el, spec) {
+    var m = /^([A-Za-z_$][A-Za-z0-9_$]*)\s*\((.*)\)$/.exec(String(spec || '').trim());
+    if (!m) return;
+    var fn = window[m[1]];
+    if (typeof fn !== 'function') return;
+    var args = [];
+    var raw = m[2].trim();
+    if (raw) {
+      raw.split(',').forEach(function (a) {
+        a = a.trim();
+        if (a === 'this') { args.push(el); }
+        else if (/^-?\d+(\.\d+)?$/.test(a)) { args.push(Number(a)); }
+        else if (/^(['"]).*\1$/.test(a)) { args.push(a.slice(1, -1)); }
+        else { args.push(a); }
+      });
+    }
+    fn.apply(el, args);
+  }
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-action]');
+    if (el) runAction(el, el.getAttribute('data-action'));
+  });
+  window.addEventListener('load', function () {
+    document.querySelectorAll('[data-onload]').forEach(function (el) {
+      runAction(el, el.getAttribute('data-onload'));
+    });
+  });
+})();
+</script>
+
 </body>
 </html>

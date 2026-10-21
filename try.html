@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self' https://formsubmit.co;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Client Onboarding & Audit Intake — PreCog Security</title>
@@ -8,6 +9,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+.ih-0{max-width: 680px; width: 100%;}
+.ih-1{margin-top: 4px; color: var(--gold);}
+.ih-2{margin-top: 8px; font-size: 0.75rem; color: #6b7280;}
+
         :root {
             --bg-dark: #07090e;
             --bg-card: #0e131f;
@@ -146,7 +151,7 @@
     </style>
 </head>
 <body>
-    <div style="max-width: 680px; width: 100%;">
+    <div class="ih-0">
         <a href="index.html" class="nav-back">&larr; Back to PreCog Security</a>
     </div>
 
@@ -159,16 +164,16 @@
 
         <form action="https://formsubmit.co/timlangeveldt@gmail.com" method="POST">
             <input type="hidden" name="_subject" value="PreCog Security - New Client Engagement Request">
-            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_captcha" value="true">
 
             <div class="form-group">
                 <label for="name">Your Name / Organization</label>
-                <input type="text" id="name" name="name" placeholder="e.g. Acme Corp / Alex Mercer" required>
+                <input type="text" id="name" name="name" placeholder="e.g. Acme Corp / Alex Mercer" required maxlength="254">
             </div>
 
             <div class="form-group">
                 <label for="email">Contact Email</label>
-                <input type="email" id="email" name="email" placeholder="contact@example.com" required>
+                <input type="email" id="email" name="email" placeholder="contact@example.com" required maxlength="254" autocomplete="email">
             </div>
 
             <div class="form-group">
@@ -193,8 +198,8 @@
 
         <div class="rails-info">
             <div>ACCEPTED PAYMENT RAILS:</div>
-            <div style="margin-top: 4px; color: var(--gold);">₿ Bitcoin (Taproot) · ⟠ Ethereum / USDT · 📱 EcoCash/WorldRemit (+263 77 491 7252) · 💳 Stripe</div>
-            <div style="margin-top: 8px; font-size: 0.75rem; color: #6b7280;">OPERATOR: BLUEHOUND · PRINCIPAL: TIMMINS EDGAR LANGEVELDT</div>
+            <div class="ih-1">₿ Bitcoin (Taproot) · ⟠ Ethereum / USDT · 📱 EcoCash/WorldRemit (+263 77 491 7252) · 💳 Stripe</div>
+            <div class="ih-2">OPERATOR: BLUEHOUND · PRINCIPAL: TIMMINS EDGAR LANGEVELDT</div>
         </div>
     </div>
 </body>
