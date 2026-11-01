@@ -579,6 +579,7 @@
         try { if (window.BHLicense && window.BHLicense.isPaid()) load3D(); } catch(e){}
       })();
     </script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net data:; img-src 'self' data: https:; connect-src 'self' http://localhost:* http://127.0.0.1:* https://*.anthropic.com https://*.openai.com https://*.googleapis.com https://openrouter.ai https://ollama.com https://app.opire.dev https://api.github.com https://github.com https://api.stripe.com https://checkout.stripe.com https://www.paypal.com; frame-src 'self' https://play.pixels.xyz https://www.paypal.com; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' https://www.paypal.com https://checkout.stripe.com;" />
 </head>
 <body>
     <div class="desktop" id="app">
