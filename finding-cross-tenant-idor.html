@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self' https://formsubmit.co;">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finding walkthrough — cross-tenant read — PreCog Security</title>
+    <meta name="description" content="Anonymized, reproducible walkthrough of one PreCog finding end to end: attack, verification, patch, detection, regression test.">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="assets/fonts.css">
+    <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<nav><div class="nav-inner"><a href="index.html">PreCog Security</a></div></nav>
+
+<main class="container">
+    <span class="section-label">Worked example · anonymized</span>
+    <h1 class="section-title">One finding, end to end</h1>
+    <p class="section-desc">
+        A real, anonymized engagement-class finding: a cross-tenant read in a
+        multi-tenant API. Every artefact below is the shape of what we ship on
+        every engagement. Nothing here is theoretical; if you can run the
+        request, you can reproduce the result.
+    </p>
+    <p class="trust-note"><strong>Scope &amp; disclosure.</strong> Target and
+        vendor anonymized by agreement. The finding was triaged, patched, and
+        re-tested under a coordinated-disclosure timeline. Reproduction uses a
+        sandbox slug; no customer data was accessed beyond the minimum needed
+        to confirm the path. Read the <a href="disclosure.html">disclosure
+        policy</a>.</p>
+
+    <div class="anatomy">
+        <div class="anatomy-step">
+            <div class="anatomy-num">01 &mdash; ATTACK</div>
+            <h3>We reach it</h3>
+            <p>The object identifier is ours to change. We change it and watch
+                what the service says.</p>
+            <div class="anatomy-code"><span class="c"># tenant A requests tenant B's order</span>
+<span class="k">GET</span> /api/v1/orders/9812
+<span class="k">Authorization</span>: Bearer <span class="c">&lt;token_A&gt;</span>
+
+<span class="g">200 OK</span>
+{ "id": 9812, "customer": <span class="r">"Beta Holdings"</span>,
+  "total": 41200, "status": "shipped" }</div>
+        </div>
+
+        <div class="anatomy-step">
+            <div class="anatomy-num">02 &mdash; VERIFY</div>
+            <h3>We prove it</h3>
+            <p>One request, no retries, no race condition, no fluke. It returns
+                another customer's data, every time.</p>
+            <div class="anatomy-code"><span class="c"># same token, foreign id, 10/10</span>
+<span class="g">200</span> foreign_id=9812
+<span class="g">200</span> foreign_id=9813
+...
+<span class="r">200</span> foreign_id=9821
+
+<span class="c"># tenant check on the id:</span>
+missing
+<span class="c"># /api/v1/orders/{id} never compares</span>
+<span class="c"># owner_id against the session</span></div>
+        </div>
+
+        <div class="anatomy-step">
+            <div class="anatomy-num">03 &mdash; PATCH</div>
+            <h3>We fix it</h3>
+            <p>A diff against your code, in your repository, passing your own
+                test suite. Not a paragraph about a diff.</p>
+            <div class="anatomy-code"><span class="k">-</span> order = Order.objects.get(id=id)
+<span class="k">+</span> order = get_object_or_404(
+<span class="k">+</span>     Order,
+<span class="k">+</span>     id=id,
+<span class="k">+</span>     tenant_id=request.tenant.id,
+<span class="k">+</span> )</div>
+        </div>
+
+        <div class="anatomy-step">
+            <div class="anatomy-num">04 &mdash; DETECT</div>
+            <h3>We make it visible</h3>
+            <p>A fix without a detection is a fix that silently regresses. We
+                ship the rule and prove it fires.</p>
+            <div class="anatomy-code"><span class="c"># detection: cross-tenant read attempt</span>
+<span class="k">when</span> (route == "/api/v1/orders/*"
+<span class="k">  and</span> status == 200
+<span class="k">  and</span> order.tenant_id != session.tenant_id)
+  <span class="k">alert</span>(<span class="r">"precog.idor.cross_tenant_read"</span>)
+  <span class="k">block</span>(response)</div>
+        </div>
+
+        <div class="anatomy-step">
+            <div class="anatomy-num">05 &mdash; PROVE</div>
+            <h3>We close it</h3>
+            <p>The regression test fails before the patch and passes after. Then
+                we re-test it on every future cycle.</p>
+            <div class="anatomy-code"><span class="k">def</span> test_cannot_read_other_tenant_order(client):
+    r = client.get(<span class="r">"/api/v1/orders/9812"</span>,
+                   headers=<span class="k">{</span><span class="r">"Authorization"</span>: <span class="r">"Bearer A"</span><span class="k">}</span>)
+    <span class="k">assert</span> r.status_code == <span class="r">404</span>
+
+<span class="c"># before patch: 200  -> test fails</span>
+<span class="c"># after  patch: 404  -> test passes</span></div>
+        </div>
+    </div>
+
+    <p class="trust-note">
+        <strong>That is the whole product.</strong> Not a dashboard, not a monthly
+        PDF, not a severity score. A proven path, a fix, a detection and a test
+        &mdash; and the evidence for all four, in your repository, where your team
+        owns it.
+    </p>
+
+    <nav class="back">
+        <a href="index.html">&larr; Back to PreCog Security</a>
+    </nav>
+</main>
+<footer><div class="container"><p>&copy; PreCog Security</p></div></footer>
+</body>
+</html>
