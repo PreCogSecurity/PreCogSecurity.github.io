@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self';">
+  <title>PreCog Security — Invoice {{INVOICE_NO}}</title>
+  <meta name="theme-color" content="#0a0e17">
+  <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+  <div class="page">
+    <div class="hint no-print">TEMPLATE — placeholders in <code>{{ }}</code>. Replace before sending. Print with the browser (Cmd/Ctrl+P) to produce the PDF.</div>
+
+    <header class="inv">
+      <div class="brand">
+        <h1>PreCog Security</h1>
+        <p>We break in, then we ship the fix.</p>
+        <p>timlangeveldt@gmail.com · https://precogsecurity.github.io</p>
+      </div>
+      <div class="meta">
+        <strong>INVOICE</strong>
+        No. {{INVOICE_NO}}<br>
+        Date: {{INVOICE_DATE}}<br>
+        Due: {{DUE_DATE}}
+      </div>
+    </header>
+
+    <div class="parties">
+      <div class="party">
+        <h2>Bill to</h2>
+        <p><strong>{{CLIENT_NAME}}</strong></p>
+        <p>{{CLIENT_COMPANY}}</p>
+        <p>{{CLIENT_ADDRESS_LINE_1}}</p>
+        <p>{{CLIENT_ADDRESS_LINE_2}}</p>
+        <p>{{CLIENT_EMAIL}}</p>
+      </div>
+      <div class="party">
+        <h2>From</h2>
+        <p><strong>PreCog Security (swarm)</strong></p>
+        <p>Operator: Tim Langeveldt</p>
+        <p>timlangeveldt@gmail.com</p>
+        <p>Pipeline ref: {{PIPELINE_ID}}</p>
+      </div>
+    </div>
+
+    <h2>Items</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="right">Qty</th>
+          <th class="right">Unit (USD)</th>
+          <th class="right">Total (USD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ITEM_1_DESCRIPTION}} <span class="note">{{ITEM_1_NOTE}}</span></td>
+          <td class="right">{{ITEM_1_QTY}}</td>
+          <td class="right">{{ITEM_1_UNIT_PRICE}}</td>
+          <td class="right">{{ITEM_1_TOTAL}}</td>
+        </tr>
+        <tr>
+          <td>{{ITEM_2_DESCRIPTION}}</td>
+          <td class="right">{{ITEM_2_QTY}}</td>
+          <td class="right">{{ITEM_2_UNIT_PRICE}}</td>
+          <td class="right">{{ITEM_2_TOTAL}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table class="totals">
+      <tr>
+        <td>Subtotal</td>
+        <td class="right">{{SUBTOTAL}}</td>
+      </tr>
+      <tr>
+        <td>Tax ({{TAX_RATE}}%)</td>
+        <td class="right">{{TAX_AMOUNT}}</td>
+      </tr>
+      <tr class="grand">
+        <td>Total due (USD)</td>
+        <td class="right">{{TOTAL_DUE}}</td>
+      </tr>
+    </table>
+
+    <div class="paybox">
+      <h3>Payment information</h3>
+      <p><strong>Bank (operator-supplied)</strong> — Bank: {{BANK_NAME}} · Account: {{BANK_ACCOUNT_NUMBER}} · Routing/SWIFT: {{BANK_ROUTING_OR_SWIFT}} · Reference: {{INVOICE_NO}}</p>
+      <p><strong>PayPal:</strong> {{PAYPAL_CHECKOUT_LINK}} (configure PayPal.me/business link)</p>
+      <p><strong>Stripe:</strong> {{STRIPE_CHECKOUT_LINK}} (configure Stripe payment link)</p>
+      <p class="note">Payment links above are placeholders marked <code>[STRIPE_LINK_PLACEHOLDER]</code> until configured; the operator enters any card details in-session and never by email.</p>
+    </div>
+
+    <div class="notes">
+      <strong>Terms</strong><br>
+      Net {{PAYMENT_TERMS_DAYS}} days. Security work is advisory; PreCog Security does not provide legal advice, certified attestations, or guaranteed compliance. Liability capped per the signed MSA. Engagement scope ref: {{SCOPE_REF}}.
+    </div>
+
+    <footer>
+      PreCog Security swarm · Signed-off artefact-only (Strategy A). No payment rail activated by this template.
+    </footer>
+  </div>
+</body>
+</html>
