@@ -122,7 +122,7 @@
     // v0 ships an ACTIVE upgrade link so customers can pay immediately;
     // replace with a PayPal Subscription button / Stripe Checkout URL for
     // recurring billing before scaling traffic.
-    var UPGRADE_URL = "https://www.paypal.com/paypalme/timlangeveldt";
+    var UPGRADE_URL = "https://www.paypal.com/paypalme/PrecogSecurity";
 
     function setUpgradeUrl(url) {
         if (typeof url === "string" && /^https?:\/\//.test(url)) UPGRADE_URL = url;
