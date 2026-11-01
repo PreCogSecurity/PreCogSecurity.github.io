@@ -43,6 +43,79 @@
         document.head.appendChild(script);
     }
 
+    // Premium skins (free + paid). The mesh material colour/pattern is the visual
+    // differentiator; skins are unlocked by license tier (see license.js).
+    var SKINS = [
+        { id: "default", label: "Default", tier: "free", color: 0x33ccff, emissive: 0x0a3a5a },
+        { id: "hacker", label: "Hacker", tier: "free", color: 0x33ff99, emissive: 0x0a3a1a },
+        { id: "analyst", label: "Analyst", tier: "free", color: 0xa855f7, emissive: 0x1a0a3a },
+        { id: "crimson", label: "Crimson", tier: "pro", color: 0xff3366, emissive: 0x3a0a1a },
+        { id: "gold", label: "Gold", tier: "pro", color: 0xffcc33, emissive: 0x3a2a0a },
+        { id: "ghost", label: "Ghost", tier: "pro", color: 0xffffff, emissive: 0x1a1a2a },
+        { id: "matrix", label: "Matrix", tier: "pro", color: 0x00ff88, emissive: 0x003a1a },
+        { id: "neon", label: "Neon", tier: "pro", color: 0xff33ff, emissive: 0x3a0a3a },
+        { id: "ice", label: "Ice", tier: "pro", color: 0x99ffff, emissive: 0x0a2a3a },
+        { id: "ember", label: "Ember", tier: "pro", color: 0xff8833, emissive: 0x3a1a0a },
+        { id: "phantom", label: "Phantom", tier: "pro", color: 0x667788, emissive: 0x0a0a1a },
+    ];
+
+    var REACTION_COLORS = {
+        // severity -> mesh emissive intensity bump
+        info: 0x0a3a5a,
+        low: 0x0a3a1a,
+        medium: 0x3a2a0a,
+        high: 0x3a1a0a,
+        critical: 0x3a0a1a,
+        success: 0x0a3a3a,
+    };
+
+    function currentSkin() {
+        try {
+            if (root.BHLicense && root.BHLicense.isPaid && root.BHLicense.isPaid()) {
+                var k = localStorage.getItem("bh_3d_skin");
+                if (k) { for (var i = 0; i < SKINS.length; i++) if (SKINS[i].id === k) return SKINS[i]; }
+            }
+        } catch (e) {}
+        return SKINS[0];
+    }
+
+    function applySkin(skin) {
+        if (!state.mesh || !skin) return;
+        state.mesh.material.color.setHex(skin.color);
+        if (state.mesh.material.emissive) state.mesh.material.emissive.setHex(skin.emissive);
+    }
+
+    function react(kind) {
+        // kind: 'scan-start' | 'scan-ok' | 'scan-warn' | 'scan-crit' | 'error' | 'idle'
+        if (!state.mesh) return;
+        var em = REACTION_COLORS.medium;
+        var scale = 1.0;
+        if (kind === "scan-start") { em = REACTION_COLORS.info; scale = 1.02; }
+        else if (kind === "scan-ok") { em = REACTION_COLORS.success; scale = 1.05; }
+        else if (kind === "scan-warn") { em = REACTION_COLORS.medium; scale = 1.04; }
+        else if (kind === "scan-crit") { em = REACTION_COLORS.critical; scale = 1.08; }
+        else if (kind === "error") { em = REACTION_COLORS.high; scale = 0.96; }
+        if (state.mesh.material.emissive) state.mesh.material.emissive.setHex(em);
+        state.mesh.scale.setScalar(scale);
+        setTimeout(function () { if (state.mesh) state.mesh.scale.setScalar(1); }, 600);
+    }
+
+    function setSkin(skinId) {
+        if (!root.BHLicense || !root.BHLicense.isPaid()) {
+            // free tier: only free skins
+            var free = null;
+            for (var i = 0; i < SKINS.length; i++) if (SKINS[i].id === skinId && SKINS[i].tier === "free") free = SKINS[i];
+            if (!free) return false;
+        }
+        var chosen = null;
+        for (var i = 0; i < SKINS.length; i++) if (SKINS[i].id === skinId) chosen = SKINS[i];
+        if (!chosen) return false;
+        if (chosen.tier === "pro" && !(root.BHLicense && root.BHLicense.isPaid && root.BHLicense.isPaid())) return false;
+        try { localStorage.setItem("bh_3d_skin", skinId); } catch (e) {}
+        applySkin(chosen);
+        return true;
+    }
+
     var state = { scene: null, renderer: null, camera: null, mesh: null, raf: null, fallbackShown: false };
 
     function showFallback(host) {
@@ -74,7 +147,8 @@
                 host.appendChild(state.renderer.domElement);
                 // simple placeholder avatar: a glowing icosahedron (skin swap point)
                 var geo = new THREE.IcosahedronGeometry(0.9, 2);
-                var mat = new THREE.MeshStandardMaterial({ color: 0x33ccff, metalness: 0.4, roughness: 0.3, emissive: 0x0a3a5a });
+                var skin = currentSkin();
+                var mat = new THREE.MeshStandardMaterial({ color: skin.color, metalness: 0.4, roughness: 0.3, emissive: skin.emissive });
                 state.mesh = new THREE.Mesh(geo, mat);
                 state.scene.add(state.mesh);
                 var light = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -121,5 +195,5 @@
         } catch (e) {}
     }
 
-    root.BH3D = { init: init, destroy: destroy, speak: speak, hasWebGL: hasWebGL };
+    root.BH3D = { init: init, destroy: destroy, speak: speak, hasWebGL: hasWebGL, setSkin: setSkin, react: react, SKINS: SKINS, currentSkin: currentSkin };
 })(typeof window !== "undefined" ? window : globalThis);
