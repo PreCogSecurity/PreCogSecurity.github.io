@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Precog Security · BlueHound OS</title>
+
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet" />
+
+    <!-- Ethers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js">
+    </script>
+
+    <!-- WalletConnect Ethereum Provider (CDN – the official way) -->
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.10.0/dist/index.umd.min.js">
+    </script>
+
+    <!-- Day.js, CryptoJS, Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/dayjs.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/dayjs@1.11.10/plugin/utc.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.6.0/dist/axios.min.js">
+    </script>
+
+    <style>
+        /* ===== Reset & Theme ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --bg: #0a0e1a;
+            --bg-card: rgba(17, 17, 40, 0.85);
+            --border: #1a2a5a;
+            --text: #c8e6ff;
+            --dim: #6688bb;
+            --accent: #33ccff;
+            --purple: #a855f7;
+            --gold: #ffcc33;
+            --radius: 12px;
+            --font: 'Inter', 'Segoe UI', sans-serif;
+        }
+        html,
+        body {
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            padding: 0.8rem;
+            overflow: hidden;
+            user-select: none;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .desktop {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-height: 100vh;
+        }
+
+        /* --- Top Bar --- */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            border-radius: var(--radius) var(--radius) 0 0;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+        }
+        .topbar .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .topbar .brand i {
+            font-size: 1.4rem;
+            color: var(--accent);
+        }
+        .topbar .brand h1 {
+            font-weight: 600;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .topbar .status {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.65rem;
+            flex-wrap: wrap;
+        }
+        .topbar .status .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #33ff99;
+            animation: pulse-dot 1.8s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+        .topbar .clock {
+            color: var(--dim);
+            font-family: 'Courier New', monospace;
+            font-size: 0.7rem;
+        }
+        .btn-sm {
+            background: var(--border);
+            border: none;
+            color: var(--text);
+            padding: 0.15rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.6rem;
+            transition: 0.2s;
+            font-family: var(--font);
+        }
+        .btn-sm:hover {
+            background: #2a3a7a;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--purple));
+            border: none;
+            color: #0a0e1a;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: 0.2s;
+            font-family: var(--font);
+        }
+        .btn-primary:hover {
+            opacity: 0.85;
+            transform: scale(1.02);
+        }
+        .btn-gold {
+            background: var(--gold);
+            border: none;
+            color: #0a0e1a;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.65rem;
+            font-weight: 600;
+            transition: 0.2s;
+            font-family: var(--font);
+        }
+        .btn-gold:hover {
+            opacity: 0.85;
+            transform: scale(1.02);
+        }
+
+        /* --- Dock --- */
+        .dock {
+            display: flex;
+            justify-content: center;
+            gap: 0.3rem;
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+        }
+        .dock .icon {
+            background: transparent;
+            border: none;
+            color: var(--dim);
+            font-size: 1.1rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.55rem;
+            gap: 0.1rem;
+        }
+        .dock .icon i {
+            font-size: 1.2rem;
+        }
+        .dock .icon:hover {
+            color: var(--text);
+            background: var(--border);
+        }
+        .dock .icon.active {
+            color: var(--accent);
+            background: var(--border);
+        }
+
+        /* --- Window Container --- */
+        .windows {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg);
+            border-radius: 0 0 var(--radius) var(--radius);
+            min-height: 0;
+        }
+        .window {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            display: none;
+            flex-direction: column;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            resize: both;
+            min-width: 280px;
+            min-height: 200px;
+        }
+        .window.active {
+            display: flex;
+            z-index: 10;
+        }
+        .window .titlebar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.3rem 0.6rem;
+            background: var(--border);
+            cursor: grab;
+            flex-shrink: 0;
+        }
+        .window .titlebar .title {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+        .window .titlebar .actions button {
+            background: none;
+            border: none;
+            color: var(--dim);
+            cursor: pointer;
+            font-size: 0.7rem;
+            padding: 0 0.2rem;
+        }
+        .window .titlebar .actions button:hover {
+            color: var(--text);
+        }
+        .window .body {
+            flex: 1;
+            padding: 0.6rem;
+            overflow-y: auto;
+            font-size: 0.75rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .window .body iframe {
+            width: 100%;
+            flex: 1;
+            border: none;
+            border-radius: 4px;
+            background: #000;
+        }
+
+        /* ===== Android Desktop (copy.sh/v86 iframe) ===== */
+        .android-iframe {
+            width: 100%;
+            flex: 1;
+            border: none;
+            border-radius: 4px;
+            background: #000;
+            transition: transform 0.2s;
+        }
+        .android-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 0.3rem 0.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            margin-top: 0.3rem;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .android-controls .btn-sm {
+            background: var(--border);
+            border: none;
+            color: var(--text);
+            padding: 0.15rem 0.6rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.55rem;
+            font-family: var(--font);
+        }
+        .android-controls .btn-sm:hover {
+            background: #2a3a7a;
+        }
+        .android-controls .status-text {
+            font-size: 0.5rem;
+            color: var(--dim);
+            margin-left: auto;
+        }
+
+        /* ===== Apps ===== */
+        .chat-box {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 0.4rem;
+            font-size: 0.7rem;
+            border: 1px solid var(--border);
+            margin-bottom: 0.3rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-box .msg {
+            margin: 0.15rem 0;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+        .chat-box .user {
+            background: var(--border);
+            color: var(--text);
+            align-self: flex-end;
+        }
+        .chat-box .bot {
+            background: var(--bg-card);
+            color: var(--accent);
+            border: 1px solid var(--border);
+            align-self: flex-start;
+        }
+        .chat-input {
+            display: flex;
+            gap: 0.3rem;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 0.25rem 0.6rem;
+            background: rgba(10, 10, 26, 0.8);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 0.7rem;
+            outline: none;
+            font-family: var(--font);
+        }
+        .chat-input input:focus {
+            border-color: var(--accent);
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .tool-card {
+            background: rgba(10, 10, 26, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.4rem 0.5rem;
+        }
+        .tool-card h4 {
+            font-size: 0.6rem;
+            color: #88bbdd;
+            margin-bottom: 0.1rem;
+        }
+        .tool-card input {
+            width: 100%;
+            padding: 0.15rem 0.4rem;
+            background: rgba(10, 10, 26, 0.8);
+            border: 1px solid #2a3a6a;
+            border-radius: 16px;
+            color: #fff;
+            font-size: 0.6rem;
+            outline: none;
+            margin-bottom: 0.1rem;
+            font-family: var(--font);
+        }
+        .tool-card input:focus {
+            border-color: var(--accent);
+        }
+        .tool-card .result-box {
+            background: rgba(10, 10, 26, 0.8);
+            padding: 0.2rem;
+            border-radius: 6px;
+            min-height: 24px;
+            font-size: 0.5rem;
+            color: #aaccdd;
+            border: 1px solid #1a2244;
+            word-break: break-word;
+            max-height: 50px;
+            overflow-y: auto;
+        }
+
+        .prst-panel {
+            background: rgba(10, 10, 26, 0.6);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        .prst-panel .token-symbol {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gold);
+        }
+        .prst-panel .token-address {
+            font-size: 0.55rem;
+            color: var(--dim);
+            word-break: break-all;
+            margin: 0.2rem 0;
+        }
+        .prst-panel .btn-gold {
+            margin-top: 0.3rem;
+        }
+        .prst-panel .btn-gold:hover {
+            opacity: 0.85;
+            transform: scale(1.02);
+        }
+
+        .compute-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            color: var(--dim);
+            gap: 0.5rem;
+        }
+        .compute-placeholder i {
+            font-size: 3rem;
+            color: var(--accent);
+        }
+
+        .game-fallback {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            z-index: 5;
+        }
+        .game-fallback i {
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 0.8rem;
+        }
+        .game-fallback h3 {
+            font-weight: 300;
+            font-size: 1.1rem;
+        }
+        .game-fallback p {
+            color: var(--dim);
+            font-size: 0.75rem;
+            max-width: 400px;
+            margin: 0.5rem 0;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.65rem;
+            color: var(--text);
+            z-index: 9999;
+            max-width: 280px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+            transform: translateY(120%);
+            transition: transform 0.3s ease;
+        }
+        .toast.show {
+            transform: translateY(0);
+        }
+        .toast .toast-title {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .toast .toast-close {
+            background: none;
+            border: none;
+            color: var(--dim);
+            cursor: pointer;
+            float: right;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 0.3rem;
+            }
+            .topbar .brand h1 {
+                font-size: 0.9rem;
+            }
+            .topbar .status {
+                font-size: 0.55rem;
+                gap: 0.4rem;
+            }
+            .dock .icon {
+                font-size: 0.5rem;
+                padding: 0.1rem 0.3rem;
+            }
+            .dock .icon i {
+                font-size: 1rem;
+            }
+            .window {
+                width: 96% !important;
+                left: 2% !important;
+                height: 92% !important;
+                top: 4% !important;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 400px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .persist-bar{display:flex;gap:.35rem;align-items:center;flex-wrap:wrap;margin-top:.4rem}
+        .persist-badge{font-size:.52rem;color:#33ff99;border:1px solid #245f55;border-radius:12px;padding:.12rem .45rem}
+        .wallet-panel{background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:8px;padding:.55rem;margin-top:.5rem}
+        .wallet-row{display:flex;justify-content:space-between;gap:.5rem;font-size:.58rem;margin:.18rem 0}
+        .wallet-row span:first-child{color:var(--dim)}
+        .danger{border-color:#8b2944!important;color:#ff7799!important}
+
+    </style>
+    <!-- Freemium gate (v0): BH_TIER license + usage counters. -->
+    <script src="license.js"></script>
+    <!-- 3D assistant (Pro) is lazy-loaded on demand; 2D fallback otherwise. -->
+    <script>
+      (function(){
+        function load3D(){ try { var s=document.createElement('script'); s.src='assistant3d.js'; s.onload=function(){ if(window.BH3D){ var h=document.getElementById('assistantHost'); if(h) window.BH3D.init(h); } }; document.head.appendChild(s); } catch(e){ console.warn('3D avatar unavailable', e); } }
+        try { if (window.BHLicense && window.BHLicense.isPaid()) load3D(); } catch(e){}
+      })();
+    </script>
+</head>
+<body>
+    <div class="desktop" id="app">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="brand">
+                <i class="fas fa-shield-alt"></i>
+                <h1>Precog Security</h1>
+                <span style="font-size:0.5rem;background:var(--purple);padding:0.05rem 0.5rem;border-radius:10px;color:#fff;">BlueHound</span>
+            </div>
+            <div class="status">
+                <span><span class="dot"></span> <span id="statusText">Online</span></span>
+                <span class="clock" id="clockDisplay">--:--:--</span>
+                <span style="color:var(--dim);font-size:0.55rem;"><i class="fas fa-wallet"></i> <span id="walletStatus">Not Connected</span></span>
+                <button class="btn-sm" id="connectWalletBtn"><i class="fas fa-link"></i> Wallet</button>
+                <button class="btn-sm" id="disconnectWalletBtn" style="display:none;"><i class="fas fa-unlink"></i> Disconnect</button>
+                <button class="btn-sm" onclick="PrecogPersistence.exportBackup()"><i class="fas fa-download"></i> Backup</button>
+                 <button class="btn-sm" onclick="window.showToast('Info','System ready.')"><i class="fas fa-info-circle"></i></button>
+            </div>
+        </header>
+
+        <!-- Dock -->
+        <nav class="dock" id="dock">
+            <button class="icon active" data-app="android"><i class="fas fa-mobile-alt"></i> Android</button>
+            <button class="icon" data-app="bluehound"><i class="fas fa-robot"></i> BlueHound</button>
+            <button class="icon" data-app="tools"><i class="fas fa-tools"></i> Tools</button>
+            <button class="icon" data-app="store"><i class="fas fa-store"></i> Store</button>
+            <button class="icon" data-app="compute"><i class="fas fa-microchip"></i> Compute</button>
+            <button class="icon" data-app="games"><i class="fas fa-gamepad"></i> Games</button>
+            <button class="icon" data-app="paths"><i class="fas fa-project-diagram"></i> Attack Path</button>
+        </nav>
+
+        <!-- Windows -->
+        <div class="windows" id="windowsContainer">
+            <!-- Android Desktop: copy.sh/v86 Android-x86 (iframe) -->
+            <div class="window active" id="win-android" style="width:94%;height:92%;top:4%;left:3%;">
+                <div class="titlebar">
+                    <span class="title"><i class="fas fa-mobile-alt"></i> Android-x86 4.4</span>
+                    <div class="actions">
+                        <button onclick="toggleAndroidFullscreen()" title="Fullscreen"><i class="fas fa-expand"></i></button>
+                        <button onclick="closeWindow('android')">✕</button>
+                    </div>
+                </div>
+                <div class="body" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
+                    <div id="androidRuntime" style="flex:1;display:flex;align-items:center;justify-content:center;background:#000;position:relative;overflow:hidden;">
+        <div style="text-align:center;max-width:520px;padding:1.5rem;color:#c8e6ff;">
+          <div style="font-size:3rem;color:#33ccff;margin-bottom:.8rem;">▣</div>
+          <h3 style="font-weight:500;margin-bottom:.5rem;">Persistent Emulator Runtime</h3>
+          <p style="font-size:.7rem;color:#6688bb;line-height:1.6;">
+            Emulator state persistence is enabled. This single-file shell stores Precog state locally.
+            A fully embedded Android/v86 runtime additionally requires the v86 WASM, BIOS and Android disk
+            image assets; those are not present in the supplied HTML and are therefore not falsely bundled here.
+          </p>
+          <div id="emulatorStateBadge" style="margin-top:1rem;font-size:.6rem;color:#33ff99;">LOCAL STATE READY</div>
+        </div>
+      </div>
+                    <div class="android-controls">
+                        <button class="btn-sm" onclick="toggleAndroidFullscreen()"><i class="fas fa-expand"></i> Fullscreen</button>
+                        <button class="btn-sm" onclick="androidZoomIn()"><i class="fas fa-plus"></i> Zoom In</button>
+                        <button class="btn-sm" onclick="androidZoomOut()"><i class="fas fa-minus"></i> Zoom Out</button>
+                        <button class="btn-sm" onclick="androidZoomReset()"><i class="fas fa-undo"></i> Reset</button>
+                         <button class="btn-sm" onclick="PrecogPersistence.snapshot()"><i class="fas fa-save"></i> Save State</button>
+                         <button class="btn-sm" onclick="PrecogPersistence.restore()"><i class="fas fa-history"></i> Restore</button>
+                        <span class="status-text" id="androidZoomStatus">100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BlueHound -->
+            <div class="window" id="win-bluehound" style="width:70%;height:80%;top:10%;left:15%;">
+                <div class="titlebar"><span class="title"><i class="fas fa-robot"></i> BlueHound AI</span><div class="actions"><button onclick="closeWindow('bluehound')">✕</button></div></div>
+                <div class="body">
+                    <div class="chat-box" id="chatBox">
+                        <div class="msg bot">🐕 BlueHound: Hello, I'm your cybersecurity AI assistant. How can I help?</div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Ask BlueHound..." />
+                        <button class="btn-primary" onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <div style="margin-top:0.3rem;font-size:0.5rem;color:var(--dim);">
+                        <i class="fas fa-lock"></i> Local Ollama first · OpenRouter optional (no key bundled)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools -->
+            <div class="window" id="win-tools" style="width:80%;height:85%;top:7%;left:10%;">
+                <div class="titlebar"><span class="title"><i class="fas fa-tools"></i> Cybersecurity Tools</span><div class="actions"><button onclick="closeWindow('tools')">✕</button></div></div>
+                <div class="body">
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <h4><i class="fas fa-network-wired"></i> IP Scan</h4>
+                            <input type="text" id="scanInput" placeholder="IP address" />
+                            <button class="btn-sm" onclick="window.scanIP()"><i class="fas fa-play"></i> Scan</button>
+                            <div class="result-box" id="scanResult"><span class="label">🔍 Enter IP</span></div>
+                        </div>
+                        <div class="tool-card">
+                            <h4><i class="fas fa-search"></i> IP Lookup</h4>
+                            <input type="text" id="ipInput" placeholder="IP or domain" />
+                            <div class="result-box" id="lookupResult"><span class="label">🔎 Enter IP</span></div>
+                        </div>
+                        <div class="tool-card">
+                            <h4><i class="fas fa-bug"></i> CVE Lookup</h4>
+                            <input type="text" id="cveInput" placeholder="CVE-2025-xxxx" />
+                            <button class="btn-sm" onclick="window.lookupCVE()"><i class="fas fa-search"></i> Check</button>
+                            <div class="result-box" id="cveResult"><span class="label">📋 Enter CVE</span></div>
+                        </div>
+                        <div class="tool-card">
+                            <h4><i class="fas fa-shield-virus"></i> Breach Check</h4>
+                            <input type="text" id="breachInput" placeholder="email@domain.com" />
+                            <button class="btn-sm" onclick="window.checkBreach()"><i class="fas fa-search"></i> Check</button>
+                            <div class="result-box" id="breachResult"><span class="label">📧 Enter email</span></div>
+                        </div>
+                    </div>
+                    <div style="margin-top:0.5rem;font-size:0.55rem;color:var(--dim);">
+                        <i class="fas fa-database"></i> Data: AlienVault OTX · NVD · HIBP · ip-api.com
+                    </div>
+                </div>
+            </div>
+
+            <!-- Store – PRST Token -->
+            <div class="window" id="win-store" style="width:80%;height:85%;top:7%;left:10%;">
+                <div class="titlebar"><span class="title"><i class="fas fa-store"></i> PRST Token & Marketplace</span><div class="actions"><button onclick="closeWindow('store')">✕</button></div></div>
+                <div class="body" style="padding:0.6rem; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div class="prst-panel" style="width:100%;max-width:500px;">
+                        <div class="token-symbol">✦ PRST Token</div>
+                        <div class="token-address">
+                            <span style="color:var(--dim);">Contract:</span>
+                            0xb2a8E38177c1a023db108e28384aa6055A1c7Ba3
+                        </div>
+                        <div style="font-size:0.6rem;color:var(--dim);margin:0.2rem 0;">
+                            Robinhood Chain · 100,000,000,000 supply · 18 decimals
+                        </div>
+                        <button class="btn-gold" onclick="window.open('https://app.uniswap.org/#/swap?outputCurrency=0xb2a8E38177c1a023db108e28384aa6055A1c7Ba3', '_blank')">
+                            <i class="fas fa-arrow-right"></i> Buy PRST on Uniswap
+                        </button>
+                        <button class="btn-sm" onclick="window.open('https://robinhoodchain.blockscout.com/token/0xb2a8E38177c1a023db108e28384aa6055A1c7Ba3', '_blank')" style="margin-left:0.3rem;">
+                            <i class="fas fa-chart-line"></i> View Contract
+                        </button>
+                    </div>
+                    <div style="font-size:0.5rem;color:var(--dim);text-align:center;padding:0.5rem;border-top:1px solid var(--border);width:100%;max-width:500px;">
+                        <i class="fas fa-info-circle"></i> Browse NFTs on <a href="https://opensea.io" target="_blank" style="color:var(--accent);">OpenSea</a> or <a href="https://magiceden.io" target="_blank" style="color:var(--accent);">Magic Eden</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Compute – NodeGo -->
+            <div class="window" id="win-compute" style="width:80%;height:85%;top:7%;left:10%;">
+                <div class="titlebar"><span class="title"><i class="fas fa-microchip"></i> DePIN Compute · NodeGo</span><div class="actions"><button onclick="closeWindow('compute')">✕</button></div></div>
+                <div class="body" style="padding:0.6rem; overflow-y:auto; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div class="compute-placeholder">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3 style="color:var(--text);font-weight:300;font-size:1rem;">NodeGo DePIN Network</h3>
+                        <p style="font-size:0.7rem;max-width:400px;">
+                            Share your unused bandwidth and compute power to earn rewards. Over 1.5 million active nodes worldwide.
+                        </p>
+                        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem;">
+                            <button class="btn-primary" onclick="window.open('https://nodego.ai', '_blank')">
+                                <i class="fas fa-external-link-alt"></i> Visit NodeGo
+                            </button>
+                            <button class="btn-sm" onclick="window.open('https://chrome.google.com/webstore/detail/nodego', '_blank')">
+                                <i class="fab fa-chrome"></i> Chrome Extension
+                            </button>
+                        </div>
+                        <div style="font-size:0.5rem;color:var(--dim);margin-top:1rem;border-top:1px solid var(--border);padding-top:0.5rem;">
+                            <i class="fas fa-info-circle"></i> NodeGo is a live DePIN project – users can earn crypto by sharing idle resources.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Games – Pixels -->
+            <div class="window" id="win-games" style="width:85%;height:90%;top:5%;left:7%;">
+                <div class="titlebar"><span class="title"><i class="fas fa-gamepad"></i> Pixels · Web3 Farming Game</span><div class="actions"><button onclick="closeWindow('games')">✕</button></div></div>
+                <div class="body" style="padding:0; overflow:hidden; position:relative;">
+                    <iframe id="pixelsFrame" src="https://play.pixels.xyz" style="width:100%;height:100%;border:none;background:#000;" allowfullscreen></iframe>
+                    <div class="game-fallback" id="gameFallback">
+                        <i class="fas fa-gamepad"></i>
+                        <h3>Pixels</h3>
+                        <p>Web3 farming game on Ronin. Click below to play in a new tab.</p>
+                        <button class="btn-primary" onclick="window.open('https://play.pixels.xyz', '_blank')">
+                            <i class="fas fa-external-link-alt"></i> Play Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attack Path – BlueHound-inspired threat pathing -->
+            <div class="window" id="win-paths" style="width:90%;height:90%;top:5%;left:5%;">
+                <div class="titlebar"><span class="title"><i class="fas fa-project-diagram"></i> Attack Path · BlueHound-style Threat Mapping</span><div class="actions"><button onclick="closeWindow('paths')">✕</button></div></div>
+                <div class="body">
+                    <div style="font-size:0.6rem;color:var(--dim);margin-bottom:0.4rem;">
+                        <i class="fas fa-info-circle"></i> Inspired by the BlueHound cybersecurity tool — combine reputation, reachability and exposure to reveal the paths an attacker would take.
+                    </div>
+                    <div class="tools-grid">
+                        <div class="tool-card">
+                            <h4><i class="fas fa-user-shield"></i> Start Host (compromised / untrusted)</h4>
+                            <input type="text" id="pathStartInput" placeholder="e.g. 198.51.100.7" />
+                        </div>
+                        <div class="tool-card">
+                            <h4><i class="fas fa-crown"></i> Crown Jewels (targets)</h4>
+                            <input type="text" id="pathJewelsInput" placeholder="CSV of high-value IPs" />
+                            <button class="btn-sm" onclick="window.mapAttackPath()"><i class="fas fa-project-diagram"></i> Map Path</button>
+                        </div>
+                    </div>
+                    <div class="result-box" id="pathMapResult" style="min-height:120px;max-height:260px;border:1px solid var(--accent);margin-top:0.3rem;">
+                        <span class="label">🔬 Enter a start host and crown-jewel targets, then Map Path.</span>
+                    </div>
+                    <div style="margin-top:0.4rem;font-size:0.55rem;color:var(--dim);">
+                        <i class="fas fa-eye"></i> Methodology mirrors BlueHound: edge filtering + crown-jewel focus. Path hops are scored by abuse-reputation; criticality persists locally.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <button class="toast-close" onclick="this.parentElement.classList.remove('show')">×</button>
+        <div class="toast-title" id="toastTitle">Info</div>
+        <div id="toastMsg">Message</div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  DAYJS UTC
+        // ================================================================
+        if (typeof dayjs !== 'undefined' && typeof dayjs_plugin_utc !== 'undefined') {
+            dayjs.extend(dayjs_plugin_utc);
+        } else {
+            if (!dayjs.utc) dayjs.utc = function(d) { return dayjs(d); };
+        }
+
+        // ================================================================
+        //  TOAST
+        // ================================================================
+        window.showToast = function(title, msg, isError = false) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMsg').textContent = msg;
+            t.style.borderColor = isError ? '#cc3355' : 'var(--accent)';
+            t.classList.add('show');
+            clearTimeout(t._timeout);
+            t._timeout = setTimeout(() => t.classList.remove('show'), 4000);
+        };
+
+        // ================================================================
+        //  WINDOW MANAGEMENT
+        // ================================================================
+        function openWindow(id) {
+            document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
+            const win = document.getElementById('win-' + id);
+            if (win) win.classList.add('active');
+            document.querySelectorAll('.dock .icon').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`.dock .icon[data-app="${id}"]`);
+            if (btn) btn.classList.add('active');
+        }
+
+        window.openWindow = openWindow;
+
+        window.closeWindow = function(id) {
+            const win = document.getElementById('win-' + id);
+            if (win) win.classList.remove('active');
+            const active = document.querySelector('.window.active');
+            if (!active) {
+                const term = document.getElementById('win-android');
+                if (term) term.classList.add('active');
+                document.querySelector('.dock .icon[data-app="android"]')?.classList.add('active');
+            }
+        };
+
+        document.querySelectorAll('.dock .icon').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const app = this.dataset.app;
+                openWindow(app);
+            });
+        });
+
+        // Draggable windows
+        document.querySelectorAll('.window .titlebar').forEach(bar => {
+            let isDragging = false,
+                offsetX, offsetY, win;
+            bar.addEventListener('mousedown', function(e) {
+                win = this.closest('.window');
+                if (!win.classList.contains('active')) return;
+                isDragging = true;
+                const rect = win.getBoundingClientRect();
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                win.style.cursor = 'grabbing';
+                e.preventDefault();
+            });
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging || !win) return;
+                const container = document.getElementById('windowsContainer');
+                const cRect = container.getBoundingClientRect();
+                let left = e.clientX - cRect.left - offsetX;
+                let top = e.clientY - cRect.top - offsetY;
+                left = Math.max(0, Math.min(left, cRect.width - win.offsetWidth));
+                top = Math.max(0, Math.min(top, cRect.height - win.offsetHeight));
+                win.style.left = left + 'px';
+                win.style.top = top + 'px';
+                win.style.width = win.offsetWidth + 'px';
+                win.style.height = win.offsetHeight + 'px';
+            });
+            document.addEventListener('mouseup', function() {
+                if (isDragging && win) {
+                    isDragging = false;
+                    win.style.cursor = '';
+                }
+            });
+        });
+
+        // ================================================================
+        //  CLOCK
+        // ================================================================
+        function updateClock() {
+            const now = dayjs();
+            const utc = now.utc ? now.utc() : now;
+            document.getElementById('clockDisplay').textContent = utc.format('HH:mm:ss');
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // ================================================================
+        //  ANDROID IFRAME CONTROLS (Zoom & Fullscreen)
+        // ================================================================
+        let androidZoomLevel = 1.0;
+        const ANDROID_ZOOM_STEP = 0.1;
+        const ANDROID_MIN_ZOOM = 0.3;
+        const ANDROID_MAX_ZOOM = 2.0;
+
+        function getAndroidIframe() {
+            return document.getElementById('androidRuntime');
+        }
+
+        function applyAndroidZoom() {
+            const runtime = getAndroidIframe();
+            const screen = document.getElementById('screen_container');
+            if (screen) {
+                screen.style.transform = `scale(${androidZoomLevel})`;
+                screen.style.transformOrigin = 'top left';
+            } else if (runtime) {
+                runtime.style.transform = `scale(${androidZoomLevel})`;
+                runtime.style.transformOrigin = 'top left';
+            }
+            document.getElementById('androidZoomStatus').textContent = Math.round(androidZoomLevel * 100) + '%';
+        }
+
+        window.androidZoomIn = function() {
+            if (androidZoomLevel < ANDROID_MAX_ZOOM) {
+                androidZoomLevel = Math.min(androidZoomLevel + ANDROID_ZOOM_STEP, ANDROID_MAX_ZOOM);
+                applyAndroidZoom();
+            }
+        };
+
+        window.androidZoomOut = function() {
+            if (androidZoomLevel > ANDROID_MIN_ZOOM) {
+                androidZoomLevel = Math.max(androidZoomLevel - ANDROID_ZOOM_STEP, ANDROID_MIN_ZOOM);
+                applyAndroidZoom();
+            }
+        };
+
+        window.androidZoomReset = function() {
+            androidZoomLevel = 1.0;
+            applyAndroidZoom();
+        };
+
+        window.toggleAndroidFullscreen = function() {
+            const container = document.getElementById('win-android');
+            if (!container) return;
+            if (!document.fullscreenElement) {
+                container.requestFullscreen?.() || container.webkitRequestFullscreen?.() || container.msRequestFullscreen?.();
+            } else {
+                document.exitFullscreen?.() || document.webkitExitFullscreen?.() || document.msExitFullscreen?.();
+            }
+        };
+
+        document.addEventListener('fullscreenchange', updateFullscreenIcon);
+        document.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+        document.addEventListener('msfullscreenchange', updateFullscreenIcon);
+
+        function updateFullscreenIcon() {
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+            const btn = document.querySelector('#win-android .titlebar .actions button:first-child i');
+            if (btn) {
+                btn.className = isFull ? 'fas fa-compress' : 'fas fa-expand';
+            }
+            const btn2 = document.querySelector('#win-android .android-controls .btn-sm:first-child i');
+            if (btn2) {
+                btn2.className = isFull ? 'fas fa-compress' : 'fas fa-expand';
+            }
+        }
+
+        // ================================================================
+        //  GAMES TAB FALLBACK
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const frame = document.getElementById('pixelsFrame');
+            const fallback = document.getElementById('gameFallback');
+
+            let loaded = false;
+            frame.onload = function() {
+                loaded = true;
+                fallback.style.display = 'none';
+                console.log('Pixels iframe loaded.');
+            };
+
+            setTimeout(() => {
+                if (!loaded) {
+                    fallback.style.display = 'flex';
+                    console.log('Showing Pixels fallback (iframe did not load).');
+                }
+            }, 8000);
+
+            frame.onerror = function() {
+                fallback.style.display = 'flex';
+                console.log('Pixels iframe error, showing fallback.');
+            };
+        });
+
+        // ================================================================
+        //  WALLET CONNECT (CDN method – this is the working version)
+        // ================================================================
+        let walletProvider = null;
+        let ethersProvider = null;
+        let signer = null;
+        let walletAddress = null;
+
+        const PROJECT_ID = 'f5520f7f-646c-466f-936e-1cf40caa6345';
+        const CHAIN_ID = 1;
+
+        const connectBtn = document.getElementById('connectWalletBtn');
+        const disconnectBtn = document.getElementById('disconnectWalletBtn');
+        const walletStatus = document.getElementById('walletStatus');
+
+        async function connectWallet() {
+            try {
+                showToast('Connecting', 'Initializing WalletConnect...');
+
+                if (typeof window.ethereumProvider === 'undefined') {
+                    showToast('Error', 'WalletConnect library not loaded. Check your network.', true);
+                    return;
+                }
+
+                // Initialize the provider
+                walletProvider = await window.ethereumProvider.init({
+                    projectId: PROJECT_ID,
+                    chains: [CHAIN_ID],
+                    showQrModal: true,
+                    qrModalOptions: {
+                        themeMode: 'dark',
+                        themeVariables: {
+                            '--wcm-accent-color': '#33ccff',
+                            '--wcm-background-color': '#0a0e1a',
+                        }
+                    }
+                });
+
+                // Connect (this shows the QR modal)
+                await walletProvider.connect();
+
+                // Wrap with ethers
+                ethersProvider = new ethers.providers.Web3Provider(walletProvider);
+                signer = ethersProvider.getSigner();
+                walletAddress = await signer.getAddress();
+
+                // Update UI
+                walletStatus.textContent = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+                connectBtn.style.display = 'none';
+                disconnectBtn.style.display = 'inline-block';
+
+                showToast('Connected', 'Wallet connected: ' + walletAddress.slice(0, 10) + '...');
+
+                // Check PRST balance
+                try {
+                    const prstContract = new ethers.Contract(
+                        '0xb2a8E38177c1a023db108e28384aa6055A1c7Ba3', [
+                            'function balanceOf(address) view returns (uint256)'
+                        ], ethersProvider
+                    );
+                    const bal = await prstContract.balanceOf(walletAddress);
+                    const formatted = ethers.utils.formatEther(bal);
+                    showToast('PRST Balance', formatted + ' PRST');
+                } catch (e) { /* ignore */ }
+
+                // Listen for disconnection events
+                walletProvider.on('disconnect', () => {
+                    disconnectWallet();
+                });
+
+                console.log('✅ Wallet connected:', walletAddress);
+
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                if (error.code === 4001) {
+                    showToast('Rejected', 'You rejected the connection request.', true);
+                } else {
+                    showToast('Error', error.message || 'Failed to connect wallet.', true);
+                }
+                walletProvider = null;
+                ethersProvider = null;
+                signer = null;
+                walletAddress = null;
+            }
+        }
+
+        async function disconnectWallet() {
+            try {
+                if (walletProvider) {
+                    await walletProvider.disconnect();
+                }
+            } catch (e) {
+                console.warn('Disconnect error:', e);
+            } finally {
+                walletProvider = null;
+                ethersProvider = null;
+                signer = null;
+                walletAddress = null;
+                walletStatus.textContent = 'Not Connected';
+                connectBtn.style.display = 'inline-block';
+                disconnectBtn.style.display = 'none';
+                showToast('Disconnected', 'Wallet disconnected.');
+                console.log('🔌 Wallet disconnected');
+            }
+        }
+
+        // Wire up buttons
+        connectBtn.addEventListener('click', connectWallet);
+        disconnectBtn.addEventListener('click', disconnectWallet);
+
+        // Check if library loaded
+        if (typeof window.ethereumProvider === 'undefined') {
+            showToast('Warning', 'WalletConnect library not loaded. Please refresh.', true);
+            connectBtn.disabled = true;
+        }
+
+        // ================================================================
+        //  BLUEHOUND AI (OpenRouter free tier + fallback)
+        // ================================================================
+        const OPENROUTER_KEY = ''; // Never embed API keys in a browser-delivered application.
+
+        async function sendChat() {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            const box = document.getElementById('chatBox');
+            box.innerHTML += `<div class="msg user">🧑 ${msg}</div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            try {
+                let reply;
+                if (window.PrecogAI) {
+                    try {
+                        reply = await window.PrecogAI.chat(msg);
+                    } catch (_) {}
+                }
+                if (!reply && OPENROUTER_KEY) {
+                    const resp = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+                        model: 'mistralai/mistral-7b-instruct:free',
+                        messages: [
+                            { role: 'system',
+                                content: 'You are BlueHound, a cybersecurity AI assistant inspired by the BlueHound blue-team tool (attack-path mapping, crown-jewel focus, edge filtering). Be concise, helpful, and security-focused.' },
+                            { role: 'user', content: msg }
+                        ]
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + OPENROUTER_KEY
+                        }
+                    });
+                    reply = resp.data.choices[0].message.content;
+                }
+                if (!reply) throw new Error('No AI backend available');
+                box.innerHTML += `<div class="msg bot">🐕 BlueHound: ${reply}</div>`;
+            } catch (e) {
+                const fallbacks = [
+                    "That's a great security question. Let me think...",
+                    "I recommend checking your firewall rules and updating all credentials.",
+                    "Have you looked at the latest CVE database for that vulnerability?",
+                    "Always enable 2FA on all critical accounts. It's your first line of defense.",
+                    "Let's analyze that threat together. I'll help you secure your network."
+                ];
+                const reply = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+                box.innerHTML += `<div class="msg bot">🐕 BlueHound: ${reply}</div>`;
+            }
+            box.scrollTop = box.scrollHeight;
+        }
+        window.sendChat = sendChat;
+        document.getElementById('chatInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') sendChat();
+        });
+
+        // ================================================================
+        //  TOOLS (Real APIs)
+        // ================================================================
+
+        async function lookupIP(ip) {
+            try {
+                const resp = await axios.get('https://ip-api.com/json/' + ip, { params: { fields: 'status,country,regionName,city,isp,org,as,query,timezone' } });
+                return resp.data;
+            } catch (e) { return null; }
+        }
+
+        async function checkAbuseIPDB(ip) {
+            try {
+                const resp = await axios.get('https://api.abuseipdb.com/api/v2/check', {
+                    params: { ipAddress: ip, maxAgeInDays: 90 },
+                    headers: { 'Key': 'YOUR_DEMO_KEY_HERE', 'Accept': 'application/json' }
+                });
+                return resp.data;
+            } catch (e) { return null; }
+        }
+
+        async function checkHIBP(email) {
+            try {
+                const resp = await axios.get('https://haveibeenpwned.com/api/v3/breachedaccount/' + encodeURIComponent(email),
+                { headers: { 'hibp-api-key': '' } });
+                return resp.data;
+            } catch (e) {
+                if (e.response && e.response.status === 404) return [];
+                return null;
+            }
+        }
+
+        window.scanIP = async function() {
+            const ip = document.getElementById('scanInput').value.trim();
+            const res = document.getElementById('scanResult');
+            if (!ip) { res.innerHTML = 'Enter an IP.'; return; }
+            res.innerHTML = '⏳ Scanning...';
+            try {
+                const abuse = await checkAbuseIPDB(ip);
+                const geo = await lookupIP(ip);
+                let html = '';
+                if (geo && geo.status === 'success') {
+                    html += `<strong>${ip}</strong> · ${geo.city}, ${geo.country}<br>`;
+                    html += `<span class="label">🏢 ${geo.isp}</span><br>`;
+                }
+                if (abuse && abuse.data) {
+                    const score = abuse.data.abuseConfidenceScore || 0;
+                    const color = score > 50 ? '#ff4466' : score > 20 ? '#ff8833' : '#33ff99';
+                    html += `<span style="color:${color};">⚠️ Abuse Score: ${score}%</span>`;
+                    if (abuse.data.totalReports) html += ` (${abuse.data.totalReports} reports)`;
+                } else {
+                    html += `<span class="label">🔒 No abuse reports</span>`;
+                }
+                res.innerHTML = html;
+            } catch (e) {
+                res.innerHTML = '❌ Error: ' + e.message;
+            }
+        };
+
+        document.getElementById('ipInput').addEventListener('keydown', async function(e) {
+            if (e.key !== 'Enter') return;
+            const ip = this.value.trim();
+            const res = document.getElementById('lookupResult');
+            if (!ip) { res.innerHTML = 'Enter IP.'; return; }
+            res.innerHTML = '⏳ Looking up...';
+            try {
+                const geo = await lookupIP(ip);
+                if (geo && geo.status === 'success') {
+                    let html = `<strong>${geo.query}</strong><br>`;
+                    html += `<span class="label">📍 ${geo.city}, ${geo.regionName}, ${geo.country}</span><br>`;
+                    html += `<span class="label">🏢 ${geo.isp}</span><br>`;
+                    res.innerHTML = html;
+                } else {
+                    res.innerHTML = '❌ IP not found.';
+                }
+            } catch (e) {
+                res.innerHTML = '⚠️ Error: ' + e.message;
+            }
+        });
+
+        window.lookupCVE = async function() {
+            const cve = document.getElementById('cveInput').value.trim();
+            const res = document.getElementById('cveResult');
+            if (!cve || !cve.toUpperCase().startsWith('CVE-')) {
+                res.innerHTML = 'Enter a valid CVE (e.g. CVE-2025-1234)';
+                return;
+            }
+            res.innerHTML = '⏳ Looking up...';
+            try {
+                const resp = await axios.get('https://services.nvd.nist.gov/rest/json/cves/2.0', { params: { cveId: cve
+                            .toUpperCase() } });
+                const vuln = resp.data.vulnerabilities?.[0];
+                if (!vuln) { res.innerHTML = '❌ CVE not found.'; return; }
+                const data = vuln.cve;
+                const score = data.metrics?.cvssMetricV31?.[0]?.cvssData?.baseScore || 'N/A';
+                const severity = data.metrics?.cvssMetricV31?.[0]?.cvssData?.baseSeverity || 'N/A';
+                const desc = data.descriptions?.[0]?.value || 'No description.';
+                let html = `<strong>${data.id}</strong> · CVSS: ${score} (${severity})<br>`;
+                html += `<span class="label">${desc.substring(0, 120)}...</span>`;
+                res.innerHTML = html;
+            } catch (e) {
+                res.innerHTML = '⚠️ Error: ' + e.message;
+            }
+        };
+
+        window.checkBreach = async function() {
+            const email = document.getElementById('breachInput').value.trim();
+            const res = document.getElementById('breachResult');
+            if (!email || !email.includes('@')) {
+                res.innerHTML = 'Enter a valid email.';
+                return;
+            }
+            res.innerHTML = '⏳ Checking...';
+            try {
+                const data = await checkHIBP(email);
+                if (data && data.length > 0) {
+                    const breaches = data.map(b => b.Name).join(', ');
+                    res.innerHTML = `⚠️ Found in ${data.length} breaches: ${breaches}`;
+                } else if (data === null) {
+                    res.innerHTML = '⚠️ API rate limit. Try again.';
+                } else {
+                    res.innerHTML = '✅ No breaches found.';
+                }
+            } catch (e) {
+                res.innerHTML = '⚠️ Error: ' + e.message;
+            }
+        };
+
+
+        // ================================================================
+        //  PRECOG SECURITY v3 — LOCAL-FIRST PERSISTENCE
+        // ================================================================
+        const PRECOG_DB = 'precog-security-v3';
+        const PRECOG_STORE = 'state';
+        const PRECOG_KEY = 'workspace';
+
+        const PrecogPersistence = (() => {
+            let dbPromise;
+
+            function openDB() {
+                if (!('indexedDB' in window)) return Promise.reject(new Error('IndexedDB unavailable'));
+                if (dbPromise) return dbPromise;
+                dbPromise = new Promise((resolve, reject) => {
+                    const req = indexedDB.open(PRECOG_DB, 1);
+                    req.onupgradeneeded = () => {
+                        const db = req.result;
+                        if (!db.objectStoreNames.contains(PRECOG_STORE)) {
+                            db.createObjectStore(PRECOG_STORE);
+                        }
+                    };
+                    req.onsuccess = () => resolve(req.result);
+                    req.onerror = () => reject(req.error);
+                });
+                return dbPromise;
+            }
+
+            async function getState() {
+                try {
+                    const db = await openDB();
+                    return await new Promise((resolve, reject) => {
+                        const tx = db.transaction(PRECOG_STORE, 'readonly');
+                        const req = tx.objectStore(PRECOG_STORE).get(PRECOG_KEY);
+                        req.onsuccess = () => resolve(req.result || {});
+                        req.onerror = () => reject(req.error);
+                    });
+                } catch (_) {
+                    try { return JSON.parse(localStorage.getItem('precog-state') || '{}'); }
+                    catch (_) { return {}; }
+                }
+            }
+
+            async function putEmulatorState(state) {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(PRECOG_STORE, 'readwrite');
+                    tx.objectStore(PRECOG_STORE).put(state, 'emulator-state');
+                    tx.oncomplete = resolve;
+                    tx.onerror = () => reject(tx.error);
+                });
+            }
+            async function getEmulatorState() {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(PRECOG_STORE, 'readonly');
+                    const req = tx.objectStore(PRECOG_STORE).get('emulator-state');
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => reject(req.error);
+                });
+            }
+            async function clearEmulatorState() {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction(PRECOG_STORE, 'readwrite');
+                    tx.objectStore(PRECOG_STORE).delete('emulator-state');
+                    tx.oncomplete = resolve;
+                    tx.onerror = () => reject(tx.error);
+                });
+            }
+
+            async function putState(state) {
+                const clean = JSON.parse(JSON.stringify(state));
+                try {
+                    const db = await openDB();
+                    await new Promise((resolve, reject) => {
+                        const tx = db.transaction(PRECOG_STORE, 'readwrite');
+                        tx.objectStore(PRECOG_STORE).put(clean, PRECOG_KEY);
+                        tx.oncomplete = resolve;
+                        tx.onerror = () => reject(tx.error);
+                    });
+                } catch (_) {
+                    localStorage.setItem('precog-state', JSON.stringify(clean));
+                }
+                return clean;
+            }
+
+            function uiState() {
+                const windows = {};
+                document.querySelectorAll('.window').forEach(w => {
+                    windows[w.id] = {
+                        active: w.classList.contains('active'),
+                        left: w.style.left,
+                        top: w.style.top,
+                        width: w.style.width,
+                        height: w.style.height
+                    };
+                });
+                return {
+                    version: 3,
+                    savedAt: new Date().toISOString(),
+                    windows,
+                    activeApp: document.querySelector('.dock .icon.active')?.dataset.app || 'android',
+                    androidZoomLevel,
+                    chat: document.getElementById('chatBox')?.innerHTML || '',
+                    inputs: [...document.querySelectorAll('input[id]')].reduce((a, el) => {
+                        a[el.id] = el.value; return a;
+                    }, {}),
+                    wallet: {
+                        address: walletAddress || null,
+                        chainId: CHAIN_ID
+                    },
+                    settings: {
+                        theme: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()
+                    }
+                };
+            }
+
+            async function save() {
+                const state = uiState();
+                await putState(state);
+                const badge = document.getElementById('emulatorStateBadge');
+                if (badge) badge.textContent = 'LOCAL STATE SAVED · ' + new Date().toLocaleTimeString();
+                return state;
+            }
+
+            async function restore() {
+                const state = await getState();
+                if (!state || !state.version) {
+                    window.showToast('Persistence', 'No saved Precog workspace found.');
+                    return false;
+                }
+
+                if (state.windows) {
+                    Object.entries(state.windows).forEach(([id, s]) => {
+                        const w = document.getElementById(id);
+                        if (!w) return;
+                        if (s.left) w.style.left = s.left;
+                        if (s.top) w.style.top = s.top;
+                        if (s.width) w.style.width = s.width;
+                        if (s.height) w.style.height = s.height;
+                        w.classList.toggle('active', !!s.active);
+                    });
+                }
+
+                if (typeof state.androidZoomLevel === 'number') {
+                    androidZoomLevel = state.androidZoomLevel;
+                    applyAndroidZoom();
+                }
+
+                if (state.chat && document.getElementById('chatBox')) {
+                    document.getElementById('chatBox').innerHTML = state.chat;
+                }
+
+                Object.entries(state.inputs || {}).forEach(([id, value]) => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = value;
+                });
+
+                const app = state.activeApp || 'android';
+                document.querySelectorAll('.dock .icon').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.dock .icon[data-app="${app}"]`)?.classList.add('active');
+
+                document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
+                document.getElementById('win-' + app)?.classList.add('active');
+
+                const badge = document.getElementById('emulatorStateBadge');
+                if (badge) badge.textContent = 'LOCAL STATE RESTORED · ' + new Date().toLocaleTimeString();
+                window.showToast('Restored', 'Precog workspace restored from local storage.');
+                return true;
+            }
+
+            async function snapshot() {
+                await save();
+                window.showToast('Saved', 'Precog workspace snapshot saved locally.');
+            }
+
+            async function exportBackup() {
+                const state = await save();
+                const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'precog-security-backup.json';
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+            }
+
+            async function importBackup(file) {
+                const text = await file.text();
+                const state = JSON.parse(text);
+                if (!state || state.version !== 3) throw new Error('Unsupported Precog backup');
+                await putState(state);
+                await restore();
+            }
+
+            let timer;
+            function schedule() {
+                clearTimeout(timer);
+                timer = setTimeout(save, 350);
+            }
+
+            return {save, restore, snapshot, exportBackup, importBackup, schedule, putEmulatorState, getEmulatorState, clearEmulatorState};
+        })();
+
+        // Save UI changes automatically.
+        document.addEventListener('click', () => PrecogPersistence.schedule());
+        window.addEventListener('beforeunload', () => {
+            // Best-effort synchronous fallback for the last UI snapshot.
+            try { localStorage.setItem('precog-state-last', JSON.stringify({
+                version: 3, savedAt: new Date().toISOString(),
+                activeApp: document.querySelector('.dock .icon.active')?.dataset.app || 'android',
+                androidZoomLevel
+            })); } catch (_) {}
+        });
+
+        // ================================================================
+        //  EIP-1193 WALLET BRIDGE
+        // ================================================================
+        async function connectInjectedWallet() {
+            if (!window.ethereum) return false;
+            try {
+                const accounts = await window.ethereum.request({method:'eth_requestAccounts'});
+                if (!accounts?.length) return false;
+
+                walletAddress = accounts[0];
+                ethersProvider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+                signer = ethersProvider.getSigner();
+
+                const network = await ethersProvider.getNetwork();
+                walletStatus.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
+                connectBtn.style.display = 'none';
+                disconnectBtn.style.display = 'inline-block';
+
+                await PrecogPersistence.save();
+                showToast('Connected', 'Injected wallet: ' + walletAddress.slice(0,10) + '...');
+                console.log('Precog EIP-1193 wallet:', walletAddress, network.chainId);
+                return true;
+            } catch (e) {
+                console.error(e);
+                showToast('Wallet Error', e.message || 'Wallet connection failed.', true);
+                return false;
+            }
+        }
+
+        if (window.ethereum) {
+            window.ethereum.on?.('accountsChanged', async accounts => {
+                if (!accounts?.length) {
+                    await disconnectWallet();
+                } else {
+                    walletAddress = accounts[0];
+                    walletStatus.textContent = walletAddress.slice(0,6) + '...' + walletAddress.slice(-4);
+                    await PrecogPersistence.save();
+                }
+            });
+            window.ethereum.on?.('chainChanged', async () => {
+                await PrecogPersistence.save();
+                showToast('Network Changed', 'Wallet network changed.');
+            });
+        }
+
+        // Prefer an injected wallet for single-file/browser-native operation;
+        // fall back to the existing WalletConnect implementation.
+        const originalConnectWallet = connectWallet;
+        connectWallet = async function() {
+            if (await connectInjectedWallet()) return;
+            return originalConnectWallet();
+        };
+
+        // ================================================================
+        //  V86 ANDROID RUNTIME — LOCAL DISK + INDEXEDDB STATE
+        // ================================================================
+        const PrecogEmulator = (() => {
+            const A = './assets/';
+            let emulator = null;
+            let booted = false;
+            let autosaveTimer = null;
+
+            function status(text, ok=false) {
+                const el = document.getElementById('emulatorStateBadge');
+                if (el) {
+                    el.textContent = text;
+                    el.style.color = ok ? '#33ff99' : '#ffcc66';
+                }
+            }
+
+            function loadScript(src) {
+                return new Promise((resolve, reject) => {
+                    const existing = document.querySelector(`script[data-v86="${src}"]`);
+                    if (existing) return existing.dataset.loaded === '1' ? resolve() : existing.addEventListener('load', resolve, {once:true});
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.dataset.v86 = src;
+                    script.onload = () => { script.dataset.loaded='1'; resolve(); };
+                    script.onerror = () => reject(new Error('Unable to load v86 runtime: ' + src));
+                    document.head.appendChild(script);
+                });
+            }
+
+            async function loadState() {
+                try {
+                    const state = await PrecogPersistence.getEmulatorState?.();
+                    return state || null;
+                } catch (e) { console.warn('No emulator state:', e); return null; }
+            }
+
+            function start() {
+                return loadScript(A + 'libv86.js').then(async () => {
+                    if (!window.V86Starter && !window.V86) throw new Error('v86 library loaded but V86 API was not found');
+                    const Runtime = window.V86Starter || window.V86;
+                    const screen = document.getElementById('androidRuntime');
+                    screen.innerHTML = `<div id="screen_container" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000"><div style="white-space:pre;font:14px monospace;line-height:14px;color:#8fb8d8"></div><canvas style="display:none"></canvas></div>`;
+                    status('STARTING ANDROID…');
+                    emulator = new Runtime({
+                        wasm_path: A + 'v86.wasm',
+                        memory_size: 128 * 1024 * 1024,
+                        vga_memory_size: 8 * 1024 * 1024,
+                        screen_container: document.getElementById('screen_container'),
+                        bios: { url: A + 'seabios.bin' },
+                        vga_bios: { url: A + 'vgabios.bin' },
+                        hda: { url: A + 'android-x86-4.4-r2.img', async: true },
+                        autostart: true,
+                        disable_mouse: false,
+                        disable_keyboard: false,
+                    });
+                    booted = true;
+                    status('ANDROID RUNTIME ACTIVE', true);
+                    applyAndroidZoom();
+                    const saved = await loadState();
+                    if (saved) {
+                        status('RESTORING ANDROID STATE…');
+                        await new Promise((resolve, reject) => emulator.restore_state(saved, err => err ? reject(err) : resolve()));
+                        status('ANDROID STATE RESTORED', true);
+                    }
+                    clearInterval(autosaveTimer);
+                    autosaveTimer = setInterval(() => save(), 60000);
+                    return emulator;
+                }).catch(err => {
+                    console.error(err);
+                    status('RUNTIME ASSETS NOT FOUND');
+                    const badge = document.getElementById('emulatorStateBadge');
+                    if (badge) badge.title = 'Place libv86.js, v86.wasm, seabios.bin, vgabios.bin and android-x86-4.4-r2.img in ./assets/';
+                });
+            }
+
+            async function save() {
+                if (!emulator || !booted || !emulator.save_state) return false;
+                status('SAVING ANDROID STATE…');
+                return new Promise(resolve => {
+                    emulator.save_state(async (error, state) => {
+                        if (error) { console.error(error); status('SAVE FAILED'); return resolve(false); }
+                        try {
+                            await PrecogPersistence.putEmulatorState?.(state);
+                            status('ANDROID STATE SAVED · ' + new Date().toLocaleTimeString(), true);
+                            resolve(true);
+                        } catch (e) { console.error(e); status('SAVE FAILED'); resolve(false); }
+                    });
+                });
+            }
+
+            async function restore() {
+                if (!emulator) return start();
+                const state = await loadState();
+                if (!state) return window.showToast('Emulator', 'No Android snapshot exists yet.');
+                emulator.stop();
+                await new Promise((resolve, reject) => emulator.restore_state(state, err => err ? reject(err) : resolve()));
+                emulator.run();
+                status('ANDROID STATE RESTORED', true);
+            }
+
+            async function reset() {
+                if (emulator) { try { emulator.stop(); } catch(_){} emulator = null; }
+                await PrecogPersistence.clearEmulatorState?.();
+                location.reload();
+            }
+
+            window.addEventListener('pagehide', () => { try { save(); } catch(_){} });
+            return {start, save, restore, reset};
+        })();
+
+        // ================================================================
+        //  ATTACK PATH — BlueHound-inspired threat mapping
+        //  Combines host reputation/exposure (ip-api) + crown-jewel focus
+        //  to reveal the paths an attacker would take (edge-filter, C2, pivot).
+        // ================================================================
+        function isPrivateIP(ip) {
+            const p = ip.split('.').map(Number);
+            if (p.length !== 4 || p.some(isNaN)) return false;
+            return (p[0] === 10) ||
+                (p[0] === 172 && p[1] >= 16 && p[1] <= 31) ||
+                (p[0] === 192 && p[1] === 168) ||
+                (p[0] === 127) || (p[0] === 0) || (p[0] === 169 && p[1] === 254);
+        }
+
+        function exposureScore(geo) {
+            // BlueHound-style risk proxy: internet-facing + commercial hosting = more exposed.
+            if (!geo || geo.status !== 'success') return { score: 20, label: 'unknown', color: '#88bbdd' };
+            if (isPrivateIP(geo.query)) return { score: 10, label: 'internal', color: '#33ff99' };
+            const hosting = /(amazon|aws|microsoft|azure|google|gcp|digitalocean|ovh|linode|hetzner|cloudflare|alphabet)/i.test(geo.isp || '');
+            const score = hosting ? 95 : 60;
+            return { score, label: hosting ? 'cloud / hosting' : (geo.isp || 'residential'), color: hosting ? '#ff4466' : '#ff8833' };
+        }
+
+        window.mapAttackPath = async function() {
+            const start = document.getElementById('pathStartInput').value.trim();
+            const jewels = document.getElementById('pathJewelsInput').value.split(',').map(s => s.trim()).filter(Boolean);
+            const res = document.getElementById('pathMapResult');
+            if (!start || jewels.length === 0) {
+                res.innerHTML = '<span class="label">⚠️ Provide a start host AND at least one crown jewel.</span>';
+                return;
+            }
+            res.innerHTML = '<span class="label">⏳ Mapping attack paths…</span>';
+            try {
+                const startGeo = await lookupIP(start);
+                const rows = [];
+                for (const jewel of jewels) {
+                    const g = await lookupIP(jewel);
+                    const s = exposureScore(g);
+                    rows.push({ jewel, geo: g && g.status === 'success' ? `${g.city || '?'}, ${g.country || '?'}` : 'unresolved', score: s.score, label: s.label, color: s.color });
+                }
+                let html = '<div style="font-size:0.6rem;margin-bottom:0.3rem;"><strong>Entry point:</strong> ' +
+                    (startGeo && startGeo.status === 'success' ? `${start} · ${startGeo.isp || ''}` : start) +
+                    ' <em>(assumed compromised / external)</em></div>';
+                rows.forEach(r => {
+                    const risk = r.score >= 85 ? 'HIGH' : r.score >= 50 ? 'MED' : 'LOW';
+                    html += `<div style="display:flex;align-items:center;gap:0.4rem;padding:0.25rem 0;border-top:1px solid var(--border);">
+                        <i class="fas fa-chevron-right" style="color:var(--accent);"></i>
+                        <span style="min-width:70px;font-family:monospace;">${r.jewel}</span>
+                        <span class="label">${r.geo}</span>
+                        <span style="margin-left:auto;font-weight:600;color:${r.color};">${r.label} · ${risk} (${r.score})</span>
+                    </div>`;
+                });
+                const avg = Math.round(rows.reduce((a, b) => a + b.score, 0) / rows.length);
+                html += `<div style="margin-top:0.4rem;font-size:0.6rem;color:var(--accent);">
+                    <i class="fas fa-crown"></i> Crown-jewel exposure: ${avg}/100 — prioritize hardening the <strong>${avg >= 85 ? 'internet-facing' : 'highest-scored'}</strong> hosts first, BlueHound-style.</div>`;
+                res.innerHTML = html;
+            } catch (e) {
+                res.innerHTML = '❌ Error: ' + e.message;
+            }
+        };
+
+        // ================================================================
+        //  LOCAL AI CONFIG — NO SECRET KEYS
+        // ================================================================
+        window.PrecogAI = {
+            endpoint: localStorage.getItem('precog-ai-endpoint') || 'http://localhost:11434',
+            model: localStorage.getItem('precog-ai-model') || 'qwen2.5-coder:7b',
+            async chat(message) {
+                const r = await fetch(this.endpoint.replace(/\/$/, '') + '/api/chat', {
+                    method:'POST',
+                    headers:{'Content-Type':'application/json'},
+                    body:JSON.stringify({
+                        model:this.model,
+                        messages:[
+                            {role:'system',content:'You are BlueHound, a defensive cybersecurity assistant inspired by the BlueHound blue-team tool (attack-path mapping, crown-jewel focus, edge filtering). Be concise and safety-focused.'},
+                            {role:'user',content:message}
+                        ],
+                        stream:false
+                    })
+                });
+                if (!r.ok) throw new Error('Local AI HTTP ' + r.status);
+                const data = await r.json();
+                return data.message?.content || '';
+            }
+        };
+
+        // Persist after typing into important fields.
+        document.addEventListener('input', () => PrecogPersistence.schedule());
+
+        // ================================================================
+        //  INIT
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            openWindow('android');
+            PrecogEmulator.start();
+            PrecogPersistence.restore().catch(e => console.warn('Restore failed:', e));
+            if (window.ethereum) {
+                connectBtn.disabled = false;
+                connectBtn.title = 'Connect browser wallet';
+            }
+            showToast('Precog Security', 'BlueHound OS ready. Local persistence enabled.');
+            console.log('🛡️ Precog Security v3 – Local v86 Android runtime + IndexedDB persistence.');
+        });
+    </script>
+<input id="precogBackupInput" type="file" accept="application/json" hidden>
+<script>
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+    e.preventDefault();
+    PrecogPersistence.snapshot();
+  }
+});
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', async e => {
+  e.preventDefault();
+  const file = e.dataTransfer?.files?.[0];
+  if (file?.name.endsWith('.json')) {
+    try { await PrecogPersistence.importBackup(file); }
+    catch (err) { showToast('Import Error', err.message, true); }
+  }
+});
+</script>
+</body>
+</html>

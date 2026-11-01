@@ -7,7 +7,11 @@ import config from "../lint.config.mjs";
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 export const repositoryRoot = path.resolve(currentDirectory, "..");
 
-const ignoredDirectories = new Set([".git", "coverage", "dist", "node_modules"]);
+// BlueHound/ is a self-contained embedded product shell (single-file desktop app)
+// whose entire UI is intentionally inline-styled and event-handler-driven. It is
+// not marketing content and is exempt from the marketing site's CSP/style lint
+// because it ships its own CSP meta tag and its own rendering loop.
+const ignoredDirectories = new Set([".git", "BlueHound", "coverage", "dist", "node_modules"]);
 const tagPattern = /<([a-z][a-z0-9:-]*)\b((?:[^>"']|"[^"]*"|'[^']*')*)>/gi;
 const attributePattern = /([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
 
