@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self';">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="One-page attack surface & subdomain recon cheat sheet: passive recon methodology, do/don't, scope/legal guardrails, pricing. PreCog Security.">
+  <title>Attack Surface & Subdomain Recon Cheat Sheet — PreCog Security</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#content" class="skip">Skip to content</a>
+  <div class="page" id="content">
+    <header>
+      <div>
+        <h1>Attack Surface &amp; Subdomain Recon — Cheat Sheet</h1>
+        <p class="sub">Any internet-facing business · Seed-stage to 500 employees · PreCog Security swarm · Advisory only, not a pen test</p>
+      </div>
+      <div class="sub" class="as">1 page · printable A4<br>Strategy A: artefact first</div>
+    </header>
+
+    <div class="cols">
+      <div>
+        <h2>What it is (and isn't)</h2>
+        <p>An <strong>external attack-surface report</strong> is a dated, scoped inventory of everything the internet can see tied to your brand/domain, with prioritized fixes. It is <strong>not</strong> a penetration test, certification, or audit opinion. PreCog identifies and prioritizes exposure; we never exploit, authenticate with found secrets, or alter your systems.</p>
+
+        <h2>Passive recon methodology (no exploitation)</h2>
+        <ol>
+          <li><strong>Scope &amp; authorization</strong> — signed authorization, domain ownership proof, ops-scope entry, agreed asset list. No collection before this.</li>
+          <li><strong>DNS &amp; zone evidence</strong> — A/AAAA/CNAME/MX/TXT, subdomain candidate lists, wildcard detection.</li>
+          <li><strong>Certificate Transparency (CT) logs</strong> — SANs, forgotten/preview hosts, issuance history. Highest-yield, lowest-risk source.</li>
+          <li><strong>Public search operators</strong> — indexed references to domain/brand in repos, gists, pastes, docs.</li>
+          <li><strong>Service fingerprinting (passive)</strong> — HTTP headers/banners on known paths, TLS handshake only. No login attempts.</li>
+          <li><strong>TLS &amp; certificate hygiene</strong> — version/cipher, chain, expiry, SAN, HSTS, redirect correctness.</li>
+          <li><strong>Correlation &amp; attribution</strong> — dedupe assets, attribute to your estate, separate in-scope vs out-of-scope.</li>
+          <li><strong>Secret reference triage</strong> — locate lept leaks (paths/locators) but <em>never</em> store or use live values.</li>
+          <li><strong>Prioritized reporting</strong> — P1/P2/P3 with owner hints, effort, verification steps + methodology appendix.</li>
+        </ol>
+
+        <h2>Do / don't (scope discipline)</h2>
+        <ul>
+          <li class="mono">DO: get written authorization + ownership proof first.</li>
+          <li class="mono">DO: enumerate via passive sources (DNS, CT, search) first.</li>
+          <li class="mono">DO: treat any unknown host as a finding, not a target.</li>
+          <li class="mono">DO: report secret locators/previews only — never values.</li>
+          <li class="mono">DO: stop at the scope boundary; report, don't pursue.</li>
+          <li class="mono">DON'T: brute-force subdomains or directories without authorization.</li>
+          <li class="mono">DON'T: attempt login, auth, or use of found creds.</li>
+          <li class="mono">DON'T: pivot into third-party assets or tenants.</li>
+          <li class="mono">DON'T: store/transmit/use live secret values.</li>
+          <li class="mono">DON'T: claim "certified secure" — it's a dated, scoped review.</li>
+        </ul>
+
+        <h2>Scope &amp; Legal guardrails</h2>
+        <div class="danger">
+          <strong>Authorization required — always.</strong> No collection without written authorization + domain ownership proof, recorded as an ops-scope entry. Out-of-scope assets become findings, not targets — no third-party pivot. No active scanning/exploitation without a separately scoped engagement.
+        </div>
+        <ul>
+          <li>Lawful only (incl. applicable anti-hacking statutes).</li>
+          <li>Coordinated disclosure if third-party data is encountered.</li>
+          <li>Never store/transmit/live-use of exposed credentials.</li>
+          <li>Advisory only — not legal advice, pen test, or audit.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h2>What ships in the $199 report</h2>
+        <ul>
+          <li><strong>Subdomain inventory</strong> — known + discovered hosts, status, suspected owner, in-inventory flag.</li>
+          <li><strong>Exposed services &amp; tech stack</strong> — ports, services, banners, fingerprints (passive).</li>
+          <li><strong>Leaked secret preview</strong> — redacted references only, with locators &amp; rotation actions.</li>
+          <li><strong>Certificate &amp; TLS hygiene</strong> — expiry, chain, ciphers, HSTS, SAN, redirects.</li>
+          <li><strong>Prioritized fixes</strong> — P1 (this week) / P2 (month) / P3 (program) with effort + owner hints.</li>
+          <li><strong>Methodology appendix</strong> — sources, timestamps, scope, limits (evidence-grade).</li>
+          <li><strong>Walkthrough call</strong> included.</li>
+        </ul>
+
+        <h2>Pricing (explicit, USD)</h2>
+        <table>
+          <tr><th>Tier</th><th>Price</th></tr>
+          <tr><td><strong>Attack Surface Report</strong> <span class="tag">Start here</span></td><td class="price">$199 (one-off, fixed)</td></tr>
+          <tr><td><strong>Continuous Monitoring</strong></td><td class="price">$79/mo (cancel any time)</td></tr>
+        </table>
+        <p><strong>Report:</strong> ~5 business days from authorization to PDF. <strong>Continuous:</strong> monthly re-scan — new/changed subdomains, service drift, fresh secret references, cert expiry alerts, short delta report.</p>
+        <p class="warn"><strong>No payment rail is activated by this page.</strong> Terms agreed in the MSA before work begins; contact us to arrange.</p>
+
+        <h2>Common "forgotten asset" classes</h2>
+        <ul>
+          <li>CT-log hosts with no DNS record (e.g., <code>admin-staging</code>).</li>
+          <li>Dormant <code>preview-N</code> build hosts.</li>
+          <li>Dev sandboxes live without auth.</li>
+          <li>Abandoned promo/lander pages still ingesting PII.</li>
+          <li>Legacy WP/blog estates.</li>
+          <li>Unmanaged metrics/Grafana endpoints.</li>
+          <li>Expired certs breaking SDKs/SSO.</li>
+        </ul>
+
+        <h2>Process timeline</h2>
+        <table>
+          <tr><th>Phase</th><th>Duration</th></tr>
+          <tr><td>Scope &amp; authorization</td><td>Day 0–1</td></tr>
+          <tr><td>Passive / authorized recon</td><td>Day 1–3</td></tr>
+          <tr><td>Triage &amp; correlation</td><td>Day 3–4</td></tr>
+          <tr><td>Report &amp; handover</td><td>Day 4–5</td></tr>
+          <tr><td>Continuous re-scan</td><td>Monthly</td></tr>
+        </table>
+
+        <h2>Important disclaimers</h2>
+        <p class="warn">PreCog Security is advisory. This cheat sheet is not legal advice, a pen test, an audit, or a certification. Coverage depends on public/authorized sources; we do not guarantee completeness or absence of unknown assets. Client data never shared or sold.</p>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div>© 2026 PreCog Security swarm · Client data never shared or sold.</div>
+      <div>Contact: <strong>timlangeveldt@gmail.com</strong> · Ask for the redacted sample report + authorization checklist.</div>
+    </div>
+  </div>
+</body>
+</html>

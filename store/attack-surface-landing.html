@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self';">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Attack Surface & Subdomain Recon Report for any internet-facing business. Redacted sample, subdomain inventory, exposed services, leaked secret preview, TLS/cert hygiene, prioritized fixes. From PreCog Security.">
+  <title>Attack Surface &amp; Subdomain Recon Report — PreCog Security</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a href="#main" class="skip">Skip to content</a>
+  <header class="site">
+    <div class="wrap nav" role="navigation" aria-label="Primary">
+      <div class="brand">PreCog <span>Security</span></div>
+      <a class="cta-small" href="mailto:timlangeveldt@gmail.com?subject=Attack%20Surface%20Report%20-%20request%20redacted%20sample">Request the redacted sample</a>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero">
+      <div class="wrap">
+        <span class="eyebrow">Cross-sector · Any internet-facing business · Seed-stage to 500 employees</span>
+        <h1>See your entire internet-facing footprint before attackers do.</h1>
+        <p class="lead">The Attack Surface &amp; Subdomain Recon Report maps every subdomain, exposed service, leaked credential reference, and certificate weakness tied to your domain — delivered as a branded PDF with prioritized fixes and an evidence-grade methodology appendix. Strategy A: a redacted sample first, then work begins.</p>
+        <div class="hero-cta">
+          <a class="btn" href="mailto:timlangeveldt@gmail.com?subject=Attack%20Surface%20Report%20-%20book%20%24199%20scan">Book the $199 report</a>
+          <a class="btn secondary" href="#pricing">See pricing</a>
+        </div>
+        <p class="note"><strong>Authorization required.</strong> We only scan domains you own or control with written authorization. No active exploitation, no third-party pivot. See <a href="#guardrails">Scope &amp; Legal guardrails</a>.</p>
+        <div class="badge-row" aria-label="Highlights">
+          <span class="badge">Passive recon + authorized scope only</span>
+          <span class="badge">Subdomains · services · secrets · TLS · certs</span>
+          <span class="badge">Redacted sample delivered before you pay</span>
+          <span class="badge">Evidence-grade methodology appendix</span>
+          <span class="badge">Strategy A: artefact first</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="problem">
+      <div class="wrap">
+        <h2>Your attack surface grows quietly.</h2>
+        <p class="sub">A staging subdomain spun up for a sprint, a forgotten marketing micro-site, a certificate that expired last Tuesday, a secret committed to a public repo six months ago — none of these show up in your SaaS dashboard, and all of them are findable by anyone with a search bar.</p>
+        <div class="kpi">
+          <div class="card"><div class="num">Day 0</div><div class="lbl">new subdomains appear with every launch, hire, or vendor</div></div>
+          <div class="card"><div class="num">$199</div><div class="lbl">fixed-fee one-off report</div></div>
+          <div class="card"><div class="num">5 days</div><div class="lbl">typical turnaround from authorization to PDF</div></div>
+        </div>
+        <div class="grid cols-2">
+          <div class="card"><h3>You can't defend what you can't inventory.</h3><p>Most teams don't know their full hostname footprint, which ports are open on the edge, or which credentials have leaked publicly. Unknown assets don't get patched, monitored, or scoped into your program.</p></div>
+          <div class="card"><h3>You don't need another tool license.</h3><p>You need a bounded, one-time, human-reviewed report that tells you what's out there, what's exposed, and what to fix first — with proof you can hand to a customer, insurer, or auditor.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="included">
+      <div class="wrap">
+        <h2>What's in the report</h2>
+        <p class="sub">Delivered as a branded PDF plus an evidence/appendix pack. All findings are attributed to your scoped domain with reproduction notes (passive, authorized methods only).</p>
+        <div class="grid cols-3">
+          <div class="card"><h3>Subdomain inventory</h3><p>Enumerated hosts tied to your apex domain and brand — including forgotten, staging, and vendor-hosted subdomains — with first-seen and resolution status.</p></div>
+          <div class="card"><h3>Exposed services &amp; tech stack</h3><p>Ports, services, banners, and technology fingerprints visible from the internet, flagged where they're unnecessary, outdated, or admin-facing.</p></div>
+          <div class="card"><h3>Leaked secret preview</h3><p>Redacted references to credentials, API keys, tokens, and configs found in public repositories and paste sites — previews only, never full live secrets.</p></div>
+          <div class="card"><h3>Certificate hygiene</h3><p>TLS version/cipher posture, certificate expiry, chain validity, SAN coverage, weak or expired certs, misconfigured redirects and mixed content.</p></div>
+          <div class="card"><h3>Prioritized fixes</h3><p>Severity-ranked remediation list (P1–P3) with owner hints, effort, and verification steps. Written for engineers and for exec summaries.</p></div>
+          <div class="card"><h3>Methodology appendix</h3><p>Evidence-grade notes on sources, timestamps, scope, and limits — so the report is defensible to customers, insurers, and auditors.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="process">
+      <div class="wrap">
+        <h2>How an engagement runs</h2>
+        <p class="sub">Fixed scope, agreed in writing before any data collection. Advisory only — we identify and prioritize; we never exploit, alter, or store live secrets.</p>
+        <div class="timeline">
+          <div class="step"><div class="w">Day 0–1</div><h4>Scope &amp; authorization</h4><p>Written authorization, domain ownership proof, ops-scope entry, and an agreed asset list. No collection before this.</p></div>
+          <div class="step"><div class="w">Day 1–3</div><h4>Passive / authorized recon</h4><p>Subdomain enumeration, DNS, certificate transparency, public-repo and paste-site secret references, service fingerprinting — all within authorized scope.</p></div>
+          <div class="step"><div class="w">Day 3–4</div><h4>Triage &amp; correlation</h4><p>Deduplicate, attribute assets to your estate, rank by real-world exposure and exploitability context (no exploitation).</p></div>
+          <div class="step"><div class="w">Day 4–5</div><h4>Report &amp; handover</h4><p>Branded PDF with exec summary, inventories, secret previews, cert hygiene, prioritized fixes, and methodology appendix. Walkthrough call included.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="guardrails" aria-labelledby="guardrails-title">
+      <div class="wrap">
+        <h2 id="guardrails-title">Scope &amp; Legal guardrails</h2>
+        <p class="sub">This is a legal boundary, not a disclaimer footer. Read it before booking.</p>
+        <div class="guard">
+          <h3>Authorization required — always</h3>
+          <ul>
+            <li><strong>Written authorization &amp; domain ownership proof</strong> (DNS TXT, registrar confirmation, or org domain control) are required before any collection begins, and are recorded as an ops-scope entry.</li>
+            <li><strong>Authorized scope only.</strong> We scan only assets you own or control. Assets discovered outside scope become findings; the work stops there — no third-party pivot.</li>
+            <li><strong>No active scanning without authorization.</strong> Recon is passive/authorized by default. Any active, intrusive, or authenticated testing requires a separately scoped and signed engagement.</li>
+            <li><strong>No exploitation, ever.</strong> We never exploit a vulnerability, authenticate with found credentials, or access live data. Found secrets are reported as redacted previews; we never store, transmit, or use live secret values.</li>
+            <li><strong>Coordinated disclosure.</strong> If a finding exposes third-party data (e.g., a partner's assets or another customer's data), we coordinate responsible disclosure per our MSA rather than silently reporting it to you.</li>
+            <li><strong>Lawful only.</strong> All work stays inside the applicable legal framework (including applicable anti-hacking statutes). Asset discovery for unscoped targets is reported as out-of-scope, not pursued.</li>
+            <li><strong>Advisory only.</strong> A recon report is not a penetration test, not a certified assessment, and not legal advice. Coverage depends on public/authorized sources; we do not guarantee completeness or absence of unknown assets.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="pricing">
+      <div class="wrap">
+        <h2>Pricing — explicit, fixed where stated</h2>
+        <p class="sub">All USD. Advisory services only; payment terms agreed in the MSA before work begins. No payment rail is activated by this page; contact us to arrange terms.</p>
+        <table class="pricing" role="table" aria-label="Attack Surface &amp; Subdomain Recon Report pricing">
+          <thead><tr><th scope="col">Tier</th><th scope="col">Price</th><th scope="col">What you get</th></tr></thead>
+          <tbody>
+            <tr class="featured">
+              <td><strong>Attack Surface Report</strong><br><span class="as">One-off, fixed fee</span> <span class="tag">Most popular</span></td>
+              <td class="price">$199</td>
+              <td>Full subdomain inventory, exposed services &amp; tech stack, leaked-secret preview (redacted), certificate/TLS hygiene, prioritized fix list (P1–P3), walkthrough call, and evidence-grade methodology appendix. Turnaround ~5 business days from authorization.</td>
+            </tr>
+            <tr>
+              <td><strong>Continuous Monitoring</strong><br><span class="as">Monthly retainer</span></td>
+              <td class="price">$79<span class="as">/mo</span></td>
+              <td>Monthly re-scan of the scoped footprint: new/changed subdomains, drift in exposed services, new leaked-secret references, cert expiry alerts, and a short delta report. Cancel any time; no long-term lock-in.</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="note" class="as">Most teams start with the $199 report to see the unknown, then add $79/mo monitoring to keep the footprint honest.</p>
+      </div>
+    </section>
+
+    <section id="faq" class="faq">
+      <div class="wrap">
+        <h2>Questions buyers ask</h2>
+        <details><summary>Is this a penetration test?</summary><p>No. This is passive, authorized reconnaissance and asset inventory. We identify and prioritize exposure; we do not exploit vulnerabilities, attempt intrusion, or alter your systems. Active testing requires a separately scoped engagement.</p></details>
+        <details><summary>What do you need from me to start?</summary><p>Written authorization naming the in-scope domains, proof you own or control them, and an agreed asset list. We record this as an ops-scope entry before any data collection. Typical onboarding completes in one business day.</p></details>
+        <details><summary>Do you store secrets you find?</summary><p>No. Found secrets are reported as redacted previews with enough context to locate and rotate them (file path, line range, commit hash). We never store, transmit, or use live secret values; full engagement runs under NDA and MSA with a liability cap.</p></details>
+        <details><summary>What if a secret or asset belongs to someone else?</summary><p>We stop. Anything outside your scoped estate is reported as out-of-scope. If a finding exposes third-party data, we coordinate responsible disclosure per the MSA rather than pursue it.</p></details>
+        <details><summary>How complete can a one-off report be?</summary><p>Completeness depends on public and authorized sources plus your confirmed asset list. We document scope, sources, timestamps, and limits in the methodology appendix. We do not promise zero unknown assets or guarantee absence of future exposure.</p></details>
+        <details><summary>Can I use this for compliance or insurance?</summary><p>Yes as evidence of a dated, scoped attack-surface review and remediation tracking. It is not a certification or audit opinion; share it alongside your control evidence. Have counsel review how you represent it.</p></details>
+        <details><summary>Strategy A — artefact first</summary><p>Before any commitment, we send the redacted sample report for a fictional domain so you can judge the format and depth. Confirmation first, then work begins.</p></details>
+      </div>
+    </section>
+
+    <section class="cta-block" id="contact">
+      <div class="wrap">
+        <h2>See the redacted sample before you decide.</h2>
+        <p class="sub" class="as">Email us and we'll send the redacted sample report for a fictional domain, the authorization checklist, and a slot to scope your in-scope assets.</p>
+        <a class="btn" href="mailto:timlangeveldt@gmail.com?subject=Attack%20Surface%20Report%20-%20send%20redacted%20sample">Email timlangeveldt@gmail.com</a>
+        <p class="note">PreCog Security swarm · Advisory only · Not legal advice · No active scanning or exploitation without authorization · Client data never shared or sold.</p>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div class="wrap row">
+      <div>© 2026 PreCog Security — swarm-operated. Advisory services only.</div>
+      <div>Secured-storage policy: client data never shared or sold. No payment rail activated by this page.</div>
+    </div>
+  </footer>
+</body>
+</html>
