@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://api.github.com https://console.algora.io https://api.opire.dev https://openrouter.ai; font-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PreCog Security — Earn Console</title>
+    <meta name="description" content="Mine PRST/COG demo credits, scan live bounty sources, connect a wallet, and inspect the autonomous improvement loop behind PreCog Security.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="PreCog Security — Earn Console">
+    <meta property="og:description" content="Mine PRST/COG demo credits, scan live bounties, connect a wallet, and watch the improvement loop research itself.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://precogsecurity.github.io/earn.html">
+    <meta name="theme-color" content="#0a0e17">
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <link rel="stylesheet" href="assets/earn.css">
+</head>
+<body>
+
+<nav>
+    <div class="nav-inner">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">&#x1F6E1;</div>
+            PreCog Security
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html#services">Services</a></li>
+            <li><a href="index.html#pricing">Pricing</a></li>
+            <li><a href="index.html#research">Research</a></li>
+            <li><a href="swarm.html">Swarm</a></li>
+            <li><a href="earn.html" class="active">Earn</a></li>
+            <li><a href="index.html#freescan" class="nav-cta">Free Scan</a></li>
+        </ul>
+    </div>
+</nav>
+
+<header class="hero container">
+    <span class="hero-badge"><span class="dot"></span> Earn console · live sources · self-improving loop</span>
+    <h1>Put the loop to work for <span>you</span></h1>
+    <p>
+        Mine PRST/COG demo credits with real browser proof-of-work, scan every live bounty
+        source the loop tracks, connect a wallet to the operator-blessed treasury rails, and
+        watch the improvement loop review its own workflow and model architecture.
+    </p>
+    <div class="stat-grid">
+        <div class="stat"><div class="label">PRST balance</div><div class="value cyan" id="prst-val">0.0000</div><div class="sub">demo credit</div></div>
+        <div class="stat"><div class="label">COG balance</div><div class="value gold" id="cog-val">0.00</div><div class="sub">demo credit</div></div>
+        <div class="stat"><div class="label">Hash rate</div><div class="value" id="hashrate-val">0 H/s</div><div class="sub">live measure</div></div>
+        <div class="stat"><div class="label">Accepted shares</div><div class="value green" id="shares-val">0</div><div class="sub">difficulty <span id="difficulty-val">3</span></div></div>
+    </div>
+</header>
+
+<section id="mining">
+    <div class="container">
+        <span class="section-label">ZKP miner</span>
+        <h2 class="section-title">Mine PRST &amp; COG in the browser</h2>
+        <p class="section-desc">
+            Each profile runs a genuine SHA proof-of-work search against a live difficulty target.
+            Difficulty tightens every 40 accepted shares. Credits accrue to this browser only and
+            settle through the treasury bridge when the payout cycle runs.
+        </p>
+        <div class="panel-grid">
+            <div class="panel">
+                <h3>Miner controls</h3>
+                <div class="control-row">
+                    <div class="field">
+                        <label for="algo-select">Hash profile</label>
+                        <select id="algo-select">
+                            <option value="sha256">SHA-256</option>
+                            <option value="sha512">SHA-512</option>
+                            <option value="sha384">SHA-384</option>
+                            <option value="sha1">SHA-1</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="threads-input">Workers</label>
+                        <input type="number" id="threads-input" min="1" max="8" value="4">
+                    </div>
+                    <div class="field">
+                        <label>Auto-optimize</label>
+                        <button class="btn btn-ghost btn-sm" id="btn-optimize">Auto-optimize</button>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="btn-mine">Start mining</button>
+                    <label class="toggle"><input type="checkbox" id="auto-toggle"> Auto-mine</label>
+                </div>
+                <p class="hint" id="mine-status" style="margin-top:0.8rem">idle</p>
+                <p class="hint" id="profile-desc"></p>
+            </div>
+            <div class="panel">
+                <h3>Live readout</h3>
+                <div class="readout">
+                    <div class="cell"><div class="k">Current target</div><div class="v" id="target-val">000…</div></div>
+                    <div class="cell"><div class="k">Session earned</div><div class="v gold" id="total-val">0.0000 PRST</div></div>
+                    <div class="cell"><div class="k">Hash rate</div><div class="v cyan" id="hashrate-val-2">0 H/s</div></div>
+                    <div class="cell"><div class="k">Difficulty</div><div class="v" id="difficulty-val-2">3</div></div>
+                </div>
+                <div class="log" id="miner-log"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="wallet">
+    <div class="container">
+        <span class="section-label">Wallet &amp; treasury</span>
+        <h2 class="section-title">Connect and verify the blessed rails</h2>
+        <p class="section-desc">
+            The console reads your wallet address and balance only; it never requests signing
+            or move permissions. Payouts from PreCog Security engagements and bounties land on
+            the operator-blessed destinations below.
+        </p>
+        <div class="panel">
+            <div class="wallet-row">
+                <button class="btn" id="btn-connect">Connect wallet</button>
+                <span class="hint" id="wallet-status">not connected</span>
+                <span class="badge cyan" id="network-val">—</span>
+                <span class="badge" id="balance-val">—</span>
+            </div>
+            <div class="dest-list">
+                <div class="dest">
+                    <span class="rail">BTC</span>
+                    <code id="btc-dest">—</code>
+                    <button class="btn btn-ghost btn-sm" id="copy-btc">Copy</button>
+                </div>
+                <div class="dest">
+                    <span class="rail">ETH</span>
+                    <code id="eth-dest">—</code>
+                    <button class="btn btn-ghost btn-sm" id="copy-eth">Copy</button>
+                </div>
+            </div>
+            <p class="hint">
+                PayPal engagements: <a href="https://www.paypal.com/paypalme/PrecogSecurity" target="_blank" rel="noopener noreferrer">paypal.me/PrecogSecurity</a>
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="bounties">
+    <div class="container">
+        <span class="section-label">Bounty radar</span>
+        <h2 class="section-title">Live funded issues across the swarm's sources</h2>
+        <p class="section-desc">
+            One scan queries GitHub bounty labels, Algora's console feed and Opire's public
+            rewards API, de-duplicates by issue URL and sorts by reward where published.
+        </p>
+        <button class="btn btn-primary" id="btn-scan">Scan bounty sources</button>
+        <div class="bounty-grid" id="bounty-list">
+            <div class="empty">Run a scan to pull live funded issues.</div>
+        </div>
+    </div>
+</section>
+
+<section id="revenue">
+    <div class="container">
+        <span class="section-label">Revenue tracker</span>
+        <h2 class="section-title">Every earning stream, in one place</h2>
+        <p class="section-desc">
+            The session value updates as you mine. Published service rates and bounty ranges
+            are the operator's current public pricing.
+        </p>
+        <div class="panel">
+            <div class="stream-list" id="stream-list"></div>
+        </div>
+    </div>
+</section>
+
+<section id="loop">
+    <div class="container">
+        <span class="section-label">Self-improvement</span>
+        <h2 class="section-title">The loop reviews itself</h2>
+        <p class="section-desc">
+            The improvement loop continuously scores its own workflow, model pool and sources.
+            Run the local heuristic review or supply an OpenRouter key for a cloud model pass.
+        </p>
+        <div class="panel-grid">
+            <div class="panel">
+                <h3>Current loop configuration</h3>
+                <div class="readout">
+                    <div class="cell"><div class="k">State</div><div class="v green">RUNNING</div></div>
+                    <div class="cell"><div class="k">Cycle</div><div class="v">120s</div></div>
+                    <div class="cell"><div class="k">Workers</div><div class="v">4</div></div>
+                    <div class="cell"><div class="k">Sources</div><div class="v">6</div></div>
+                </div>
+                <h3 style="margin-top:1.1rem">Model pool</h3>
+                <ul class="resource-list">
+                    <li>Cloud-first Gemini / OpenRouter routing</li>
+                    <li>Ollama Phi-4-mini-instruct Q4_K_M fallback</li>
+                    <li>qwen2.5-coder:7b patch retries</li>
+                </ul>
+                <div class="btn-row">
+                    <button class="btn btn-primary" id="btn-research">Run local review</button>
+                    <button class="btn" id="btn-ask">Ask cloud model</button>
+                </div>
+                <div class="field" style="margin-top:0.9rem">
+                    <label for="ai-key">OpenRouter API key (optional, never stored)</label>
+                    <input type="password" id="ai-key" placeholder="sk-or-v1-…" autocomplete="off">
+                </div>
+            </div>
+            <div class="panel">
+                <h3>Research output</h3>
+                <div class="log" id="research-log"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-bottom">
+        <div>&copy; 2026 PreCog Security. All rights reserved.</div>
+        <div>Autonomous red team &middot; blue team &middot; earn loop</div>
+    </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src="assets/earn.js"></script>
+</body>
+</html>
