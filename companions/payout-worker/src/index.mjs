@@ -103,6 +103,33 @@ export default {
       }
     }
 
+    // ---------- referrals (HMAC-signed by the new node; dedup per pair) ----------
+    if (path === "/v1/referral" && request.method === "POST") {
+      const rawBody = await request.text();
+      const node = await hmacOk(request, env, rawBody);
+      if (!node) return corsJson(err(401, "signed node receipt required"), "*");
+      let body;
+      try { body = JSON.parse(rawBody); } catch { return corsJson(err(400, "invalid JSON"), "*"); }
+      const ref = String(body.ref_code ?? "").trim().slice(0, 40);
+      const newHandle = String(body.new_handle ?? "").trim().slice(0, 200);
+      if (!/^[A-Za-z0-9_-]{4,40}$/.test(ref) || !newHandle) {
+        return corsJson(err(400, "ref_code (4-40 url-safe chars) and new_handle required"), "*");
+      }
+      const now = Math.floor(Date.now() / 1000);
+      await env.LEDGER.prepare(
+        "INSERT OR IGNORE INTO referrals(ref_code, new_handle, ts) VALUES (?,?,?)"
+      ).bind(ref, newHandle, now).run();
+      return corsJson(ok({ recorded: true, ref_code: ref }), "*");
+    }
+    if (path === "/v1/referral-stats" && request.method === "GET") {
+      const ref = (url.searchParams.get("ref") || "").trim().slice(0, 40);
+      if (!ref) return corsJson(err(400, "ref query param required"), "*");
+      const row = await env.LEDGER.prepare(
+        "SELECT COUNT(*) AS n, COALESCE(SUM(CASE WHEN ts > ? THEN 1 ELSE 0 END),0) AS recent FROM referrals WHERE ref_code = ?"
+      ).bind(Math.floor(Date.now() / 1000) - 7 * 86400, ref).first();
+      return corsJson(ok({ ref_code: ref, total: Number(row?.n ?? 0), last_7d: Number(row?.recent ?? 0) }), "*");
+    }
+
     // ---------- forum (D1-backed; reads public, posts require node HMAC) ----------
     if (path === "/v1/forum/threads") {
       if (request.method === "GET") {
