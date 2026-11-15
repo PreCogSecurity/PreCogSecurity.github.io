@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """PreCog Earn - desktop GUI (Tkinter, no installs).
 
-A Kryptex-style one-window miner for the PreCog Earn pilot:
+A one-window desktop miner for the PreCog Earn pilot:
   * big visible state (Idle / Mining), honest about everything
   * consent checkbox required before Start is allowed
   * Start/Stop drives the bundled XMRig miner to YOUR company treasury
