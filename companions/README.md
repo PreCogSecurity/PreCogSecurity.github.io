@@ -9,16 +9,31 @@ means matching their *visibility and control*, not their aggression:
   Install: `chrome://extensions` → Developer mode → Load unpacked →
   select `companions/chrome-extension`.
 
-- **Desktop node** (`desktop/precog-earn-node.py`) — standalone Python 3
-  (stdlib only). Refuses to run without `--i-consent`. Prints its lane/lane
-  budget before starting, honours `--lanes`, `--duration`, `--difficulty`,
-  Ctrl-C stops instantly, and appends to `precog-earn-ledger.log` next to the
-  script. Never touches wallets or keys. `python3 precog-earn-node.py --i-consent`
+- **Desktop node** (`desktop/precog-earn-node.py`) — standalone, hash-verified
+  wrapper around XMRig v6.26.0 (RandomX/Monero). Refuses to run without
+  `--i-consent`; downloads the exact pinned release on first launch and
+  SHA-256-verifies it against XMRig's published SHA256SUMS; mines to a
+  company treasury XMR address you configure; Ctrl-C stops the miner child.
+  `python precog-earn-node.py --i-consent --bench` (bounded benchmark) or
+  `--start` (mine). See `THIRD_PARTY.md`.
 
 - **Android companion** (`android/`) — consent-first skeleton: per-session
   switch, foreground-only, zero permissions declared, no background service.
   Building/signing the APK requires the Android SDK and store review; it is
   deliberately not wired into any release pipeline yet.
+
+- **Credits & payout accounting** (`credits/credits_ledger.py`) — append-only,
+  hash-chained share ledger; duplicate-receipt rejection; proportional
+  allocation with configurable threshold; emits human-approvable payout
+  DRAFTS. No code in this repo moves funds. Spec: `credits/README.md`.
+
+## What "provably fair" means here
+
+Hash-chained, publishable ledger + open proportional math + pseudonymous
+handles. No zero-knowledge proofs are implemented or claimed; if that is a
+requirement, it is a separate engineering project. See `credits/README.md`.
+
+
 
 ## Honest capability limits (do not market past these)
 

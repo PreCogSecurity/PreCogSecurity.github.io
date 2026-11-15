@@ -238,7 +238,7 @@
                 <article class="roadmap-card soon">
                     <span class="status-badge research">Pilot</span>
                     <h3>Desktop + mobile companion</h3>
-                    <p>Standalone desktop node (consent flag, lane cap, time window, plain-text ledger) plus an Android skeleton with per-job consent and battery/thermal guards.</p>
+                    <p>Desktop node = hash-verified XMRig (Monero/RandomX) with consent flag and CPU caps; Android skeleton keeps per-job consent and battery/thermal guards. Users accrue credits on a hash-chained ledger; payouts only after threshold + human approval.</p>
                     <small>Source pilots under companions/. No background mining without visible consent.</small>
                 </article>
                 <article class="roadmap-card planned">
@@ -282,11 +282,11 @@
                     <p>Visible work-package inbox, capacity toggle, pause/stop, immutable local activity log. No permissions beyond storage; no background mining while disabled.</p>
                     <small>Load unpacked from companions/chrome-extension/ — see companions/README.md.</small>
                 </article>
-                <article class="roadmap-card now">
-                    <span class="status-badge available">Pilot source</span>
+                <article class="roadmap-card soon">
+                    <span class="status-badge research">Pilot</span>
                     <h3>Desktop node (Windows/macOS/Linux)</h3>
-                    <p>Standalone Python node: consent flag, CPU lane count, per-session time window, thermal-ish guard via core count cap, plain-text ledger log. No tray stealth, no autostart.</p>
-                    <small>Runs from companions/desktop/precog-earn-node.py — see companions/README.md.</small>
+                    <p>Real RandomX (Monero) CPU mining via hash-verified XMRig v6.26.0 downloaded on first run: consent flag, CPU thread cap, plain-text ledger. Mines to the operator-designated treasury wallet; users accrue internal credits on a published, hash-chained ledger, and payouts fire only after a threshold is crossed and a human approves.</p>
+                    <small>Source under companions/desktop/ and companions/credits/ — see companions/README.md and companions/THIRD_PARTY.md.</small>
                 </article>
                 <article class="roadmap-card soon">
                     <span class="status-badge research">Pilot skeleton</span>
