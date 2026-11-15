@@ -64,7 +64,38 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, "");
-    const halt = await haltStatus(env);
+      const halt = await haltStatus(env);
+
+    // ---------- live pool stats (public data, edge-cached) ----------
+    if (path === "/v1/pool-stats" && request.method === "GET") {
+      const wallet = (url.searchParams.get("wallet") || "").trim();
+      if (!walletOk(wallet)) return err(400, "valid 95-char XMR standard/subaddress required as wallet");
+      try {
+        const upstream = await fetch(
+          "https://supportxmr.com/api/miner/" + encodeURIComponent(wallet) + "/stats",
+          { cf: { cacheTtl: 20, cacheEverything: true } }
+        );
+        if (!upstream.ok) return err(502, `upstream pool stats returned ${upstream.status}`);
+        const stats = await upstream.json();
+        const body = {
+          wallet_pool_stats: {
+            hashrate: stats.hash ?? null,
+            total_hashes: stats.totalHashes ?? null,
+            valid_shares: stats.validShares ?? null,
+            invalid_shares: stats.invalidShares ?? null,
+            paid_xmr: stats.amtPaid != null ? stats.amtPaid / 1e12 : null,
+            due_xmr: stats.amtDue != null ? stats.amtDue / 1e12 : null,
+            last_share_at: stats.lastHash ?? null,
+            source: "supportxmr.com public API (cached ≤20s)"
+          }
+        };
+        return new Response(JSON.stringify({ ok: true, ...body }), {
+          headers: { "content-type": "application/json", "access-control-allow-origin": "*" }
+        });
+      } catch (e) {
+        return err(502, "upstream pool stats unreachable");
+      }
+    }
 
     // ---------- health ----------
     if (path === "/v1/health") {
@@ -207,6 +238,32 @@ export default {
     }
 
     return err(404, "unknown route");
+  },
+
+  async scheduled(event, env, ctx) {
+    // PAYOUT_CRON=1 arms a weekly heartbeat report ONLY. It moves no funds,
+    // sends nothing, and holds no authority. If PAYOUT_CRON is unset (default)
+    // this handler does nothing. An operator that wants autonomous settlement
+    // implements and arms it explicitly — deliberately; this code will not
+    // invent a silent spend path and never will.
+    if (String(env.PAYOUT_CRON ?? "0") !== "1") {
+      console.log("scheduled: PAYOUT_CRON not set; noop");
+      return;
+    }
+    try {
+      const users = await env.LEDGER.prepare(
+        "SELECT COUNT(DISTINCT user_handle) AS users, COALESCE(SUM(shares),0) AS credits FROM receipts WHERE redeemed = 0"
+      ).first();
+      const last = await env.LEDGER.prepare(
+        "SELECT COALESCE(MAX(idempotency_key),'none') AS last_key FROM settlements"
+      ).first();
+      await env.LEDGER.prepare(
+        "INSERT INTO meta(key, value) VALUES ('LAST_CRON_HEARTBEAT', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value"
+      ).bind(`weekly-${new Date().toISOString().slice(0,10)}|users=${users?.users ?? 0}|credits=${users?.credits ?? 0}|last=${last?.last_key ?? "none"}`).run();
+      console.log("scheduled: heartbeat recorded");
+    } catch (e) {
+      console.log("scheduled: heartbeat skipped:", String(e).slice(0, 120));
+    }
   }
 };
 

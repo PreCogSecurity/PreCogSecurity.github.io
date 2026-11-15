@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://precog-earn-payout.precogsecurity.workers.dev; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PreCog Earn is the live PreCog Security workload network: desktop Monero RandomX mining, an auditable hash-chained share ledger, and a declared 50/50 redemption pool of net proceeds, distributed pro-rata with threshold + human-approved payouts.">
     <meta name="robots" content="index, follow">
@@ -82,6 +82,36 @@
                     <strong>Not a get-rich scheme:</strong> a 2012 CPU nets on the order of ~170 H/s. The network is real, the ledger is real, the economics are disclosed — magic is not part of the stack.
                 </div>
             </aside>
+        </div>
+    </section>
+
+    <section id="telemetry" class="section">
+        <div class="container">
+            <div class="section-heading">
+                <span class="eyebrow">Live telemetry</span>
+                <h2>Treasury rail,<br><span>measured not promised.</span></h2>
+                <p>Public pool stats for the operator treasury miner, read live from supportxmr.com (edge-cached ≤20s) via the PreCog edge proxy. Paste any 95-char XMR address to read its own public pool stats.</p>
+            </div>
+            <div class="demo-grid">
+                <div class="panel control-panel">
+                    <div class="panel-title"><h3>Wallet to inspect</h3></div>
+                    <div class="field">
+                        <label for="telemetry-wallet">XMR wallet address</label>
+                        <input type="text" id="telemetry-wallet" name="telemetry-wallet" spellcheck="false" autocomplete="off" maxlength="95" value="42mWtiADkUDQgALdotiApdWcc5EVyW2ku64rn81SNvv99KszmX3U5okPgdeoDxsDfJeHdpUc6j4DKKZuVXoqDXrTNBfiKKX">
+                    </div>
+                    <button id="telemetry-refresh" class="btn btn-primary" type="button">Refresh telemetry</button>
+                    <p class="small-note">This reads the public pool API directly. No account, no signature, no keys. Browser sees the same public data you would see on supportxmr.com.</p>
+                </div>
+                <div class="panel readout-panel" aria-live="polite">
+                    <div class="panel-title"><h3>Stats</h3><span id="telemetry-state" class="badge">Idle</span></div>
+                    <div class="metrics">
+                        <div class="metric"><span class="metric-value" id="t-hashrate">—</span><span class="metric-label">H/s</span></div>
+                        <div class="metric"><span class="metric-value" id="t-shares">—</span><span class="metric-label">valid shares</span></div>
+                        <div class="metric"><span class="metric-value" id="t-total">—</span><span class="metric-label">total hashes</span></div>
+                    </div>
+                    <div class="log" id="telemetry-log"><span>Waiting for a telemetry refresh…</span></div>
+                </div>
+            </div>
         </div>
     </section>
 

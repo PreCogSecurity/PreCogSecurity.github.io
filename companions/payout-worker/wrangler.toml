@@ -24,3 +24,7 @@ DRY_RUN = "1"
 MAX_BATCH_XMR = "0.5"        # absolute cap per settlement cycle (operator-tunable)
 MIN_REDEEM_XMR = "0.001"     # per-destination dust floor
 PAYOUT_INTERVAL_DAYS = "7"   # informational; settlement trigger is operator call
+PAYOUT_CRON = "0"            # set to "1" to arm a WEEKLY report-only heartbeat; never executes XMR
+# Optional weekly trigger, entirely inert unless PAYOUT_CRON changes:
+# [triggers]
+# crons = ["0 4 * * 1"]       # 04:00 UTC every Monday
