@@ -174,3 +174,6 @@ select:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
 .consent-legal { font-size: 0.75rem; color: var(--dim); border-left: 3px solid var(--amber); padding-left: 12px; }
 .consent-check { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0; font-size: 0.9rem; color: var(--text); cursor: pointer; }
 .consent-check input { margin-top: 3px; accent-color: var(--primary); width: 18px; height: 18px; }
+
+.is-hidden { display: none; }
+

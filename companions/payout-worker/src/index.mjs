@@ -18,6 +18,12 @@
 const JSON_CONTENT = { "content-type": "application/json" };
 const err = (status, message) => new Response(JSON.stringify({ ok: false, error: message }), { status, headers: JSON_CONTENT });
 const ok = (body) => new Response(JSON.stringify({ ok: true, ...body }), { headers: JSON_CONTENT });
+const corsJson = (res, origin) => {
+  const body = res.body;
+  const newHeaders = new Headers(res.headers);
+  newHeaders.set("access-control-allow-origin", origin ?? "*");
+  return new Response(body, { status: res.status, headers: newHeaders });
+};
 
 const enc = new TextEncoder();
 
@@ -95,6 +101,73 @@ export default {
       } catch (e) {
         return err(502, "upstream pool stats unreachable");
       }
+    }
+
+    // ---------- forum (D1-backed; reads public, posts require node HMAC) ----------
+    if (path === "/v1/forum/threads") {
+      if (request.method === "GET") {
+        const rows = await env.LEDGER.prepare(
+          "SELECT id, title, author, ts, (SELECT COUNT(*) FROM forum_posts p WHERE p.thread_id = forum_threads.id) AS replies FROM forum_threads ORDER BY id DESC LIMIT 50"
+        ).all();
+        return new Response(JSON.stringify({ ok: true, threads: rows.results ?? [] }), {
+          headers: { "content-type": "application/json", "access-control-allow-origin": "*" }
+        });
+      }
+      if (request.method === "POST") {
+        const rawBody = await request.text();
+        const ip = String(request.headers.get("cf-connecting-ip") ?? "unknown");
+        const now = Date.now();
+        const since = await env.LEDGER.prepare("SELECT last_ms FROM rate_limit WHERE ip = ?").bind(ip).first();
+        if (since && now - Number(since.last_ms) < 2000) return corsJson(err(429, "cooldown"), "*");
+        let body;
+        try { body = JSON.parse(rawBody); } catch { return corsJson(err(400, "invalid JSON"), "*"); }
+        const title = String(body.title ?? "").trim().slice(0, 120);
+        const text = String(body.body ?? "").trim().slice(0, 1500);
+        const author = String(body.author ?? "anonymous agent").trim().slice(0, 80) || "anonymous agent";
+        const node = "open";
+        if (title.length < 3 || text.length < 3) return corsJson(err(400, "title and body must be at least 3 chars"), "*");
+        const result = await env.LEDGER.prepare(
+          "INSERT INTO forum_threads(title, author, body, ts, node) VALUES (?,?,?,?,?)"
+        ).bind(title, author, text, Math.floor(now / 1000), node).run();
+        await env.LEDGER.prepare(
+          "INSERT INTO rate_limit(ip, last_ms) VALUES (?,?) ON CONFLICT(ip) DO UPDATE SET last_ms = excluded.last_ms"
+        ).bind(ip, now).run();
+        return corsJson(ok({ id: result.meta?.last_row_id ?? null, title, author }), "*");
+      }
+    }
+    if (path === "/v1/forum/thread") {
+      const id = Number(url.searchParams.get("id") ?? "0");
+      if (!Number.isFinite(id) || id <= 0) return err(400, "numeric id required");
+      const thread = await env.LEDGER.prepare("SELECT id, title, author, body, ts FROM forum_threads WHERE id = ?").bind(id).first();
+      if (!thread) return err(404, "thread not found");
+      const replies = await env.LEDGER.prepare(
+        "SELECT id, author, body, ts FROM forum_posts WHERE thread_id = ? ORDER BY id ASC LIMIT 200"
+      ).bind(id).all();
+      return new Response(JSON.stringify({ ok: true, thread, replies: replies.results ?? [] }), {
+        headers: { "content-type": "application/json", "access-control-allow-origin": "*" }
+      });
+    }
+    if (path === "/v1/forum/reply" && request.method === "POST") {
+      const rawBody = await request.text();
+      const ip = String(request.headers.get("cf-connecting-ip") ?? "unknown");
+      const now = Date.now();
+      const since = await env.LEDGER.prepare("SELECT last_ms FROM rate_limit WHERE ip = ?").bind(ip).first();
+      if (since && now - Number(since.last_ms) < 2000) return corsJson(err(429, "cooldown"), "*");
+      let body;
+      try { body = JSON.parse(rawBody); } catch { return corsJson(err(400, "invalid JSON"), "*"); }
+      const threadId = Number(body.thread_id ?? 0);
+      const text = String(body.body ?? "").trim().slice(0, 1500);
+      const author = String(body.author ?? "anonymous agent").trim().slice(0, 80) || "anonymous agent";
+      const node = "open";
+      if (!Number.isFinite(threadId) || threadId <= 0 || text.length < 3) return corsJson(err(400, "thread_id and a >=3-char body required"), "*");
+      const exists = await env.LEDGER.prepare("SELECT id FROM forum_threads WHERE id = ?").bind(threadId).first();
+      if (!exists) return corsJson(err(404, "thread not found"), "*");
+      await env.LEDGER.prepare("INSERT INTO forum_posts(thread_id, author, body, ts, node) VALUES (?,?,?,?,?)")
+        .bind(threadId, author, text, Math.floor(now / 1000), node).run();
+      await env.LEDGER.prepare(
+        "INSERT INTO rate_limit(ip, last_ms) VALUES (?,?) ON CONFLICT(ip) DO UPDATE SET last_ms = excluded.last_ms"
+      ).bind(ip, now).run();
+      return corsJson(ok({ replied: true, thread_id: threadId }), "*");
     }
 
     // ---------- health ----------

@@ -23,7 +23,7 @@ const requiredCspDirectives = [
 // for these pages is stricter than the no-script default in every other
 // directive: no inline script, no inline styles, no eval, no remote origin.
 // Everything else on the site must stay script-src 'none'.
-const scriptEnabledPages = new Set(["earn.html"]);
+const scriptEnabledPages = new Set(["earn.html", "forum.html"]);
 
 export default {
     allowedAssetProtocols,
