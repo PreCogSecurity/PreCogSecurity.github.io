@@ -1,0 +1,26 @@
+name = "precog-earn-payout"
+main = "src/index.mjs"
+compatibility_date = "2026-11-15"
+
+# Database: append-only share credits + payout plan/executed logs.
+# Free tier on Workers (100k req/day) and D1 (5 GB) easily covers a pilot.
+[[d1_databases]]
+binding = "LEDGER"
+database_name = "precog-earn-ledger"
+database_id = "REPLACE_WITH_YOUR_D1_ID"
+
+# DO NOT add secrets to this file. Set them with:
+#   wrangler secret put ADMIN_TOKEN       (bearer for operator endpoints)
+#   wrangler secret put NODE_HMAC_KEY     (HMAC shared key for node receipts)
+#   wrangler secret put RPC_URL           (operator's monero-wallet-rpc, e.g. http://127.0.0.1:18082)
+#   wrangler secret put RPC_AUTH          (base64 user:pass for the wallet RPC)
+# Toggle:
+#   wrangler secret put APPROVE_AUTO_BATCH   ("1" to arm automatic settlement)
+#   set HALT=1 via wrangler.toml or `wrangler secret put HALT` to freeze all spend paths
+# DRY_RUN defaults to 1 in src/index.mjs; it refuses to spend unless explicitly set to 0.
+
+[vars]
+DRY_RUN = "1"
+MAX_BATCH_XMR = "0.5"        # absolute cap per settlement cycle (operator-tunable)
+MIN_REDEEM_XMR = "0.001"     # per-destination dust floor
+PAYOUT_INTERVAL_DAYS = "7"   # informational; settlement trigger is operator call
