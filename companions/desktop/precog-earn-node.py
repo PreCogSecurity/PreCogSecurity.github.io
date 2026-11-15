@@ -17,7 +17,7 @@ Requirements before `--start` can mine
   * An operator-controlled XMR wallet address (the PreCog treasury).
     Provide it via the PRECOG_XMR_WALLET environment variable or a file
     next to this script named `precog-earn-wallet.txt` (one line, gitignored).
-  * A mining pool endpoint. Default: pool.supportxmr.com:443. Override via
+  * A mining pool endpoint. Default: stratum+ssl://pool.supportxmr.com:443. Override via
     --pool HOST:PORT or PRECOG_XMR_POOL.
   * Your explicit consent, every single run: --i-consent.
 
@@ -166,7 +166,7 @@ def load_wallet() -> str:
 def run_mining(args) -> int:
     wallet = load_wallet()
     binary = ensure_xmrig()
-    pool = args.pool or os.environ.get("PRECOG_XMR_POOL", "pool.supportxmr.com:443")
+    pool = args.pool or os.environ.get("PRECOG_XMR_POOL", "stratum+ssl://pool.supportxmr.com:443")
     workers = max(1, (os.cpu_count() or 2) - 1)
     threads = args.threads or workers
     print("XMRig node starting. Budget:", json.dumps({
@@ -236,7 +236,7 @@ def main() -> int:
     parser.add_argument("--threads", type=int, default=None, help="CPU threads (default: cores - 1)")
     parser.add_argument("--cpu-priority", type=int, default=2, help="XMRig CPU priority 0-5")
     parser.add_argument("--donate", type=int, default=1, help="donate level percent 0-99 (default 1)")
-    parser.add_argument("--pool", default=None, help="pool host:port (default pool.supportxmr.com:443)")
+    parser.add_argument("--pool", default=None, help="pool host:port (default stratum+ssl://pool.supportxmr.com:443)")
     args = parser.parse_args()
 
     if not args.i_consent:
