@@ -43,7 +43,7 @@ class SwarmHandler(http.server.SimpleHTTPRequestHandler):
                     "btc": 0.842,
                     "eth": 14.20,
                     "ecocash_usd": 1450.00,
-                    "btc_rail": "bc1ps8prywz25ele9n408yu0yf8j4qwv93f6xxm7l35tc5nmksj7vmtqwdjlsy",
+                    "btc_rail": "bc1qhtnzal6wupj4xg049juwarkqmle7lqxemyezrw",
                     "eth_rail": "0xa71b83C6CC50665E4B67fDCEecD63D5100cCf988",
                     "ecocash_rail": "+263 77 491 7252"
                 },
