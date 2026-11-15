@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PreCog Earn Companion</title>
+  <style>
+    body { font-family: system-ui, sans-serif; width: 320px; margin: 0; padding: 14px; background: #0d1420; color: #eef7f6; }
+    h1 { font-size: 15px; margin: 0 0 8px; color: #36f5be; }
+    p { font-size: 12px; line-height: 1.45; color: #9eb0b9; margin: 6px 0; }
+    .stat { display: flex; justify-content: space-between; font-size: 12px; border-top: 1px solid #24324a; padding: 4px 0; }
+    button { width: 100%; padding: 8px; margin-top: 8px; border: 0; border-radius: 8px; font-weight: 700; cursor: pointer; }
+    #toggle { background: #36f5be; color: #04110c; }
+    #toggle[aria-pressed="true"] { background: #ff6b6b; color: #1a0505; }
+    #reset { background: #17243a; color: #eef7f6; }
+    .fine { font-size: 10px; color: #6f8491; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>PreCog Earn Companion (Pilot)</h1>
+  <p>You are in control. Work runs only while this toggle is ON and this popup has been opened by you at least once this session. Nothing runs in the background while disabled.</p>
+  <div class="stat"><span>State</span><strong id="state">Disabled</strong></div>
+  <div class="stat"><span>Attempts (this device)</span><strong id="attempts">0</strong></div>
+  <div class="stat"><span>Accepted shares</span><strong id="accepted">0</strong></div>
+  <div class="stat"><span>Activity log entries</span><strong id="log-count">0</strong></div>
+  <button id="toggle" type="button" aria-pressed="false">Enable work (I consent)</button>
+  <button id="reset" type="button">Reset local counters</button>
+  <p class="fine">Local demo ledger only. No wallet, no keys, no funds, no network access. Consent is revocable at any time by clicking the toggle again or removing the extension. Open-source pilot: github.com/PreCogSecurity/PreCogSecurity.github.io (companions/).</p>
+  <script src="popup.js"></script>
+</body>
+</html>

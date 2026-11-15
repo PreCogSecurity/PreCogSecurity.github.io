@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "PreCog Earn Companion (Pilot)",
+  "version": "0.1.0",
+  "description": "Consent-first companion for the PreCog Earn peer workload pilot. You enable it, you see it, you stop it. No background mining without visible opt-in.",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "PreCog Earn Companion"
+  }
+}

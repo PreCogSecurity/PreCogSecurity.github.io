@@ -11,7 +11,10 @@ export const repositoryRoot = path.resolve(currentDirectory, "..");
 // whose entire UI is intentionally inline-styled and event-handler-driven. It is
 // not marketing content and is exempt from the marketing site's CSP/style lint
 // because it ships its own CSP meta tag and its own rendering loop.
-const ignoredDirectories = new Set([".git", "BlueHound", "coverage", "dist", "node_modules"]);
+// Companion app sources (chrome extension popup, Android) are source trees, not
+// site pages; they carry their own CSP and packaging rules, so the site-page
+// validator does not sweep them.
+const ignoredDirectories = new Set([".git", "BlueHound", "coverage", "dist", "node_modules", "companions"]);
 const tagPattern = /<([a-z][a-z0-9:-]*)\b((?:[^>"']|"[^"]*"|'[^']*')*)>/gi;
 const attributePattern = /([^\s=/>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
 

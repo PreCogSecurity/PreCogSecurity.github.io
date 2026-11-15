@@ -163,3 +163,14 @@ select:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
     .site-nav .nav-links { gap: 6px; }
     .footer-inner { flex-direction: column; }
 }
+
+/* Consent dialog */
+.consent-dialog { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background: rgba(2, 6, 10, 0.78); backdrop-filter: blur(6px); padding: 20px; }
+.consent-dialog[hidden] { display: none; }
+.consent-panel { max-width: 560px; background: var(--card); border: 1px solid rgba(54, 245, 190, 0.35); border-radius: var(--radius); box-shadow: var(--shadow); padding: 28px; }
+.consent-panel h2 { font-size: 1.4rem; letter-spacing: -0.02em; margin-bottom: 12px; }
+.consent-panel ul { color: var(--muted); padding-left: 20px; font-size: 0.9rem; }
+.consent-panel li { margin-bottom: 8px; }
+.consent-legal { font-size: 0.75rem; color: var(--dim); border-left: 3px solid var(--amber); padding-left: 12px; }
+.consent-check { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0; font-size: 0.9rem; color: var(--text); cursor: pointer; }
+.consent-check input { margin-top: 3px; accent-color: var(--primary); width: 18px; height: 18px; }

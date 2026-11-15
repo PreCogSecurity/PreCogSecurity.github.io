@@ -28,6 +28,7 @@
             <li><a href="#demo">Live demo</a></li>
             <li><a href="#model">Reward model</a></li>
             <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#companions">Companions</a></li>
             <li><a href="#roadmap">Roadmap</a></li>
             <li><a class="nav-cta" href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20pilot">Join pilot</a></li>
         </ul>
@@ -66,8 +67,8 @@
                     <div><strong>Peer scheduler</strong><span>CPU/GPU work assignment, queueing, and verifier design.</span></div>
                 </div>
                 <div class="status-row">
-                    <span class="status-badge roadmap">Roadmap</span>
-                    <div><strong>Native nodes + companions</strong><span>Windows, macOS, Linux, browser extension, desktop/mobile app.</span></div>
+                    <span class="status-badge research">Pilot</span>
+                    <div><strong>Native nodes + companions</strong><span>Source pilots: Chrome extension, desktop node, Android skeleton. Same consent model everywhere.</span></div>
                 </div>
                 <div class="panel-note">
                     <strong>Not claimed yet:</strong> universal 50/50 payouts, automated earnings, or guaranteed ROI. Those require equal contribution and verified settlement.
@@ -106,13 +107,23 @@
                                 <option value="equal">Equal peers (opt-in demo)</option>
                             </select>
                         </div>
+                        <div class="field">
+                            <label for="lane-split">Compute lanes</label>
+                            <select id="lane-split">
+                                <option value="cpu" selected>CPU lanes (Web Crypto SHA-256, hardware accelerated)</option>
+                                <option value="balanced">Balanced 50/50 lanes (GPU lane is pilot-labelled, see below)</option>
+                                <option value="gpu">GPU lane only (pilot-labelled, see below)</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="action-row">
                         <button id="start-demo" class="btn btn-primary" type="button">Start demo</button>
                         <button id="stop-demo" class="btn btn-outline" type="button" disabled>Stop</button>
                         <button id="reset-demo" class="btn btn-ghost" type="button">Reset</button>
+                        <button id="consent-withdraw" class="btn btn-ghost" type="button">Withdraw consent</button>
                     </div>
-                    <p class="small-note">A high difficulty can pause the tab. Stop any time. No background process continues after this page is closed.</p>
+                    <p class="small-note">Start opens an explicit consent dialog. Hashing runs in pooled workers across your consented cores using hardware-accelerated Web Crypto SHA-256. No background process continues after this page is closed.</p>
+                    <p class="small-note">GPU lane honesty: browsers expose WebGPU, but no verified browser GPU SHA-256 kernel ships here. Choosing a GPU lane reports the adapter status and falls back to CPU lanes; it never invents a GPU hashrate. Native GPU kernels (CUDA/OpenCL) ship with the desktop node pilot.</p>
                 </div>
 
                 <div class="panel readout-panel" aria-live="polite">
@@ -121,10 +132,15 @@
                         <div class="metric"><span class="metric-value" id="attempt-count">0</span><span class="metric-label">attempts</span></div>
                         <div class="metric"><span class="metric-value" id="accepted-count">0</span><span class="metric-label">accepted shares</span></div>
                         <div class="metric"><span class="metric-value" id="rate-count">0</span><span class="metric-label">hashes / sec</span></div>
+                        <div class="metric"><span class="metric-value" id="worker-count">0</span><span class="metric-label">active lanes</span></div>
+                        <div class="metric"><span class="metric-value" id="signed-shares">0</span><span class="metric-label">signed share claims</span></div>
                     </div>
                     <div class="bar-wrap"><div class="bar-fill" id="share-progress"></div></div>
                     <dl class="ledger">
                         <div><dt>Work package</dt><dd id="package-id">PC-DEMO-0000</dd></div>
+                        <div><dt>Package size</dt><dd id="package-compression">not measured yet</dd></div>
+                        <div><dt>GPU lane</dt><dd id="gpu-status">probing WebGPU...</dd></div>
+                        <div><dt>Share signatures</dt><dd>Ed25519 (classical; ML-DSA / FIPS 204 is the post-quantum roadmap item, labelled honestly)</dd></div>
                         <div><dt>Your share of pool</dt><dd id="pool-share">0.000%</dd></div>
                         <div><dt>Illustrative payout</dt><dd id="illustrative-share">0.000</dd></div>
                         <div><dt>Allocation basis</dt><dd id="allocation-label">valid shares</dd></div>
@@ -198,7 +214,7 @@
                 <article class="roadmap-card now">
                     <span class="status-badge available">Available</span>
                     <h3>Web demo</h3>
-                    <p>Local SHA-256 proof of work, local ledger, difficulty control, proportional and explicit equal-peer mode.</p>
+                    <p>Pooled-worker SHA-256 (Web Crypto, hardware accelerated), consent dialog, lane split control, deflate-compressed packages, Ed25519-signed share claims (classical; ML-DSA roadmap), local ledger, proportional and explicit equal-peer mode.</p>
                     <small>Runs entirely in your browser. No payout yet.</small>
                 </article>
                 <article class="roadmap-card soon">
@@ -213,17 +229,17 @@
                     <p>Windows service/app, then macOS and Linux. Hardware-aware scheduling and strict opt-in resource limits.</p>
                     <small>No silent install. No coin access.</small>
                 </article>
-                <article class="roadmap-card planned">
-                    <span class="status-badge roadmap">Roadmap</span>
+                <article class="roadmap-card soon">
+                    <span class="status-badge research">Pilot</span>
                     <h3>Browser extension</h3>
                     <p>Visible work-package inbox, capacity toggle, pause/stop, immutable local activity log.</p>
-                    <small>Extension store review applies.</small>
+                    <small>Source pilot under companions/chrome-extension/. Extension store review applies.</small>
                 </article>
-                <article class="roadmap-card planned">
-                    <span class="status-badge roadmap">Roadmap</span>
+                <article class="roadmap-card soon">
+                    <span class="status-badge research">Pilot</span>
                     <h3>Desktop + mobile companion</h3>
-                    <p>Device fleet status, payout ledger, per-job consent, thermal/battery guards, notifications.</p>
-                    <small>No background mining without visible consent.</small>
+                    <p>Standalone desktop node (consent flag, lane cap, time window, plain-text ledger) plus an Android skeleton with per-job consent and battery/thermal guards.</p>
+                    <small>Source pilots under companions/. No background mining without visible consent.</small>
                 </article>
                 <article class="roadmap-card planned">
                     <span class="status-badge roadmap">Roadmap</span>
@@ -250,6 +266,44 @@
         </div>
     </section>
 
+    <section id="companions" class="section tint">
+        <div class="container">
+            <div class="section-heading split">
+                <div>
+                    <span class="eyebrow">Companion apps</span>
+                    <h2>One honest node,<br><span>every device.</span></h2>
+                </div>
+                <p>Same consent model and the same transparent ledger everywhere. All companion apps are open source, auditable, and require explicit opt-in before any work begins. None of them touch your wallet, your keys, or your files.</p>
+            </div>
+            <div class="roadmap-grid">
+                <article class="roadmap-card now">
+                    <span class="status-badge available">Pilot source</span>
+                    <h3>Chrome extension</h3>
+                    <p>Visible work-package inbox, capacity toggle, pause/stop, immutable local activity log. No permissions beyond storage; no background mining while disabled.</p>
+                    <small>Load unpacked from companions/chrome-extension/ — see companions/README.md.</small>
+                </article>
+                <article class="roadmap-card now">
+                    <span class="status-badge available">Pilot source</span>
+                    <h3>Desktop node (Windows/macOS/Linux)</h3>
+                    <p>Standalone Python node: consent flag, CPU lane count, per-session time window, thermal-ish guard via core count cap, plain-text ledger log. No tray stealth, no autostart.</p>
+                    <small>Runs from companions/desktop/precog-earn-node.py — see companions/README.md.</small>
+                </article>
+                <article class="roadmap-card soon">
+                    <span class="status-badge research">Pilot skeleton</span>
+                    <h3>Android app</h3>
+                    <p>Consent-first mobile companion: per-job approve/decline, battery and thermal guards, foreground-only visibility.</p>
+                    <small>Gradle skeleton under companions/android/. Building the APK requires the Android SDK; store review applies.</small>
+                </article>
+                <article class="roadmap-card planned">
+                    <span class="status-badge roadmap">Roadmap</span>
+                    <h3>Hardware acceleration across the fleet</h3>
+                    <p>Native CUDA/OpenCL GPU kernels for the desktop node, hardware SHA-256 where CPU features allow it, and deflate-compressed work packages (already measured in the browser demo).</p>
+                    <small>Post-quantum signature verification (ML-DSA / FIPS 204) lands as browsers and the node expose it.</small>
+                </article>
+            </div>
+        </div>
+    </section>
+
     <section id="pilot" class="cta-section">
         <div class="container">
             <div class="cta-panel">
@@ -262,6 +316,29 @@
         </div>
     </section>
 </main>
+
+<div id="consent-dialog" class="consent-dialog" role="dialog" aria-modal="true" aria-labelledby="consent-title" aria-hidden="true" hidden>
+    <div class="consent-panel">
+        <h2 id="consent-title">Consent to run the local workload demo</h2>
+        <p>Before anything hashes, here is exactly what will happen on this device:</p>
+        <ul>
+            <li>Your CPU hashes SHA-256 in pooled Web Workers (hardware-accelerated where your browser/CPU supports it). You choose CPU, balanced 50/50, or GPU-labelled lanes; GPU falls back to CPU with a visible notice.</li>
+            <li>No pool connection, no wallet, no keys, no funds, and no network requests leave this page. Work is verified locally and the ledger is illustrative only.</li>
+            <li>You can stop instantly with the Stop button or by closing this tab. Closing the tab ends all work; nothing persists in the background.</li>
+            <li>Consent is remembered for this origin only and can be withdrawn at any time with the "Withdraw consent" button.</li>
+            <li>Share claims are signed with Ed25519 as a classical authenticator; post-quantum signatures (ML-DSA / FIPS 204) are a labelled roadmap item, not a current claim.</li>
+        </ul>
+        <p class="consent-legal">This is a local demonstration, not an investment offer, not a cryptocurrency offering, and not a guarantee of earnings. Electricity and device wear are real costs. Do not run this on a device you do not own or without the owner’s permission.</p>
+        <label class="consent-check" for="consent-checkbox">
+            <input type="checkbox" id="consent-checkbox">
+            I have read the above and consent to this device hashing while this page is open and running.
+        </label>
+        <div class="action-row">
+            <button id="consent-accept" class="btn btn-primary" type="button" disabled>Accept and start</button>
+            <button id="consent-decline" class="btn btn-outline" type="button">Decline</button>
+        </div>
+    </div>
+</div>
 
 <footer class="footer">
     <div class="container footer-inner">
