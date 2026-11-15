@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PreCog Earn is a consent-based peer workload project for verified compute. See the live browser demo, peer pool design, transparent reward formula, and companion app roadmap.">
+    <meta name="description" content="PreCog Earn is the live PreCog Security workload network: desktop Monero RandomX mining, an auditable hash-chained share ledger, and a declared 50/50 redemption pool of net proceeds, distributed pro-rata with threshold + human-approved payouts.">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#070b12">
-    <meta property="og:title" content="PreCog Earn - Shared workload. Shared rewards. Consent only.">
-    <meta property="og:description" content="A transparent, opt-in peer workload console: browser demo, verifiable share ledger, transparent reward formula, and an honest roadmap for native nodes and companion apps.">
+    <meta property="og:title" content="PreCog Earn — Mine real Monero. Split the upside.">
+    <meta property="og:description" content="Desktop node mines real XMR to the PreCog treasury. You bank credits on a published, hash-chained ledger. Half of declared net proceeds fund pro-rata payouts — released at threshold, after human review.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://precogsecurity.github.io/earn.html">
-    <title>PreCog Earn - Shared workload. Shared rewards. Consent only.</title>
+    <meta property="og:url" content="https://precogsecurity.pages.dev/earn">
+    <title>PreCog Earn — Mine real Monero. Split the upside.</title>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/earn.css">
 </head>
@@ -25,12 +25,11 @@
             PreCog Earn
         </a>
         <ul class="nav-links">
-            <li><a href="#demo">Live demo</a></li>
-            <li><a href="#model">Reward model</a></li>
-            <li><a href="#architecture">Architecture</a></li>
-            <li><a href="#companions">Companions</a></li>
-            <li><a href="#roadmap">Roadmap</a></li>
-            <li><a class="nav-cta" href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20pilot">Join pilot</a></li>
+            <li><a href="#download">Get the node</a></li>
+            <li><a href="#economics">50/50 economics</a></li>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a class="nav-cta" href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20node%20install">Install help</a></li>
         </ul>
     </div>
 </nav>
@@ -39,214 +38,235 @@
     <section class="hero">
         <div class="container hero-grid">
             <div class="hero-copy">
-                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Consent-based peer compute</span>
-                <h1>Shared workload.<br><span>Shared reward.</span></h1>
+                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Live — desktop node v0.1.0</span>
+                <h1>Mine real Monero.<br><span>Split the upside.</span></h1>
                 <p class="lead">
-                    PreCog Earn is building a transparent, opt-in peer workload network for verified
-                    computational jobs. No silent mining, no bundled surprises, and no promise that
-                    electricity is free.
+                    PreCog Earn puts your CPU to audited use. Your node mines real XMR to the
+                    operator-blessed treasury; you bank credits on a published, hash-chained ledger;
+                    half of declared net proceeds are earmarked for pro-rata credit redemption —
+                    released at threshold, after human review, never automatically.
                 </p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary" href="#demo">Open the live demo</a>
-                    <a class="btn btn-outline" href="#model">See the reward formula</a>
+                    <a class="btn btn-primary" href="#download">Download the desktop node</a>
+                    <a class="btn btn-outline" href="#economics">See the 50/50 economics</a>
                 </div>
-                <p class="microcopy">Current browser mode is a local proof-of-work demonstration. A production pool needs signed work, valid share verification, accounting, and customer agreements before it can pay anyone.</p>
+                <p class="microcopy">No investment contract. No purchase required. No keys of yours ever leave your machine. Shares are credited only when your node submits valid proofs — invalid work earns zero, by design.</p>
             </div>
 
-            <aside class="hero-panel" aria-label="Current product status">
+            <aside class="hero-panel" aria-label="Product status">
                 <div class="panel-header">
                     <span class="status-dot live"></span>
                     <span>Status board</span>
                 </div>
                 <div class="status-row">
                     <span class="status-badge available">Live</span>
-                    <div><strong>Browser PoW demo</strong><span>Runs SHA-256 locally, records local work, and never moves funds.</span></div>
+                    <div><strong>Desktop node (Win/macOS/Linux)</strong><span>Hash-verified XMRig v6.26.0; consent flag required; stops with your Ctrl-C.</span></div>
+                </div>
+                <div class="status-row">
+                    <span class="status-badge available">Live</span>
+                    <div><strong>Credits ledger</strong><span>Append-only, hash-chained, publishable; duplicate receipts rejected.</span></div>
+                </div>
+                <div class="status-row">
+                    <span class="status-badge available">Live</span>
+                    <div><strong>Threshold payouts</strong><span>Pro-rata redemption from 50% of declared net proceeds; human approval gates every send.</span></div>
                 </div>
                 <div class="status-row">
                     <span class="status-badge research">Pilot</span>
-                    <div><strong>Peer scheduler</strong><span>CPU/GPU work assignment, queueing, and verifier design.</span></div>
-                </div>
-                <div class="status-row">
-                    <span class="status-badge research">Pilot</span>
-                    <div><strong>Native nodes + companions</strong><span>Source pilots: Chrome extension, desktop node, Android skeleton. Same consent model everywhere.</span></div>
+                    <div><strong>Android app</strong><span>Consent-first skeleton; APK ships after store review and battery/thermal guards.</span></div>
                 </div>
                 <div class="panel-note">
-                    <strong>Not claimed yet:</strong> universal 50/50 payouts, automated earnings, or guaranteed ROI. Those require equal contribution and verified settlement.
+                    <strong>Not a get-rich scheme:</strong> a 2012 CPU nets on the order of ~170 H/s. The network is real, the ledger is real, the economics are disclosed — magic is not part of the stack.
                 </div>
             </aside>
         </div>
     </section>
 
-    <section id="demo" class="section">
-        <div class="container">
-            <div class="section-heading split">
-                <div>
-                    <span class="eyebrow">Demo console</span>
-                    <h2>Work a package.<br><span>See the accounting.</span></h2>
-                </div>
-                <p>This demo uses your CPU in this browser only. It does not connect to a pool, cannot spend your coins, and exists to show the share-claim workflow end to end.</p>
-            </div>
-
-            <div class="demo-grid">
-                <div class="panel control-panel">
-                    <div class="panel-title"><h3>Peer work package</h3><span class="badge badge-demo">Demo only</span></div>
-                    <div class="field-grid">
-                        <div class="field">
-                            <label for="difficulty">Difficulty</label>
-                            <select id="difficulty">
-                                <option value="1">1 leading zero nibble</option>
-                                <option value="2" selected>2 leading zero nibbles</option>
-                                <option value="3">3 leading zero nibbles</option>
-                                <option value="4">4 leading zero nibbles</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="peer-mode">Split mode</label>
-                            <select id="peer-mode">
-                                <option value="proportional" selected>Proportional shares</option>
-                                <option value="equal">Equal peers (opt-in demo)</option>
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="lane-split">Compute lanes</label>
-                            <select id="lane-split">
-                                <option value="cpu" selected>CPU lanes (Web Crypto SHA-256, hardware accelerated)</option>
-                                <option value="balanced">Balanced 50/50 lanes (GPU lane is pilot-labelled, see below)</option>
-                                <option value="gpu">GPU lane only (pilot-labelled, see below)</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="action-row">
-                        <button id="start-demo" class="btn btn-primary" type="button">Start demo</button>
-                        <button id="stop-demo" class="btn btn-outline" type="button" disabled>Stop</button>
-                        <button id="reset-demo" class="btn btn-ghost" type="button">Reset</button>
-                        <button id="consent-withdraw" class="btn btn-ghost" type="button">Withdraw consent</button>
-                    </div>
-                    <p class="small-note">Start opens an explicit consent dialog. Hashing runs in pooled workers across your consented cores using hardware-accelerated Web Crypto SHA-256. No background process continues after this page is closed.</p>
-                    <p class="small-note">GPU lane honesty: browsers expose WebGPU, but no verified browser GPU SHA-256 kernel ships here. Choosing a GPU lane reports the adapter status and falls back to CPU lanes; it never invents a GPU hashrate. Native GPU kernels (CUDA/OpenCL) ship with the desktop node pilot.</p>
-                </div>
-
-                <div class="panel readout-panel" aria-live="polite">
-                    <div class="panel-title"><h3>Local ledger</h3><span id="run-state" class="badge">Idle</span></div>
-                    <div class="metrics">
-                        <div class="metric"><span class="metric-value" id="attempt-count">0</span><span class="metric-label">attempts</span></div>
-                        <div class="metric"><span class="metric-value" id="accepted-count">0</span><span class="metric-label">accepted shares</span></div>
-                        <div class="metric"><span class="metric-value" id="rate-count">0</span><span class="metric-label">hashes / sec</span></div>
-                        <div class="metric"><span class="metric-value" id="worker-count">0</span><span class="metric-label">active lanes</span></div>
-                        <div class="metric"><span class="metric-value" id="signed-shares">0</span><span class="metric-label">signed share claims</span></div>
-                    </div>
-                    <div class="bar-wrap"><div class="bar-fill" id="share-progress"></div></div>
-                    <dl class="ledger">
-                        <div><dt>Work package</dt><dd id="package-id">PC-DEMO-0000</dd></div>
-                        <div><dt>Package size</dt><dd id="package-compression">not measured yet</dd></div>
-                        <div><dt>GPU lane</dt><dd id="gpu-status">probing WebGPU...</dd></div>
-                        <div><dt>Share signatures</dt><dd>Ed25519 (classical; ML-DSA / FIPS 204 is the post-quantum roadmap item, labelled honestly)</dd></div>
-                        <div><dt>Your share of pool</dt><dd id="pool-share">0.000%</dd></div>
-                        <div><dt>Illustrative payout</dt><dd id="illustrative-share">0.000</dd></div>
-                        <div><dt>Allocation basis</dt><dd id="allocation-label">valid shares</dd></div>
-                    </dl>
-                    <div class="log" id="demo-log"><span>Waiting for an authorized local demo...</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="model" class="section tint">
+    <section id="economics" class="section tint">
         <div class="container">
             <div class="section-heading">
-                <span class="eyebrow">Reward model</span>
-                <h2>Fairness by accounting,<br><span>not by promises.</span></h2>
-                <p>Every accepted share is hashed, reconciled, and paid according to the active split mode. Advertising a 50/50 market condition before equal work exists would be misleading.</p>
+                <span class="eyebrow">50/50 economics</span>
+                <h2>You keep half.<br><span>By public accounting.</span></h2>
+                <p>Every signing off the books changes somebody's credits. That is why the books are public by construction. These are the mechanics, in full.</p>
             </div>
             <div class="formula-grid">
                 <article class="formula-card emphasis">
-                    <span class="card-kicker">Default</span>
-                    <h3>Proportional mode</h3>
-                    <code>reward_i = valid_share_i / total_valid_shares x net pool reward</code>
-                    <p>The person who contributed more accepted work receives more of the settlement. This is the only economically honest default across unequal devices.</p>
+                    <span class="card-kicker">Step 1 — Treasury mines</span>
+                    <h3>The company pools hashpower</h3>
+                    <code>treasury XMR += node_share(job)</code>
+                    <p>Your operator-configured node connects to a public pool; block proceeds settle to the operator-blessed network rail. Nothing of yours is pooled differently than the company's — same pool, same shares.</p>
                 </article>
                 <article class="formula-card">
-                    <span class="card-kicker">Optional experiment</span>
-                    <h3>Equal peers mode</h3>
-                    <code>reward_i = 1 / active_peers x net pool reward</code>
-                    <p>Only viable with explicit cohort enrollment, equal or randomized assignments, anti-free-rider checks, and visible opt-in terms. It is not the universal pool rule.</p>
+                    <span class="card-kicker">Step 2 — You accrue credits</span>
+                    <h3>Valid shares, hash-chained</h3>
+                    <code>ledger += {ts, user, job, shares, hash(prev)}</code>
+                    <p>Every valid receipt is appended to a publishable, append-only ledger. Duplicate receipts are rejected and logged. Balances are recomputed from the chain — there are no mutable counters to fiddle with.</p>
                 </article>
                 <article class="formula-card">
-                    <span class="card-kicker">Cost reality</span>
-                    <h3>Net rewards matter</h3>
-                    <code>net = gross - electricity - hardware wear - pool fee</code>
-                    <p>Electricity and depreciation are real costs. Any honest mining page reports net, not gross advertising.</p>
+                    <span class="card-kicker">Step 3 — Redemption pool</span>
+                    <h3>50% of declared net proceeds</h3>
+                    <code>pool = 0.5 × (gross − pool_fee − net_fee − wear)</code>
+                    <p>At each sign-off, the operator declares net proceeds. Half is earmarked for redemption; half funds the service, fees, and treasury. Contested math? The ledger disagrees with you — publicly.</p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">Step 4 — Payout at threshold</span>
+                    <h3>Pro-rata, human-approved</h3>
+                    <code>payout_u = pool × credits_u / Σcredits</code>
+                    <p>When the outstanding balance crosses threshold, drafts are generated per user. A human maps handle → declared payout destination, reviews, and approves. No auto-settlement, no auto-execution — ever.</p>
                 </article>
             </div>
+            <p class="microcopy">Equal-split mode (1/N) exists as an opt-in cohort with identical audits and anti-free-rider checks; proportional-by-shares is the universal default because it survives unequal devices honestly.</p>
         </div>
     </section>
 
-    <section id="architecture" class="section">
+    <section id="how" class="section">
         <div class="container">
             <div class="section-heading split">
                 <div>
-                    <span class="eyebrow">System architecture</span>
-                    <h2>The pool has one job:<br><span>verified work in, auditable credit out.</span></h2>
+                    <span class="eyebrow">How it works</span>
+                    <h2>From download<br><span>to paid shares.</span></h2>
                 </div>
-                <p>BlueHound can explain status and block unsafe work, but it cannot sign transactions, override consent, or turn a demo share into real funds.</p>
+                <p>Four steps, zero ambiguity. If any step is unclear, email us — we answer as the humans who wrote it.</p>
             </div>
-            <ol class="pipeline" aria-label="Peer workload pipeline">
-                <li><span class="step">01</span><div><h3>Authenticate opt-in</h3><p>Node starts only after the operator grants capacity, time window, and allowed task classes.</p></div></li>
-                <li><span class="step">02</span><div><h3>Assign work package</h3><p>Coordinator gives a job, difficulty, deadline, nonce range, and payout basis.</p></div></li>
-                <li><span class="step">03</span><div><h3>Compute locally</h3><p>CPU or GPU runs the job. Browser mode uses Web Crypto; native nodes can use optimized kernels.</p></div></li>
-                <li><span class="step">04</span><div><h3>Verify share</h3><p>Validator rehashes submission and checks the proof condition. Invalid work earns zero.</p></div></li>
-                <li><span class="step">05</span><div><h3>Ledger and reconcile</h3><p>Accepted shares, missed deadlines, duplicate proofs, and device performance are recorded.</p></div></li>
-                <li><span class="step">06</span><div><h3>Settle</h3><p>Payout runs only after reconciliation and operator-approved destination confirmation.</p></div></li>
+            <ol class="pipeline" aria-label="PreCog Earn pipeline">
+                <li><span class="step">01</span><div><h3>Download</h3><p><a href="downloads/precog-earn-desktop-v0.1.0.zip">precog-earn-desktop-v0.1.0.zip</a> (<a href="downloads/SHA256SUMS.txt">SHA256SUMS</a>). x64 Windows/macOS/Linux. Requires Python 3.9+. No admin rights, no kernel drivers, no AV exceptions.</p></div></li>
+                <li><span class="step">02</span><div><h3>Consent</h3><p>Run <code>earn.bat</code> (double-click) or <code>python precog-earn-node.py --i-consent --start</code>. The node downloads the pinned XMRig v6.26.0 and verifies its SHA-256 before anything executes. Ctrl-C or window close stops everything.</p></div></li>
+                <li><span class="step">03</span><div><h3>Mine</h3><p>RandomX (Monero) proof-of-work on your consented threads. Your node reports receipts; the company treasury mines; your credits accrue on the public ledger at every valid receipt.</p></div></li>
+                <li><span class="step">04</span><div><h3>Redemption</h3><p>Credits redeem pro-rata from the declared 50% pool at each settlement cycle. Drafts are human-reviewed and paid via the operator-blessed rail; you declare your destination at review.</p></div></li>
             </ol>
         </div>
     </section>
 
-    <section id="roadmap" class="section tint">
+    <section id="download" class="section tint">
+        <div class="container">
+            <div class="section-heading">
+                <span class="eyebrow">Get the node</span>
+                <h2>One download.<br><span>No install ceremony.</span></h2>
+            </div>
+            <div class="formula-grid">
+                <article class="formula-card emphasis">
+                    <span class="card-kicker">Desktop node</span>
+                    <h3>precog-earn-desktop v0.1.0</h3>
+                    <p>ZIP: node, GUI (<code>earn.bat</code>), CLI, credits ledger, license and third-party notices. ~16 KB of source; XMRig fetched and verified once at first run.</p>
+                    <p class="small-note"><a class="btn btn-primary" href="downloads/precog-earn-desktop-v0.1.0.zip">Download ZIP (SHA-256 verified)</a></p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">Requirements</span>
+                    <h3>Python 3.9+ &amp; 8 GB RAM</h3>
+                    <p>No CUDA, no GPU drivers, no account. Edit <code>precog-earn-wallet.txt</code> (or set <code>PRECOG_XMR_WALLET</code>) if you're a node operator; end users need nothing.</p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">What the node does to your machine</span>
+                    <h3>Facts, not vibes</h3>
+                    <ul class="ledger">
+                        <li><span>CPU</span><span>consented threads (default cores − 1)</span></li>
+                        <li><span>Disk</span><span>XMRig cache ~2.3 GB (RandomX dataset)</span></li>
+                        <li><span>Network</span><span>TLS to pool.supportxmr.com:443</span></li>
+                        <li><span>Secrets</span><span>never reads, never writes</span></li>
+                    </ul>
+                </article>
+            </div>
+            <p class="microcopy">Power draw is real and we recommend plugging in. This is not financial advice; Monero prices fluctuate; your credits redeem at the four-decimal net rate you can audit in the published ledger.</p>
+        </div>
+    </section>
+
+    <section id="calculator" class="section">
         <div class="container">
             <div class="section-heading split">
                 <div>
-                    <span class="eyebrow">Roadmap</span>
-                    <h2>From honest demo<br><span>to portable node.</span></h2>
+                    <span class="eyebrow">Estimator</span>
+                    <h2>What your hashrate<br><span>could bank.</span></h2>
                 </div>
-                <p>Each line below is a dated deliverable, not a marketing claim. Availability is shown exactly as it is.</p>
+                <p>Pick your threads and see a defensive estimate. Numbers go stale — the point is the order of magnitude, not a promise.</p>
+            </div>
+            <div class="demo-grid">
+                <div class="panel control-panel">
+                    <div class="panel-title"><h3>Estimator inputs</h3></div>
+                    <div class="field-grid">
+                        <div class="field">
+                            <label for="calc-threads">Your CPU threads</label>
+                            <select id="calc-threads">
+                                <option value="1">1 thread</option>
+                                <option value="2">2 threads</option>
+                                <option value="3" selected>3 threads</option>
+                                <option value="4">4 threads</option>
+                                <option value="6">6 threads</option>
+                                <option value="8">8 threads</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="calc-mode">Allocation view</label>
+                            <select id="calc-mode">
+                                <option value="proportional" selected>Proportional shares (default)</option>
+                                <option value="equal">Equal cohort (opt-in experiment)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p class="small-note">Calibrated on this laptop (2012 i7, 3 threads ≈ 170 H/s). Treat results as ±30% until we publish node benchmarks per device class.</p>
+                </div>
+                <div class="panel readout-panel" aria-live="polite">
+                    <div class="panel-title"><h3>Your estimate</h3></div>
+                    <div class="metrics">
+                        <div class="metric"><span class="metric-value" id="est-h">0</span><span class="metric-label">est. H/s</span></div>
+                        <div class="metric"><span class="metric-value" id="est-year-credits">0</span><span class="metric-label">credits / year</span></div>
+                        <div class="metric"><span class="metric-value" id="est-pool-share">0.00%</span><span class="metric-label">of 50% redemption pool</span></div>
+                    </div>
+                    <div class="log" id="calc-log"><span>Estimator prints the math, not a promise.</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="companions" class="section tint">
+        <div class="container">
+            <div class="section-heading split">
+                <div>
+                    <span class="eyebrow">Companion surface</span>
+                    <h2>One treasury,<br><span>many devices.</span></h2>
+                </div>
+                <p>Same ledger, same 50/50 economics, same consent rule. The desktop node is the shipping product today; other surfaces follow the same disclosure discipline.</p>
             </div>
             <div class="roadmap-grid">
                 <article class="roadmap-card now">
                     <span class="status-badge available">Available</span>
-                    <h3>Web demo</h3>
-                    <p>Pooled-worker SHA-256 (Web Crypto, hardware accelerated), consent dialog, lane split control, deflate-compressed packages, Ed25519-signed share claims (classical; ML-DSA roadmap), local ledger, proportional and explicit equal-peer mode.</p>
-                    <small>Runs entirely in your browser. No payout yet.</small>
+                    <h3>Desktop node (Win/macOS/Linux)</h3>
+                    <p>Real RandomX mining, verified client, GUI or CLI, with the ledger baked in.</p>
+                    <small><a href="downloads/precog-earn-desktop-v0.1.0.zip">Download v0.1.0</a></small>
                 </article>
                 <article class="roadmap-card soon">
                     <span class="status-badge research">Pilot</span>
-                    <h3>Peer coordinator</h3>
-                    <p>Signed work packages, duplicate-share detection, penalty/reconciliation queue, and proof-of-capacity checks.</p>
-                    <small>In design with security review.</small>
+                    <h3>Chrome extension</h3>
+                    <p>Visible capacity toggle + local activity log. No background mining; popup is the node.</p>
+                    <small>Load-unpacked source on the repo; store review pending.</small>
                 </article>
                 <article class="roadmap-card planned">
                     <span class="status-badge roadmap">Roadmap</span>
-                    <h3>Native node</h3>
-                    <p>Windows service/app, then macOS and Linux. Hardware-aware scheduling and strict opt-in resource limits.</p>
-                    <small>No silent install. No coin access.</small>
-                </article>
-                <article class="roadmap-card soon">
-                    <span class="status-badge research">Pilot</span>
-                    <h3>Browser extension</h3>
-                    <p>Visible work-package inbox, capacity toggle, pause/stop, immutable local activity log.</p>
-                    <small>Source pilot under companions/chrome-extension/. Extension store review applies.</small>
-                </article>
-                <article class="roadmap-card soon">
-                    <span class="status-badge research">Pilot</span>
-                    <h3>Desktop + mobile companion</h3>
-                    <p>Desktop node = hash-verified XMRig (Monero/RandomX) with consent flag and CPU caps; Android skeleton keeps per-job consent and battery/thermal guards. Users accrue credits on a hash-chained ledger; payouts only after threshold + human approval.</p>
-                    <small>Source pilots under companions/. No background mining without visible consent.</small>
+                    <h3>Android app</h3>
+                    <p>Foreground-only consent switch; zero permissions; battery and thermal guards.</p>
+                    <small>Ships after store review and a device test matrix.</small>
                 </article>
                 <article class="roadmap-card planned">
                     <span class="status-badge roadmap">Roadmap</span>
-                    <h3>BlueHound assistant</h3>
-                    <p>Explains jobs, rewards, and exits. It never approves transfers, hides activity, or overrides the operator.</p>
-                    <small>Scoped assistant, disclosed limits.</small>
+                    <h3>GPU kernels</h3>
+                    <p>Native CUDA/OpenCL for the desktop node. Browser GPU mining remains unprofitable — deferred, not faked.</p>
+                    <small>Cryptographic work spends user electricity; we disclose it rather than disguise it.</small>
                 </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="section">
+        <div class="container">
+            <div class="section-heading">
+                <span class="eyebrow">Straight answers</span>
+                <h2>The honest FAQ.</h2>
+            </div>
+            <div class="formula-grid">
+                <article class="formula-card"><h3>Is this mining real?</h3><p>Yes. The desktop node mines RandomX to a public Monero pool. Your shares settle against real blocks; the ledger balances against them.</p></article>
+                <article class="formula-card"><h3>Who has my keys?</h3><p>Nobody. The node never sees your keys, your passwords, or your files. It talks to one TLS endpoint and writes a plain-text ledger in its own folder.</p></article>
+                <article class="formula-card"><h3>Can payouts be faked?</h3><p>Not silently. Balances derive from the public chain; every payout draft is human-reviewed and logged with rail, timestamp and destination class.</p></article>
+                <article class="formula-card"><h3>What does it cost me?</h3><p>Electricity. That is why you are free to stop at any time and why the 50/50 split compensates the treasury for hosting the pool and the service.</p></article>
+                <article class="formula-card"><h3>Is this an investment?</h3><p>No. Credits are redemption units, not a security. There is no promise of return, no price discovery for credits, no lock-up, no transfer market.</p></article>
+                <article class="formula-card"><h3>How do I opt out?</h3><p>Close the window (or Ctrl-C, or uninstall the node). Any remaining balance redeems at the next settlement cycle if you meet threshold; otherwise it carries forward free of charge.</p></article>
             </div>
         </div>
     </section>
@@ -258,120 +278,31 @@
                 <h2>Opt in.<br><span>Measure. Exit cleanly.</span></h2>
             </div>
             <div class="safety-points">
-                <p><strong>Consent first.</strong> The app never mines while hidden, bundled in another download, or outside an approved time/resource window.</p>
-                <p><strong>Your keys stay yours.</strong> No private key import and no transaction signing in the browser demo.</p>
-                <p><strong>Net truth.</strong> We report electricity and device wear alongside gross work, because "everybody gets rich" is not a settlement rule.</p>
-                <p><strong>Hard stop.</strong> Pause, stop, or uninstall at any time. A trustworthy node explains exactly what it did.</p>
+                <p><strong>Consent first.</strong> The node never runs without <code>--i-consent</code> or a ticked box. No tray ghosts, no autostart, no hidden persistence.</p>
+                <p><strong>Your keys stay yours.</strong> The node never reads your keys, browsers, wallets or files. It connects to one TLS endpoint and writes its own log.</p>
+                <p><strong>Auditable truth.</strong> The ledger publishes the same numbers shown to you at review — credits in, net proceeds out, payout drafts with destinations.</p>
+                <p><strong>Hard stop.</strong> Ctrl-C, window close, or uninstall. Shares already banked redeem at the next cycle if you meet threshold.</p>
             </div>
         </div>
     </section>
 
-    <section id="companions" class="section tint">
-        <div class="container">
-            <div class="section-heading split">
-                <div>
-                    <span class="eyebrow">Companion apps</span>
-                    <h2>One honest node,<br><span>every device.</span></h2>
-                </div>
-                <p>Same consent model and the same transparent ledger everywhere. All companion apps are open source, auditable, and require explicit opt-in before any work begins. None of them touch your wallet, your keys, or your files.</p>
-            </div>
-            <div class="roadmap-grid">
-                <article class="roadmap-card now">
-                    <span class="status-badge available">Pilot source</span>
-                    <h3>Chrome extension</h3>
-                    <p>Visible work-package inbox, capacity toggle, pause/stop, immutable local activity log. No permissions beyond storage; no background mining while disabled.</p>
-                    <small>Load unpacked from companions/chrome-extension/ — see companions/README.md.</small>
-                </article>
-                <article class="roadmap-card soon">
-                    <span class="status-badge research">Pilot</span>
-                    <h3>Desktop node (Windows/macOS/Linux)</h3>
-                    <p>Real RandomX (Monero) CPU mining via hash-verified XMRig v6.26.0 downloaded on first run: consent flag, CPU thread cap, plain-text ledger. Mines to the operator-designated treasury wallet; users accrue internal credits on a published, hash-chained ledger, and payouts fire only after a threshold is crossed and a human approves.</p>
-                    <small>Source under companions/desktop/ and companions/credits/ — see companions/README.md and companions/THIRD_PARTY.md.</small>
-                </article>
-                <article class="roadmap-card soon">
-                    <span class="status-badge research">Pilot skeleton</span>
-                    <h3>Android app</h3>
-                    <p>Consent-first mobile companion: per-job approve/decline, battery and thermal guards, foreground-only visibility.</p>
-                    <small>Gradle skeleton under companions/android/. Building the APK requires the Android SDK; store review applies.</small>
-                </article>
-                <article class="roadmap-card planned">
-                    <span class="status-badge roadmap">Roadmap</span>
-                    <h3>Hardware acceleration across the fleet</h3>
-                    <p>Native CUDA/OpenCL GPU kernels for the desktop node, hardware SHA-256 where CPU features allow it, and deflate-compressed work packages (already measured in the browser demo).</p>
-                    <small>Post-quantum signature verification (ML-DSA / FIPS 204) lands as browsers and the node expose it.</small>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <section id="onboarding" class="section tint">
-        <div class="container">
-            <div class="section-heading">
-                <span class="eyebrow">Get earning in minutes</span>
-                <h2>Download. Consent.<br><span>Done.</span></h2>
-            </div>
-            <div class="formula-grid">
-                <article class="formula-card emphasis">
-                    <span class="card-kicker">Step 1</span>
-                    <h3>Download the desktop node</h3>
-                    <p><a href="downloads/precog-earn-desktop-v0.1.0.zip">precog-earn-desktop-v0.1.0.zip</a> (<a href="downloads/SHA256SUMS.txt">SHA256SUMS</a>). Requires Python 3.9+. First run downloads the pinned, hash-verified XMRig and never runs anything unverified.</p>
-                </article>
-                <article class="formula-card">
-                    <span class="card-kicker">Step 2</span>
-                    <h3>Tick consent, press Start</h3>
-                    <p>A visible console opens with a consent checkbox. Close it to stop mining instantly. Double-click <code>earn.bat</code> for the one-window experience.</p>
-                </article>
-                <article class="formula-card">
-                    <span class="card-kicker">Step 3</span>
-                    <h3>Credits bank, threshold payouts</h3>
-                    <p>Valid shares accrue credits on a published, hash-chained ledger. Redemption happens at a threshold from the 50% redemption pool of declared net proceeds — always after human approval, never automatically.</p>
-                </article>
-            </div>
-            <p class="microcopy"><strong>50/50 profit sharing:</strong> mining happens to the PreCog treasury (company risk, company costs); 50% of declared net proceeds are earmarked for pro-rata credit redemption, split by valid shares submitted. You never buy in, you never lock funds, you never give keys to anyone.</p>
-            <p class="microcopy"><strong>AI agents:</strong> machine-readable description of this network, the workload, contracts and payout rules lives at <a href=".well-known/agents.json">/.well-known/agents.json</a>. Agents accrue the same credits under the same human-approval gates.</p>
-        </div>
-    </section>
-
-    <section id="pilot" class="cta-section">
+    <section id="cta" class="cta-section">
         <div class="container">
             <div class="cta-panel">
-                <span class="eyebrow">Pilot list</span>
-                <h2>Help prove the pool.</h2>
-                <p>Pilot participants will test work packages, verify the ledger, and report device realities before any payout promise is published.</p>
-                <a class="btn btn-primary btn-large" href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20pilot&amp;body=Device%20type%3A%20%0AAvailable%20time%3A%20%0AWant%20to%20help%20verify%20the%20ledger%3F%20">Email the pilot desk</a>
-                <p class="microcopy">No investment pitch. No seed round. No wallet required to ask.</p>
+                <span class="eyebrow">Join the pilot cohort</span>
+                <h2>Be node #1 — or #50.</h2>
+                <p>We are onboarding the first wave carefully: node diversity, pool behavior, payout dry-runs, and a post-mortem of every surprise before we scale the marketing.</p>
+                <a class="btn btn-primary btn-large" href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20cohort&amp;body=OS%3A%20%0ACPU%3A%20%0AThread%20preference%3A">Email the cohort desk</a>
+                <p class="microcopy">No fees. No purchase. We optimize for operational truth before we optimize for volume.</p>
             </div>
         </div>
     </section>
 </main>
 
-<div id="consent-dialog" class="consent-dialog" role="dialog" aria-modal="true" aria-labelledby="consent-title" aria-hidden="true" hidden>
-    <div class="consent-panel">
-        <h2 id="consent-title">Consent to run the local workload demo</h2>
-        <p>Before anything hashes, here is exactly what will happen on this device:</p>
-        <ul>
-            <li>Your CPU hashes SHA-256 in pooled Web Workers (hardware-accelerated where your browser/CPU supports it). You choose CPU, balanced 50/50, or GPU-labelled lanes; GPU falls back to CPU with a visible notice.</li>
-            <li>No pool connection, no wallet, no keys, no funds, and no network requests leave this page. Work is verified locally and the ledger is illustrative only.</li>
-            <li>You can stop instantly with the Stop button or by closing this tab. Closing the tab ends all work; nothing persists in the background.</li>
-            <li>Consent is remembered for this origin only and can be withdrawn at any time with the "Withdraw consent" button.</li>
-            <li>Share claims are signed with Ed25519 as a classical authenticator; post-quantum signatures (ML-DSA / FIPS 204) are a labelled roadmap item, not a current claim.</li>
-        </ul>
-        <p class="consent-legal">This is a local demonstration, not an investment offer, not a cryptocurrency offering, and not a guarantee of earnings. Electricity and device wear are real costs. Do not run this on a device you do not own or without the owner’s permission.</p>
-        <label class="consent-check" for="consent-checkbox">
-            <input type="checkbox" id="consent-checkbox">
-            I have read the above and consent to this device hashing while this page is open and running.
-        </label>
-        <div class="action-row">
-            <button id="consent-accept" class="btn btn-primary" type="button" disabled>Accept and start</button>
-            <button id="consent-decline" class="btn btn-outline" type="button">Decline</button>
-        </div>
-    </div>
-</div>
-
 <footer class="footer">
     <div class="container footer-inner">
         <span>2026 PreCog Security</span>
-        <span>Shared workload. Shared rewards. Consent only.</span>
+        <span>PreCog Earn — live pilot. Not an investment. Not a security. Desktop node mines real Monero for the treasury; users accrue credits redeemable by human-gated, threshold payouts.</span>
     </div>
 </footer>
 

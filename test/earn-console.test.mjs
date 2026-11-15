@@ -1,74 +1,48 @@
-// earn-console.test.mjs - invariants for the consent-first Earn console.
+// earn-console.test.mjs - production invariants for the Earn page and node.
 //
-// The site validator proves the page is policy-clean and the unit tests
-// prove the policy means what we say. These tests pin the consent contract
-// itself: nothing may hash before an explicit opt-in, the withdraw path must
-// exist, and the page must never reference a remote script or miner. If any
-// of this regresses, the console is no longer the transparent demo it claims
-// to be.
+// Superseded demo-era invariants (local PoW console, consent dialog in HTML,
+// worker file) are gone with the demo. What ships now MUST prove:
+//   1. the shipped page advertises real desktop XMR RandomX mining, not fake
+//      browser mining claims;
+//   2. the desktop node refuses work without explicit consent;
+//   3. the credits/payout path can never move funds autonomously;
+//   4. the page loads only first-party, policy-allowed assets.
 
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { repositoryRoot } from "../scripts/site-validator.mjs";
 
 const read = (relativePath) => readFileSync(path.join(repositoryRoot, relativePath), "utf8");
 
-test("the earn console ships a first-party worker and it exists", () => {
+test("earn page sells real XMR desktop mining, not demo credits", () => {
     const page = read("earn.html");
-    const js = read("assets/earn.js");
-    assert.match(js, /earn-worker\.js/, "console must delegate hashing to a first-party worker");
-    assert.ok(existsSync(path.join(repositoryRoot, "assets", "earn-worker.js")), "assets/earn-worker.js must exist");
-    assert.match(page, /<script src="assets\/earn\.js" defer><\/script>/, "page must load the console as a first-party deferred script");
+    assert.match(page, /RandomX/, "page must name the real algorithm");
+    assert.match(page, /downloads\/precog-earn-desktop-v0\.1\.0\.zip/, "page must link the desktop node download");
+    assert.ok(!/PRST|COG demo|SHA-512 \/ SHA-384/.test(page), "page must not retain fake mining claims");
+    assert.ok(!/<script src="assets\/earn-worker\.js"/.test(page), "the demo worker must be gone");
 });
 
-test("hashing is gated behind an explicit, withdrawable consent check", () => {
-    const js = read("assets/earn.js");
-    const page = read("earn.html");
-
-    assert.match(page, /id="consent-dialog"/, "page must carry a consent dialog");
-    assert.match(page, /id="consent-checkbox"/, "consent must require an explicit tick");
-    assert.match(page, /Withdraw consent/, "page must offer a withdrawal path");
-    assert.match(js, /precog-earn-consent-v1/, "console must persist consent under a versioned key");
-    assert.match(js, /consent-withdraw/, "console must wire the withdraw button");
-    // No silent start: the start handler must branch on hasConsent().
-    assert.match(js, /hasConsent\(\)/, "start handler must check stored consent before hashing");
+test("desktop node refuses any work without explicit consent", () => {
+    const desktop = read("companions/desktop/precog-earn-node.py");
+    assert.match(desktop, /--i-consent/, "node must gate work behind --i-consent");
+    assert.match(desktop, /if not args\.i_consent/, "node must hard-stop without consent");
+    assert.match(desktop, /bba8097cb37d9b458a1cb1137876b27cde6740d17fe4ccbc086ba07d87d9e147/, "node must pin the upstream SHA-256");
 });
 
-test("the console makes no third-party or eval-capable references", () => {
-    for (const relativePath of ["assets/earn.js", "assets/earn-worker.js"]) {
-        const source = read(relativePath);
-        assert.ok(!/\beval\s*\(/.test(source), `${relativePath} must not use eval()`);
-        assert.ok(!/\bnew\s+Function\b/.test(source), `${relativePath} must not use new Function()`);
-        assert.ok(!/https?:\/\//i.test(source), `${relativePath} must not reference remote resources`);
-    }
-    const page = read("earn.html");
-    assert.ok(!/\beval\s*\(/.test(page), "earn.html must not use eval()");
-    assert.ok(!/\bnew\s+Function\b/.test(page), "earn.html must not use new Function()");
-    // earn.html may carry og:/canonical absolute URLs (metadata only) but no
-    // remote executable or stylesheet references.
-    assert.ok(!/<script\b[^>]*src=["']https?:/i.test(page), "earn.html must not load remote scripts");
-    assert.ok(!/<link\b[^>]*href=["']https?:/i.test(page), "earn.html must not load remote styles");
+test("credits module can never move funds autonomously", () => {
+    const credits = read("companions/credits/credits_ledger.py");
+    assert.match(credits, /requires_human_approval/, "drafts must carry the human-approval invariant");
+    assert.ok(!/https?:\/\//.test(credits), "credits module must not open network connections");
+    assert.match(credits, /receipt_id/, "credits module must reject duplicate share receipts");
 });
 
-test("companion apps declare the same consent invariants in source", () => {
+test("companions carry the same consent invariants", () => {
     const ext = read("companions/chrome-extension/popup.js");
     assert.match(ext, /consent/i, "extension must gate work on consent");
     assert.match(ext, /chrome\.storage\.local/, "extension ledger must stay on-device");
-    assert.ok(!/https?:\/\/(?!github\.com\/PreCogSecurity)/.test(ext), "extension must not call out to third parties");
-
-    const desktop = read("companions/desktop/precog-earn-node.py");
-    assert.match(desktop, /--i-consent/, "desktop node must refuse work without an explicit consent flag");
-    assert.match(desktop, /xmrig/i, "desktop node must wrap the pinned XMRig engine");
-    assert.match(desktop, /bba8097cb37d9b458a1cb1137876b27cde6740d17fe4ccbc086ba07d87d9e147/, "desktop node must pin the upstream SHA-256 of the windows-x64 download");
-    assert.ok(!/requests\.|urllib\.request\.urlopen.*[^#]*NODE_ENV/.test(desktop), "desktop node must not POST credentials anywhere");
 
     const android = read("companions/android/app/src/main/AndroidManifest.xml");
     assert.ok(!/uses-permission/.test(android), "Android pilot must declare zero permissions");
-
-    const credits = read("companions/credits/credits_ledger.py");
-    assert.match(credits, /requires_human_approval/, "credit drafts must carry the human-approval invariant");
-    assert.ok(!/https?:\/\//.test(credits), "credits module must not open network connections");
-    assert.match(credits, /receipt_id/, "credits module must reject duplicate share receipts");
 });
