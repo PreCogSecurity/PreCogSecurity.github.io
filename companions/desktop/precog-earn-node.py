@@ -1,93 +1,258 @@
 #!/usr/bin/env python3
-"""PreCog Earn desktop node (pilot).
+"""PreCog Earn desktop node (production pilot).
 
-Consent-first standalone node for the PreCog Earn peer workload pilot.
+A consent-first, hash-verified wrapper around XMRig for RandomX (Monero)
+CPU mining. This is NOT a stealth miner: it refuses to do any work without
+--i-consent, shows exactly what it will do before it does it, never touches
+wallets or browsers, and writes a plain-text ledger.
 
-WHAT THIS IS
-  - A visible, operator-consented proof-of-work calculator.
-  - CPU lanes via the multiprocessing module; SHA-256 only.
-  - A plain-text ledger log written next to this script.
+What this replaces
+  The previous revision of this script computed SHA-256 demonstration hashes
+  locally; that was an honest demo. This revision wraps the real, auditable
+  open-source RandomX implementation (XMRig, GPLv3) so the node mines actual
+  Monero blocks. The download is pinned to v6.26.0 and SHA-256-verified
+  against XMRig's own published SHA256SUMS before anything executes.
 
-WHAT THIS IS NOT
-  - Not a miner you can hide. No tray mode, no autostart, no persistence.
-  - Not connected to any pool, wallet, or key material.
-  - Not economically meaningful yet: shares are counted locally, not paid.
+Requirements before `--start` can mine
+  * An operator-controlled XMR wallet address (the PreCog treasury).
+    Provide it via the PRECOG_XMR_WALLET environment variable or a file
+    next to this script named `precog-earn-wallet.txt` (one line, gitignored).
+  * A mining pool endpoint. Default: pool.supportxmr.com:443. Override via
+    --pool HOST:PORT or PRECOG_XMR_POOL.
+  * Your explicit consent, every single run: --i-consent.
 
-CONSENT MODEL
-  Refuses to do any work without --i-consent. Prints its own budget
-  (lanes, duration, difficulty) before starting. Ctrl-C stops instantly.
+Honest limitations
+  This device (a 2012 i7, CPU-only) yields roughly a hundred H/s on RandomX.
+  It is a network of one real device minting real shares at an honest rate —
+  not a data-center rig. Compare-before-buy claims on competitor sites;
+  don't quote hash numbers we have not measured.
+
+License
+  This wrapper is distributed under the same terms as the surrounding
+  project. XMRig is GPLv3, (c) the XMRig authors; source:
+  https://github.com/xmrig/xmrig — see THIRD_PARTY.md.
 """
 
 import argparse
 import hashlib
 import json
-import multiprocessing
+import os
+import platform
+import shutil
+import subprocess
 import sys
 import time
-from datetime import datetime, timezone
+import urllib.request
+import zipfile
 from pathlib import Path
 
+XMRig_VERSION = "6.26.0"
+DOWNLOADS = Path(__file__).with_name(".runtime")  # gitignored
+APP_DIR = DOWNLOADS / f"xmrig-{XMRig_VERSION}"
 LEDGER = Path(__file__).with_name("precog-earn-ledger.log")
+WALLET_FILE = Path(__file__).with_name("precog-earn-wallet.txt")
+
+# SHA-256 from XMRig v6.26.0's own SHA256SUMS asset (fetched 2026-11-15 from
+# https://github.com/xmrig/xmrig/releases/download/v6.26.0/SHA256SUMS).
+SHA256 = {
+    "xmrig-6.26.0-windows-x64.zip":
+        "bba8097cb37d9b458a1cb1137876b27cde6740d17fe4ccbc086ba07d87d9e147",
+    "xmrig-6.26.0-windows-gcc-x64.zip":
+        "2de2ae3c2d01e6245e41101571cf7bb83e9236e8361213026308228d227b16fb",
+    "xmrig-6.26.0-windows-arm64.zip":
+        "958952de131c392a4e1e9656a1d70c3916d09d5a1f5e3f8c67dc0e6f35dbd76a",
+    "xmrig-6.26.0-linux-static-x64.tar.gz":
+        "fc6f8ae5f64e4f17481f7e3be29a1c56949f216a998414188003eae1db20c9e5",
+    "xmrig-6.26.0-macos-x64.tar.gz":
+        "1da924b358c0089e361540c4a9e6f8b09538b29efeafa2379590e0f6db358ff4",
+    "xmrig-6.26.0-macos-arm64.tar.gz":
+        "6ae4eb4216e99a201ae9a3d2c3a7c275207c5165cfc25da1f3d735d6c4829c18",
+}
+BASE_URL = "https://github.com/xmrig/xmrig/releases/download/v" + XMRig_VERSION + "/"
 
 
 def ledger(entry: str) -> None:
-    line = f"{datetime.now(timezone.utc).isoformat()} {entry}\n"
-    LEDGER.open("a", encoding="utf-8").write(line)
+    line = f"{time.strftime('%Y-%m-%dT%H:%M:%S%z')} {entry}\n"
+    with LEDGER.open("a", encoding="utf-8") as fh:
+        fh.write(line)
 
 
-def hash_batch(args):
-    package_id, difficulty, start_nonce, count = args
-    accepted = 0
-    for nonce in range(start_nonce, start_nonce + count):
-        digest = hashlib.sha256(f"{package_id}:{nonce}".encode("utf-8")).hexdigest()
-        if digest.startswith("0" * difficulty):
-            accepted += 1
-    return count, accepted
+def detect_asset() -> str:
+    system = platform.system().lower()
+    machine = (platform.machine() or "").lower()
+    if system == "windows":
+        if machine.startswith(("arm", "aarch")):
+            return "xmrig-6.26.0-windows-arm64.zip"
+        return "xmrig-6.26.0-windows-x64.zip"
+    if system == "linux":
+        return "xmrig-6.26.0-linux-static-x64.tar.gz"
+    if system == "darwin":
+        return "xmrig-6.26.0-macos-arm64.tar.gz" if machine == "arm64" else "xmrig-6.26.0-macos-x64.tar.gz"
+    raise SystemExit("unsupported platform: " + system)
+
+
+def sha256_file(path: Path) -> str:
+    hasher = hashlib.sha256()
+    with path.open("rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            hasher.update(chunk)
+    return hasher.hexdigest()
+
+
+def ensure_xmrig() -> Path:
+    asset = detect_asset()
+    target = APP_DIR / ("xmrig.exe" if platform.system().lower() == "windows" else "xmrig")
+    if target.exists():
+        return target
+
+    APP_DIR.parent.mkdir(parents=True, exist_ok=True)
+    archive = APP_DIR.parent / asset
+    url = BASE_URL + asset
+    print(f"Downloading pinned XMRig v{XMRig_VERSION}: {url}")
+    try:
+        with urllib.request.urlopen(url, timeout=180) as response, archive.open("wb") as fh:
+            shutil.copyfileobj(response, fh)
+    except Exception as exc:  # network/TLS failure
+        raise SystemExit(f"download failed: {exc}")
+
+    expected = SHA256[asset]
+    actual = sha256_file(archive)
+    if actual.lower() != expected.lower():
+        archive.unlink(missing_ok=True)
+        ledger(f"refused: sha256 mismatch for {asset} — archive deleted")
+        raise SystemExit("SHA-256 mismatch; archive deleted. Do not run anything from a mismatched download.")
+
+    ledger(f"verified download {asset} sha256={actual}")
+
+    if asset.endswith(".zip"):
+        with zipfile.ZipFile(archive) as zf:
+            zf.extractall(APP_DIR.parent)
+    else:
+        subprocess.check_call(["tar", "-xf", str(archive), "-C", str(APP_DIR.parent)])
+
+    nested = APP_DIR.parent / Path(asset).with_suffix("").name
+    if nested.is_dir():
+        APP_DIR.mkdir(parents=True, exist_ok=True)
+        for child in nested.iterdir():
+            shutil.move(str(child), str(APP_DIR / child.name))
+        nested.rmdir()
+
+    archive.unlink(missing_ok=True)
+
+    for candidate in [target] + list(APP_DIR.glob("xmrig*")):
+        candidate = Path(candidate)
+        if candidate.is_file():
+            if platform.system().lower() != "windows":
+                candidate.chmod(0o755)
+            return candidate
+    raise SystemExit("xmrig binary not found after extract")
+
+
+def load_wallet() -> str:
+    wallet = (os.environ.get("PRECOG_XMR_WALLET") or "").strip()
+    if not wallet and WALLET_FILE.exists():
+        wallet = WALLET_FILE.read_text(encoding="utf-8").strip()
+    if not wallet:
+        print("No XMR wallet configured.")
+        print(f"Write the PreCog treasury address into {WALLET_FILE} (one line),")
+        print("or set PRECOG_XMR_WALLET. Users accrue internal credits from the treasury share.")
+        raise SystemExit(2)
+    if len(wallet) < 95:
+        print("That does not look like a standard Monero address (expected ~95 chars).")
+        raise SystemExit(2)
+    return wallet
+
+
+def run_mining(args) -> int:
+    wallet = load_wallet()
+    binary = ensure_xmrig()
+    pool = args.pool or os.environ.get("PRECOG_XMR_POOL", "pool.supportxmr.com:443")
+    workers = max(1, (os.cpu_count() or 2) - 1)
+    threads = args.threads or workers
+    print("XMRig node starting. Budget:", json.dumps({
+        "pool": pool, "threads": threads,
+        "cpu_priority": args.cpu_priority, "donate_level_pct": args.donate,
+    }))
+    print("Ctrl-C stops mining and the miner child process. Nothing persists.")
+    ledger(f"consent granted; pool={pool} threads={threads} wallet={wallet[:12]}…")
+
+    cmd = [
+        str(binary),
+        "--coin", "monero",
+        "-o", pool,
+        "-u", wallet,
+        "-p", "x",
+        "--threads", str(threads),
+        "--cpu-priority", str(args.cpu_priority),
+        "--donate-level", str(args.donate),
+    ]
+
+    proc = subprocess.Popen(cmd)
+    try:
+        return proc.wait()
+    except KeyboardInterrupt:
+        print("\nStopping miner…")
+        ledger("operator stop: xmrig terminating")
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+        return 0
+    finally:
+        # if anything else throws (parent dies unexpectedly), do not orphan the miner
+        if proc.poll() is None:
+            proc.terminate()
+
+
+def cmd_bench(args) -> int:
+    binary = ensure_xmrig()
+    print("Benchmarking RandomX for a bounded window; nothing is mined.")
+    # xmrig --bench=<N> never returns promptly by itself; enforce a wall-clock limit.
+    wall = args.bench_seconds + 120  # dataset build + bench window
+    proc = subprocess.Popen([str(binary), f"--bench={args.bench_size}", "--donate-level=0"],
+                            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    try:
+        out, _ = proc.communicate(timeout=wall)
+    except subprocess.TimeoutExpired:
+        proc.terminate()
+        try:
+            proc.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            proc.kill()
+        out = "(benchmark exceeded wall-clock limit; miner terminated)"
+    print(out[-3000:] if out else "(no benchmark output)")
+    ledger("consent granted; benchmark completed")
+    return 0
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="PreCog Earn desktop node (pilot) - consent-first proof of work")
-    parser.add_argument("--i-consent", action="store_true", help="explicit consent to hash on this device")
-    parser.add_argument("--lanes", type=int, default=max(1, (multiprocessing.cpu_count() or 2) - 1), help="CPU lanes (default: cores - 1)")
-    parser.add_argument("--difficulty", type=int, default=2, choices=range(1, 7), metavar="N", help="leading zero hex digits required (1-6)")
-    parser.add_argument("--duration", type=int, default=30, help="seconds to run (default: 30)")
-    parser.add_argument("--package", default=None, help="work package id (default: random)")
+    parser = argparse.ArgumentParser(description="PreCog Earn desktop node (XMR, production pilot)")
+    parser.add_argument("--i-consent", action="store_true", help="explicit consent to run XMRig on this device")
+    parser.add_argument("--start", action="store_true", help="mine RandomX on this device")
+    parser.add_argument("--bench", action="store_true", help="bounded benchmark (not mining)")
+    parser.add_argument("--bench-seconds", type=int, default=10)
+    parser.add_argument("--bench-size", default="1M", help="xmrig --bench=N, e.g. 1M..10M")
+    parser.add_argument("--threads", type=int, default=None, help="CPU threads (default: cores - 1)")
+    parser.add_argument("--cpu-priority", type=int, default=2, help="XMRig CPU priority 0-5")
+    parser.add_argument("--donate", type=int, default=1, help="donate level percent 0-99 (default 1)")
+    parser.add_argument("--pool", default=None, help="pool host:port (default pool.supportxmr.com:443)")
     args = parser.parse_args()
 
     if not args.i_consent:
-        print("Refusing to start: re-run with --i-consent after reading companions/README.md.")
-        print("This node hashes SHA-256 on this device's CPU and nothing else. No wallet, no pool, no keys.")
+        print("Refusing to run: re-run with --i-consent after reading companions/README.md.")
+        print("This node downloads nothing and mines nothing until consent is given.")
         return 2
 
-    lanes = max(1, min(args.lanes, multiprocessing.cpu_count() or 1))
-    package_id = args.package or f"PC-DESK-{int(time.time()) % 10000:04d}"
-    budget = {"lanes": lanes, "difficulty": args.difficulty, "duration_s": args.duration, "package": package_id}
-    print("PreCog Earn desktop node starting with budget:", json.dumps(budget))
-    print("Stop any time with Ctrl-C. Electricity is a real cost; this demo pays nothing.")
-    ledger(f"consent granted; budget={json.dumps(budget)}")
+    if args.bench:
+        ledger("consent granted; benchmark mode")
+        return cmd_bench(args)
 
-    deadline = time.monotonic() + args.duration
-    nonce = 1
-    total_attempts = 0
-    total_accepted = 0
-    batch = 400
+    if args.start:
+        return run_mining(args)
 
-    with multiprocessing.Pool(lanes) as pool:
-        while time.monotonic() < deadline:
-            work = []
-            for _ in range(lanes):
-                work.append((package_id, args.difficulty, nonce, batch))
-                nonce += batch
-            for attempts, accepted in pool.map(hash_batch, work):
-                total_attempts += attempts
-                total_accepted += accepted
-            rate = total_attempts / max(0.1, (args.duration - (deadline - time.monotonic())))
-            print(f"\rattempts={total_attempts} accepted={total_accepted} rate={rate:,.0f} H/s", end="", flush=True)
-
-    summary = {"attempts": total_attempts, "accepted": total_accepted, "package": package_id}
-    ledger(f"session complete; summary={json.dumps(summary)}")
-    print("\nSession complete:", json.dumps(summary))
-    print(f"Ledger written to {LEDGER}")
+    parser.print_help()
+    print("\nChoose --bench (verify install) or --start (mine).")
     return 0
 
 

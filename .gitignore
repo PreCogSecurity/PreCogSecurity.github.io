@@ -8,3 +8,12 @@ Thumbs.db
 !.env.example
 
 companions/desktop/precog-earn-ledger.log
+
+companions/desktop/.runtime/
+companions/desktop/precog-earn-ledger.log
+companions/desktop/precog-earn-wallet.txt
+companions/credits/precog-earn-credits.jsonl
+companions/credits/precog-earn-payout-drafts.json
+
+__pycache__/
+*.pyc

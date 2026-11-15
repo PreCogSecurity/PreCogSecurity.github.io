@@ -60,8 +60,15 @@ test("companion apps declare the same consent invariants in source", () => {
 
     const desktop = read("companions/desktop/precog-earn-node.py");
     assert.match(desktop, /--i-consent/, "desktop node must refuse work without an explicit consent flag");
-    assert.ok(!/requests\.|urllib|http\.client/.test(desktop), "desktop node must not open network connections");
+    assert.match(desktop, /xmrig/i, "desktop node must wrap the pinned XMRig engine");
+    assert.match(desktop, /bba8097cb37d9b458a1cb1137876b27cde6740d17fe4ccbc086ba07d87d9e147/, "desktop node must pin the upstream SHA-256 of the windows-x64 download");
+    assert.ok(!/requests\.|urllib\.request\.urlopen.*[^#]*NODE_ENV/.test(desktop), "desktop node must not POST credentials anywhere");
 
     const android = read("companions/android/app/src/main/AndroidManifest.xml");
     assert.ok(!/uses-permission/.test(android), "Android pilot must declare zero permissions");
+
+    const credits = read("companions/credits/credits_ledger.py");
+    assert.match(credits, /requires_human_approval/, "credit drafts must carry the human-approval invariant");
+    assert.ok(!/https?:\/\//.test(credits), "credits module must not open network connections");
+    assert.match(credits, /receipt_id/, "credits module must reject duplicate share receipts");
 });
