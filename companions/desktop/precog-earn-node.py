@@ -163,15 +163,60 @@ def load_wallet() -> str:
     return wallet
 
 
+def _user_handle(args) -> str:
+    # Pseudonymous, stable per-machine handle. Never the wallet address.
+    handle = (os.environ.get("PRECOG_USER_HANDLE") or "").strip()
+    if handle:
+        return handle
+    identity = DOWNLOADS / "identity.txt"
+    if identity.exists():
+        return identity.read_text(encoding="utf-8").strip()
+    DOWNLOADS.mkdir(parents=True, exist_ok=True)
+    import secrets as _secrets
+    handle = "h_" + _secrets.token_hex(16)
+    identity.write_text(handle + "\n", encoding="utf-8")
+    return handle
+
+
+def report_session(shares: int, job_id: str) -> None:
+    url = (os.environ.get("PRECOG_PAYOUT_URL") or "").strip()
+    key = os.environ.get("PRECOG_NODE_HMAC_KEY") or ""
+    if not url or not key:
+        print("receipt report skipped: PRECOG_PAYOUT_URL / PRECOG_NODE_HMAC_KEY not set (mining still works)")
+        return
+    import hmac as _hmac
+    import hashlib as _hashlib
+    import urllib.request as _urlreq
+    handle = _user_handle(None)
+    body = json.dumps({"user_handle": handle, "job_id": job_id, "shares": shares}).encode()
+    sig = _hmac.new(key.encode(), body, _hashlib.sha256).hexdigest()
+    req = _urlreq.Request(url.rstrip("/") + "/v1/receipt", data=body, method="POST",
+                          headers={"content-type": "application/json",
+                                   "x-precog-signature": sig,
+                                   "x-precog-node": platform.node()[:120] or "node",
+                                   "user-agent": "precog-earn-node/1.0 (+https://precogsecurity.pages.dev/earn)"})
+    try:
+        with _urlreq.urlopen(req, timeout=10) as resp:
+            print("receipt reported:", resp.status, resp.read().decode()[:120])
+    except Exception as exc:
+        print(f"receipt report failed (mining unaffected): {type(exc).__name__}")
+
+
 def run_mining(args) -> int:
     wallet = load_wallet()
     binary = ensure_xmrig()
     pool = args.pool or os.environ.get("PRECOG_XMR_POOL", "stratum+ssl://pool.supportxmr.com:443")
     workers = max(1, (os.cpu_count() or 2) - 1)
     threads = args.threads or workers
+    import time as _time
+    import uuid as _uuid
+    import re as _re
+    job_id = _uuid.uuid4().hex[:12]
+    log_path = DOWNLOADS / "xmrig.log"
     print("XMRig node starting. Budget:", json.dumps({
         "pool": pool, "threads": threads,
         "cpu_priority": args.cpu_priority, "donate_level_pct": args.donate,
+        "job_id": job_id,
     }))
     print("Ctrl-C stops mining and the miner child process. Nothing persists.")
     ledger(f"consent granted; pool={pool} threads={threads} wallet={wallet[:12]}…")
@@ -185,11 +230,12 @@ def run_mining(args) -> int:
         "--threads", str(threads),
         "--cpu-priority", str(args.cpu_priority),
         "--donate-level", str(args.donate),
+        "--log-file", str(log_path),
     ]
 
     proc = subprocess.Popen(cmd)
     try:
-        return proc.wait()
+        code = proc.wait()
     except KeyboardInterrupt:
         print("\nStopping miner…")
         ledger("operator stop: xmrig terminating")
@@ -198,11 +244,24 @@ def run_mining(args) -> int:
             proc.wait(timeout=10)
         except subprocess.TimeoutExpired:
             proc.kill()
-        return 0
+        code = 0
     finally:
-        # if anything else throws (parent dies unexpectedly), do not orphan the miner
         if proc.poll() is None:
             proc.terminate()
+
+    # Report cumulative accepted shares from the XMRig log, if any.
+    try:
+        text = log_path.read_text(encoding="utf-8", errors="ignore") if log_path.exists() else ""
+        matches = _re.findall(r"accepted:\s*(\d+)\s*/\s*\d+", text)
+        shares = max([int(m) for m in matches], default=0)
+    except Exception:
+        shares = 0
+    if shares > 0:
+        report_session(shares, job_id)
+        ledger(f"receipts reported: shares={shares} job={job_id}")
+    else:
+        print("no accepted shares in this session; nothing to report (ledger clean)")
+    return code
 
 
 def cmd_bench(args) -> int:
