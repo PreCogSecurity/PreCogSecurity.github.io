@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none';">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PreCog Earn is live — mine real Monero, split the upside | PreCog Security</title>
+    <meta name="description" content="The desktop node is out. RandomX mining, SHA-256-verified XMRig, an auditable hash-chained ledger, and a declared 50/50 redemption pool of net proceeds. Honest numbers, honest mechanics.">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="PreCog Earn is live — mine real Monero, split the upside">
+    <meta property="og:description" content="Desktop node mines RandomX for the PreCog treasury. You bank credits on a hash-chained public ledger. Half of declared net proceeds funds pro-rata redemption. Human-approved payouts only.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://precogsecurity.pages.dev/blog/precog-earn-is-live.html">
+    <meta name="theme-color" content="#0a0e17">
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+    <link rel="stylesheet" href="../assets/fonts.css">
+    <link rel="stylesheet" href="../assets/blog.css">
+</head>
+<body>
+
+<div class="hero">
+    <div class="container">
+        <span class="kicker">Launch</span>
+        <h1>PreCog Earn is live</h1>
+        <p class="standfirst">
+            The desktop node is out: real RandomX mining, an auditable share ledger,
+            and a declared economics blueprint that pays users for the work they do —
+            released pro-rata after human review. It is small, it is honest, and it is
+            shipped.
+        </p>
+        <p class="byline">By PreCog Security &middot; November 2026</p>
+    </div>
+</div>
+
+<article class="container">
+
+    <h2>What shipped, not what I wanted to ship</h2>
+
+    <p>
+        The <a href="../earn.html">PreCog Earn</a> desktop node (v0.1.0) is a consent-gated wrapper around
+        XMRig v6.26.0, pinned and hash-verified against the upstream SHA256SUMS before anything executes
+        on your machine. It mines RandomX to the operator-configured Monero address. It has no tray ghost,
+        no autostart, no background persistence: close the window and the miner dies with it.
+    </p>
+
+    <p>
+        Every valid share your node submits lands on a hash-chained, append-only ledger. Balances are
+        recomputed from the chain — there are no mutable counters to manipulate, no quiet over-crediting,
+        and any retroactive edit breaks the chain for everything after it. Duplicate receipts are rejected
+        and logged.
+    </p>
+
+    <h2>The economics, in public</h2>
+
+    <p>
+        The treasury receives all mined coin. Your credits accrue on the ledger. At each settlement,
+        half of declared net proceeds funds the redemption pool; your payout equals
+        <code>pool × credits_u / Σcredits</code>. Drafts are generated per handle. A human maps handles
+        to declared destinations, reviews every payout, and approves every send. There is no automatic
+        settlement: the ledger stores drafts, humans sign releases.
+    </p>
+
+    <h2>Honest numbers</h2>
+
+    <ul>
+        <li>Node v0.1.0 — Windows, macOS, Linux; requires Python 3.9+; no admin rights.</li>
+        <li>Reference measurement: ~170 H/s per 3 threads on a 2012 i7-class CPU. That is the order of magnitude, not a promise.</li>
+        <li>Payout cadence: per redemption cycle, after threshold. No interpolation, no weighting, no loyalty tiers.</li>
+        <li>Credits are redemption units, not a security. Not an investment. No promise of return.</li>
+    </ul>
+
+    <h2>What comes next, still public</h2>
+
+    <p>
+        GPU kernels, Android distribution after store review, cohort payout dry-runs before scaling, and
+        a published post-mortem of the first settlement. If any of that disappoints, the ledger will show
+        it before we say anything in prose.
+    </p>
+
+    <h2>Install</h2>
+
+    <p>
+        <a href="../downloads/precog-earn-desktop-v0.1.0.zip">Download the node v0.1.0</a>
+        (<a href="../downloads/SHA256SUMS.txt">SHA256SUMS</a>). Double-click <code>earn.bat</code>, tick consent,
+        press <em>Start mining</em>. Or, from a terminal:
+    </p>
+
+    <p><code>python precog-earn-node.py --i-consent --start</code></p>
+
+    <p>
+        If you are comfortable being node #1 in public, or you want to break this in ways we have not thought
+        of, email
+        <a href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20cohort">timlangeveldt@gmail.com</a>.
+        We read everything, we owe you evidence, not optimism.
+    </p>
+</article>
+
+<footer class="footer">
+    <div class="container footer-inner">
+        <span>2026 PreCog Security</span>
+        <span>PreCog Earn — live. Not an investment. Not a security.</span>
+    </div>
+</footer>
+
+</body>
+</html>
