@@ -11,34 +11,47 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #0a0e17;
-    color: #f1f5f9;
+    background: #05070e;
+    color: #edf3fa;
     line-height: 1.75;
     -webkit-font-smoothing: antialiased;
 }
 
-a { color: #0ea5e9; text-decoration: none; }
-a:hover { text-decoration: underline; }
+a { color: #38bdf8; text-decoration: none; transition: color 0.2s ease; }
+a:hover { color: #7dd3fc; text-decoration: none; }
 
 .container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
 
 .hero {
-    background: linear-gradient(180deg, rgba(14,165,233,0.10), rgba(10,14,23,0));
-    border-bottom: 1px solid #1e293b;
-    padding: 72px 20px 52px;
+    background: linear-gradient(180deg, rgba(56,189,248,0.10), rgba(5,7,14,0));
+    border-bottom: 1px solid rgba(148,197,255,0.10);
+    padding: 76px 20px 56px;
     text-align: center;
+    position: relative;
 }
+
+.hero .container > * { animation: ops-rise 0.85s var(--ops-ease, cubic-bezier(0.22,1,0.36,1)) both; }
+.hero .container > *:nth-child(1) { animation-delay: 0.05s; }
+.hero .container > *:nth-child(2) { animation-delay: 0.16s; }
+.hero .container > *:nth-child(3) { animation-delay: 0.26s; }
+.hero .container > *:nth-child(4) { animation-delay: 0.36s; }
 
 .hero .kicker {
     display: inline-block; font-family: 'JetBrains Mono', monospace;
-    font-size: 0.74rem; font-weight: 700; letter-spacing: 0.12em;
-    text-transform: uppercase; color: #0ea5e9; margin-bottom: 20px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: #38bdf8; margin-bottom: 20px;
+    border: 1px solid rgba(56,189,248,0.35); border-radius: 999px;
+    padding: 6px 16px; background: rgba(56,189,248,0.07);
+    box-shadow: 0 0 22px rgba(56,189,248,0.18);
 }
 
 .hero h1 {
-    font-size: clamp(1.9rem, 4.4vw, 2.8rem); font-weight: 800;
-    letter-spacing: -0.025em; line-height: 1.18; margin-bottom: 18px;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    font-size: clamp(1.9rem, 4.4vw, 2.9rem); font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1.14; margin-bottom: 18px;
     max-width: 720px; margin-left: auto; margin-right: auto;
+    text-wrap: balance;
+    text-shadow: 0 0 44px rgba(56,189,248,0.25);
 }
 
 .hero .standfirst {
@@ -53,8 +66,9 @@ a:hover { text-decoration: underline; }
 article.container { padding-top: 48px; padding-bottom: 56px; }
 
 h2 {
-    color: #f1f5f9; font-size: 1.45rem; font-weight: 700;
-    letter-spacing: -0.015em; margin: 44px 0 14px;
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    color: #edf3fa; font-size: 1.45rem; font-weight: 800;
+    letter-spacing: -0.02em; margin: 44px 0 14px;
 }
 
 h3 { font-size: 1.05rem; font-weight: 700; margin: 26px 0 10px; color: #e2e8f0; }
@@ -67,27 +81,29 @@ li { margin-bottom: 8px; }
 strong { color: #f1f5f9; }
 
 code {
-    background: #111827; border: 1px solid #1e293b;
+    background: #0d1524; border: 1px solid rgba(125,211,252,0.18);
     color: #7dd3fc; padding: 2px 6px; border-radius: 5px;
     font-family: 'JetBrains Mono', monospace; font-size: 0.85em;
 }
 
 pre {
-    background: #0d1117; border: 1px solid #1e293b; color: #94a3b8;
-    padding: 20px; border-radius: 10px; overflow-x: auto; margin: 20px 0;
+    background: #060b13; border: 1px solid rgba(148,197,255,0.10); color: #92a3b8;
+    padding: 20px; border-radius: 12px; overflow-x: auto; margin: 20px 0;
     font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; line-height: 1.7;
+    box-shadow: inset 0 0 28px rgba(0,0,0,0.55);
 }
 
 blockquote {
-    border-left: 3px solid #0ea5e9; background: #111827;
-    border-radius: 0 10px 10px 0; padding: 18px 22px; margin: 24px 0;
+    border-left: 3px solid #38bdf8; background: linear-gradient(90deg, rgba(56,189,248,0.08), #0d1524);
+    border-radius: 0 12px 12px 0; padding: 18px 22px; margin: 24px 0;
     color: #e2e8f0;
 }
 
 .callout {
-    border: 1px solid #1e293b; border-left: 3px solid #10b981;
-    background: #111827; border-radius: 0 10px 10px 0;
+    border: 1px solid rgba(52,211,153,0.25); border-left: 3px solid #34d399;
+    background: linear-gradient(90deg, rgba(52,211,153,0.06), #0d1524); border-radius: 0 12px 12px 0;
     padding: 20px 24px; margin: 26px 0;
+    box-shadow: 0 0 30px rgba(52,211,153,0.07);
 }
 
 .callout .callout-label {
@@ -97,18 +113,23 @@ blockquote {
 }
 
 .cta {
-    display: inline-block; background: #0ea5e9; color: #fff;
-    padding: 13px 26px; border-radius: 9px; text-decoration: none;
-    font-weight: 600; margin: 12px 10px 12px 0;
+    display: inline-block;
+    background: linear-gradient(135deg, #7dd3fc, #38bdf8 55%, #0284c7);
+    color: #04121d;
+    padding: 13px 26px; border-radius: 11px; text-decoration: none;
+    font-weight: 700; margin: 12px 10px 12px 0;
+    box-shadow: 0 10px 30px rgba(56,189,248,0.28), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
 
-.cta:hover { background: #0284c7; text-decoration: none; }
+.cta:hover { transform: translateY(-2px); box-shadow: 0 14px 38px rgba(56,189,248,0.36), inset 0 1px 0 rgba(255,255,255,0.45); text-decoration: none; }
 
 .cta.secondary {
-    background: transparent; color: #f1f5f9; border: 1px solid #334155;
+    background: rgba(148,197,255,0.04); color: #edf3fa; border: 1px solid rgba(148,197,255,0.22);
+    box-shadow: none;
 }
 
-.cta.secondary:hover { border-color: #0ea5e9; color: #0ea5e9; background: transparent; }
+.cta.secondary:hover { border-color: #38bdf8; color: #7dd3fc; background: rgba(56,189,248,0.06); transform: translateY(-2px); }
 
 .checklist { list-style: none; margin-left: 0; }
 .checklist li { padding-left: 26px; position: relative; }
@@ -118,10 +139,10 @@ blockquote {
 }
 
 .footer {
-    background: #0d1117; border-top: 1px solid #1e293b;
-    color: #94a3b8; text-align: center; padding: 36px 20px;
+    background: #060b13; border-top: 1px solid rgba(148,197,255,0.10);
+    color: #92a3b8; text-align: center; padding: 36px 20px;
     font-size: 0.85rem;
 }
 
-.footer a { color: #0ea5e9; }
-.footer .footer-brand { font-weight: 700; color: #f1f5f9; margin-bottom: 8px; }
+.footer a { color: #38bdf8; }
+.footer .footer-brand { font-weight: 700; color: #edf3fa; margin-bottom: 8px; }

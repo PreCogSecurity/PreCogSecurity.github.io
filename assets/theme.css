@@ -1,0 +1,146 @@
+/*
+ * theme.css - the shared "night-ops console" layer.
+ *
+ * ONE visual language for every PreCog surface: deep-space base, a slow
+ * aurora glow, a fine console grid, glass panels, cyan/mint glow accents
+ * and JetBrains Mono readouts. Page stylesheets keep their layout rules;
+ * this file owns the atmosphere, the motion vocabulary and the
+ * accessibility floor (focus rings, selection, reduced motion).
+ *
+ * Hard rules this file keeps:
+ *   - CSS only. No images, no fonts beyond the self-hosted @font-face set
+ *     in fonts.css, no external origins, nothing that widens the CSP.
+ *   - Cheap on old CPUs: opacity/transform animations only, one fixed
+ *     layer per effect, static grid, no blur animation.
+ *   - prefers-reduced-motion honoured by turning every animation and
+ *     transition off, including the smooth scroll.
+ *   - Honest motion: pulses and sweeps signify "live", never fake activity.
+ */
+
+:root {
+    --ops-bg: #05070e;
+    --ops-panel: #0d1524;
+    --ops-panel-2: #111b2e;
+    --ops-line: rgba(148, 197, 255, 0.10);
+    --ops-line-strong: rgba(125, 211, 252, 0.32);
+    --ops-text: #edf3fa;
+    --ops-muted: #92a3b8;
+    --ops-dim: #5f7086;
+    --ops-cyan: #38bdf8;
+    --ops-cyan-bright: #7dd3fc;
+    --ops-cyan-deep: #0284c7;
+    --ops-mint: #34f5c5;
+    --ops-green: #34d399;
+    --ops-amber: #fbbf24;
+    --ops-red: #f87171;
+    --ops-violet: #a78bfa;
+    --ops-glow-cyan: 0 0 26px rgba(56, 189, 248, 0.28);
+    --ops-glow-mint: 0 0 26px rgba(52, 245, 197, 0.24);
+    --ops-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── Aurora + console grid ───────────────────────────────
+ * body::before is the breathing aurora (opacity animation only).
+ * body::after is the static fine grid, masked toward the top.
+ * Both are fixed, non-interactive and behind everything. */
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+body::before {
+    background:
+        radial-gradient(52rem 36rem at 12% -12%, rgba(56, 189, 248, 0.16), transparent 62%),
+        radial-gradient(46rem 34rem at 88% 2%, rgba(167, 139, 250, 0.13), transparent 64%),
+        radial-gradient(62rem 44rem at 50% 118%, rgba(52, 245, 197, 0.09), transparent 62%);
+    animation: aurora-breathe 18s ease-in-out infinite alternate;
+}
+
+body::after {
+    background-image:
+        linear-gradient(rgba(148, 197, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 197, 255, 0.045) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(ellipse 95% 72% at 50% 0%, black 25%, transparent 78%);
+    mask-image: radial-gradient(ellipse 95% 72% at 50% 0%, black 25%, transparent 78%);
+}
+
+@keyframes aurora-breathe {
+    from { opacity: 0.62; }
+    to   { opacity: 1; }
+}
+
+/* ── Keyframes (shared motion vocabulary) ─────────────── */
+
+/* Live dot: a steady pulse with a soft ping ring. */
+@keyframes ops-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
+    50%      { box-shadow: 0 0 0 5px rgba(52, 211, 153, 0); }
+}
+
+/* Hero/page load reveal. Stagger with animation-delay at call site. */
+@keyframes ops-rise {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* A single light band sweeping a panel, top to bottom. */
+@keyframes ops-scan {
+    0%        { transform: translateY(-120%); opacity: 0; }
+    12%       { opacity: 1; }
+    34%, 100% { transform: translateY(1400%); opacity: 0; }
+}
+
+/* Button sheen sweep on hover. */
+@keyframes ops-sheen {
+    from { transform: translateX(-130%) skewX(-18deg); }
+    to   { transform: translateX(230%) skewX(-18deg); }
+}
+
+/* Blinking caret for mono readouts that represent "listening". */
+@keyframes ops-blink {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.15; }
+}
+
+/* Slow shimmer for skeleton/placeholder states. */
+@keyframes ops-shimmer {
+    from { background-position: -140% 0; }
+    to   { background-position: 240% 0; }
+}
+
+/* ── Accessibility floor ───────────────────────────────── */
+
+:focus-visible {
+    outline: 2px solid var(--ops-cyan);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+::selection {
+    background: rgba(56, 189, 248, 0.30);
+    color: #f0f9ff;
+}
+
+/* Thin dark scrollbars for console panels. */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--ops-panel-2) transparent;
+}
+
+/* ── Reduced motion: everything off, static page wins ─── */
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto !important; }
+
+    *, *::before, *::after {
+        animation: none !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition: none !important;
+    }
+}
