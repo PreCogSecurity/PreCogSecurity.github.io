@@ -209,6 +209,10 @@ def _flush_ledger_once(log_path: Path, job_id: str) -> bool:
     except Exception:
         cumulative = 0
     state = _load_flush_state()
+    # A node restart truncates/creates a fresh log; never compare a new log to a stale high-water mark.
+    if state.get("job_id") != job_id:
+        state = {"job_id": job_id, "last_flush_accepted": 0, "flush_seq": 0}
+        _save_flush_state(state)
     last = int(state.get("last_flush_accepted", 0))
     delta = cumulative - last
     if delta <= 0:
