@@ -67,8 +67,12 @@
                     <div><strong>Credits ledger</strong><span>Append-only, hash-chained, publishable; duplicate receipts rejected.</span></div>
                 </div>
                 <div class="status-row">
+                    <span class="status-badge research">Arming</span>
+                    <div><strong>Automatic settlement rail</strong><span>Payout worker: HMAC-signed share receipts → D1 ledger → armed, idempotent batch sends via the operator's own monero-wallet-rpc. DRY_RUN by default; HALT freezes everything.</span></div>
+                </div>
+                <div class="status-row">
                     <span class="status-badge available">Live</span>
-                    <div><strong>Threshold payouts</strong><span>Pro-rata redemption from 50% of declared net proceeds; human approval gates every send.</span></div>
+                    <div><strong>Threshold payouts</strong><span>Pro-rata redemption from 50% of declared net proceeds; the operator arms automatic execution or keeps every send human-reviewed.</span></div>
                 </div>
                 <div class="status-row">
                     <span class="status-badge research">Pilot</span>
