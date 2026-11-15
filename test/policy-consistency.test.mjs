@@ -31,6 +31,7 @@ import test from "node:test";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { discoverHtmlFiles, repositoryRoot } from "../scripts/site-validator.mjs";
+import config from "../lint.config.mjs";
 
 function readPage(relativePath) {
     return readFileSync(path.join(repositoryRoot, relativePath), "utf8");
@@ -133,10 +134,24 @@ test("every page declares a policy that the validator accepts", () => {
         assert.ok(directives, `${file} must declare a Content-Security-Policy`);
         assert.ok(directives.has("script-src"), `${file} must declare script-src`);
         assert.ok(directives.has("style-src"), `${file} must declare style-src`);
-        assert.ok(
-            directives.get("script-src").includes("'none'"),
-            `${file} must keep script-src 'none' so nothing can execute`,
-        );
+
+        const scriptSources = directives.get("script-src");
+        const scriptEnabled = config.scriptEnabledPages.has(path.posix.basename(file));
+        if (scriptEnabled) {
+            assert.ok(
+                scriptSources.includes("'self'"),
+                `${file} is the interactive console and must load first-party scripts`,
+            );
+            assert.ok(
+                !scriptSources.some((source) => source.includes("unsafe-") || source.startsWith("https:") || source.startsWith("http:")),
+                `${file} must not allow inline or remote scripts`,
+            );
+        } else {
+            assert.ok(
+                scriptSources.includes("'none'"),
+                `${file} must keep script-src 'none' so nothing can execute`,
+            );
+        }
     }
 });
 

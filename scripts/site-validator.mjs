@@ -178,7 +178,17 @@ function checkCsp(metaTags, sourceRelativePath, errors) {
         errors.push(`${sourceRelativePath}: CSP must allow styles only from this origin`);
     }
 
-    if (!/script-src\s+[^;]*'none'/i.test(policy)) {
+    const scriptEnabled = config.scriptEnabledPages.has(path.posix.basename(sourceRelativePath));
+    if (scriptEnabled) {
+        if (
+            !/script-src\s+[^;]*'self'/i.test(policy) ||
+            /script-src\s+[^;]*(?:'unsafe-inline'|'unsafe-eval'|https?:)/i.test(policy)
+        ) {
+            errors.push(
+                `${sourceRelativePath}: CSP must allow only first-party scripts with script-src 'self' on this page`,
+            );
+        }
+    } else if (!/script-src\s+[^;]*'none'/i.test(policy)) {
         errors.push(`${sourceRelativePath}: CSP must disable scripts with script-src 'none'`);
     }
 

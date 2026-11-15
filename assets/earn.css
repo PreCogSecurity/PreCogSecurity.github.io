@@ -393,3 +393,42 @@ footer {
     .stream .val { text-align: left; }
     .nav-links { gap: 0.9rem; font-size: 0.84rem; }
 }
+/* --- Crypto puzzle lanes -------------------------------------------------- */
+.lane-list { display: flex; flex-direction: column; gap: 12px; }
+.lane {
+    border: 1px solid var(--border, #1e293b);
+    border-radius: 12px;
+    padding: 16px 18px;
+    background: rgba(255,255,255,0.02);
+    display: flex; flex-direction: column; gap: 6px;
+}
+.lane-head {
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace;
+}
+.lane-head .lane-name { font-size: 0.88rem; font-weight: 700; color: #f1f5f9; }
+.lane-head .lane-rate {
+    margin-left: auto; font-size: 0.72rem; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.06em;
+}
+.lane p { font-size: 0.85rem; color: #94a3b8; line-height: 1.65; }
+.badge.amber { background: rgba(245,158,11,0.16); color: #f59e0b; border-color: rgba(245,158,11,0.5); }
+.badge.purple { background: rgba(168,85,247,0.16); color: #a855f7; border-color: rgba(168,85,247,0.5); }
+.badge.green { background: rgba(16,185,129,0.16); color: #10b981; border-color: rgba(16,185,129,0.5); }
+
+/* --- Self-upgrade agenda --------------------------------------------------- */
+.agenda { display: flex; flex-direction: column; gap: 9px; list-style: none; }
+.agenda li { font-size: 0.85rem; color: #d1d5db; line-height: 1.6; padding-left: 16px; position: relative; }
+.agenda li::before { content: '\2013'; position: absolute; left: 0; color: #0ea5e9; }
+.agenda .tag {
+    display: inline-block; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.64rem; font-weight: 700; letter-spacing: 0.06em;
+    padding: 2px 7px; border-radius: 5px; margin-right: 8px; vertical-align: 1px;
+}
+.agenda .tag.done { background: rgba(16,185,129,0.16); color: #10b981; }
+.agenda .tag.progress { background: rgba(245,158,11,0.16); color: #f59e0b; }
+.agenda .tag.proposed { background: rgba(168,85,247,0.16); color: #a855f7; }
+
+.hint-tight, .section-sub { margin-top: 1rem; }
+.field-tight { margin-top: 0.9rem; }
+.badge.ghost { background: rgba(148,163,184,0.12); color: #94a3b8; border-color: rgba(148,163,184,0.35); }

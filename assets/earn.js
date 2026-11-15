@@ -8,12 +8,16 @@
     sha256: { label: 'SHA-256', sub: 'Bitcoin-style proof of work', algo: 'SHA-256', prst: 0.0008, cog: 0.04, mult: 1.0 },
     sha512: { label: 'SHA-512', sub: 'High-throughput profile', algo: 'SHA-512', prst: 0.0012, cog: 0.06, mult: 1.1 },
     sha384: { label: 'SHA-384', sub: 'Balanced profile', algo: 'SHA-384', prst: 0.0011, cog: 0.055, mult: 1.05 },
-    sha1: { label: 'SHA-1', sub: 'Legacy high-rate profile', algo: 'SHA-1', prst: 0.0015, cog: 0.08, mult: 1.3 }
+    sha1: { label: 'SHA-1', sub: 'Legacy high-rate profile', algo: 'SHA-1', prst: 0.0015, cog: 0.08, mult: 1.3 },
+    keccak256: { label: 'Keccak-256', sub: 'Ethereum address puzzle', algo: 'keccak256', prst: 0.002, cog: 0.11, mult: 1.6 }
   };
   const STREAMS = [
     { name: 'ZKP hash mining', type: 'crypto', rate: 'variable by profile' },
-    { name: 'Bounty pull requests', type: 'bounty', rate: '$30 - $500 per PR' },
+    { name: 'Keccak-256 puzzle lane', type: 'crypto', rate: 'Ethash-style target' },
+    { name: 'Bounty pull requests', type: 'bounty', rate: '$30 - $5,000 per PR' },
     { name: 'Bug bounty findings', type: 'bounty', rate: '$50 - $5,000 per finding' },
+    { name: 'Puzzle & CTF competitions', type: 'competition', rate: 'per event' },
+    { name: 'Crypto puzzle bounties', type: 'bounty', rate: 'variable, on-chain' },
     { name: 'DataFactor improve loop', type: 'automation', rate: 'passive, CI-gated' },
     { name: 'Storefront operations', type: 'store', rate: 'margin-based' }
   ];
@@ -120,7 +124,76 @@
     $('profile-desc').textContent = p.sub + ' · ' + fmt(p.prst * p.mult, 5) + ' PRST + ' + fmt(p.cog * p.mult, 3) + ' COG per accepted share';
   }
 
+  const KECCAK_MASK = 0xFFFFFFFFFFFFFFFFn;
+  const KECCAK_ROT = [
+    [0, 36, 3, 41, 18],
+    [1, 44, 10, 45, 2],
+    [62, 6, 43, 15, 61],
+    [28, 55, 25, 21, 56],
+    [27, 20, 39, 8, 14]
+  ];
+  const KECCAK_RC = [
+    0x0000000000000001n, 0x0000000000008082n, 0x800000000000808an, 0x8000000080008000n,
+    0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
+    0x000000000000008an, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000an,
+    0x000000008000808bn, 0x800000000000008bn, 0x8000000000008089n, 0x8000000000008003n,
+    0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
+    0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n
+  ];
+
+  function rotl64(value, shift) {
+    return ((value << shift) | (value >> (64n - shift))) & KECCAK_MASK;
+  }
+
+  function keccakF1600(state) {
+    for (let round = 0; round < 24; round++) {
+      const c = new Array(5);
+      for (let x = 0; x < 5; x++) c[x] = state[x] ^ state[x + 5] ^ state[x + 10] ^ state[x + 15] ^ state[x + 20];
+      const d = new Array(5);
+      for (let x = 0; x < 5; x++) d[x] = c[(x + 4) % 5] ^ rotl64(c[(x + 1) % 5], 1n);
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) state[x + 5 * y] ^= d[x];
+      }
+      const b = new Array(25);
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+          b[y + 5 * ((2 * x + 3 * y) % 5)] = rotl64(state[x + 5 * y], BigInt(KECCAK_ROT[x][y]));
+        }
+      }
+      for (let y = 0; y < 5; y++) {
+        for (let x = 0; x < 5; x++) {
+          state[x + 5 * y] = b[x + 5 * y] ^ (~b[(x + 1) % 5 + 5 * y] & b[(x + 2) % 5 + 5 * y]);
+        }
+      }
+      state[0] ^= KECCAK_RC[round];
+    }
+  }
+
+  // Original Keccak-256 (Ethereum-style) padding: 0x01 ... 0x80.
+  function keccak256(message) {
+    const rate = 136;
+    const state = new Array(25).fill(0n);
+    const bytes = new TextEncoder().encode(message);
+    const paddedLength = Math.ceil((bytes.length + 1) / rate) * rate;
+    const padded = new Uint8Array(paddedLength);
+    padded.set(bytes);
+    padded[bytes.length] = 0x01;
+    padded[paddedLength - 1] |= 0x80;
+    for (let offset = 0; offset < paddedLength; offset += rate) {
+      for (let j = 0; j < rate; j++) {
+        state[j >> 3] ^= BigInt(padded[offset + j]) << BigInt((j % 8) * 8);
+      }
+      keccakF1600(state);
+    }
+    let out = '';
+    for (let j = 0; j < 32; j++) {
+      out += ((state[j >> 3] >> BigInt((j % 8) * 8)) & 0xffn).toString(16).padStart(2, '0');
+    }
+    return out;
+  }
+
   async function digest(algo, text) {
+    if (algo === 'keccak256') return keccak256(text);
     const buf = await crypto.subtle.digest(algo, new TextEncoder().encode(text));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
@@ -155,7 +228,7 @@
 
   async function startMining() {
     if (mining) return;
-    if (!crypto.subtle) {
+    if (state.algo !== 'keccak256' && !crypto.subtle) {
       toast('This browser does not expose WebCrypto on this origin.');
       return;
     }
@@ -333,6 +406,9 @@
     const jobs = [
       ['GitHub', 'https://api.github.com/search/issues?q=is:issue+is:open+label%3Abounty&sort=updated&order=desc&per_page=6', normalizeGitHub],
       ['GitHub bug-bounty', 'https://api.github.com/search/issues?q=is:issue+is:open+label%3Abug-bounty&sort=updated&order=desc&per_page=6', normalizeGitHub],
+      ['GitHub paid-task', 'https://api.github.com/search/issues?q=is:issue+is:open+no%3Aassignee+%22%2Fbounty+%24%22+sort%3Acreated-desc&per_page=6', normalizeGitHub],
+      ['Polar', 'https://api.github.com/search/issues?q=is:issue+is:open+no%3Aassignee+commenter%3Apolar-sh&sort=created-desc&per_page=6', normalizeGitHub],
+      ['BossBounty', 'https://api.github.com/search/issues?q=is:issue+is:open+no%3Aassignee+commenter%3Aboss-bounty%5Bbot%5D&sort=created-desc&per_page=6', normalizeGitHub],
       ['Algora', 'https://console.algora.io/api/trpc/bounty.list?input=' + encodeURIComponent(JSON.stringify({ limit: 6, status: 'open' })), normalizeAlgora],
       ['Opire', 'https://api.opire.dev/rewards?limit=6', normalizeOpire]
     ];
@@ -411,10 +487,13 @@
   function localResearch() {
     const cores = navigator.hardwareConcurrency || 4;
     const proposals = [
+      ['Workflow', 'Cycle at 120s; keep GitHub writes serialised in the submitter so one rate limit does not stall a cycle.'],
       ['Concurrency', 'Loop workers ' + LOOP_CONFIG.workers + ' → ' + Math.min(8, cores) + ' to match detected cores; keep API serialisation in the submitter.'],
       ['Model pool', 'Keep cloud-first Gemini/OpenRouter routing with Ollama Phi-4-mini-instruct as the offline fallback; add qwen2.5-coder:7b for patch generation retries.'],
+      ['Architecture', 'Route OpenBot/Odysseus offline tasks around the same gate; let agents propose workflow, model and tooling changes as gated pull requests.'],
+      ['Puzzle desk', 'Add the Keccak-256 / Ethash-style address lane with on-chain entry and claim flow, and track competition reward pools per lane.'],
+      ['Web3', 'Route bounty, puzzle and competition payouts to blessed rails and log every transfer to payout-approvals.json with its txid.'],
       ['Sources', 'Expand watchlist with rustchain-bounties and Algora repos; add a per-source cooldown back-off so one 403 does not stall a cycle.'],
-      ['Web3', 'Route bounty payouts to blessed rails and log every transfer to payout-approvals.json; mine PRST/COG through the Earn console and settle on schedule.'],
       ['Quality', 'Keep CI as the merge gate; add a compacted report summary to each PR so reviewers see findings, fixes and tests.']
     ];
     proposals.forEach(([name, text]) => {

@@ -590,3 +590,135 @@
         @media (max-width: 768px) {
             .loop-strip { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
         }
+
+        /* --- Earn: crypto puzzle mining & bounty board --------------------------------- */
+        .earn-section {
+            padding: 92px 0 84px;
+            background: linear-gradient(180deg, rgba(14,165,233,0.055), rgba(10,14,23,0) 46%);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .earn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px;
+            margin-top: 38px;
+        }
+        .earn-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px;
+            display: flex; flex-direction: column; gap: 12px;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .earn-card:hover {
+            border-color: var(--accent); transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(2, 132, 199, 0.16);
+        }
+        .earn-icon {
+            width: 46px; height: 46px; border-radius: 10px;
+            background: rgba(14,165,233,0.14); border: 1px solid rgba(14,165,233,0.28);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.35rem;
+        }
+        .earn-card h3 { font-size: 1.02rem; font-weight: 700; }
+        .earn-card > p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; }
+        .earn-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; }
+        .earn-list li {
+            position: relative; padding-left: 18px;
+            font-size: 0.84rem; color: var(--text); line-height: 1.5;
+        }
+        .earn-list li::before {
+            content: '\2713'; position: absolute; left: 0; top: 0;
+            color: var(--green); font-family: var(--mono); font-weight: 700; font-size: 0.72rem;
+        }
+        .earn-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 4px; }
+        .earn-meta span {
+            font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.02em;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+            color: var(--text-muted); padding: 4px 10px; border-radius: 999px;
+        }
+        .earn-board {
+            margin-top: 26px; border: 1px solid var(--border);
+            border-radius: 14px; background: var(--bg-card); overflow: hidden;
+        }
+        .earn-board-head {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; flex-wrap: wrap;
+            padding: 18px 22px; border-bottom: 1px solid var(--border);
+        }
+        .earn-board-label {
+            font-family: var(--mono); font-size: 0.74rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+        }
+        .earn-board-note { font-size: 0.8rem; color: var(--text-muted); }
+        .earn-board-rank { display: flex; gap: 8px; flex-wrap: wrap; padding: 14px 22px 8px; }
+        .earn-chip {
+            font-family: var(--mono); font-size: 0.72rem;
+            border: 1px solid var(--border); color: var(--text-muted);
+            border-radius: 6px; padding: 5px 10px; background: rgba(255,255,255,0.02);
+        }
+        .earn-chip.is-live { color: #10b981; border-color: rgba(16,185,129,0.45); }
+        .earn-board-row {
+            display: grid; grid-template-columns: 92px 1fr auto; gap: 16px; align-items: baseline;
+            padding: 14px 22px; border-bottom: 1px solid rgba(30,41,59,0.55);
+            font-size: 0.88rem;
+        }
+        .earn-board-row:last-child { border-bottom: none; }
+        .earn-board-row .src {
+            font-family: var(--mono); font-size: 0.72rem; color: var(--accent);
+            letter-spacing: 0.03em;
+        }
+        .earn-board-row .ttl { font-weight: 600; }
+        .earn-board-row .ttl small {
+            display: block; font-weight: 400; font-size: 0.78rem;
+            color: var(--text-muted); margin-top: 3px;
+        }
+        .earn-board-row .amt {
+            font-family: var(--mono); font-size: 0.84rem; font-weight: 700;
+            color: var(--amber); white-space: nowrap;
+        }
+        .earn-steps {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+            gap: 16px; margin-top: 28px;
+        }
+        .earn-step { border-left: 2px solid var(--accent); padding: 2px 0 2px 14px; }
+        .earn-step .k {
+            font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
+        }
+        .earn-step strong { display: block; font-size: 0.9rem; margin: 4px 0 3px; }
+        .earn-step span { font-size: 0.82rem; color: var(--text-muted); line-height: 1.6; }
+        .cta-group { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+
+        /* --- Earn: self-upgrading loop ------------------------------------------------ */
+        .loop-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 18px; margin-top: 36px;
+        }
+        .loop-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 10px;
+        }
+        .loop-card .loop-kind {
+            font-family: var(--mono); font-size: 0.7rem; font-weight: 700;
+            letter-spacing: 0.09em; text-transform: uppercase; color: var(--green);
+        }
+        .loop-card h3 { font-size: 1rem; font-weight: 700; }
+        .loop-card p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.65; }
+        .loop-card code {
+            font-family: var(--mono); font-size: 0.74rem; color: var(--amber);
+            word-break: break-all;
+        }
+        .loop-status {
+            display: inline-flex; align-items: center; gap: 7px;
+            font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+            color: var(--green); letter-spacing: 0.04em;
+        }
+        .loop-status::before {
+            content: ''; width: 7px; height: 7px; border-radius: 50%;
+            background: var(--green); box-shadow: 0 0 9px rgba(16,185,129,0.8);
+        }
+        @media (max-width: 720px) {
+            .earn-board-row { grid-template-columns: 1fr; gap: 4px; }
+            .earn-board-row .amt { justify-self: start; }
+        }

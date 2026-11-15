@@ -19,6 +19,12 @@ const requiredCspDirectives = [
     "form-action",
 ];
 
+// Interactive pages that must load their own first-party script. The policy
+// for these pages is stricter than the no-script default in every other
+// directive: no inline script, no inline styles, no eval, no remote origin.
+// Everything else on the site must stay script-src 'none'.
+const scriptEnabledPages = new Set(["earn.html"]);
+
 export default {
     allowedAssetProtocols,
     allowedLinkProtocols,
@@ -26,4 +32,5 @@ export default {
     disallowHttpLinks: true,
     requiredCspDirectives,
     requireCaptchaOnForms: true,
+    scriptEnabledPages,
 };

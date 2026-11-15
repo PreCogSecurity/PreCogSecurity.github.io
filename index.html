@@ -453,20 +453,220 @@ missing
     </div>
 </section>
 
-<!-- Earn with PreCog -->
-<section id="earn" class="bluehound-cta">
+<!-- Earn with PreCog: crypto puzzle mining & bounty board -->
+<section id="earn" class="earn-section">
     <div class="container">
         <span class="section-label">Earn with PreCog</span>
-        <h2>Put the autonomous loop to work</h2>
+        <h2 class="section-title">Crypto puzzle mining &amp; the bounty board</h2>
         <p class="section-desc">
-            The same swarm that hunts vulnerabilities also earns. Mine PRST/COG demo credits
-            with real browser proof-of-work, scan live bounties from GitHub, Algora and Opire,
-            connect a wallet to the operator-blessed treasury rails, and inspect the self-review
-            the improvement loop runs on its own workflow and model architecture.
+            The loop is not a marketing claim. It runs continuously, and the earn layer is
+            open: mine demo credits in the browser, read the live funded issues the swarm
+            is watching, enter the puzzle and competition desk, and settle to the
+            operator-blessed treasury rails. Everything below is inspectable.
         </p>
+
+        <div class="earn-grid">
+            <article class="earn-card">
+                <div class="earn-icon">&#x26CF;</div>
+                <h3>Browser puzzle mining</h3>
+                <p>
+                    Real SHA-256 / SHA-512 / SHA-384 / SHA-1 proof-of-work run in this tab
+                    against a live leading-zero target. Difficulty tightens every 40 accepted
+                    shares, and the auto-optimizer picks the profile your cores can feed.
+                </p>
+                <ul class="earn-list">
+                    <li>PRST + COG demo credits per accepted share</li>
+                    <li>Keccak-256 / Ethash-style address-puzzle lane</li>
+                    <li>Session totals, hash rate and share log, no plugins</li>
+                </ul>
+                <div class="earn-meta"><span>WebCrypto</span><span>zero install</span><span>zero fees</span></div>
+            </article>
+
+            <article class="earn-card">
+                <div class="earn-icon">&#x25CE;</div>
+                <h3>Live bounty board</h3>
+                <p>
+                    Six feeds are de-duplicated by issue URL and ranked on expected value
+                    before a line of code is written. The console scans the sources directly
+                    and sorts by published reward where one exists.
+                </p>
+                <ul class="earn-list">
+                    <li>GitHub bounty and bug-bounty label scans</li>
+                    <li>Algora, Opire, Polar and BossBounty lanes</li>
+                    <li>$30 &ndash; $5,000 per funded finding is the common band</li>
+                </ul>
+                <div class="earn-meta"><span>6 feeds</span><span>EV scoring</span></div>
+            </article>
+
+            <article class="earn-card">
+                <div class="earn-icon">&#x2694;</div>
+                <h3>Puzzle &amp; competition desk</h3>
+                <p>
+                    Agents enter on-chain and security competitions the same way they work a
+                    bounty: research, proof, submission, payout. The desk tracks reward pools,
+                    picks the lane, and writes the claim to the ledger.
+                </p>
+                <ul class="earn-list">
+                    <li>Agent-vs-agent bug bounty and CTF lanes</li>
+                    <li>On-chain crypto puzzle and bounty hunts</li>
+                    <li>Competition entry, result and claim flow</li>
+                </ul>
+                <div class="earn-meta"><span>competitions</span><span>claims logged</span></div>
+            </article>
+
+            <article class="earn-card">
+                <div class="earn-icon">&#x20BF;</div>
+                <h3>Treasury rails</h3>
+                <p>
+                    Demo credits and engagement payouts settle to the operator-blessed
+                    destinations below. Nothing leaves the audit ledger, and the address is
+                    shown exactly as it is signed.
+                </p>
+                <ul class="earn-list">
+                    <li><code>bc1qhtnzal6wupj4xg049juwarkqmle7lqxemyezrw</code></li>
+                    <li><code>0xa71b83C6CC50665E4B67fDCEecD63D5100cCf988</code></li>
+                    <li>PayPal, EcoCash and bank transfer by invoice</li>
+                    <li>Every send logged with timestamp, rail and txid</li>
+                </ul>
+                <div class="earn-meta"><span>BTC</span><span>ETH</span><span>fiat rails</span></div>
+            </article>
+        </div>
+
+        <div class="earn-board">
+            <div class="earn-board-head">
+                <span class="earn-board-label">Bounty board &mdash; tracked lanes</span>
+                <span class="earn-board-note">Live scan, de-duplicated and sorted by reward, runs in the Earn console.</span>
+            </div>
+            <div class="earn-board-rank">
+                <span class="earn-chip is-live">LIVE</span>
+                <span class="earn-chip">github:api</span>
+                <span class="earn-chip">algora:api</span>
+                <span class="earn-chip">opire:api</span>
+                <span class="earn-chip">polar:watch</span>
+                <span class="earn-chip">bossbounty:watch</span>
+                <span class="earn-chip">watchlist:repos</span>
+            </div>
+            <div class="earn-board-row">
+                <span class="src">GitHub</span>
+                <span class="ttl">Open issues carrying bounty / bug-bounty labels
+                    <small>Newest first, labelled funded, no assignee.</small>
+                </span>
+                <span class="amt">$30 &ndash; $5,000</span>
+            </div>
+            <div class="earn-board-row">
+                <span class="src">Algora</span>
+                <span class="ttl">Console bounty feed
+                    <small>Open programmes with a published reward.</small>
+                </span>
+                <span class="amt">to $10,000</span>
+            </div>
+            <div class="earn-board-row">
+                <span class="src">Opire</span>
+                <span class="ttl">Public rewards API
+                    <small>Funded issues with a payable reward attached.</small>
+                </span>
+                <span class="amt">$50 &ndash; $5,000</span>
+            </div>
+            <div class="earn-board-row">
+                <span class="src">Puzzle</span>
+                <span class="ttl">Crypto puzzle, CTF and agent competition desk
+                    <small>Reward pools vary per lane; entries are logged.</small>
+                </span>
+                <span class="amt">variable</span>
+            </div>
+        </div>
+
+        <div class="earn-steps">
+            <div class="earn-step">
+                <span class="k">Step 01</span>
+                <strong>Connect</strong>
+                <span>Connect a wallet read-only, or note the rail you want payouts on. No keys are ever requested.</span>
+            </div>
+            <div class="earn-step">
+                <span class="k">Step 02</span>
+                <strong>Mine</strong>
+                <span>Run a puzzle profile in the Earn console; credits accrue locally and settle on the payout cycle.</span>
+            </div>
+            <div class="earn-step">
+                <span class="k">Step 03</span>
+                <strong>Scan</strong>
+                <span>The board queries the live sources and ranks every funded issue by expected value.</span>
+            </div>
+            <div class="earn-step">
+                <span class="k">Step 04</span>
+                <strong>Submit &amp; claim</strong>
+                <span>Ship the pull request, or enter the competition. The ledger records the transfer.</span>
+            </div>
+        </div>
+
         <div class="cta-group">
             <a href="earn.html" class="btn btn-primary">Open the Earn console</a>
             <a href="earn.html#bounties" class="btn btn-secondary">Scan live bounties</a>
+        </div>
+    </div>
+</section>
+
+<!-- Self-upgrading loop -->
+<section id="loop" class="section-alt">
+    <div class="container">
+        <span class="section-label">Self-upgrading loop</span>
+        <h2 class="section-title">The loop studies its own workflow</h2>
+        <p class="section-desc">
+            The swarm is allowed to research its own workflow, model pool and architecture,
+            then propose the change as a gated pull request. That is the only way a
+            self-upgrade ships: it passes the same evidence gate as a security fix.
+        </p>
+
+        <div class="loop-grid">
+            <article class="loop-card">
+                <span class="loop-kind">Workflow</span>
+                <h3>Self-review of the loop itself</h3>
+                <p>
+                    Each research pass scores the cycle interval, concurrency, source
+                    cooldowns, watcher ordering and submitter serialisation, then writes a
+                    proposal an operator can accept, defer or reject.
+                </p>
+                <span class="loop-status">RUNNING &middot; 120s cycle &middot; 4&ndash;8 workers</span>
+            </article>
+
+            <article class="loop-card">
+                <span class="loop-kind">AI software</span>
+                <h3>Model &amp; agent architecture</h3>
+                <p>
+                    Cloud-first routing over Gemini and OpenRouter, with local Ollama
+                    fallbacks on <code>Phi-4-mini-instruct</code> and
+                    <code>qwen2.5-coder:7b</code>. The pool rotates on rate limits and
+                    quality probes instead of failing a cycle.
+                </p>
+                <span class="loop-status">367 models probed &middot; failover tested</span>
+            </article>
+
+            <article class="loop-card">
+                <span class="loop-kind">Web3 agents</span>
+                <h3>Puzzle mining, bounty &amp; competition lanes</h3>
+                <p>
+                    Dedicated agents run browser proof-of-work, submit bounty pull requests,
+                    enter puzzle and CTF competitions, and claim through the treasury bridge.
+                    Every send lands on the audit ledger with its txid.
+                </p>
+                <span class="loop-status">blessed rails &middot; ledger enabled</span>
+            </article>
+
+            <article class="loop-card">
+                <span class="loop-kind">Evidence gate</span>
+                <h3>The gate is the merge gate</h3>
+                <p>
+                    CI, the validator and the test suite decide whether a self-upgrade ships.
+                    Anything that does not pass its own checks is blocked and rolled back,
+                    exactly like a finding that does not reproduce.
+                </p>
+                <span class="loop-status">CI-gated &middot; never force-pushed</span>
+            </article>
+        </div>
+
+        <div class="cta-group">
+            <a href="earn.html#loop" class="btn btn-primary">Open the self-review console</a>
+            <a href="swarm.html" class="btn btn-secondary">Read the operations log</a>
         </div>
     </div>
 </section>
