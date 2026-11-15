@@ -180,6 +180,48 @@ def _user_handle(args) -> str:
     return handle
 
 
+def _flush_state_path() -> Path:
+    return DOWNLOADS / "flush-state.json"
+
+
+def _load_flush_state() -> dict:
+    try:
+        return json.loads(_flush_state_path().read_text(encoding="utf-8"))
+    except Exception:
+        return {"last_flush_accepted": 0}
+
+
+def _save_flush_state(state: dict) -> None:
+    DOWNLOADS.mkdir(parents=True, exist_ok=True)
+    _flush_state_path().write_text(json.dumps(state), encoding="utf-8")
+
+
+def _count_accepted_in_log(text: str) -> int:
+    import re as _re
+    return len(_re.findall(r"accepted\s*\(", text))
+
+
+def _flush_ledger_once(log_path: Path, job_id: str) -> bool:
+    import re as _re
+    try:
+        text = log_path.read_text(encoding="utf-8", errors="ignore") if log_path.exists() else ""
+        cumulative = _count_accepted_in_log(text)
+    except Exception:
+        cumulative = 0
+    state = _load_flush_state()
+    last = int(state.get("last_flush_accepted", 0))
+    delta = cumulative - last
+    if delta <= 0:
+        return False
+    flush_seq = int(state.get("flush_seq", 0)) + 1
+    unique_job = f"{job_id}-flush-{flush_seq}"
+    report_session(delta, unique_job)
+    state["last_flush_accepted"] = cumulative
+    state["flush_seq"] = flush_seq
+    _save_flush_state(state)
+    return True
+
+
 def report_session(shares: int, job_id: str) -> None:
     url = (os.environ.get("PRECOG_PAYOUT_URL") or "").strip()
     key = os.environ.get("PRECOG_NODE_HMAC_KEY") or ""
@@ -236,6 +278,22 @@ def run_mining(args) -> int:
     ]
 
     proc = subprocess.Popen(cmd)
+
+    # Start a live receipt flusher: every ~20s it re-reads the XMRig log,
+    # computes how many accepted shares we have seen cumulatively since this
+    # session started, and POSTs only the delta to the settlement rail.
+    import threading as _threading
+
+    flush_stop = _threading.Event()
+
+    def flush_loop():
+        while not flush_stop.is_set():
+            _flush_ledger_once(log_path, job_id)
+            flush_stop.wait(20)
+
+    flusher = _threading.Thread(target=flush_loop, name="earn-receipt-flush", daemon=True)
+    flusher.start()
+
     try:
         code = proc.wait()
     except KeyboardInterrupt:
@@ -248,21 +306,16 @@ def run_mining(args) -> int:
             proc.kill()
         code = 0
     finally:
+        flush_stop.set()
+        flusher.join(timeout=5)
+        final = _flush_ledger_once(log_path, job_id)
+        if final:
+            ledger(f"receipt posted at session end: job_id={job_id}")
+        else:
+            print("final flush produced no delta (operator keeps only what was already posted)")
         if proc.poll() is None:
             proc.terminate()
 
-    # Report cumulative accepted shares from the XMRig log, if any.
-    try:
-        text = log_path.read_text(encoding="utf-8", errors="ignore") if log_path.exists() else ""
-        matches = _re.findall(r"accepted:\s*(\d+)\s*/\s*\d+", text)
-        shares = max([int(m) for m in matches], default=0)
-    except Exception:
-        shares = 0
-    if shares > 0:
-        report_session(shares, job_id)
-        ledger(f"receipts reported: shares={shares} job={job_id}")
-    else:
-        print("no accepted shares in this session; nothing to report (ledger clean)")
     return code
 
 
