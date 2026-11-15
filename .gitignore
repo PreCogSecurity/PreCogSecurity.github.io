@@ -17,3 +17,5 @@ companions/credits/precog-earn-payout-drafts.json
 
 __pycache__/
 *.pyc
+
+companions/desktop/.runtime/

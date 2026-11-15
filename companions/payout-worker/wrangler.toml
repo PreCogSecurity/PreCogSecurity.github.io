@@ -7,7 +7,7 @@ compatibility_date = "2026-11-15"
 [[d1_databases]]
 binding = "LEDGER"
 database_name = "precog-earn-ledger"
-database_id = "REPLACE_WITH_YOUR_D1_ID"
+database_id = "d69afa29-3b30-4c7a-bd79-6ec251f5613c"
 
 # DO NOT add secrets to this file. Set them with:
 #   wrangler secret put ADMIN_TOKEN       (bearer for operator endpoints)
