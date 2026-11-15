@@ -30,6 +30,25 @@
 3. Draft payouts are only generated when a balance crosses the threshold;
    they carry `requires_human_approval: true`.
 
+## 50/50 redemption protocol (company treasury model)
+
+Mined XMR lands in the company treasury. Economics and etiquette:
+
+- 50% of **net** proceeds (after pool fee, network fee, and wear reserve)
+  is declared in an off-cycle human sign-off (`pool-statement.json`:
+  `net_xmr`, `split_pct`, optional `price_usd`).
+- That half funds the **redemption pool**: each credit is redeemable for an
+  equal slice of the pool (`credits_u / outstanding_credits × pool`).
+- `python credits_ledger.py allocate-redemption --statement stmt.json`
+  writes one DRAFT per outstanding handle into
+  `precog-earn-payout-drafts.json`, each flagged `requires_human_approval`.
+- A human maps handles → declared payout destinations and records sends in
+  the approval ledger. No code executes settlement.
+- The public chain + public allocation math IS the whole proof to users:
+  here is every share ever logged and the division of every declared pool.
+  If payout rates ever disagree with published math, the company is caught
+  by its own ledger — that is the mechanism, nothing more mystical.
+
 ## Payout flow (human-gated, always)
 
 1. Node mines to the **company treasury** (operator-blessed BTC/XMR/ETH rail).

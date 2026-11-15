@@ -138,6 +138,11 @@ def main() -> int:
     sub.add_parser("report")
     sub.add_parser("verify")
 
+    p = sub.add_parser("allocate-redemption")
+    p.add_argument("--statement", required=True,
+                   help="JSON file: {\"net_xmr\": <float>, \"split_pct\": 50, \"price_usd\": <float optional>}")
+    p.add_argument("--out", default=str(Path(__file__).with_name("precog-earn-payout-drafts.json")))
+
     p = sub.add_parser("draft-payouts")
     p.add_argument("--threshold", type=float, default=DEFAULT_THRESHOLD)
     p.add_argument("--out", default=str(Path(__file__).with_name("precog-earn-payout-drafts.json")))
@@ -175,6 +180,48 @@ def main() -> int:
         return 0
     if args.command == "verify":
         return 0 if verify_chain() else 1
+    if args.command == "allocate-redemption":
+        # 50/50 profit-sharing redemption: of the declared NET pool proceeds,
+        # split_pct% is earmarked for pro-rata credit redemption. No price is
+        # fetched here; price discovery is the human approver's problem.
+        stmt = json.loads(Path(args.statement).read_text(encoding="utf-8"))
+        net_xmr = float(stmt["net_xmr"])
+        split_pct = float(stmt.get("split_pct", 50.0))
+        if not (0.0 <= split_pct <= 100.0):
+            print("split_pct must be between 0 and 100")
+            return 1
+        total = sum(totals.values())
+        if total <= 0:
+            print("no credits outstanding; nothing to allocate")
+            return 1
+        pool = net_xmr * split_pct / 100.0
+        drafts = []
+        for user, credits in sorted(totals.items(), key=lambda kv: -kv[1]):
+            amount = pool * (credits / total)
+            drafts.append({
+                "kind": "draft",
+                "channel": "earn-redemption",
+                "destination": user,  # handle -> wallet mapping is a human step
+                "amount_xmr": round(amount, 12),
+                "amount_usd": (round(amount * float(stmt["price_usd"]), 2)
+                               if "price_usd" in stmt else None),
+                "credits_redeemed": credits,
+                "allocation": "proportional",
+                "issuer": "company-treasury",
+                "requires_human_approval": True,
+            })
+        out_path = Path(args.out)
+        out_path.write_text(json.dumps({
+            "note": "DRAFTS ONLY. 50/50 redemption pool. No money moved. "
+                    "Human review must map handles to payout destinations and approve each send.",
+            "statement": stmt,
+            "redemption_pool_xmr": round(pool, 8),
+            "total_outstanding_credits": total,
+            "ledger_tip": entries[-1]["hash"] if entries else None,
+            "drafts": drafts,
+        }, indent=2), encoding="utf-8")
+        print(f"wrote {len(drafts)} redemption drafts (pool {pool:.6f} XMR) to {out_path}")
+        return 0
     if args.command == "draft-payouts":
         drafts = []
         for user, credits in totals.items():
