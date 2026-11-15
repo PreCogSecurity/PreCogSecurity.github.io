@@ -14,9 +14,10 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="PreCog Security — We Break In, Then We Ship the Fix">
     <meta name="twitter:description" content="Continuous adversary simulation, verified findings, and the fix, the detection and the test that follow.">
-    <meta name="theme-color" content="#0a0e17">
+    <meta name="theme-color" content="#05070e">
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
     <link rel="stylesheet" href="assets/fonts.css">
+    <link rel="stylesheet" href="assets/theme.css">
     <link rel="stylesheet" href="assets/site.css">
     <script type="application/ld+json">
     {
@@ -602,6 +603,112 @@ missing
         <div class="cta-group">
             <a href="earn.html" class="btn btn-primary">Open the Earn console</a>
             <a href="earn.html#bounties" class="btn btn-secondary">Scan live bounties</a>
+        </div>
+    </div>
+</section>
+
+<!-- PreCog Vault: design preview (watch-only wallet) -->
+<section id="vault" class="vault-section">
+    <div class="container">
+        <span class="vault-badge">In design &mdash; not available</span>
+        <h2 class="section-title">PreCog Vault, a wallet that watches before it spends</h2>
+        <p class="section-desc">
+            A watch-only wallet first: you import public keys or descriptors, PreCog
+            computes balances and history, and nothing that can move funds ever
+            touches our service. Spending comes later &mdash; after the audits,
+            not before them. The goal is most of your portfolio in one honest
+            ledger, with the least possible trust required.
+        </p>
+        <div class="vault-grid">
+            <div class="vault-panel" role="img" aria-label="Illustration of the PreCog Vault watch-only portfolio showing sample balances across twelve assets. All figures are illustrative.">
+                <div class="vault-panel-head">
+                    <span class="vault-panel-title"><span class="vault-lock">&#x1F512;</span> Watch-only portfolio</span>
+                    <span class="vault-sample">Sample data</span>
+                </div>
+                <div class="vault-total">
+                    <span class="vault-total-label">Combined value &mdash; 12 assets</span>
+                    <span class="vault-total-value">$13,482.10</span>
+                    <span class="vault-total-sub">+2.4% this week &middot; read-only &middot; every figure illustrative</span>
+                </div>
+                <div class="vault-coins">
+                    <div class="vault-coin-row">
+                        <span class="vault-coin-glyph">BTC</span>
+                        <span><span class="vault-coin-name">Bitcoin</span><span class="vault-coin-amount">0.0821 BTC</span></span>
+                        <span class="vault-coin-value">$7,912.40</span>
+                        <span class="vault-coin-delta is-up">+3.1%</span>
+                    </div>
+                    <div class="vault-coin-row">
+                        <span class="vault-coin-glyph">ETH</span>
+                        <span><span class="vault-coin-name">Ethereum</span><span class="vault-coin-amount">1.62 ETH + 6 tokens</span></span>
+                        <span class="vault-coin-value">$4,118.20</span>
+                        <span class="vault-coin-delta is-up">+1.8%</span>
+                    </div>
+                    <div class="vault-coin-row">
+                        <span class="vault-coin-glyph">XMR</span>
+                        <span><span class="vault-coin-name">Monero</span><span class="vault-coin-amount">3.40 XMR</span></span>
+                        <span class="vault-coin-value">$612.30</span>
+                        <span class="vault-coin-delta is-down">&minus;0.9%</span>
+                    </div>
+                    <div class="vault-coin-row">
+                        <span class="vault-coin-glyph">SOL</span>
+                        <span><span class="vault-coin-name">Solana</span><span class="vault-coin-amount">8.20 SOL + 3 tokens</span></span>
+                        <span class="vault-coin-value">$1,181.90</span>
+                        <span class="vault-coin-delta is-up">+5.2%</span>
+                    </div>
+                    <div class="vault-coin-row">
+                        <span class="vault-coin-glyph">USDC</span>
+                        <span><span class="vault-coin-name">USD Coin</span><span class="vault-coin-amount">742.00 USDC &middot; Ethereum</span></span>
+                        <span class="vault-coin-value">$742.00</span>
+                        <span class="vault-coin-delta">&middot;&middot;&middot;</span>
+                    </div>
+                    <div class="vault-coin-row">
+                        <span class="vault-coin-glyph">LTC</span>
+                        <span><span class="vault-coin-name">Litecoin</span><span class="vault-coin-amount">2.10 LTC</span></span>
+                        <span class="vault-coin-value">$215.30</span>
+                        <span class="vault-coin-delta is-up">+0.7%</span>
+                    </div>
+                </div>
+                <div class="vault-panel-foot">
+                    <span>xpub import &middot; 14 networks detected</span>
+                    <span>keys stay on this device</span>
+                </div>
+            </div>
+            <div>
+                <span class="section-label">Design principles</span>
+                <ul class="vault-principles">
+                    <li>
+                        <div class="why-check">&#x2713;</div>
+                        <div><strong>Watch-only first</strong>
+                        Balances, history and labels computed from public keys and descriptors. Our service never sees anything that can sign.</div>
+                    </li>
+                    <li>
+                        <div class="why-check">&#x2713;</div>
+                        <div><strong>Many coins, minimal fuss</strong>
+                        One import flow across Bitcoin, Ethereum, Monero, Solana and their token standards; the long tail grows from an open asset registry rather than hand-picked listings.</div>
+                    </li>
+                    <li>
+                        <div class="why-check">&#x2713;</div>
+                        <div><strong>Keys never move</strong>
+                        When signing lands, it happens on your device against an open-source core that has passed external review. PreCog cannot approve, delay or redirect a transaction.</div>
+                    </li>
+                    <li>
+                        <div class="why-check">&#x2713;</div>
+                        <div><strong>No seed, no custody, no exceptions</strong>
+                        We will never ask for a seed phrase or private key. If a page claiming to be PreCog asks for one, it is not PreCog.</div>
+                    </li>
+                </ul>
+                <div class="vault-chips">
+                    <span class="vault-chip">BTC</span><span class="vault-chip">ETH</span><span class="vault-chip">XMR</span><span class="vault-chip">SOL</span><span class="vault-chip">USDC</span><span class="vault-chip">USDT</span><span class="vault-chip">LTC</span><span class="vault-chip">DOGE</span><span class="vault-chip">ADA</span><span class="vault-chip">DOT</span><span class="vault-chip">AVAX</span><span class="vault-chip">LINK</span><span class="vault-chip">ATOM</span><span class="vault-chip">NEAR</span><span class="vault-chip">TRX</span><span class="vault-chip">OP</span><span class="vault-chip">ARB</span><span class="vault-chip">XRP</span>
+                </div>
+            </div>
+        </div>
+        <div class="vault-note">
+            <strong>No launch date, no presale, no token.</strong> PreCog Vault is in design.
+            There is nothing to buy and nothing to download yet, and we will not take
+            payment for it before the watch-only core passes an external review. The asset
+            list and figures above are illustrative, not a promise of coverage or price data.
+            Not financial advice &mdash; wallet software is only as good as its last audit,
+            so that is where the effort goes first.
         </div>
     </div>
 </section>
