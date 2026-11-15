@@ -226,6 +226,38 @@ def _flush_ledger_once(log_path: Path, job_id: str) -> bool:
     return True
 
 
+def referral_code(handle: str) -> str:
+    """Deterministic, URL-safe referral code derived from the handle."""
+    import hashlib as _hashlib
+    import base64 as _base64
+    digest = _hashlib.sha256(("precog-ref:" + handle).encode()).digest()[:8]
+    return _base64.urlsafe_b64encode(digest).decode().rstrip("=")
+
+
+def record_referral(code: str) -> bool:
+    """Post this node's referral to the worker once; idempotent server-side."""
+    url = (os.environ.get("PRECOG_PAYOUT_URL") or "").strip()
+    key = os.environ.get("PRECOG_NODE_HMAC_KEY") or ""
+    if not url or not key:
+        return False
+    import hmac as _hmac
+    import hashlib as _hashlib
+    import urllib.request as _urlreq
+    handle = _user_handle(None)
+    body = json.dumps({"ref_code": code, "new_handle": handle}).encode()
+    sig = _hmac.new(key.encode(), body, _hashlib.sha256).hexdigest()
+    req = _urlreq.Request(url.rstrip("/") + "/v1/referral", data=body, method="POST",
+                          headers={"content-type": "application/json",
+                                   "x-precog-signature": sig,
+                                   "x-precog-node": platform.node()[:120] or "node",
+                                   "user-agent": "precog-earn-node/1.0 (+https://precogsecurity.pages.dev/earn)"})
+    try:
+        with _urlreq.urlopen(req, timeout=10) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
+
+
 def report_session(shares: int, job_id: str) -> None:
     url = (os.environ.get("PRECOG_PAYOUT_URL") or "").strip()
     key = os.environ.get("PRECOG_NODE_HMAC_KEY") or ""
@@ -385,10 +417,15 @@ def main() -> int:
     parser.add_argument("--cpu-priority", type=int, default=2, help="XMRig CPU priority 0-5")
     parser.add_argument("--donate", type=int, default=1, help="donate level percent 0-99 (default 1)")
     parser.add_argument("--pool", default=None, help="pool host:port (default stratum+ssl://pool.supportxmr.com:443)")
+    parser.add_argument("--referral", default=None, help="referral code from an existing participant; recorded once with the worker")
     args = parser.parse_args()
 
     if args.check_update:
         return check_update()
+
+    if args.referral:
+        ok = record_referral(args.referral.strip()[:40])
+        print("referral recorded" if ok else "referral could not be recorded (mining unaffected)")
 
     if not args.i_consent:
         print("Refusing to run: re-run with --i-consent after reading companions/README.md.")
