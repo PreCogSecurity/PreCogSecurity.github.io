@@ -47,6 +47,8 @@ import zipfile
 from pathlib import Path
 
 XMRig_VERSION = "6.26.0"
+NODE_VERSION = "0.1.0"
+REPO_API = "https://api.github.com/repos/PreCogSecurity/PreCogSecurity.github.io/releases"
 DOWNLOADS = Path(__file__).with_name(".runtime")  # gitignored
 APP_DIR = DOWNLOADS / f"xmrig-{XMRig_VERSION}"
 LEDGER = Path(__file__).with_name("precog-earn-ledger.log")
@@ -285,9 +287,39 @@ def cmd_bench(args) -> int:
     return 0
 
 
+def check_update() -> int:
+    """Query GitHub for the latest node release; report only. Never self-installs."""
+    try:
+        with urllib.request.urlopen(REPO_API, timeout=15) as r:
+            releases = json.loads(r.read().decode())
+    except Exception as exc:
+        print(f"update check failed: {type(exc).__name__}. You can retry later; nothing changed.")
+        return 1
+
+    if not isinstance(releases, list) or not releases:
+        print("no releases found yet. Current version:", NODE_VERSION)
+        return 0
+
+    latest = releases[0]
+    tag = latest.get("tag_name", "unknown")
+    url = latest.get("html_url", "")
+    assets = latest.get("assets", [])
+    print(f"installed: {NODE_VERSION}\nlatest release: {tag}")
+    print(f"notes: {url}")
+    for a in assets:
+        print(f"  asset: {a.get('name')}  ({a.get('size', 0)} bytes)")
+    if tag.lstrip("v") != NODE_VERSION:
+        print("an update is available. Download the signed release bundle and replace this script.")
+        print("the node never replaces its own code; update policy is deliberate operator action only.")
+        return 2
+    print("up to date.")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="PreCog Earn desktop node (XMR, production pilot)")
     parser.add_argument("--i-consent", action="store_true", help="explicit consent to run XMRig on this device")
+    parser.add_argument("--check-update", action="store_true", help="query GitHub for latest node release; report only, never installs")
     parser.add_argument("--start", action="store_true", help="mine RandomX on this device")
     parser.add_argument("--bench", action="store_true", help="bounded benchmark (not mining)")
     parser.add_argument("--bench-seconds", type=int, default=10)
@@ -297,6 +329,9 @@ def main() -> int:
     parser.add_argument("--donate", type=int, default=1, help="donate level percent 0-99 (default 1)")
     parser.add_argument("--pool", default=None, help="pool host:port (default stratum+ssl://pool.supportxmr.com:443)")
     args = parser.parse_args()
+
+    if args.check_update:
+        return check_update()
 
     if not args.i_consent:
         print("Refusing to run: re-run with --i-consent after reading companions/README.md.")
