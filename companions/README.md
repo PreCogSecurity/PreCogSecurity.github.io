@@ -1,7 +1,6 @@
 # PreCog Earn — companion apps (pilot source)
 
-One consent model across every device. Competing with Kryptex-style ecosystems
-means matching their *visibility and control*, not their aggression:
+One consent model across every device. Join the cohort: work visibly, opt in, and stop whenever you want.
 
 - **Chrome extension** (`chrome-extension/`) — visible toggle, local-only
   hashing in the popup, immutable local activity log in `chrome.storage.local`.
@@ -42,7 +41,7 @@ requirement, it is a separate engineering project. See `credits/README.md`.
 | "GPU mining in the browser" | Not shipped. WebGPU exists but no verified browser SHA-256 GPU kernel is included; the web demo reports adapter status and falls back to CPU. Native nodes are where CUDA/OpenCL land. |
 | "Post-quantum signatures today" | No. Share claims use Ed25519 (classical). ML-DSA / FIPS 204 lands when Web Crypto / node OpenSSL expose it — labelled roadmap, not a current claim. |
 | "Guaranteed earnings / 50-50 payouts" | No. Proportional accounting is the default; equal-peer splits need cohort enrolment and anti-free-rider checks. Net of electricity and hardware wear is the only honest number. |
-| "Everyone can compete with Kryptex on hashrate" | Not from a browser. The browser demo proves the workflow, the ledger, and the consent UX — native nodes carry the real throughput. |
+| "Anyone can win on hashrate in a browser" | Not from a browser. The browser demo proves the workflow, the ledger, and the consent UX - native nodes carry the real throughput. |
 
 ## Hardware acceleration notes
 

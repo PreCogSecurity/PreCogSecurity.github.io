@@ -24,8 +24,8 @@ Requirements before `--start` can mine
 Honest limitations
   This device (a 2012 i7, CPU-only) yields roughly a hundred H/s on RandomX.
   It is a network of one real device minting real shares at an honest rate —
-  not a data-center rig. Compare-before-buy claims on competitor sites;
-  don't quote hash numbers we have not measured.
+  not a data-center rig. Honest numbers only — never publish a hashrate figure
+  we have not measured on the target device.
 
 License
   This wrapper is distributed under the same terms as the surrounding
