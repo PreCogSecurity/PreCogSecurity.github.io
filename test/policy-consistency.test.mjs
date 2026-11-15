@@ -25,6 +25,11 @@
 // The fix was to remove the dependencies and make the pages static, NOT to
 // weaken the policy. These tests hold both halves of that deal in place: the
 // policy stays strict, and nothing may depend on anything the policy blocks.
+//
+// The Earn console (lint.config.mjs scriptEnabledPages) is the one page that
+// may load a first-party script. It still gets the strict treatment: scripts
+// and styles are 'self' only, with no inline or remote sources, and every
+// other directive that would let a payload execute is pinned shut.
 
 import assert from "node:assert/strict";
 import test from "node:test";
