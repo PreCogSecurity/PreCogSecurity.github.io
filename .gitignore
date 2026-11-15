@@ -6,3 +6,5 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+companions/desktop/precog-earn-ledger.log

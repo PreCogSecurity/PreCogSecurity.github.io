@@ -2,329 +2,351 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://api.github.com https://console.algora.io https://api.opire.dev https://openrouter.ai; font-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PreCog Security — Earn Console</title>
-    <meta name="description" content="Mine PRST/COG demo credits, scan live bounty sources, connect a wallet, and inspect the autonomous improvement loop behind PreCog Security.">
+    <meta name="description" content="PreCog Earn is a consent-based peer workload project for verified compute. See the live browser demo, peer pool design, transparent reward formula, and companion app roadmap.">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="PreCog Security — Earn Console">
-    <meta property="og:description" content="Mine PRST/COG demo credits, scan live bounties, connect a wallet, and watch the improvement loop research itself.">
+    <meta name="theme-color" content="#070b12">
+    <meta property="og:title" content="PreCog Earn - Shared workload. Shared rewards. Consent only.">
+    <meta property="og:description" content="A transparent, opt-in peer workload console: browser demo, verifiable share ledger, transparent reward formula, and an honest roadmap for native nodes and companion apps.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://precogsecurity.github.io/earn.html">
-    <meta name="theme-color" content="#0a0e17">
-    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+    <title>PreCog Earn - Shared workload. Shared rewards. Consent only.</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/earn.css">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
-<nav>
-    <div class="nav-inner">
-        <a href="index.html" class="logo">
-            <div class="logo-icon">&#x1F6E1;</div>
-            PreCog Security
+<nav class="site-nav" aria-label="Primary navigation">
+    <div class="container nav-inner">
+        <a href="index.html" class="brand">
+            <span class="brand-mark" aria-hidden="true">P</span>
+            PreCog Earn
         </a>
         <ul class="nav-links">
-            <li><a href="index.html#services">Services</a></li>
-            <li><a href="index.html#pricing">Pricing</a></li>
-            <li><a href="index.html#research">Research</a></li>
-            <li><a href="swarm.html">Swarm</a></li>
-            <li><a href="earn.html" class="active">Earn</a></li>
-            <li><a href="index.html#freescan" class="nav-cta">Free Scan</a></li>
+            <li><a href="#demo">Live demo</a></li>
+            <li><a href="#model">Reward model</a></li>
+            <li><a href="#architecture">Architecture</a></li>
+            <li><a href="#companions">Companions</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+            <li><a class="nav-cta" href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20pilot">Join pilot</a></li>
         </ul>
     </div>
 </nav>
 
-<header class="hero container">
-    <span class="hero-badge"><span class="dot"></span> Earn console · live sources · self-improving loop</span>
-    <h1>Put the loop to work for <span>you</span></h1>
-    <p>
-        Mine PRST/COG demo credits with real browser proof-of-work, scan every live bounty
-        source the loop tracks, connect a wallet to the operator-blessed treasury rails, and
-        watch the improvement loop review its own workflow and model architecture.
-    </p>
-    <div class="stat-grid">
-        <div class="stat"><div class="label">PRST balance</div><div class="value cyan" id="prst-val">0.0000</div><div class="sub">demo credit</div></div>
-        <div class="stat"><div class="label">COG balance</div><div class="value gold" id="cog-val">0.00</div><div class="sub">demo credit</div></div>
-        <div class="stat"><div class="label">Hash rate</div><div class="value" id="hashrate-val">0 H/s</div><div class="sub">live measure</div></div>
-        <div class="stat"><div class="label">Accepted shares</div><div class="value green" id="shares-val">0</div><div class="sub">difficulty <span id="difficulty-val">3</span></div></div>
-    </div>
-</header>
+<main id="main">
+    <section class="hero">
+        <div class="container hero-grid">
+            <div class="hero-copy">
+                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Consent-based peer compute</span>
+                <h1>Shared workload.<br><span>Shared reward.</span></h1>
+                <p class="lead">
+                    PreCog Earn is building a transparent, opt-in peer workload network for verified
+                    computational jobs. No silent mining, no bundled surprises, and no promise that
+                    electricity is free.
+                </p>
+                <div class="hero-actions">
+                    <a class="btn btn-primary" href="#demo">Open the live demo</a>
+                    <a class="btn btn-outline" href="#model">See the reward formula</a>
+                </div>
+                <p class="microcopy">Current browser mode is a local proof-of-work demonstration. A production pool needs signed work, valid share verification, accounting, and customer agreements before it can pay anyone.</p>
+            </div>
 
-<section id="mining">
-    <div class="container">
-        <span class="section-label">ZKP miner</span>
-        <h2 class="section-title">Mine PRST &amp; COG in the browser</h2>
-        <p class="section-desc">
-            Each profile runs a genuine SHA proof-of-work search against a live difficulty target.
-            Difficulty tightens every 40 accepted shares. Credits accrue to this browser only and
-            settle through the treasury bridge when the payout cycle runs.
-        </p>
-        <div class="panel-grid">
-            <div class="panel">
-                <h3>Miner controls</h3>
-                <div class="control-row">
-                    <div class="field">
-                        <label for="algo-select">Hash profile</label>
-                        <select id="algo-select">
-                            <option value="sha256">SHA-256</option>
-                            <option value="sha512">SHA-512</option>
-                            <option value="sha384">SHA-384</option>
-                            <option value="sha1">SHA-1</option>
-                            <option value="keccak256">Keccak-256 / Ethash puzzle</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="threads-input">Workers</label>
-                        <input type="number" id="threads-input" min="1" max="8" value="4">
-                    </div>
-                    <div class="field">
-                        <label>Auto-optimize</label>
-                        <button class="btn btn-ghost btn-sm" id="btn-optimize">Auto-optimize</button>
-                    </div>
+            <aside class="hero-panel" aria-label="Current product status">
+                <div class="panel-header">
+                    <span class="status-dot live"></span>
+                    <span>Status board</span>
                 </div>
-                <div class="btn-row">
-                    <button class="btn btn-primary" id="btn-mine">Start mining</button>
-                    <label class="toggle"><input type="checkbox" id="auto-toggle"> Auto-mine</label>
+                <div class="status-row">
+                    <span class="status-badge available">Live</span>
+                    <div><strong>Browser PoW demo</strong><span>Runs SHA-256 locally, records local work, and never moves funds.</span></div>
                 </div>
-                <p class="hint hint-tight" id="mine-status">idle</p>
-                <p class="hint" id="profile-desc"></p>
-            </div>
-            <div class="panel">
-                <h3>Live readout</h3>
-                <div class="readout">
-                    <div class="cell"><div class="k">Current target</div><div class="v" id="target-val">000…</div></div>
-                    <div class="cell"><div class="k">Session earned</div><div class="v gold" id="total-val">0.0000 PRST</div></div>
-                    <div class="cell"><div class="k">Hash rate</div><div class="v cyan" id="hashrate-val-2">0 H/s</div></div>
-                    <div class="cell"><div class="k">Difficulty</div><div class="v" id="difficulty-val-2">3</div></div>
+                <div class="status-row">
+                    <span class="status-badge research">Pilot</span>
+                    <div><strong>Peer scheduler</strong><span>CPU/GPU work assignment, queueing, and verifier design.</span></div>
                 </div>
-                <div class="log" id="miner-log"></div>
-            </div>
+                <div class="status-row">
+                    <span class="status-badge research">Pilot</span>
+                    <div><strong>Native nodes + companions</strong><span>Source pilots: Chrome extension, desktop node, Android skeleton. Same consent model everywhere.</span></div>
+                </div>
+                <div class="panel-note">
+                    <strong>Not claimed yet:</strong> universal 50/50 payouts, automated earnings, or guaranteed ROI. Those require equal contribution and verified settlement.
+                </div>
+            </aside>
         </div>
-    </div>
-</section>
+    </section>
 
-<section id="puzzles">
-    <div class="container">
-        <span class="section-label">Crypto puzzle desk</span>
-        <h2 class="section-title">Puzzle lanes: mine, solve, compete</h2>
-        <p class="section-desc">
-            The mining panel is the live lane. The lanes below are the desk the swarm uses to
-            route different kinds of crypto puzzle work: hash targets, on-chain address
-            puzzles, and competition entries. Status is tracked here so you can see what is
-            live and what is in the research queue.
-        </p>
-        <div class="panel">
-            <div class="lane-list">
-                <div class="lane">
-                    <div class="lane-head">
-                        <span class="badge cyan">BROWSER</span>
-                        <span class="lane-name">SHA-256 / SHA-512 / SHA-384 / SHA-1 proof-of-work</span>
-                        <span class="lane-rate">live in the miner</span>
-                    </div>
-                    <p>
-                        Pick a profile above and run genuine WebCrypto hashes against a live
-                        leading-zero target. Difficulty tightens every 40 accepted shares;
-                        credits accrue to this browser and settle through the treasury bridge.
-                    </p>
+    <section id="demo" class="section">
+        <div class="container">
+            <div class="section-heading split">
+                <div>
+                    <span class="eyebrow">Demo console</span>
+                    <h2>Work a package.<br><span>See the accounting.</span></h2>
                 </div>
-                <div class="lane">
-                    <div class="lane-head">
-                        <span class="badge purple">WEB3</span>
-                        <span class="lane-name">Keccak-256 / Ethash-style address puzzle</span>
-                        <span class="lane-rate">pilot profile</span>
+                <p>This demo uses your CPU in this browser only. It does not connect to a pool, cannot spend your coins, and exists to show the share-claim workflow end to end.</p>
+            </div>
+
+            <div class="demo-grid">
+                <div class="panel control-panel">
+                    <div class="panel-title"><h3>Peer work package</h3><span class="badge badge-demo">Demo only</span></div>
+                    <div class="field-grid">
+                        <div class="field">
+                            <label for="difficulty">Difficulty</label>
+                            <select id="difficulty">
+                                <option value="1">1 leading zero nibble</option>
+                                <option value="2" selected>2 leading zero nibbles</option>
+                                <option value="3">3 leading zero nibbles</option>
+                                <option value="4">4 leading zero nibbles</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="peer-mode">Split mode</label>
+                            <select id="peer-mode">
+                                <option value="proportional" selected>Proportional shares</option>
+                                <option value="equal">Equal peers (opt-in demo)</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="lane-split">Compute lanes</label>
+                            <select id="lane-split">
+                                <option value="cpu" selected>CPU lanes (Web Crypto SHA-256, hardware accelerated)</option>
+                                <option value="balanced">Balanced 50/50 lanes (GPU lane is pilot-labelled, see below)</option>
+                                <option value="gpu">GPU lane only (pilot-labelled, see below)</option>
+                            </select>
+                        </div>
                     </div>
-                    <p>
-                        The share machinery now runs a genuine Keccak-256 profile alongside the
-                        SHA lanes, aimed at Ethereum-style address targets. Ethash-style
-                        dataset puzzles and on-chain entry remain in the research queue, and
-                        entries, winners and claims are written to the ledger before payout.
-                    </p>
+                    <div class="action-row">
+                        <button id="start-demo" class="btn btn-primary" type="button">Start demo</button>
+                        <button id="stop-demo" class="btn btn-outline" type="button" disabled>Stop</button>
+                        <button id="reset-demo" class="btn btn-ghost" type="button">Reset</button>
+                        <button id="consent-withdraw" class="btn btn-ghost" type="button">Withdraw consent</button>
+                    </div>
+                    <p class="small-note">Start opens an explicit consent dialog. Hashing runs in pooled workers across your consented cores using hardware-accelerated Web Crypto SHA-256. No background process continues after this page is closed.</p>
+                    <p class="small-note">GPU lane honesty: browsers expose WebGPU, but no verified browser GPU SHA-256 kernel ships here. Choosing a GPU lane reports the adapter status and falls back to CPU lanes; it never invents a GPU hashrate. Native GPU kernels (CUDA/OpenCL) ship with the desktop node pilot.</p>
                 </div>
-                <div class="lane">
-                    <div class="lane-head">
-                        <span class="badge amber">ON-CHAIN</span>
-                        <span class="lane-name">Crypto puzzle bounties &amp; puzzle-chain hunts</span>
-                        <span class="lane-rate">tracked</span>
+
+                <div class="panel readout-panel" aria-live="polite">
+                    <div class="panel-title"><h3>Local ledger</h3><span id="run-state" class="badge">Idle</span></div>
+                    <div class="metrics">
+                        <div class="metric"><span class="metric-value" id="attempt-count">0</span><span class="metric-label">attempts</span></div>
+                        <div class="metric"><span class="metric-value" id="accepted-count">0</span><span class="metric-label">accepted shares</span></div>
+                        <div class="metric"><span class="metric-value" id="rate-count">0</span><span class="metric-label">hashes / sec</span></div>
+                        <div class="metric"><span class="metric-value" id="worker-count">0</span><span class="metric-label">active lanes</span></div>
+                        <div class="metric"><span class="metric-value" id="signed-shares">0</span><span class="metric-label">signed share claims</span></div>
                     </div>
-                    <p>
-                        AlphaScout and BountyRadar watch puzzle-chain and on-chain bounty
-                        programmes; qualifying entries are proposed as gated work and claimed
-                        through the same rail as a bug bounty.
-                    </p>
-                </div>
-                <div class="lane">
-                    <div class="lane-head">
-                        <span class="badge green">COMPETITION</span>
-                        <span class="lane-name">Agent-vs-agent bug bounty, CTF and ranking lanes</span>
-                        <span class="lane-rate">active</span>
-                    </div>
-                    <p>
-                        The swarm enters security and crypto competitions it can prove a result
-                        in, reports the result, and splits the reward to the operator-blessed
-                        rails. Reward pools vary per lane.
-                    </p>
+                    <div class="bar-wrap"><div class="bar-fill" id="share-progress"></div></div>
+                    <dl class="ledger">
+                        <div><dt>Work package</dt><dd id="package-id">PC-DEMO-0000</dd></div>
+                        <div><dt>Package size</dt><dd id="package-compression">not measured yet</dd></div>
+                        <div><dt>GPU lane</dt><dd id="gpu-status">probing WebGPU...</dd></div>
+                        <div><dt>Share signatures</dt><dd>Ed25519 (classical; ML-DSA / FIPS 204 is the post-quantum roadmap item, labelled honestly)</dd></div>
+                        <div><dt>Your share of pool</dt><dd id="pool-share">0.000%</dd></div>
+                        <div><dt>Illustrative payout</dt><dd id="illustrative-share">0.000</dd></div>
+                        <div><dt>Allocation basis</dt><dd id="allocation-label">valid shares</dd></div>
+                    </dl>
+                    <div class="log" id="demo-log"><span>Waiting for an authorized local demo...</span></div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section id="wallet">
-    <div class="container">
-        <span class="section-label">Wallet &amp; treasury</span>
-        <h2 class="section-title">Connect and verify the blessed rails</h2>
-        <p class="section-desc">
-            The console reads your wallet address and balance only; it never requests signing
-            or move permissions. Payouts from PreCog Security engagements and bounties land on
-            the operator-blessed destinations below.
-        </p>
-        <div class="panel">
-            <div class="wallet-row">
-                <button class="btn" id="btn-connect">Connect wallet</button>
-                <span class="hint" id="wallet-status">not connected</span>
-                <span class="badge cyan" id="network-val">—</span>
-                <span class="badge" id="balance-val">—</span>
+    <section id="model" class="section tint">
+        <div class="container">
+            <div class="section-heading">
+                <span class="eyebrow">Reward model</span>
+                <h2>Fairness by accounting,<br><span>not by promises.</span></h2>
+                <p>Every accepted share is hashed, reconciled, and paid according to the active split mode. Advertising a 50/50 market condition before equal work exists would be misleading.</p>
             </div>
-            <div class="dest-list">
-                <div class="dest">
-                    <span class="rail">BTC</span>
-                    <code id="btc-dest">bc1qhtnzal6wupj4xg049juwarkqmle7lqxemyezrw</code>
-                    <button class="btn btn-ghost btn-sm" id="copy-btc">Copy</button>
-                </div>
-                <div class="dest">
-                    <span class="rail">ETH</span>
-                    <code id="eth-dest">0xa71b83C6CC50665E4B67fDCEecD63D5100cCf988</code>
-                    <button class="btn btn-ghost btn-sm" id="copy-eth">Copy</button>
-                </div>
-            </div>
-            <p class="hint">
-                PayPal engagements: <a href="https://www.paypal.com/paypalme/PrecogSecurity" target="_blank" rel="noopener noreferrer">paypal.me/PrecogSecurity</a>
-            </p>
-        </div>
-    </div>
-</section>
-
-<section id="bounties">
-    <div class="container">
-        <span class="section-label">Bounty radar</span>
-        <h2 class="section-title">Live funded issues across the swarm's sources</h2>
-        <p class="section-desc">
-            One scan queries GitHub bounty labels, Algora's console feed, Opire's public
-            rewards API, plus the Polar, BossBounty and watchlist lanes, de-duplicates by
-            issue URL and sorts by reward where published.
-        </p>
-        <button class="btn btn-primary" id="btn-scan">Scan bounty sources</button>
-        <div class="bounty-grid" id="bounty-list">
-            <div class="empty">Run a scan to pull live funded issues.</div>
-        </div>
-    </div>
-</section>
-
-<section id="revenue">
-    <div class="container">
-        <span class="section-label">Revenue tracker</span>
-        <h2 class="section-title">Every earning stream, in one place</h2>
-        <p class="section-desc">
-            The session value updates as you mine. Published service rates and bounty ranges
-            are the operator's current public pricing.
-        </p>
-        <div class="panel">
-            <div class="stream-list" id="stream-list"></div>
-        </div>
-    </div>
-</section>
-
-<section id="workflow">
-    <div class="container">
-        <span class="section-label">Workflow &amp; architecture</span>
-        <h2 class="section-title">What the loop studies, and how it is allowed to change</h2>
-        <p class="section-desc">
-            The loop is permitted to research its own workflow, AI software, models and agent
-            architecture. A proposal only becomes a change when it lands as a gated pull
-            request and passes the same validator, test suite and evidence bar as a security
-            fix. This page publishes the agenda, not just the output.
-        </p>
-        <div class="panel-grid">
-            <div class="panel">
-                <h3>Architecture as reviewed</h3>
-                <div class="readout">
-                    <div class="cell"><div class="k">Cycle</div><div class="v">120s</div></div>
-                    <div class="cell"><div class="k">Workers</div><div class="v">4&ndash;8</div></div>
-                    <div class="cell"><div class="k">Sources</div><div class="v">6</div></div>
-                    <div class="cell"><div class="k">Merge gate</div><div class="v green">CI</div></div>
-                </div>
-                <h3 class="section-sub">Model routing</h3>
-                <ul class="resource-list">
-                    <li>cloud-first: Gemini 3.8 / 3.1, OpenRouter GLM, Gemma, Laguna</li>
-                    <li>local fallback: Ollama Phi-4-mini-instruct Q4_K_M</li>
-                    <li>patch retries: qwen2.5-coder:7b</li>
-                    <li>OpenBot / Odysseus bridge for offline agent tasks</li>
-                </ul>
-            </div>
-            <div class="panel">
-                <h3>Self-upgrade agenda</h3>
-                <ul class="agenda">
-                    <li><span class="tag done">SHIPPED</span>Cloud-first routing with an Ollama
-                    fallback, concurrent workers, a 120s cycle and the live bounty scan.</li>
-                    <li><span class="tag progress">IN PROGRESS</span>Per-source cooldown
-                    back-off, watchlist expansion and the wallet balance readout.</li>
-                    <li><span class="tag proposed">PROPOSED</span>Ethash-style dataset puzzles and
-                    the competition claim agent.</li>
-                </ul>
+            <div class="formula-grid">
+                <article class="formula-card emphasis">
+                    <span class="card-kicker">Default</span>
+                    <h3>Proportional mode</h3>
+                    <code>reward_i = valid_share_i / total_valid_shares x net pool reward</code>
+                    <p>The person who contributed more accepted work receives more of the settlement. This is the only economically honest default across unequal devices.</p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">Optional experiment</span>
+                    <h3>Equal peers mode</h3>
+                    <code>reward_i = 1 / active_peers x net pool reward</code>
+                    <p>Only viable with explicit cohort enrollment, equal or randomized assignments, anti-free-rider checks, and visible opt-in terms. It is not the universal pool rule.</p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">Cost reality</span>
+                    <h3>Net rewards matter</h3>
+                    <code>net = gross - electricity - hardware wear - pool fee</code>
+                    <p>Electricity and depreciation are real costs. Any honest mining page reports net, not gross advertising.</p>
+                </article>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section id="loop">
-    <div class="container">
-        <span class="section-label">Self-improvement</span>
-        <h2 class="section-title">The loop reviews itself</h2>
-        <p class="section-desc">
-            The improvement loop scores its own workflow, model pool and sources. Run the local
-            heuristic review below, supply an OpenRouter key for a cloud model pass, and check
-            the architecture and agenda in the section above.
-        </p>
-        <div class="panel-grid">
-            <div class="panel">
-                <h3>Current loop configuration</h3>
-                <div class="readout">
-                    <div class="cell"><div class="k">State</div><div class="v green">RUNNING</div></div>
-                    <div class="cell"><div class="k">Cycle</div><div class="v">120s</div></div>
-                    <div class="cell"><div class="k">Workers</div><div class="v">4&ndash;8</div></div>
-                    <div class="cell"><div class="k">Sources</div><div class="v">6</div></div>
+    <section id="architecture" class="section">
+        <div class="container">
+            <div class="section-heading split">
+                <div>
+                    <span class="eyebrow">System architecture</span>
+                    <h2>The pool has one job:<br><span>verified work in, auditable credit out.</span></h2>
                 </div>
-                <h3 class="section-sub">Model pool</h3>
-                <ul class="resource-list">
-                    <li>Cloud-first Gemini / OpenRouter routing</li>
-                    <li>Ollama Phi-4-mini-instruct Q4_K_M fallback</li>
-                    <li>qwen2.5-coder:7b patch retries</li>
-                </ul>
-                <div class="btn-row">
-                    <button class="btn btn-primary" id="btn-research">Run local review</button>
-                    <button class="btn" id="btn-ask">Ask cloud model</button>
-                </div>
-                <div class="field field-tight">
-                    <label for="ai-key">OpenRouter API key (optional, never stored)</label>
-                    <input type="password" id="ai-key" placeholder="sk-or-v1-…" autocomplete="off">
-                </div>
+                <p>BlueHound can explain status and block unsafe work, but it cannot sign transactions, override consent, or turn a demo share into real funds.</p>
             </div>
-            <div class="panel">
-                <h3>Research output</h3>
-                <div class="log" id="research-log"></div>
+            <ol class="pipeline" aria-label="Peer workload pipeline">
+                <li><span class="step">01</span><div><h3>Authenticate opt-in</h3><p>Node starts only after the operator grants capacity, time window, and allowed task classes.</p></div></li>
+                <li><span class="step">02</span><div><h3>Assign work package</h3><p>Coordinator gives a job, difficulty, deadline, nonce range, and payout basis.</p></div></li>
+                <li><span class="step">03</span><div><h3>Compute locally</h3><p>CPU or GPU runs the job. Browser mode uses Web Crypto; native nodes can use optimized kernels.</p></div></li>
+                <li><span class="step">04</span><div><h3>Verify share</h3><p>Validator rehashes submission and checks the proof condition. Invalid work earns zero.</p></div></li>
+                <li><span class="step">05</span><div><h3>Ledger and reconcile</h3><p>Accepted shares, missed deadlines, duplicate proofs, and device performance are recorded.</p></div></li>
+                <li><span class="step">06</span><div><h3>Settle</h3><p>Payout runs only after reconciliation and operator-approved destination confirmation.</p></div></li>
+            </ol>
+        </div>
+    </section>
+
+    <section id="roadmap" class="section tint">
+        <div class="container">
+            <div class="section-heading split">
+                <div>
+                    <span class="eyebrow">Roadmap</span>
+                    <h2>From honest demo<br><span>to portable node.</span></h2>
+                </div>
+                <p>Each line below is a dated deliverable, not a marketing claim. Availability is shown exactly as it is.</p>
+            </div>
+            <div class="roadmap-grid">
+                <article class="roadmap-card now">
+                    <span class="status-badge available">Available</span>
+                    <h3>Web demo</h3>
+                    <p>Pooled-worker SHA-256 (Web Crypto, hardware accelerated), consent dialog, lane split control, deflate-compressed packages, Ed25519-signed share claims (classical; ML-DSA roadmap), local ledger, proportional and explicit equal-peer mode.</p>
+                    <small>Runs entirely in your browser. No payout yet.</small>
+                </article>
+                <article class="roadmap-card soon">
+                    <span class="status-badge research">Pilot</span>
+                    <h3>Peer coordinator</h3>
+                    <p>Signed work packages, duplicate-share detection, penalty/reconciliation queue, and proof-of-capacity checks.</p>
+                    <small>In design with security review.</small>
+                </article>
+                <article class="roadmap-card planned">
+                    <span class="status-badge roadmap">Roadmap</span>
+                    <h3>Native node</h3>
+                    <p>Windows service/app, then macOS and Linux. Hardware-aware scheduling and strict opt-in resource limits.</p>
+                    <small>No silent install. No coin access.</small>
+                </article>
+                <article class="roadmap-card soon">
+                    <span class="status-badge research">Pilot</span>
+                    <h3>Browser extension</h3>
+                    <p>Visible work-package inbox, capacity toggle, pause/stop, immutable local activity log.</p>
+                    <small>Source pilot under companions/chrome-extension/. Extension store review applies.</small>
+                </article>
+                <article class="roadmap-card soon">
+                    <span class="status-badge research">Pilot</span>
+                    <h3>Desktop + mobile companion</h3>
+                    <p>Standalone desktop node (consent flag, lane cap, time window, plain-text ledger) plus an Android skeleton with per-job consent and battery/thermal guards.</p>
+                    <small>Source pilots under companions/. No background mining without visible consent.</small>
+                </article>
+                <article class="roadmap-card planned">
+                    <span class="status-badge roadmap">Roadmap</span>
+                    <h3>BlueHound assistant</h3>
+                    <p>Explains jobs, rewards, and exits. It never approves transfers, hides activity, or overrides the operator.</p>
+                    <small>Scoped assistant, disclosed limits.</small>
+                </article>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<footer>
-    <div class="footer-bottom">
-        <div>&copy; 2026 PreCog Security. All rights reserved.</div>
-        <div>Autonomous red team &middot; blue team &middot; earn loop</div>
+    <section id="safety" class="section">
+        <div class="container safety-layout">
+            <div>
+                <span class="eyebrow">Safety by default</span>
+                <h2>Opt in.<br><span>Measure. Exit cleanly.</span></h2>
+            </div>
+            <div class="safety-points">
+                <p><strong>Consent first.</strong> The app never mines while hidden, bundled in another download, or outside an approved time/resource window.</p>
+                <p><strong>Your keys stay yours.</strong> No private key import and no transaction signing in the browser demo.</p>
+                <p><strong>Net truth.</strong> We report electricity and device wear alongside gross work, because "everybody gets rich" is not a settlement rule.</p>
+                <p><strong>Hard stop.</strong> Pause, stop, or uninstall at any time. A trustworthy node explains exactly what it did.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="companions" class="section tint">
+        <div class="container">
+            <div class="section-heading split">
+                <div>
+                    <span class="eyebrow">Companion apps</span>
+                    <h2>One honest node,<br><span>every device.</span></h2>
+                </div>
+                <p>Same consent model and the same transparent ledger everywhere. All companion apps are open source, auditable, and require explicit opt-in before any work begins. None of them touch your wallet, your keys, or your files.</p>
+            </div>
+            <div class="roadmap-grid">
+                <article class="roadmap-card now">
+                    <span class="status-badge available">Pilot source</span>
+                    <h3>Chrome extension</h3>
+                    <p>Visible work-package inbox, capacity toggle, pause/stop, immutable local activity log. No permissions beyond storage; no background mining while disabled.</p>
+                    <small>Load unpacked from companions/chrome-extension/ — see companions/README.md.</small>
+                </article>
+                <article class="roadmap-card now">
+                    <span class="status-badge available">Pilot source</span>
+                    <h3>Desktop node (Windows/macOS/Linux)</h3>
+                    <p>Standalone Python node: consent flag, CPU lane count, per-session time window, thermal-ish guard via core count cap, plain-text ledger log. No tray stealth, no autostart.</p>
+                    <small>Runs from companions/desktop/precog-earn-node.py — see companions/README.md.</small>
+                </article>
+                <article class="roadmap-card soon">
+                    <span class="status-badge research">Pilot skeleton</span>
+                    <h3>Android app</h3>
+                    <p>Consent-first mobile companion: per-job approve/decline, battery and thermal guards, foreground-only visibility.</p>
+                    <small>Gradle skeleton under companions/android/. Building the APK requires the Android SDK; store review applies.</small>
+                </article>
+                <article class="roadmap-card planned">
+                    <span class="status-badge roadmap">Roadmap</span>
+                    <h3>Hardware acceleration across the fleet</h3>
+                    <p>Native CUDA/OpenCL GPU kernels for the desktop node, hardware SHA-256 where CPU features allow it, and deflate-compressed work packages (already measured in the browser demo).</p>
+                    <small>Post-quantum signature verification (ML-DSA / FIPS 204) lands as browsers and the node expose it.</small>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="pilot" class="cta-section">
+        <div class="container">
+            <div class="cta-panel">
+                <span class="eyebrow">Pilot list</span>
+                <h2>Help prove the pool.</h2>
+                <p>Pilot participants will test work packages, verify the ledger, and report device realities before any payout promise is published.</p>
+                <a class="btn btn-primary btn-large" href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20pilot&amp;body=Device%20type%3A%20%0AAvailable%20time%3A%20%0AWant%20to%20help%20verify%20the%20ledger%3F%20">Email the pilot desk</a>
+                <p class="microcopy">No investment pitch. No seed round. No wallet required to ask.</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="consent-dialog" class="consent-dialog" role="dialog" aria-modal="true" aria-labelledby="consent-title" aria-hidden="true" hidden>
+    <div class="consent-panel">
+        <h2 id="consent-title">Consent to run the local workload demo</h2>
+        <p>Before anything hashes, here is exactly what will happen on this device:</p>
+        <ul>
+            <li>Your CPU hashes SHA-256 in pooled Web Workers (hardware-accelerated where your browser/CPU supports it). You choose CPU, balanced 50/50, or GPU-labelled lanes; GPU falls back to CPU with a visible notice.</li>
+            <li>No pool connection, no wallet, no keys, no funds, and no network requests leave this page. Work is verified locally and the ledger is illustrative only.</li>
+            <li>You can stop instantly with the Stop button or by closing this tab. Closing the tab ends all work; nothing persists in the background.</li>
+            <li>Consent is remembered for this origin only and can be withdrawn at any time with the "Withdraw consent" button.</li>
+            <li>Share claims are signed with Ed25519 as a classical authenticator; post-quantum signatures (ML-DSA / FIPS 204) are a labelled roadmap item, not a current claim.</li>
+        </ul>
+        <p class="consent-legal">This is a local demonstration, not an investment offer, not a cryptocurrency offering, and not a guarantee of earnings. Electricity and device wear are real costs. Do not run this on a device you do not own or without the owner’s permission.</p>
+        <label class="consent-check" for="consent-checkbox">
+            <input type="checkbox" id="consent-checkbox">
+            I have read the above and consent to this device hashing while this page is open and running.
+        </label>
+        <div class="action-row">
+            <button id="consent-accept" class="btn btn-primary" type="button" disabled>Accept and start</button>
+            <button id="consent-decline" class="btn btn-outline" type="button">Decline</button>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="container footer-inner">
+        <span>2026 PreCog Security</span>
+        <span>Shared workload. Shared rewards. Consent only.</span>
     </div>
 </footer>
 
-<div class="toast" id="toast"></div>
-<script src="assets/earn.js"></script>
+<script src="assets/earn.js" defer></script>
 </body>
 </html>

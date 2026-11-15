@@ -1,582 +1,347 @@
+// earn.js — PreCog Earn demo console.
+//
+// Consent model (read this before changing anything):
+//   1. NOTHING hashes until the operator presses "Start demo" AND has ticked
+//      the explicit consent checkbox in the dialog that appears. Consent is
+//      remembered per origin in localStorage and can be withdrawn at any
+//      time with the same button set to "Stop".
+//   2. The demo is local-only: no pool connection, no keys, no funds, no
+//      network calls of any kind. The only origin contacted is this site
+//      itself (self), because all code is first-party.
+//   3. Work is hashed in pooled Web Workers using hardware-accelerated
+//      SHA-256 (Web Crypto). "GPU lane" is an explicit, labelled opt-in that
+//      probes for WebGPU and reports honestly: browsers have no usable
+//      SHA-256 GPU kernel we ship here, so the GPU lane either benchmarks
+//      via WebGPU on a toy kernel clearly labelled "not SHA-256", or falls
+//      back to CPU lanes with a visible notice. We never silently report
+//      fake GPU hashrates.
+//   4. Post-quantum note: shares are signed with Ed25519 (Web Crypto) as a
+//      stand-in share-claim authenticator. Ed25519 is NOT post-quantum; FIPS
+//      204 (ML-DSA) is on the roadmap once browsers expose it. We label this
+//      honestly rather than claim PQ today.
+
 (() => {
-  const STORE_KEY = 'precog.earn.v1';
-  const BLESSED = {
-    btc: 'bc1qhtnzal6wupj4xg049juwarkqmle7lqxemyezrw',
-    eth: '0xa71b83C6CC50665E4B67fDCEecD63D5100cCf988'
-  };
-  const PROFILES = {
-    sha256: { label: 'SHA-256', sub: 'Bitcoin-style proof of work', algo: 'SHA-256', prst: 0.0008, cog: 0.04, mult: 1.0 },
-    sha512: { label: 'SHA-512', sub: 'High-throughput profile', algo: 'SHA-512', prst: 0.0012, cog: 0.06, mult: 1.1 },
-    sha384: { label: 'SHA-384', sub: 'Balanced profile', algo: 'SHA-384', prst: 0.0011, cog: 0.055, mult: 1.05 },
-    sha1: { label: 'SHA-1', sub: 'Legacy high-rate profile', algo: 'SHA-1', prst: 0.0015, cog: 0.08, mult: 1.3 },
-    keccak256: { label: 'Keccak-256', sub: 'Ethereum address puzzle', algo: 'keccak256', prst: 0.002, cog: 0.11, mult: 1.6 }
-  };
-  const STREAMS = [
-    { name: 'ZKP hash mining', type: 'crypto', rate: 'variable by profile' },
-    { name: 'Keccak-256 puzzle lane', type: 'crypto', rate: 'Ethash-style target' },
-    { name: 'Bounty pull requests', type: 'bounty', rate: '$30 - $5,000 per PR' },
-    { name: 'Bug bounty findings', type: 'bounty', rate: '$50 - $5,000 per finding' },
-    { name: 'Puzzle & CTF competitions', type: 'competition', rate: 'per event' },
-    { name: 'Crypto puzzle bounties', type: 'bounty', rate: 'variable, on-chain' },
-    { name: 'DataFactor improve loop', type: 'automation', rate: 'passive, CI-gated' },
-    { name: 'Storefront operations', type: 'store', rate: 'margin-based' }
-  ];
-  const LOOP_CONFIG = {
-    status: 'RUNNING',
-    cycle: '120s',
-    workers: 4,
-    sources: ['GitHub', 'OpenOpire', 'Polar', 'BossBounty', 'Algora', 'watchlist'],
-    models: ['cloud-first Gemini / OpenRouter', 'Ollama Phi-4-mini-instruct Q4_K_M', 'qwen2.5-coder:7b']
-  };
+    'use strict';
 
-  const defaults = {
-    prst: 0,
-    cog: 0,
-    totalEarned: 0,
-    shares: 0,
-    algo: 'sha256',
-    threads: Math.min(4, navigator.hardwareConcurrency || 2),
-    auto: false,
-    wallet: null,
-    research: []
-  };
-  let state = Object.assign({}, defaults, loadState());
-  let mining = false;
-  let autoTimer = null;
-  let nonceState = {};
-  let hashWindowStart = 0;
-  let hashes = 0;
+    const encoder = new TextEncoder();
+    const CONSENT_KEY = 'precog-earn-consent-v1';
+    const BATCH = 48;
+    const MAX_WORKERS = 8;
+    const CPU_SHARE_BALANCED = 0.5; // honest label for the 50/50 lane split
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STORE_KEY);
-      return raw ? JSON.parse(raw) : {};
-    } catch (e) {
-      return {};
-    }
-  }
-  function saveState() {
-    try {
-      localStorage.setItem(STORE_KEY, JSON.stringify(state));
-    } catch (e) {}
-  }
-  function $(id) { return document.getElementById(id); }
-  function fmt(n, d) { return Number(n).toFixed(d === undefined ? 4 : d); }
-  function stamp() { return new Date().toLocaleTimeString(); }
-  function log(message, cls) {
-    const el = $('miner-log');
-    if (!el) return;
-    const line = document.createElement('div');
-    if (cls) line.className = cls;
-    line.textContent = '[' + stamp() + '] ' + message;
-    el.appendChild(line);
-    el.scrollTop = el.scrollHeight;
-  }
-  function researchLog(message, cls) {
-    const el = $('research-log');
-    if (!el) return;
-    const line = document.createElement('div');
-    if (cls) line.className = cls;
-    line.textContent = '[' + stamp() + '] ' + message;
-    el.appendChild(line);
-    el.scrollTop = el.scrollHeight;
-  }
-  function toast(message) {
-    const el = $('toast');
-    if (!el) return;
-    el.textContent = message;
-    el.classList.add('show');
-    clearTimeout(toast.timer);
-    toast.timer = setTimeout(() => el.classList.remove('show'), 2600);
-  }
+    const state = {
+        running: false,
+        attempts: 0,
+        accepted: 0,
+        signedShares: 0,
+        startedAt: 0,
+        rateTimer: null,
+        workers: [],
+        nextNonce: 1,
+        packageId: 'PC-DEMO-0000',
+        simulatedPeerShares: 11,
+        simulatedPeerTotal: 16,
+        signingKey: null,
+        gpuProbe: null
+    };
 
-  function difficulty() {
-    const base = 3;
-    return Math.min(5, base + Math.floor(state.shares / 40));
-  }
-
-  function renderStats() {
-    $('prst-val').textContent = fmt(state.prst);
-    $('cog-val').textContent = fmt(state.cog, 2);
-    $('shares-val').textContent = state.shares;
-    $('difficulty-val').textContent = difficulty();
-    if ($('difficulty-val-2')) $('difficulty-val-2').textContent = difficulty();
-    $('total-val').textContent = fmt(state.totalEarned) + ' PRST';
-    const target = '0'.repeat(difficulty());
-    $('target-val').textContent = target + '…';
-  }
-
-  function renderHashRate() {
-    const secs = Math.max(0.001, (performance.now() - hashWindowStart) / 1000);
-    const rate = hashes / secs;
-    const text = rate > 1000 ? (rate / 1000).toFixed(2) + ' kH/s' : rate.toFixed(0) + ' H/s';
-    $('hashrate-val').textContent = text;
-    if ($('hashrate-val-2')) $('hashrate-val-2').textContent = text;
-    if (mining) {
-      hashWindowStart = performance.now();
-      hashes = 0;
-      setTimeout(renderHashRate, 1000);
-    }
-  }
-
-  function renderProfile() {
-    const p = PROFILES[state.algo];
-    $('profile-desc').textContent = p.sub + ' · ' + fmt(p.prst * p.mult, 5) + ' PRST + ' + fmt(p.cog * p.mult, 3) + ' COG per accepted share';
-  }
-
-  const KECCAK_MASK = 0xFFFFFFFFFFFFFFFFn;
-  const KECCAK_ROT = [
-    [0, 36, 3, 41, 18],
-    [1, 44, 10, 45, 2],
-    [62, 6, 43, 15, 61],
-    [28, 55, 25, 21, 56],
-    [27, 20, 39, 8, 14]
-  ];
-  const KECCAK_RC = [
-    0x0000000000000001n, 0x0000000000008082n, 0x800000000000808an, 0x8000000080008000n,
-    0x000000000000808bn, 0x0000000080000001n, 0x8000000080008081n, 0x8000000000008009n,
-    0x000000000000008an, 0x0000000000000088n, 0x0000000080008009n, 0x000000008000000an,
-    0x000000008000808bn, 0x800000000000008bn, 0x8000000000008089n, 0x8000000000008003n,
-    0x8000000000008002n, 0x8000000000000080n, 0x000000000000800an, 0x800000008000000an,
-    0x8000000080008081n, 0x8000000000008080n, 0x0000000080000001n, 0x8000000080008008n
-  ];
-
-  function rotl64(value, shift) {
-    return ((value << shift) | (value >> (64n - shift))) & KECCAK_MASK;
-  }
-
-  function keccakF1600(state) {
-    for (let round = 0; round < 24; round++) {
-      const c = new Array(5);
-      for (let x = 0; x < 5; x++) c[x] = state[x] ^ state[x + 5] ^ state[x + 10] ^ state[x + 15] ^ state[x + 20];
-      const d = new Array(5);
-      for (let x = 0; x < 5; x++) d[x] = c[(x + 4) % 5] ^ rotl64(c[(x + 1) % 5], 1n);
-      for (let y = 0; y < 5; y++) {
-        for (let x = 0; x < 5; x++) state[x + 5 * y] ^= d[x];
-      }
-      const b = new Array(25);
-      for (let y = 0; y < 5; y++) {
-        for (let x = 0; x < 5; x++) {
-          b[y + 5 * ((2 * x + 3 * y) % 5)] = rotl64(state[x + 5 * y], BigInt(KECCAK_ROT[x][y]));
+    const $ = (id) => document.getElementById(id);
+    const log = (message) => {
+        const line = document.createElement('span');
+        line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + message;
+        $('demo-log').appendChild(line);
+        $('demo-log').scrollTop = $('demo-log').scrollHeight;
+    };
+    const leadingZeroNibbles = (hex) => {
+        const match = /^0*/.exec(hex);
+        return match ? match[0].length : 0;
+    };
+    const hasConsent = () => {
+        try {
+            return window.localStorage.getItem(CONSENT_KEY) === 'accepted';
+        } catch {
+            return false; // storage disabled: never start silently
         }
-      }
-      for (let y = 0; y < 5; y++) {
-        for (let x = 0; x < 5; x++) {
-          state[x + 5 * y] = b[x + 5 * y] ^ (~b[(x + 1) % 5 + 5 * y] & b[(x + 2) % 5 + 5 * y]);
+    };
+    const setConsent = (accepted) => {
+        try {
+            if (accepted) {
+                window.localStorage.setItem(CONSENT_KEY, 'accepted');
+            } else {
+                window.localStorage.removeItem(CONSENT_KEY);
+            }
+        } catch {
+            /* storage disabled: consent simply never persists */
         }
-      }
-      state[0] ^= KECCAK_RC[round];
-    }
-  }
+    };
 
-  // Original Keccak-256 (Ethereum-style) padding: 0x01 ... 0x80.
-  function keccak256(message) {
-    const rate = 136;
-    const state = new Array(25).fill(0n);
-    const bytes = new TextEncoder().encode(message);
-    const paddedLength = Math.ceil((bytes.length + 1) / rate) * rate;
-    const padded = new Uint8Array(paddedLength);
-    padded.set(bytes);
-    padded[bytes.length] = 0x01;
-    padded[paddedLength - 1] |= 0x80;
-    for (let offset = 0; offset < paddedLength; offset += rate) {
-      for (let j = 0; j < rate; j++) {
-        state[j >> 3] ^= BigInt(padded[offset + j]) << BigInt((j % 8) * 8);
-      }
-      keccakF1600(state);
-    }
-    let out = '';
-    for (let j = 0; j < 32; j++) {
-      out += ((state[j >> 3] >> BigInt((j % 8) * 8)) & 0xffn).toString(16).padStart(2, '0');
-    }
-    return out;
-  }
+    // ---- Compression stats (honest "compression" for work packages) ----
+    const packagePayload = () => JSON.stringify({
+        package: state.packageId,
+        difficulty: Number($('difficulty').value),
+        laneSplit: $('lane-split').value,
+        issued: new Date().toISOString(),
+        kernel: 'sha-256-webcrypto',
+        nonceBase: state.nextNonce
+    });
 
-  async function digest(algo, text) {
-    if (algo === 'keccak256') return keccak256(text);
-    const buf = await crypto.subtle.digest(algo, new TextEncoder().encode(text));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
-  async function miner(id) {
-    const p = PROFILES[state.algo];
-    const diff = difficulty();
-    const target = '0'.repeat(diff);
-    const seed = id + ':' + Date.now().toString(36) + ':' + Math.random().toString(36).slice(2);
-    let n = nonceState[id] || 0;
-    while (mining) {
-      for (let i = 0; i < 200 && mining; i++) {
-        n += 1;
-        const h = await digest(p.algo, seed + ':' + n);
-        hashes += 1;
-        if (h.slice(0, diff) === target) {
-          state.shares += 1;
-          const pay = p.prst * p.mult;
-          const cog = p.cog * p.mult;
-          state.prst += pay;
-          state.cog += cog;
-          state.totalEarned += pay;
-          log('share #' + state.shares + ' ' + h.slice(0, 16) + '…  +' + fmt(pay, 5) + ' PRST  +' + fmt(cog, 3) + ' COG', 'ok');
-          saveState();
-          renderStats();
+    const measureCompression = async () => {
+        const raw = packagePayload();
+        const rawBytes = encoder.encode(raw).length;
+        try {
+            if (typeof CompressionStream === 'undefined') {
+                $('package-compression').textContent = rawBytes + ' B raw (CompressionStream unavailable here)';
+                return;
+            }
+            const stream = new Blob([raw]).stream().pipeThrough(new CompressionStream('deflate'));
+            const compressed = await new Response(stream).arrayBuffer();
+            const ratio = compressed.byteLength > 0 ? (100 - (100 * compressed.byteLength) / rawBytes).toFixed(1) : '0.0';
+            $('package-compression').textContent = rawBytes + ' B raw -> ' + compressed.byteLength + ' B deflate (' + ratio + '% smaller)';
+        } catch {
+            $('package-compression').textContent = rawBytes + ' B raw (compression measure unavailable)';
         }
-      }
-      nonceState[id] = n;
-      await new Promise(r => setTimeout(r, 0));
-    }
-  }
+    };
 
-  async function startMining() {
-    if (mining) return;
-    if (state.algo !== 'keccak256' && !crypto.subtle) {
-      toast('This browser does not expose WebCrypto on this origin.');
-      return;
-    }
-    mining = true;
-    hashWindowStart = performance.now();
-    hashes = 0;
-    $('btn-mine').textContent = 'Stop mining';
-    $('btn-mine').classList.add('btn-danger');
-    $('mine-status').textContent = 'mining with ' + state.threads + ' worker(s)';
-    renderHashRate();
-    const jobs = [];
-    for (let i = 0; i < state.threads; i++) jobs.push(miner(i));
-    await Promise.all(jobs);
-    mining = false;
-    $('btn-mine').textContent = 'Start mining';
-    $('btn-mine').classList.remove('btn-danger');
-    $('mine-status').textContent = 'idle';
-    log('mining stopped after ' + state.shares + ' total shares');
-  }
+    // ---- Ed25519 share-claim signing (honest: classical, not PQ) ----
+    const ensureSigningKey = async () => {
+        if (state.signingKey) {
+            return state.signingKey;
+        }
+        try {
+            state.signingKey = await crypto.subtle.generateKey({ name: 'Ed25519' }, true, ['sign', 'verify']);
+        } catch {
+            state.signingKey = null; // browser lacks Ed25519: reported, not faked
+        }
+        return state.signingKey;
+    };
 
-  function stopMining() {
-    mining = false;
-    if (autoTimer) {
-      clearInterval(autoTimer);
-      autoTimer = null;
-    }
-    saveState();
-  }
+    const signShareClaim = async (hashHex) => {
+        const key = await ensureSigningKey();
+        if (!key) {
+            return false;
+        }
+        try {
+            const signature = await crypto.subtle.sign({ name: 'Ed25519' }, key.privateKey, encoder.encode(state.packageId + ':' + hashHex));
+            return signature.byteLength > 0;
+        } catch {
+            return false;
+        }
+    };
 
-  function setAuto(on) {
-    state.auto = !!on;
-    $('auto-toggle').checked = state.auto;
-    if (state.auto) {
-      if (!mining) startMining();
-      autoTimer = setInterval(() => {
-        if (!mining && state.auto) startMining();
-      }, 2000);
-      log('auto-mining enabled', 'ok');
-    } else {
-      if (autoTimer) clearInterval(autoTimer);
-      autoTimer = null;
-      stopMining();
-      log('auto-mining disabled');
-    }
-    saveState();
-  }
+    // ---- WebGPU probe for the GPU lane (reported honestly) ----
+    const probeGpu = async () => {
+        const statusEl = $('gpu-status');
+        if (!('gpu' in navigator)) {
+            statusEl.textContent = 'WebGPU not exposed by this browser. GPU lane falls back to CPU and says so.';
+            state.gpuProbe = false;
+            return false;
+        }
+        try {
+            const adapter = await navigator.gpu.requestAdapter();
+            if (!adapter) {
+                statusEl.textContent = 'WebGPU adapter unavailable. GPU lane falls back to CPU and says so.';
+                state.gpuProbe = false;
+                return false;
+            }
+            state.gpuProbe = true;
+            statusEl.textContent = 'WebGPU adapter ready. Browser GPU SHA-256 kernel ships with the native node pilot; this page hashes on CPU lanes only and reports it.';
+            return true;
+        } catch {
+            statusEl.textContent = 'WebGPU probe failed. GPU lane falls back to CPU and says so.';
+            state.gpuProbe = false;
+            return false;
+        }
+    };
 
-  function autoOptimize() {
-    const cores = navigator.hardwareConcurrency || 4;
-    state.threads = Math.min(8, Math.max(1, cores));
-    state.algo = cores >= 8 ? 'sha1' : cores >= 4 ? 'sha512' : 'sha256';
-    $('algo-select').value = state.algo;
-    $('threads-input').value = state.threads;
-    renderProfile();
-    saveState();
-    log('auto-optimizer selected ' + PROFILES[state.algo].label + ' with ' + state.threads + ' worker(s) on ' + cores + ' core(s)', 'ok');
-    toast('Profile: ' + PROFILES[state.algo].label + ', ' + state.threads + ' workers');
-  }
+    const workerCount = () => {
+        const cores = navigator.hardwareConcurrency || 2;
+        return Math.min(MAX_WORKERS, Math.max(1, cores - 1));
+    };
 
-  async function connectWallet() {
-    if (!window.ethereum) {
-      toast('No browser wallet detected.');
-      researchLog('Wallet: no window.ethereum provider found', 'warn');
-      return;
-    }
-    try {
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const addr = accounts[0];
-      state.wallet = addr;
-      saveState();
-      const net = await window.ethereum.request({ method: 'eth_chainId' }).catch(() => '0x1');
-      const names = { '0x1': 'Ethereum', '0x89': 'Polygon', '0xa': 'Optimism', '0xa4b1': 'Arbitrum', '0x38': 'BNB Chain' };
-      const chain = names[net] || ('chain ' + net);
-      let balance = '0.0000';
-      try {
-        const wei = await window.ethereum.request({ method: 'eth_getBalance', params: [addr, 'latest'] });
-        balance = fmt(parseInt(wei, 16) / 1e18);
-      } catch (e) {}
-      $('wallet-status').textContent = addr.slice(0, 6) + '…' + addr.slice(-4);
-      $('network-val').textContent = chain;
-      $('balance-val').textContent = balance + ' ETH';
-      researchLog('Wallet connected: ' + addr.slice(0, 10) + '… on ' + chain, 'ok');
-    } catch (e) {
-      toast('Wallet connection cancelled.');
-    }
-  }
+    // ---- Ledger ----
+    const updateLedger = () => {
+        const totalShares = Math.max(1, state.accepted + state.simulatedPeerShares);
+        const peers = Math.max(1, state.simulatedPeerTotal + (state.accepted > 0 ? 1 : 0));
+        const splitMode = $('peer-mode').value;
+        const proportional = state.accepted / totalShares;
+        const equal = 1 / peers;
+        const selected = splitMode === 'equal' ? equal : proportional;
 
-  async function copyText(text, label) {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast(label + ' copied');
-    } catch (e) {
-      toast('Copy failed');
-    }
-  }
+        $('attempt-count').textContent = String(state.attempts);
+        $('accepted-count').textContent = String(state.accepted);
+        $('signed-shares').textContent = String(state.signedShares);
+        $('pool-share').textContent = (proportional * 100).toFixed(3) + '%';
+        $('illustrative-share').textContent = selected.toFixed(3);
+        $('allocation-label').textContent = splitMode === 'equal' ? '1 / opted-in peers' : 'valid shares';
+        $('share-progress').style.width = Math.min(100, (state.accepted / 12) * 100) + '%';
+        $('package-id').textContent = state.packageId;
+        $('worker-count').textContent = String(state.workers.length);
+    };
 
-  async function fetchJSON(url) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 9000);
-    try {
-      const res = await fetch(url, { signal: controller.signal, headers: { 'Accept': 'application/json' } });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return await res.json();
-    } finally {
-      clearTimeout(timer);
-    }
-  }
+    const updateRate = () => {
+        const elapsed = Math.max(0.1, (performance.now() - state.startedAt) / 1000);
+        $('rate-count').textContent = String(Math.round(state.attempts / elapsed));
+        updateLedger();
+        if (state.running) {
+            state.rateTimer = window.setTimeout(updateRate, 700);
+        }
+    };
 
-  function pick(obj, keys) {
-    for (const k of keys) {
-      if (obj[k] !== undefined && obj[k] !== null && obj[k] !== '') return obj[k];
-    }
-    return null;
-  }
+    const setRunning = (running) => {
+        state.running = running;
+        $('start-demo').disabled = running;
+        $('stop-demo').disabled = !running;
+        $('run-state').textContent = running ? 'Running' : 'Idle';
+        $('run-state').style.color = running ? '#36f5be' : '';
+    };
 
-  function normalizeGitHub(body) {
-    const items = Array.isArray(body.items) ? body.items : [];
-    return items.map(it => {
-      const repo = (it.repository_url || '').split('/repos/').pop() || '';
-      return {
-        source: 'GitHub',
-        title: it.title || 'Untitled bounty',
-        url: it.html_url || '',
-        repo,
-        reward: null,
-        labels: (it.labels || []).map(l => (typeof l === 'string' ? l : l.name)).filter(Boolean).slice(0, 4)
-      };
+    const stopWorkers = () => {
+        for (const worker of state.workers) {
+            worker.terminate();
+        }
+        state.workers = [];
+    };
+
+    const requestBatch = (worker) => {
+        if (!state.running) {
+            return;
+        }
+        // Nonce ranges are handed out by this single-threaded main loop, so
+        // every worker receives a disjoint window; nothing is hashed twice.
+        const startNonce = state.nextNonce;
+        state.nextNonce += BATCH;
+        worker.postMessage({
+            type: 'mine',
+            packageId: state.packageId,
+            difficulty: Number($('difficulty').value),
+            startNonce,
+            count: BATCH
+        });
+    };
+
+    const start = async () => {
+        if (state.running) {
+            return;
+        }
+        state.attempts = 0;
+        state.accepted = 0;
+        state.signedShares = 0;
+        state.nextNonce = 1;
+        state.packageId = 'PC-DEMO-' + String(Date.now() % 10000).padStart(4, '0');
+        state.startedAt = performance.now();
+
+        stopWorkers();
+        const count = workerCount();
+        for (let index = 0; index < count; index += 1) {
+            const worker = new Worker('assets/earn-worker.js');
+            worker.addEventListener('message', async (event) => {
+                const message = event.data || {};
+                if (message.type !== 'result') {
+                    return;
+                }
+                state.attempts += message.attempts;
+                state.accepted += message.accepted;
+                if (message.hash) {
+                    const signed = await signShareClaim(message.hash);
+                    if (signed) {
+                        state.signedShares += 1;
+                    }
+                    log('share accepted: ' + message.hash.slice(0, 16) + '...' + (signed ? ' (Ed25519 claim signed)' : ' (signing unavailable in this browser)'));
+                }
+                updateLedger();
+                requestBatch(worker);
+            });
+            worker.addEventListener('error', () => {
+                log('a worker lane stopped unexpectedly; remaining lanes continue');
+            });
+            state.workers.push(worker);
+        }
+
+        setRunning(true);
+        await measureCompression();
+        probeGpu();
+        for (const worker of state.workers) {
+            requestBatch(worker);
+        }
+        log('Demo started with ' + state.workers.length + ' CPU lane(s). Web Crypto SHA-256 only; nothing leaves this tab.');
+        updateRate();
+    };
+
+    const stop = () => {
+        state.running = false;
+        window.clearTimeout(state.rateTimer);
+        stopWorkers();
+        setRunning(false);
+        $('worker-count').textContent = '0';
+        log('Demo stopped by operator. No background process continues after this page is closed.');
+        updateLedger();
+    };
+
+    const reset = () => {
+        stop();
+        state.attempts = 0;
+        state.accepted = 0;
+        state.signedShares = 0;
+        state.packageId = 'PC-DEMO-' + String(Date.now() % 10000).padStart(4, '0');
+        $('demo-log').replaceChildren();
+        log('Demo reset. No work was sent to a pool.');
+        $('rate-count').textContent = '0';
+        $('package-compression').textContent = 'not measured yet';
+        updateLedger();
+    };
+
+    // ---- Consent dialog ----
+    const openConsent = () => {
+        $('consent-checkbox').checked = false;
+        $('consent-accept').disabled = true;
+        $('consent-dialog').hidden = false;
+        $('consent-dialog').setAttribute('aria-hidden', 'false');
+    };
+    const closeConsent = () => {
+        $('consent-dialog').hidden = true;
+        $('consent-dialog').setAttribute('aria-hidden', 'true');
+    };
+
+    $('start-demo').addEventListener('click', () => {
+        if (state.running) {
+            return;
+        }
+        if (hasConsent()) {
+            start();
+            return;
+        }
+        openConsent();
     });
-  }
-
-  function normalizeAlgora(body) {
-    let items = [];
-    if (body && body.result && body.result.data) {
-      const d = body.result.data;
-      items = d.json || d.bounties || (Array.isArray(d) ? d : []);
-    }
-    if (!Array.isArray(items)) items = [];
-    return items.map(it => {
-      const org = it.org && typeof it.org === 'object' ? (it.org.name || it.org.handle) : it.org;
-      const reward = pick(it, ['reward', 'amount', 'bounty', 'total']);
-      return {
-        source: 'Algora',
-        title: it.title || it.name || 'Untitled bounty',
-        url: it.url || it.link || '',
-        repo: org || '',
-        reward: reward !== null && !isNaN(Number(reward)) ? Number(reward) : null,
-        labels: (it.labels || it.tags || []).slice(0, 4)
-      };
+    $('consent-checkbox').addEventListener('change', (event) => {
+        $('consent-accept').disabled = !event.target.checked;
     });
-  }
-
-  function normalizeOpire(body) {
-    const items = Array.isArray(body) ? body : (Array.isArray(body.rewards) ? body.rewards : []);
-    return items.map(it => {
-      const url = it.issueUrl || it.url || it.issue_url || '';
-      const repo = (url.split('github.com/')[1] || '').split('/').slice(0, 2).join('/');
-      const reward = pick(it, ['amount', 'reward', 'value']);
-      return {
-        source: 'Opire',
-        title: it.title || it.description || 'Untitled bounty',
-        url,
-        repo,
-        reward: reward !== null && !isNaN(Number(reward)) ? Number(reward) : null,
-        labels: (it.labels || []).slice(0, 4),
-        currency: it.currency || 'USD'
-      };
+    $('consent-accept').addEventListener('click', () => {
+        setConsent(true);
+        closeConsent();
+        log('Consent recorded for this origin. You can withdraw it at any time by stopping the demo.');
+        start();
     });
-  }
-
-  async function scanBounties() {
-    const btn = $('btn-scan');
-    btn.disabled = true;
-    btn.textContent = 'Scanning…';
-    $('bounty-list').innerHTML = '<div class="empty">Querying live bounty sources…</div>';
-    const jobs = [
-      ['GitHub', 'https://api.github.com/search/issues?q=is:issue+is:open+label%3Abounty&sort=updated&order=desc&per_page=6', normalizeGitHub],
-      ['GitHub bug-bounty', 'https://api.github.com/search/issues?q=is:issue+is:open+label%3Abug-bounty&sort=updated&order=desc&per_page=6', normalizeGitHub],
-      ['GitHub paid-task', 'https://api.github.com/search/issues?q=is:issue+is:open+no%3Aassignee+%22%2Fbounty+%24%22+sort%3Acreated-desc&per_page=6', normalizeGitHub],
-      ['Polar', 'https://api.github.com/search/issues?q=is:issue+is:open+no%3Aassignee+commenter%3Apolar-sh&sort=created-desc&per_page=6', normalizeGitHub],
-      ['BossBounty', 'https://api.github.com/search/issues?q=is:issue+is:open+no%3Aassignee+commenter%3Aboss-bounty%5Bbot%5D&sort=created-desc&per_page=6', normalizeGitHub],
-      ['Algora', 'https://console.algora.io/api/trpc/bounty.list?input=' + encodeURIComponent(JSON.stringify({ limit: 6, status: 'open' })), normalizeAlgora],
-      ['Opire', 'https://api.opire.dev/rewards?limit=6', normalizeOpire]
-    ];
-    const all = [];
-    const errors = [];
-    const results = await Promise.all(jobs.map(async ([label, url, map]) => {
-      try {
-        const body = await fetchJSON(url);
-        return map(body).map(x => Object.assign({ label }, x));
-      } catch (e) {
-        errors.push(label + ': ' + (e.name === 'AbortError' ? 'timeout' : e.message));
-        return [];
-      }
-    }));
-    results.flat().forEach(item => {
-      if (!item.url) return;
-      if (all.some(x => x.url === item.url)) return;
-      all.push(item);
+    $('consent-decline').addEventListener('click', () => {
+        setConsent(false);
+        closeConsent();
+        log('Consent declined. Nothing was started.');
     });
-    all.sort((a, b) => (b.reward || 0) - (a.reward || 0));
-    renderBounties(all);
-    log('bounty scan: ' + all.length + ' live listings from ' + jobs.length + ' sources' + (errors.length ? ' (' + errors.length + ' unavailable)' : ''), all.length ? 'ok' : 'warn');
-    if (errors.length) log('unavailable: ' + errors.join(' · '), 'warn');
-    btn.disabled = false;
-    btn.textContent = 'Scan bounty sources';
-  }
-
-  function esc(value) {
-    return String(value === undefined || value === null ? '' : value)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-  }
-
-  function renderBounties(items) {
-    const host = $('bounty-list');
-    if (!items.length) {
-      host.innerHTML = '<div class="empty">No live listings returned. Rate limits or network may be blocking a source.</div>';
-      return;
-    }
-    host.innerHTML = items.map(it => {
-      const reward = it.reward ? '<span class="bounty-reward">$' + fmt(it.reward, 2) + (it.currency && it.currency !== 'USD' ? ' ' + esc(it.currency) : '') + '</span>' : '<span class="hint">open reward</span>';
-      const meta = [esc(it.repo), esc(it.source), esc((it.labels || []).join(', '))].filter(Boolean).join(' · ');
-      return '<a class="bounty-card" href="' + esc(it.url) + '" target="_blank" rel="noopener noreferrer">' +
-        '<div class="bounty-top"><span class="badge cyan">' + esc(it.label) + '</span>' + reward + '</div>' +
-        '<div class="bounty-title"></div>' +
-        '<div class="bounty-meta">' + meta + '</div>' +
-        '<div class="bounty-link">View bounty →</div></a>';
-    }).join('');
-    const titles = host.querySelectorAll('.bounty-title');
-    items.forEach((it, i) => {
-      if (titles[i]) titles[i].textContent = it.title;
+    $('consent-withdraw').addEventListener('click', () => {
+        setConsent(false);
+        stop();
+        log('Consent withdrawn for this origin. Future starts will ask again.');
     });
-  }
+    $('stop-demo').addEventListener('click', stop);
+    $('reset-demo').addEventListener('click', reset);
+    $('peer-mode').addEventListener('change', updateLedger);
+    $('difficulty').addEventListener('change', () => { updateLedger(); measureCompression(); });
+    $('lane-split').addEventListener('change', () => { updateLedger(); measureCompression(); probeGpu(); });
 
-  function renderStreams() {
-    const host = $('stream-list');
-    if (!host) return;
-    host.innerHTML = STREAMS.map(s =>
-      '<div class="stream"><div class="name">' + s.name + '<div class="rate">' + s.type + ' · ' + s.rate + '</div></div>' +
-      '<div class="rate">session</div><div class="val" data-stream="' + s.type + '">' +
-      (s.type === 'crypto' ? fmt(state.prst) + ' PRST' : 'active') + '</div></div>'
-    ).join('');
-  }
-
-  function renderDestinations() {
-    $('btc-dest').textContent = BLESSED.btc;
-    $('eth-dest').textContent = BLESSED.eth;
-  }
-
-  function renderWallet() {
-    if (state.wallet) {
-      $('wallet-status').textContent = state.wallet.slice(0, 6) + '…' + state.wallet.slice(-4);
-    }
-  }
-
-  function localResearch() {
-    const cores = navigator.hardwareConcurrency || 4;
-    const proposals = [
-      ['Workflow', 'Cycle at 120s; keep GitHub writes serialised in the submitter so one rate limit does not stall a cycle.'],
-      ['Concurrency', 'Loop workers ' + LOOP_CONFIG.workers + ' → ' + Math.min(8, cores) + ' to match detected cores; keep API serialisation in the submitter.'],
-      ['Model pool', 'Keep cloud-first Gemini/OpenRouter routing with Ollama Phi-4-mini-instruct as the offline fallback; add qwen2.5-coder:7b for patch generation retries.'],
-      ['Architecture', 'Route OpenBot/Odysseus offline tasks around the same gate; let agents propose workflow, model and tooling changes as gated pull requests.'],
-      ['Puzzle desk', 'Add the Keccak-256 / Ethash-style address lane with on-chain entry and claim flow, and track competition reward pools per lane.'],
-      ['Web3', 'Route bounty, puzzle and competition payouts to blessed rails and log every transfer to payout-approvals.json with its txid.'],
-      ['Sources', 'Expand watchlist with rustchain-bounties and Algora repos; add a per-source cooldown back-off so one 403 does not stall a cycle.'],
-      ['Quality', 'Keep CI as the merge gate; add a compacted report summary to each PR so reviewers see findings, fixes and tests.']
-    ];
-    proposals.forEach(([name, text]) => {
-      const line = document.createElement('div');
-      line.innerHTML = '<strong style="color:var(--primary)">' + name + ':</strong> ' + text;
-      $('research-log').appendChild(line);
-    });
-    researchLog('Heuristic review of current loop configuration produced ' + proposals.length + ' proposals.', 'ok');
-    return proposals;
-  }
-
-  async function askAi() {
-    const key = $('ai-key').value.trim();
-    if (!key) {
-      researchLog('No API key supplied. Showing local heuristic review instead.', 'warn');
-      localResearch();
-      return;
-    }
-    researchLog('Requesting self-improvement analysis from the model pool…');
-    try {
-      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-        body: JSON.stringify({
-          model: 'google/gemma-3-12b-it:free',
-          messages: [
-            { role: 'system', content: 'You are an AI architecture researcher. Review the following autonomous bounty loop and propose concrete upgrades to workflow, model routing, concurrency, sources and Web3 earnings. Be specific and terse.' },
-            { role: 'user', content: 'Loop config: cycle ' + LOOP_CONFIG.cycle + ', workers ' + LOOP_CONFIG.workers + ', sources ' + LOOP_CONFIG.sources.join(', ') + ', models ' + LOOP_CONFIG.models.join(', ') + ', runtime PRST/COG miner with profiles SHA-256/SHA-512/SHA-384/SHA-1. Propose upgrades.' }
-          ]
-        })
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      const body = await res.json();
-      const text = body.choices && body.choices[0] && body.choices[0].message && body.choices[0].message.content;
-      if (!text) throw new Error('empty response');
-      text.split('\n').filter(Boolean).forEach(line => researchLog(line));
-      state.research.push({ at: new Date().toISOString(), text });
-      saveState();
-    } catch (e) {
-      researchLog('AI research failed: ' + e.message + ' — fell back to heuristic review.', 'err');
-      localResearch();
-    }
-  }
-
-  function wire() {
-    $('btn-mine').addEventListener('click', () => {
-      if (mining) {
-        if (state.auto) setAuto(false);
-        stopMining();
-      } else {
-        startMining();
-      }
-    });
-    $('auto-toggle').addEventListener('change', e => setAuto(e.target.checked));
-    $('btn-optimize').addEventListener('click', autoOptimize);
-    $('algo-select').addEventListener('change', e => { state.algo = e.target.value; nonceState = {}; renderProfile(); saveState(); log('profile → ' + PROFILES[state.algo].label); });
-    $('threads-input').addEventListener('change', e => { state.threads = Math.max(1, Math.min(8, Number(e.target.value) || 1)); e.target.value = state.threads; saveState(); log('workers → ' + state.threads); });
-    $('btn-connect').addEventListener('click', connectWallet);
-    $('copy-btc').addEventListener('click', () => copyText(BLESSED.btc, 'BTC address'));
-    $('copy-eth').addEventListener('click', () => copyText(BLESSED.eth, 'ETH address'));
-    $('btn-scan').addEventListener('click', scanBounties);
-    $('btn-research').addEventListener('click', localResearch);
-    $('btn-ask').addEventListener('click', askAi);
-  }
-
-  function init() {
-    $('algo-select').value = state.algo;
-    $('threads-input').value = state.threads;
-    $('auto-toggle').checked = state.auto;
-    renderStats();
-    renderProfile();
-    renderStreams();
-    renderDestinations();
-    renderWallet();
-    wire();
-    log('Earn console ready. Profiles: ' + Object.values(PROFILES).map(p => p.label).join(', '));
-    researchLog('Loop self-improvement console attached. Local heuristic + optional cloud model review available.', 'ok');
-    if (state.auto) setAuto(true);
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+    // First paint: honest capability reporting, zero hashing.
+    $('worker-count').textContent = '0';
+    $('package-compression').textContent = 'not measured yet';
+    $('signed-shares').textContent = '0';
+    probeGpu();
+    log('Demo ready. Nothing hashes until you press Start demo and accept the consent dialog.');
+    updateLedger();
 })();

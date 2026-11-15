@@ -141,7 +141,9 @@ test("every page declares a policy that the validator accepts", () => {
         assert.ok(directives.has("style-src"), `${file} must declare style-src`);
 
         const scriptSources = directives.get("script-src");
-        const scriptEnabled = config.scriptEnabledPages.has(path.posix.basename(file));
+        // path.basename (not path.posix.basename): discoverHtmlFiles returns
+        // native separators, so POSIX basename is wrong on Windows.
+        const scriptEnabled = config.scriptEnabledPages.has(path.basename(file));
         if (scriptEnabled) {
             assert.ok(
                 scriptSources.includes("'self'"),
