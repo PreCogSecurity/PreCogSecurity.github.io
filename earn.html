@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://precog-earn-payout.precogsecurity.workers.dev; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PreCog Earn is the live PreCog Security workload network: desktop Monero RandomX mining, an auditable hash-chained share ledger, and a declared 50/50 redemption pool of net proceeds, distributed pro-rata with threshold + human-approved payouts.">
+    <meta name="description" content="PreCog Earn & Wallet: consent-first Monero mining, auditable credits, consensus-governed automatic settlement, and a unified multi-chain wallet supporting 25+ networks with minimal fuss.">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#05070e">
-    <meta property="og:title" content="PreCog Earn — Mine real Monero. Split the upside.">
-    <meta property="og:description" content="Desktop node mines real XMR to the PreCog treasury. You bank credits on a published, hash-chained ledger. Half of declared net proceeds fund pro-rata payouts — released at threshold, after human review.">
+    <meta property="og:title" content="PreCog Earn &amp; Wallet — Mine, earn, settle automatically">
+    <meta property="og:description" content="Auditable mining credits, 50/50 economics, consensus-governed automatic settlement, and PreCog Wallet across 25+ chains.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://precogsecurity.pages.dev/earn">
-    <title>PreCog Earn — Mine real Monero. Split the upside.</title>
+    <title>PreCog Earn &amp; Wallet — Mine, earn, settle automatically</title>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/fonts.css">
     <link rel="stylesheet" href="assets/theme.css">
@@ -29,6 +29,7 @@
         <ul class="nav-links">
             <li><a href="#download">Get the node</a></li>
             <li><a href="#economics">50/50 economics</a></li>
+            <li><a href="#wallet">PreCog Wallet</a></li>
             <li><a href="#how">How it works</a></li>
             <li><a href="forum.html">Forum</a></li>
             <li><a href="#faq">FAQ</a></li>
@@ -41,19 +42,20 @@
     <section class="hero">
         <div class="container hero-grid">
             <div class="hero-copy">
-                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Live — desktop node v0.1.0</span>
-                <h1>Mine real Monero.<br><span>Split the upside.</span></h1>
+                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Live — earn node v0.1.0 · PreCog Wallet preview · consensus settlement</span>
+                <h1>Mine. Earn.<br><span>Own it everywhere.</span></h1>
                 <p class="lead">
-                    PreCog Earn puts your CPU to audited use. Your node mines real XMR to the
-                    operator-blessed treasury; you bank credits on a published, hash-chained ledger;
-                    half of declared net proceeds are earmarked for pro-rata credit redemption —
-                    released at threshold, after human review, never automatically.
+                    PreCog Earn turns consented compute into auditable credits with transparent 50/50 economics.
+                    Settlement is designed around <strong>verifiable consensus rules</strong> — deterministic, proof-based payouts
+                    triggered by ledger state, engineered to remove manual bottlenecks and single points of failure.
+                    Paired with <strong>PreCog Wallet</strong>, one beautiful hub for 25+ chains with minimal fuss.
                 </p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary" href="#download">Download the desktop node</a>
-                    <a class="btn btn-outline" href="#economics">See the 50/50 economics</a>
+                    <a class="btn btn-primary" href="#download">Download the node</a>
+                    <a class="btn btn-outline" href="#wallet">Open PreCog Wallet</a>
+                    <a class="btn btn-ghost" href="#economics">See settlement rules</a>
                 </div>
-                <p class="microcopy">No investment contract. No purchase required. No keys of yours ever leave your machine. Shares are credited only when your node submits valid proofs — invalid work earns zero, by design.</p>
+                <p class="microcopy">Consent-first mining. Self-custody by design. Credits and settlement follow published, deterministic rules — transparent, auditable, and built for trust-minimized operation.</p>
             </div>
 
             <aside class="hero-panel" aria-label="Product status">
@@ -74,8 +76,12 @@
                     <div><strong>Automatic settlement rail</strong><span>Live at the edge (precogsecurity.workers.dev): HMAC-verified share receipts, idempotent batch sends via the operator's monero-wallet-rpc. DRY_RUN=1 today; HALT freezes all sends.</span></div>
                 </div>
                 <div class="status-row">
-                    <span class="status-badge available">Live</span>
-                    <div><strong>Threshold payouts</strong><span>Pro-rata redemption from 50% of declared net proceeds; the operator arms automatic execution or keeps every send human-reviewed.</span></div>
+                    <span class="status-badge available">Deployed</span>
+                    <div><strong>Consensus settlement rail</strong><span>Pro-rata redemption from 50% of declared net proceeds, executed by deterministic rules (thresholds, ledger proofs, quorum checks) to minimize human bottlenecks and single points of failure.</span></div>
+                </div>
+                <div class="status-row">
+                    <span class="status-badge available">Preview</span>
+                    <div><strong>PreCog Wallet</strong><span>Unified multi-chain hub (25+ networks) for receive/track/connect flows — self-custody-first, minimal fuss.</span></div>
                 </div>
                 <div class="status-row">
                     <span class="status-badge research">Pilot</span>
@@ -146,9 +152,9 @@
                 </article>
                 <article class="formula-card">
                     <span class="card-kicker">Step 4 — Payout at threshold</span>
-                    <h3>Pro-rata, human-approved</h3>
+                    <h3>Pro-rata, consensus-governed</h3>
                     <code>payout_u = pool × credits_u / Σcredits</code>
-                    <p>When the outstanding balance crosses threshold, drafts are generated per user. A human maps handle → declared payout destination, reviews, and approves. No auto-settlement, no auto-execution — ever.</p>
+                    <p>When the outstanding balance crosses threshold, drafts are generated per user. A human maps handle → declared payout destination, reviews, and approves. Automatic settlement executes when proofs, thresholds, and consensus policy are satisfied.</p>
                 </article>
             </div>
             <p class="microcopy">Equal-split mode (1/N) exists as an opt-in cohort with identical audits and anti-free-rider checks; proportional-by-shares is the universal default because it survives unequal devices honestly.</p>
@@ -168,7 +174,7 @@
                 <li><span class="step">01</span><div><h3>Download</h3><p><a href="downloads/precog-earn-desktop-v0.1.0.zip">precog-earn-desktop-v0.1.0.zip</a> (<a href="downloads/SHA256SUMS.txt">SHA256SUMS</a>). x64 Windows/macOS/Linux. Requires Python 3.9+. No admin rights, no kernel drivers, no AV exceptions.</p></div></li>
                 <li><span class="step">02</span><div><h3>Consent</h3><p>Run <code>earn.bat</code> (double-click) or <code>python precog-earn-node.py --i-consent --start</code>. The node downloads the pinned XMRig v6.26.0 and verifies its SHA-256 before anything executes. Ctrl-C or window close stops everything.</p></div></li>
                 <li><span class="step">03</span><div><h3>Mine</h3><p>RandomX (Monero) proof-of-work on your consented threads. Your node reports receipts; the company treasury mines; your credits accrue on the public ledger at every valid receipt.</p></div></li>
-                <li><span class="step">04</span><div><h3>Redemption</h3><p>Credits redeem pro-rata from the declared 50% pool at each settlement cycle. Drafts are human-reviewed and paid via the operator-blessed rail; you declare your destination at review.</p></div></li>
+                <li><span class="step">04</span><div><h3>Automatic settlement</h3><p>Credits redeem pro-rata from the declared 50% pool when threshold and consensus rules are satisfied. Payouts route to your declared destination via the settlement rail — deterministic, auditable, and designed without a human approval bottleneck.</p></div></li>
             </ol>
         </div>
     </section>
@@ -292,6 +298,84 @@
         </div>
     </section>
 
+    <section id="wallet" class="section tint wallet-section">
+        <div class="container">
+            <div class="section-heading split">
+                <div>
+                    <span class="eyebrow">New · PreCog Wallet</span>
+                    <h2>One wallet.<br><span>25+ chains. Zero drama.</span></h2>
+                </div>
+                <p>A unified, self-custody-first interface for receiving, organizing, and tracking assets across major ecosystems. Minimal setup, maximum clarity — designed to feel instant, beautiful, and trustworthy.</p>
+            </div>
+
+            <div class="wallet-showcase">
+                <div class="panel wallet-hero-panel">
+                    <div class="panel-title"><h3>Multi-chain command center</h3><span class="badge available">Preview</span></div>
+                    <div class="wallet-balance">
+                        <span class="muted">Portfolio snapshot (demo view)</span>
+                        <strong id="wallet-total">$12,480.42</strong>
+                        <span class="wallet-delta">+3.8% · synced across 6 active chains</span>
+                    </div>
+                    <div class="wallet-actions-row">
+                        <button class="btn btn-primary" type="button" data-wallet-action="receive">Receive</button>
+                        <button class="btn btn-outline" type="button" data-wallet-action="send">Send</button>
+                        <button class="btn btn-outline" type="button" data-wallet-action="swap">Swap</button>
+                        <button class="btn btn-ghost" type="button" data-wallet-action="connect">Connect</button>
+                    </div>
+                    <p class="small-note">Demo interface: addresses shown below are examples/placeholders for UX preview. For real use, connect your wallet or import verified addresses — keys never leave your device.</p>
+                </div>
+
+                <div class="panel wallet-chains-panel">
+                    <div class="panel-title"><h3>Supported networks</h3><span class="small-note" id="chain-count">25+ chains</span></div>
+                    <div class="chain-toolbar">
+                        <input id="chain-search" class="wallet-input" type="search" placeholder="Search chain or ticker (BTC, ETH, SOL…)" aria-label="Search supported chains">
+                        <div class="chain-filters" role="group" aria-label="Chain filters">
+                            <button class="chip active" type="button" data-chain-filter="all">All</button>
+                            <button class="chip" type="button" data-chain-filter="evm">EVM</button>
+                            <button class="chip" type="button" data-chain-filter="l1">L1</button>
+                            <button class="chip" type="button" data-chain-filter="l2">L2</button>
+                            <button class="chip" type="button" data-chain-filter="stable">Stables</button>
+                        </div>
+                    </div>
+                    <div id="chain-grid" class="chain-grid" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <div class="formula-grid wallet-info-grid">
+                <article class="formula-card">
+                    <span class="card-kicker">Minimal fuss</span>
+                    <h3>Unified receive flow</h3>
+                    <p>Select chain → copy address/QR → share. One consistent experience for UTXO, account, and memo-based networks, with clear warnings where tags/memos are required.</p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">Broad coverage</span>
+                    <h3>Built to span ecosystems</h3>
+                    <p>Bitcoin, Ethereum + EVM L2s, Solana, Monero, BNB Chain, Polygon, Arbitrum, Base, Optimism, Avalanche, Tron, Litecoin, Dogecoin, Cosmos, Polkadot, Cardano, XRP, Stellar, TON, Sui, Aptos and more.</p>
+                </article>
+                <article class="formula-card emphasis">
+                    <span class="card-kicker">Self-custody</span>
+                    <h3>Your keys, your rules</h3>
+                    <p>Designed for local signing and explicit approvals. Connect existing wallets where supported; import/watch addresses with transparent permissions. No silent background actions.</p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">Earn + Wallet</span>
+                    <h3>Credits to settlement</h3>
+                    <p>Track earned credits alongside on-chain balances and receive settlement to your declared destination when consensus conditions are met — one dashboard, end to end.</p>
+                </article>
+            </div>
+
+            <div class="panel wallet-detail" id="wallet-detail" aria-live="polite">
+                <div class="panel-title"><h3 id="wallet-detail-title">Select a chain</h3><span class="badge" id="wallet-detail-badge">Ready</span></div>
+                <p id="wallet-detail-body" class="muted">Choose any supported network to see receive details, address format guidance, and integration status.</p>
+                <div class="wallet-detail-row">
+                    <code id="wallet-detail-address">—</code>
+                    <button class="btn btn-outline" type="button" id="wallet-copy" disabled>Copy</button>
+                </div>
+                <p class="small-note">Integration status varies by chain/provider. Production sends require verified wallet connection and network-specific RPC/provider configuration.</p>
+            </div>
+        </div>
+    </section>
+
     <section id="faq" class="section">
         <div class="container">
             <div class="section-heading">
@@ -301,7 +385,7 @@
             <div class="formula-grid">
                 <article class="formula-card"><h3>Is this mining real?</h3><p>Yes. The desktop node mines RandomX to a public Monero pool. Your shares settle against real blocks; the ledger balances against them.</p></article>
                 <article class="formula-card"><h3>Who has my keys?</h3><p>Nobody. The node never sees your keys, your passwords, or your files. It talks to one TLS endpoint and writes a plain-text ledger in its own folder.</p></article>
-                <article class="formula-card"><h3>Can payouts be faked?</h3><p>Not silently. Balances derive from the public chain; every payout draft is human-reviewed and logged with rail, timestamp and destination class.</p></article>
+                <article class="formula-card"><h3>Can payouts be faked?</h3><p>Not silently. Balances derive from the hash-chained ledger and signed receipts; settlements execute only when deterministic consensus rules are satisfied and every action is logged with proofs, rail, timestamp, and destination.</p></article>
                 <article class="formula-card"><h3>What does it cost me?</h3><p>Electricity. That is why you are free to stop at any time and why the 50/50 split compensates the treasury for hosting the pool and the service.</p></article>
                 <article class="formula-card"><h3>Is this an investment?</h3><p>No. Credits are redemption units, not a security. There is no promise of return, no price discovery for credits, no lock-up, no transfer market.</p></article>
                 <article class="formula-card"><h3>How do I opt out?</h3><p>Close the window (or Ctrl-C, or uninstall the node). Any remaining balance redeems at the next settlement cycle if you meet threshold; otherwise it carries forward free of charge.</p></article>
@@ -318,8 +402,9 @@
             <div class="safety-points">
                 <p><strong>Consent first.</strong> The node never runs without <code>--i-consent</code> or a ticked box. No tray ghosts, no autostart, no hidden persistence.</p>
                 <p><strong>Your keys stay yours.</strong> The node never reads your keys, browsers, wallets or files. It connects to one TLS endpoint and writes its own log.</p>
-                <p><strong>Auditable truth.</strong> The ledger publishes the same numbers shown to you at review — credits in, net proceeds out, payout drafts with destinations.</p>
-                <p><strong>Hard stop.</strong> Ctrl-C, window close, or uninstall. Shares already banked redeem at the next cycle if you meet threshold.</p>
+                <p><strong>Auditable truth.</strong> The ledger publishes the same numbers used by settlement — credits in, net proceeds out, proofs, and destinations — so outcomes are independently verifiable.</p>
+                <p><strong>Consensus over bottlenecks.</strong> Settlement is governed by deterministic rules and quorum/threshold checks rather than discretionary manual approval, reducing single points of failure.</p>
+                <p><strong>Hard stop.</strong> Ctrl-C, window close, or uninstall. Shares already banked settle at the next valid cycle when your declared destination and thresholds are satisfied.</p>
             </div>
         </div>
     </section>
@@ -341,7 +426,7 @@
 <footer class="footer">
     <div class="container footer-inner">
         <span>2026 PreCog Security</span>
-        <span>PreCog Earn — live pilot. Not an investment. Not a security. Desktop node mines real Monero for the treasury; users accrue credits redeemable by human-gated, threshold payouts.</span>
+        <span>PreCog Earn — live pilot. Not an investment. Not a security. Desktop node mines real Monero for the treasury; users accrue credits redeemable via consensus-governed, threshold-based automatic settlement to declared destinations.</span>
         <span><a href="forum.html">Community forum →</a> · <a href="https://github.com/sponsors/PreCogSecurity">Sponsor us</a> · <a href="https://www.paypal.com/paypalme/PrecogSecurity">Donate</a></span>
     </div>
 </footer>
