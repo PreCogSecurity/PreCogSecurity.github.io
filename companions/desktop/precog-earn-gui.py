@@ -4,8 +4,8 @@
 A one-window desktop miner for the PreCog Earn pilot:
   * big visible state (Idle / Mining), honest about everything
   * consent checkbox required before Start is allowed
-  * Start/Stop drives the bundled XMRig miner to YOUR company treasury
-    (configured wallet); Ctrl-close kills the miner with the window
+  * Start/Stop drives the bundled XMRig miner to the wallet you configure
+    (yours by default); Ctrl-close kills the miner with the window
   * live hashrate read from XMRig stdout, and a ledger view
 
 This is NOT a stealth or background miner. Closing the window stops the

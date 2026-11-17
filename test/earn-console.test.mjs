@@ -19,9 +19,20 @@ const read = (relativePath) => readFileSync(path.join(repositoryRoot, relativePa
 test("earn page sells real XMR desktop mining, not demo credits", () => {
     const page = read("earn.html");
     assert.match(page, /RandomX/, "page must name the real algorithm");
-    assert.match(page, /downloads\/precog-earn-desktop-v0\.1\.0\.zip/, "page must link the desktop node download");
+    assert.match(page, /downloads\/precog-earn-desktop-v0\.1\.2\.zip/, "page must link the current desktop node download");
+    assert.ok(!page.includes("precog-earn-desktop-v0.1.0.zip"), "page must not link the superseded build");
+    assert.ok(!page.includes("earn node v0.1.1"), "page must not advertise the superseded version");
     assert.ok(!/PRST|COG demo|SHA-512 \/ SHA-384/.test(page), "page must not retain fake mining claims");
     assert.ok(!/<script src="assets\/earn-worker\.js"/.test(page), "the demo worker must be gone");
+});
+
+test("desktop node refuses a retired/compromised wallet", () => {
+    const desktop = read("companions/desktop/precog-earn-node.py");
+    assert.match(desktop, /BLOCKED_WALLETS/, "node must keep a blocked-wallet list");
+    assert.match(desktop, /42mWtiADkUDQgALdotiApdWcc5EVyW2ku64rn81SNvv99KszmX3U5okPgdeoDxsDfJeHdpUc6j4DKKZuVXoqDXrTNBfiKKX/, "retired address must be listed as blocked");
+    assert.match(desktop, /raise SystemExit\(3\)/, "node must exit non-zero instead of mining to a blocked wallet");
+    const gui = read("companions/desktop/precog-earn-gui.py");
+    assert.match(gui, /wallet_problem/, "GUI must validate the destination wallet before Start");
 });
 
 test("desktop node refuses any work without explicit consent", () => {

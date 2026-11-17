@@ -1,7 +1,7 @@
 {
-  "latest_version": "0.1.1",
+  "latest_version": "0.1.2",
   "url": "https://precogsecurity.pages.dev/earn",
   "critical": true,
-  "message": "Security update: replace any compromised/malware wallet destination with your own verified wallet. Never reuse seeds or addresses from untrusted extensions. Use --check-update regularly.",
-  "notes": "v0.1.1: manifest-based update checks, critical security notice, blessed destination guidance."
+  "message": "Update to v0.1.2: it refuses to mine to a blocked (compromised/retired) wallet, shows the real destination address, and adds --check-update. Replace any old destination with your own verified wallet.",
+  "notes": "v0.1.2: blocked-wallet guard (exit 3), destination shown in UI, --check-update manifest-first, credits experiment removed from the download."
 }

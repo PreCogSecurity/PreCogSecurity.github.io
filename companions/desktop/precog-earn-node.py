@@ -47,7 +47,7 @@ import zipfile
 from pathlib import Path
 
 XMRig_VERSION = "6.26.0"
-NODE_VERSION = "0.1.1"
+NODE_VERSION = "0.1.2"
 REPO_API = "https://api.github.com/repos/PreCogSecurity/PreCogSecurity.github.io/releases"
 UPDATE_MANIFEST_URL = os.environ.get(
     "PRECOG_UPDATE_MANIFEST_URL",
