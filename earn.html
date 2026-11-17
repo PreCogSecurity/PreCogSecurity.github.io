@@ -42,7 +42,7 @@
     <section class="hero">
         <div class="container hero-grid">
             <div class="hero-copy">
-                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Live — Live - earn node v0.1.1 · PreCog Wallet preview · mine to your own wallet</span>
+                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Live — earn node v0.1.1 · PreCog Wallet preview · mine to your own wallet</span>
                 <h1>Mine. Earn.<br><span>Own it everywhere.</span></h1>
                 <p class="lead">
                     PreCog Earn is consent-first Monero mining. The clearest way to get paid: <strong>mine direct to your own XMR wallet</strong> and the pool pays you per its threshold — no PreCog custody.
@@ -72,11 +72,7 @@
                 </div>
                 <div class="status-row">
                     <span class="status-badge available">The product</span>
-                    <div><strong>Mine straight to a real pool</strong><span>Run with <code>--wallet &lt;YOUR_XMR_ADDRESS&gt;</code>. The pool verifies every share and pays your wallet directly per its threshold — no PreCog credits, no custody, no settlement scheme. Mining pools are a solved, decade-old technology; we use one instead of rebuilding it.</span></div>
-                </div>
-                <div class="status-row">
-                    <span class="status-badge research">Internal only</span>
-                    <div><strong>Credits ledger (experiment, not a payout product)</strong><span>An append-only, hash-chained record used for internal accounting research. It is not a pool, does not verify work, and is not a customer payout path — we do not ask anyone to mine for credits. Kept out of the product on purpose.</span></div>
+                    <div><strong>Mine straight to a real pool</strong><span>Run with <code>--wallet &lt;YOUR_XMR_ADDRESS&gt;</code>. The pool verifies every share and pays your wallet directly per its threshold — no PreCog credits, no custody, no settlement scheme. Mining pools are a solved, proven technology; we use one instead of rebuilding it.</span></div>
                 </div>
                 <div class="status-row">
                     <span class="status-badge available">Preview</span>
@@ -87,7 +83,7 @@
                     <div><strong>Android app</strong><span>Consent-first skeleton; APK ships after store review and battery/thermal guards.</span></div>
                 </div>
                 <div class="panel-note">
-                    <strong>Not a get-rich scheme:</strong> a 2012 CPU nets on the order of ~170 H/s. The network is real, the ledger is real, the economics are disclosed — magic is not part of the stack.
+                    <strong>Not a get-rich scheme:</strong> a typical older CPU may only produce ~100–200 H/s. Earnings depend on network difficulty, pool luck, and fees — the pool’s own accounting is the source of truth.
                 </div>
             </aside>
         </div>
@@ -240,7 +236,7 @@
                             <label for="calc-mode">Allocation view</label>
                             <select id="calc-mode">
                                 <option value="proportional" selected>Proportional shares (default)</option>
-                                <option value="equal">Equal cohort (opt-in experiment)</option>
+                                <option value="equal">Equal cohort (illustrative comparison)</option>
                             </select>
                         </div>
                     </div>
@@ -272,7 +268,7 @@
                 <article class="roadmap-card now">
                     <span class="status-badge available">Available</span>
                     <h3>Desktop node (Win/macOS/Linux)</h3>
-                    <p>Real RandomX mining, verified client, GUI or CLI, with the ledger baked in.</p>
+                    <p>Real RandomX mining with a verified client (GUI or CLI). You mine to a real pool and get paid to your own wallet.</p>
                     <small><a href="downloads/precog-earn-desktop-v0.1.0.zip">Download v0.1.0</a></small>
                 </article>
                 <article class="roadmap-card soon">
@@ -382,8 +378,8 @@
                 <h2>The honest FAQ.</h2>
             </div>
             <div class="formula-grid">
-                <article class="formula-card"><h3>Is this mining real?</h3><p>Yes. The desktop node mines RandomX to a public Monero pool. Your shares settle against real blocks; the ledger balances against them.</p></article>
-                <article class="formula-card"><h3>Who has my keys?</h3><p>Nobody. The node never sees your keys, your passwords, or your files. It talks to one TLS endpoint and writes a plain-text ledger in its own folder.</p></article>
+                <article class="formula-card"><h3>Is this mining real?</h3><p>Yes. The desktop node mines RandomX to a public Monero pool. The pool verifies your shares against real network work and pays your wallet according to its own rules and threshold.</p></article>
+                <article class="formula-card"><h3>Who has my keys?</h3><p>Nobody but you. The node never reads your wallet keys, passwords, or personal files. It connects to the pool you choose and writes a local activity log in its own folder.</p></article>
                 <article class="formula-card"><h3>Can payouts be faked?</h3><p>No. Real proof of work is verified by the pool against the chain, and payments come from the pool's own transparent accounting to your own address. PreCog cannot fabricate a pool payout.</p></article>
                 <article class="formula-card"><h3>What does it cost me?</h3><p>Electricity, plus the pool's published fee. You are free to stop at any time. PreCog takes no cut of your mining rewards.</p></article>
                 <article class="formula-card"><h3>Is this an investment?</h3><p>No. It is paid work: you contribute hashpower, the pool pays in XMR. There is no token, no promised return, no lock-up.</p></article>
@@ -401,9 +397,8 @@
             <div class="safety-points">
                 <p><strong>Consent first.</strong> The node never runs without <code>--i-consent</code> or a ticked box. No tray ghosts, no autostart, no hidden persistence.</p>
                 <p><strong>Your keys stay yours.</strong> The node never reads your keys, browsers, wallets or files. It connects to one TLS endpoint and writes its own log.</p>
-                <p><strong>Real infrastructure.</strong> We wrap mature mining tools and a real pool rather than inventing a payout scheme. What you see is the pool's own accounting.</p>
-                <p><strong>Real infrastructure.</strong> We wrap mature mining tools and a real pool. What you see is the pool's own accounting — not a scheme we invented.</p>
-                <p><strong>Hard stop.</strong> Ctrl-C, window close, or uninstall. Shares already banked settle at the next valid cycle when your declared destination and thresholds are satisfied.</p>
+                <p><strong>Real infrastructure.</strong> We wrap mature mining tools and a real pool. What you see is the pool’s own accounting — not a scheme we invented.</p>
+                <p><strong>Hard stop.</strong> Ctrl-C, window close, or uninstall. Mining stops immediately; any shares the pool already accepted are handled and paid by the pool on its normal schedule and threshold.</p>
             </div>
         </div>
     </section>
