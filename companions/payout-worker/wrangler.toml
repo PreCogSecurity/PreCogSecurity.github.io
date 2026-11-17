@@ -23,6 +23,9 @@ database_id = "d69afa29-3b30-4c7a-bd79-6ec251f5613c"
 DRY_RUN = "1"
 MAX_BATCH_XMR = "0.5"        # absolute cap per settlement cycle (operator-tunable)
 MIN_REDEEM_XMR = "0.001"     # per-destination dust floor
+MAX_SHARES_PER_RECEIPT = "100000"     # anti-inflation cap on signed share claims (claims are not PoW)
+MAX_SHARES_PER_USER_WINDOW = "1000000" # rolling accrual cap per handle within the window
+SHARE_WINDOW_SECONDS = "3600"         # rolling window length for the per-user cap (1h)
 PAYOUT_INTERVAL_DAYS = "7"   # informational; settlement trigger is operator call
 PAYOUT_CRON = "0"            # set to "1" to arm a WEEKLY report-only heartbeat; never executes XMR
 # Optional weekly trigger, entirely inert unless PAYOUT_CRON changes:
