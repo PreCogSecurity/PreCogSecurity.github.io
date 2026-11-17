@@ -30,8 +30,36 @@ LEDGER = HERE / "precog-earn-ledger.log"
 PY = sys.executable
 
 
+BLOCKED_WALLET = "42mWtiADkUDQgALdotiApdWcc5EVyW2ku64rn81SNvv99KszmX3U5okPgdeoDxsDfJeHdpUc6j4DKKZuVXoqDXrTNBfiKKX"
+
+
+def resolve_wallet() -> str:
+    """Same precedence as precog-earn-node.py: env var first, then wallet file."""
+    wallet = (os.environ.get("PRECOG_XMR_WALLET") or "").strip()
+    if not wallet and WALLET.exists():
+        wallet = WALLET.read_text(encoding="utf-8").strip()
+    return wallet
+
+
+def wallet_problem() -> str:
+    """Empty string when the destination wallet is usable."""
+    wallet = resolve_wallet()
+    if not wallet:
+        return "Wallet not configured: create precog-earn-wallet.txt (one line) or set PRECOG_XMR_WALLET."
+    if wallet == BLOCKED_WALLET:
+        return "Blocked wallet: that address is retired/compromised. Point precog-earn-wallet.txt or PRECOG_XMR_WALLET at your own address."
+    if len(wallet) < 95:
+        return "Wallet looks invalid (expected a ~95 character Monero address)."
+    return ""
+
+
 def wallet_ok() -> bool:
-    return os.environ.get("PRECOG_XMR_WALLET") or (WALLET.exists() and WALLET.read_text(encoding="utf-8").strip())
+    return not wallet_problem()
+
+
+def wallet_short() -> str:
+    wallet = resolve_wallet()
+    return f"{wallet[:8]}...{wallet[-6:]}" if wallet else "NOT configured"
 
 
 class EarnApp:
@@ -52,9 +80,9 @@ class EarnApp:
 
         self.state = tk.Label(root, text="Idle", fg=fg, bg=bg, font=("Segoe UI", 15, "bold"))
         self.state.pack(pady=(12, 4))
-        self.stats = tk.Label(root, text="0 H/s  ·  wallet: " + ("configured" if wallet_ok() else "NOT configured"), fg=fg, bg=bg, font=("Segoe UI", 10))
+        self.stats = tk.Label(root, text="0 H/s  ·  wallet: " + wallet_short(), fg=fg, bg=bg, font=("Segoe UI", 10))
         self.stats.pack()
-        tk.Label(root, text="Mining pays the operator-designated PreCog treasury XMR rail. Your device earns internal credits on a published, hash-chained ledger; threshold + human approval settle payouts. Not an investment.",
+        tk.Label(root, text="Mining pays the destination XMR wallet you configure (yours by default). The pool verifies shares and pays that wallet directly — no credits, no points, not an investment.",
                  fg="#6f8491", bg=bg, font=("Segoe UI", 8), wraplength=500, justify="center").pack(pady=(6, 6))
 
         self.consent = tk.BooleanVar(value=False)
@@ -83,8 +111,9 @@ class EarnApp:
 
         if not NODE.exists():
             self.line("precog-earn-node.py is missing next to this file.")
-        if not wallet_ok():
-            self.line("Wallet not configured: create precog-earn-wallet.txt (one line) or set PRECOG_XMR_WALLET.")
+        problem = wallet_problem()
+        if problem:
+            self.line(problem)
 
     def line(self, text: str) -> None:
         ts = time.strftime("%H:%M:%S")
@@ -105,8 +134,9 @@ class EarnApp:
         if not self.consent.get():
             messagebox.showwarning("Consent required", "Tick the consent checkbox first.")
             return
-        if not wallet_ok():
-            messagebox.showerror("Wallet missing", "Configure the treasury wallet first (see the log pane).")
+        problem = wallet_problem()
+        if problem:
+            messagebox.showerror("Wallet problem", problem)
             return
         try:
             self.proc = subprocess.Popen([PY, str(NODE), "--i-consent", "--start"],
@@ -130,7 +160,7 @@ class EarnApp:
                 try:
                     parts = line.split()
                     h = parts[parts.index("speed") + 3]
-                    self.stats.config(text=f"{h} H/s  ·  wallet: configured")
+                    self.stats.config(text=f"{h} H/s  ·  wallet: " + wallet_short())
                 except Exception:
                     pass
                 self.line(line)

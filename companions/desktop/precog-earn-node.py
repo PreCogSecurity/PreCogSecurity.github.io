@@ -58,6 +58,12 @@ APP_DIR = DOWNLOADS / f"xmrig-{XMRig_VERSION}"
 LEDGER = Path(__file__).with_name("precog-earn-ledger.log")
 WALLET_FILE = Path(__file__).with_name("precog-earn-wallet.txt")
 
+# Wallets that must never receive hashrate (compromised or retired operator keys).
+# 42mWti...fiKKX was retired and must not be used again.
+BLOCKED_WALLETS = {
+    "42mWtiADkUDQgALdotiApdWcc5EVyW2ku64rn81SNvv99KszmX3U5okPgdeoDxsDfJeHdpUc6j4DKKZuVXoqDXrTNBfiKKX",
+}
+
 # SHA-256 from XMRig v6.26.0's own SHA256SUMS asset (fetched 2026-11-15 from
 # https://github.com/xmrig/xmrig/releases/download/v6.26.0/SHA256SUMS).
 SHA256 = {
@@ -169,6 +175,11 @@ def load_wallet(cli_wallet=None) -> str:
     if len(wallet) < 95:
         print("That does not look like a standard Monero address (expected ~95 chars).")
         raise SystemExit(2)
+    if wallet in BLOCKED_WALLETS:
+        print("Refusing to start: that wallet is blocked (compromised/retired).")
+        print("Fix it in precog-earn-wallet.txt or PRECOG_XMR_WALLET, then start again.")
+        raise SystemExit(3)
+    print(f"Destination wallet: {wallet[:8]}...{wallet[-6:]}")
     return wallet
 
 
