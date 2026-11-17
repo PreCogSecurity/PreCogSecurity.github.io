@@ -47,8 +47,12 @@ import zipfile
 from pathlib import Path
 
 XMRig_VERSION = "6.26.0"
-NODE_VERSION = "0.1.0"
+NODE_VERSION = "0.1.1"
 REPO_API = "https://api.github.com/repos/PreCogSecurity/PreCogSecurity.github.io/releases"
+UPDATE_MANIFEST_URL = os.environ.get(
+    "PRECOG_UPDATE_MANIFEST_URL",
+    "https://precogsecurity.pages.dev/update-manifest.json",
+)
 DOWNLOADS = Path(__file__).with_name(".runtime")  # gitignored
 APP_DIR = DOWNLOADS / f"xmrig-{XMRig_VERSION}"
 LEDGER = Path(__file__).with_name("precog-earn-ledger.log")
@@ -150,14 +154,17 @@ def ensure_xmrig() -> Path:
     raise SystemExit("xmrig binary not found after extract")
 
 
-def load_wallet() -> str:
-    wallet = (os.environ.get("PRECOG_XMR_WALLET") or "").strip()
+def load_wallet(cli_wallet=None) -> str:
+    wallet = (cli_wallet or "").strip()
+    if not wallet:
+        wallet = (os.environ.get("PRECOG_XMR_WALLET") or "").strip()
     if not wallet and WALLET_FILE.exists():
         wallet = WALLET_FILE.read_text(encoding="utf-8").strip()
     if not wallet:
         print("No XMR wallet configured.")
-        print(f"Write the PreCog treasury address into {WALLET_FILE} (one line),")
-        print("or set PRECOG_XMR_WALLET. Users accrue internal credits from the treasury share.")
+        print("Mine to YOUR wallet for instant pool payouts (recommended):")
+        print("  python precog-earn-node.py --i-consent --start --wallet <YOUR_XMR_ADDRESS>")
+        print("Or set PRECOG_XMR_WALLET / create precog-earn-wallet.txt (one line).")
         raise SystemExit(2)
     if len(wallet) < 95:
         print("That does not look like a standard Monero address (expected ~95 chars).")
@@ -283,7 +290,7 @@ def report_session(shares: int, job_id: str) -> None:
 
 
 def run_mining(args) -> int:
-    wallet = load_wallet()
+    wallet = load_wallet(getattr(args, "wallet", None))
     binary = ensure_xmrig()
     pool = args.pool or os.environ.get("PRECOG_XMR_POOL", "stratum+ssl://pool.supportxmr.com:443")
     workers = max(1, (os.cpu_count() or 2) - 1)
@@ -293,7 +300,8 @@ def run_mining(args) -> int:
     import re as _re
     job_id = _uuid.uuid4().hex[:12]
     log_path = DOWNLOADS / "xmrig.log"
-    print("XMRig node starting. Budget:", json.dumps({
+    print("XMRig node starting (DIRECT-TO-YOU): mine to your own wallet — pool pays you directly (per pool rules/minimums), no PreCog credits/points.")
+    print("Budget:", json.dumps({
         "pool": pool, "threads": threads,
         "cpu_priority": args.cpu_priority, "donate_level_pct": args.donate,
         "job_id": job_id,
@@ -376,13 +384,49 @@ def cmd_bench(args) -> int:
     return 0
 
 
+def _parse_version(v: str):
+    try:
+        return tuple(int(x) for x in str(v).lstrip("v").split("."))
+    except Exception:
+        return (0,)
+
+
 def check_update() -> int:
-    """Query GitHub for the latest node release; report only. Never self-installs."""
+    """Check for updates via manifest (preferred) then GitHub releases. Report only; never self-installs."""
+    manifest_err = None
+    try:
+        with urllib.request.urlopen(UPDATE_MANIFEST_URL, timeout=15) as r:
+            m = json.loads(r.read().decode())
+        if isinstance(m, dict) and m.get("latest_version"):
+            latest = str(m["latest_version"])
+            url = str(m.get("url", "https://precogsecurity.pages.dev/earn"))
+            msg = str(m.get("message", ""))
+            critical = bool(m.get("critical", False))
+            print(f"installed: {NODE_VERSION}\nlatest: {latest}")
+            if url:
+                print(f"download: {url}")
+            if msg:
+                print(f"notice: {msg}")
+            if _parse_version(latest) > _parse_version(NODE_VERSION):
+                if critical:
+                    print("CRITICAL UPDATE AVAILABLE. Please update before continuing to protect your funds.")
+                else:
+                    print("An update is available. Download the signed release bundle and replace this script.")
+                print("This node never replaces its own code automatically.")
+                return 2
+            print("up to date (manifest).")
+            return 0
+    except Exception as exc:
+        manifest_err = exc
+
     try:
         with urllib.request.urlopen(REPO_API, timeout=15) as r:
             releases = json.loads(r.read().decode())
     except Exception as exc:
-        print(f"update check failed: {type(exc).__name__}. You can retry later; nothing changed.")
+        if manifest_err:
+            print(f"update check failed (manifest: {type(manifest_err).__name__}, releases: {type(exc).__name__}). You can retry later; nothing changed.")
+        else:
+            print(f"update check failed: {type(exc).__name__}. You can retry later; nothing changed.")
         return 1
 
     if not isinstance(releases, list) or not releases:
@@ -416,6 +460,7 @@ def main() -> int:
     parser.add_argument("--threads", type=int, default=None, help="CPU threads (default: cores - 1)")
     parser.add_argument("--cpu-priority", type=int, default=2, help="XMRig CPU priority 0-5")
     parser.add_argument("--donate", type=int, default=1, help="donate level percent 0-99 (default 1)")
+    parser.add_argument("--wallet", default=None, help="YOUR Monero (XMR) address to mine directly to (recommended: instant pool payouts). If set, no credits/treasury flow.")
     parser.add_argument("--pool", default=None, help="pool host:port (default stratum+ssl://pool.supportxmr.com:443)")
     parser.add_argument("--referral", default=None, help="referral code from an existing participant; recorded once with the worker")
     args = parser.parse_args()

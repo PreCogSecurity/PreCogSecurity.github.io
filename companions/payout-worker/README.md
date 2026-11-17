@@ -21,7 +21,7 @@ Turns the redemption ledger into an automatic settlement rail **that the operato
 
 ## Hard boundaries (non-negotiable, by design)
 
-1. This service **does not verify proof of work.** RandomX verification needs the ~2.3 GB dataset; Workers isolates use ~128 MB. Verification happens on the operator's own reconciliation step (or on a mining pool verifier upstream). Receipts are signed *claims*, not proofs.
+1. This service **does not verify proof of work.** RandomX verification needs the ~2.3 GB dataset; Workers isolates use ~128 MB. Verification happens on the operator's own reconciliation step (or on a mining pool verifier upstream). Receipts are signed *claims*, not proofs. Because they are claims, every receipt is capped: `MAX_SHARES_PER_RECEIPT` (default 100000, tunable in `wrangler.toml`) rejects oversized share assertions at ingest, so one compromised node holding the HMAC key cannot mint unlimited credits and dilute the redemption pool. This cap bounds loss per claim; it is not PoW verification.
 2. **No address is ever inferred** — unmapped handles are blocked from settlement.
 3. **No fee custody.** The worker does not hold XMR; your `monero-wallet-rpc` (operator-owned) does the actual send.
 4. **HALT is a one-member table.** One `UPDATE meta SET value='1' WHERE key='HALT'` and every spend path returns 403 — including yours — until you set it back.

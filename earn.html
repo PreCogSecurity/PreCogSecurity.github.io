@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://precog-earn-payout.precogsecurity.workers.dev; font-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none';">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PreCog Earn is the live PreCog Security workload network: desktop Monero RandomX mining, an auditable hash-chained share ledger, and a declared 50/50 redemption pool of net proceeds, distributed pro-rata with threshold + human-approved payouts.">
+    <meta name="description" content="PreCog Earn: consent-first Monero mining with a hash-verified desktop node. Mine straight to a real pool and your own XMR wallet — the pool verifies shares and pays you directly. Plus a multi-chain wallet preview (25+ networks).">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#05070e">
-    <meta property="og:title" content="PreCog Earn — Mine real Monero. Split the upside.">
-    <meta property="og:description" content="Desktop node mines real XMR to the PreCog treasury. You bank credits on a published, hash-chained ledger. Half of declared net proceeds fund pro-rata payouts — released at threshold, after human review.">
+        <meta property="og:title" content="PreCog Earn &amp; Wallet — Mine to your wallet, earn transparently">
+    <meta property="og:description" content="Consent-first Monero mining: mine to a real pool and your own wallet. No credits scheme, no custody.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://precogsecurity.pages.dev/earn">
-    <title>PreCog Earn — Mine real Monero. Split the upside.</title>
+        <title>PreCog Earn &amp; Wallet — Mine to your wallet, earn transparently</title>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="assets/fonts.css">
     <link rel="stylesheet" href="assets/theme.css">
@@ -28,7 +28,8 @@
         </a>
         <ul class="nav-links">
             <li><a href="#download">Get the node</a></li>
-            <li><a href="#economics">50/50 economics</a></li>
+            <li><a href="#economics">How payouts work</a></li>
+            <li><a href="#wallet">PreCog Wallet</a></li>
             <li><a href="#how">How it works</a></li>
             <li><a href="forum.html">Forum</a></li>
             <li><a href="#faq">FAQ</a></li>
@@ -41,19 +42,19 @@
     <section class="hero">
         <div class="container hero-grid">
             <div class="hero-copy">
-                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Live — desktop node v0.1.0</span>
-                <h1>Mine real Monero.<br><span>Split the upside.</span></h1>
+                <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Live — Live - earn node v0.1.1 · PreCog Wallet preview · mine to your own wallet</span>
+                <h1>Mine. Earn.<br><span>Own it everywhere.</span></h1>
                 <p class="lead">
-                    PreCog Earn puts your CPU to audited use. Your node mines real XMR to the
-                    operator-blessed treasury; you bank credits on a published, hash-chained ledger;
-                    half of declared net proceeds are earmarked for pro-rata credit redemption —
-                    released at threshold, after human review, never automatically.
+                    PreCog Earn is consent-first Monero mining. The clearest way to get paid: <strong>mine direct to your own XMR wallet</strong> and the pool pays you per its threshold — no PreCog custody.
+                    The pool does what pools do: it verifies your shares and pays your wallet directly at its threshold. No credits to trust, no operator to wait on.
+                    Paired with <strong>PreCog Wallet</strong>, a self-custody-first multi-chain hub preview (25+ networks).
                 </p>
                 <div class="hero-actions">
-                    <a class="btn btn-primary" href="#download">Download the desktop node</a>
-                    <a class="btn btn-outline" href="#economics">See the 50/50 economics</a>
+                    <a class="btn btn-primary" href="#download">Download &amp; mine to your wallet</a>
+                    <a class="btn btn-outline" href="#wallet">Open PreCog Wallet</a>
+                    <a class="btn btn-ghost" href="#economics">See economics &amp; rules</a>
                 </div>
-                <p class="microcopy">No investment contract. No purchase required. No keys of yours ever leave your machine. Shares are credited only when your node submits valid proofs — invalid work earns zero, by design.</p>
+                <p class="microcopy">Consent-first. Self-custody by design. The pool verifies work and pays directly — a solved system we use rather than reinvent.</p>
             </div>
 
             <aside class="hero-panel" aria-label="Product status">
@@ -67,15 +68,19 @@
                 </div>
                 <div class="status-row">
                     <span class="status-badge available">Live</span>
-                    <div><strong>Credits ledger</strong><span>Append-only, hash-chained, publishable; duplicate receipts rejected.</span></div>
+                    <div><strong>Open accounting</strong><span>Transparent pool fees and payout thresholds; no hidden cut.</span></div>
                 </div>
                 <div class="status-row">
-                    <span class="status-badge available">Deployed</span>
-                    <div><strong>Automatic settlement rail</strong><span>Live at the edge (precogsecurity.workers.dev): HMAC-verified share receipts, idempotent batch sends via the operator's monero-wallet-rpc. DRY_RUN=1 today; HALT freezes all sends.</span></div>
+                    <span class="status-badge available">The product</span>
+                    <div><strong>Mine straight to a real pool</strong><span>Run with <code>--wallet &lt;YOUR_XMR_ADDRESS&gt;</code>. The pool verifies every share and pays your wallet directly per its threshold — no PreCog credits, no custody, no settlement scheme. Mining pools are a solved, decade-old technology; we use one instead of rebuilding it.</span></div>
                 </div>
                 <div class="status-row">
-                    <span class="status-badge available">Live</span>
-                    <div><strong>Threshold payouts</strong><span>Pro-rata redemption from 50% of declared net proceeds; the operator arms automatic execution or keeps every send human-reviewed.</span></div>
+                    <span class="status-badge research">Internal only</span>
+                    <div><strong>Credits ledger (experiment, not a payout product)</strong><span>An append-only, hash-chained record used for internal accounting research. It is not a pool, does not verify work, and is not a customer payout path — we do not ask anyone to mine for credits. Kept out of the product on purpose.</span></div>
+                </div>
+                <div class="status-row">
+                    <span class="status-badge available">Preview</span>
+                    <div><strong>PreCog Wallet</strong><span>Unified multi-chain hub (25+ networks) for receive/track/connect flows — self-custody-first, minimal fuss.</span></div>
                 </div>
                 <div class="status-row">
                     <span class="status-badge research">Pilot</span>
@@ -100,7 +105,7 @@
                     <div class="panel-title"><h3>Wallet to inspect</h3></div>
                     <div class="field">
                         <label for="telemetry-wallet">XMR wallet address</label>
-                        <input type="text" id="telemetry-wallet" name="telemetry-wallet" spellcheck="false" autocomplete="off" maxlength="95" value="42mWtiADkUDQgALdotiApdWcc5EVyW2ku64rn81SNvv99KszmX3U5okPgdeoDxsDfJeHdpUc6j4DKKZuVXoqDXrTNBfiKKX">
+                        <input type="text" id="telemetry-wallet" name="telemetry-wallet" spellcheck="false" autocomplete="off" maxlength="95" value="49AFGLJTXDY3YN6vPYzpSiPAeeEhFNq58GdCasbAKjzAZFHs8KN6LkuQNhP1urDP8FME6MDXSjhM67HsUBQHE3ua1Vy5Wdf">
                     </div>
                     <button id="telemetry-refresh" class="btn btn-primary" type="button">Refresh telemetry</button>
                     <p class="small-note">This reads the public pool API directly. No account, no signature, no keys. Browser sees the same public data you would see on supportxmr.com.</p>
@@ -121,37 +126,37 @@
     <section id="economics" class="section tint">
         <div class="container">
             <div class="section-heading">
-                <span class="eyebrow">50/50 economics</span>
-                <h2>You keep half.<br><span>By public accounting.</span></h2>
-                <p>Every signing off the books changes somebody's credits. That is why the books are public by construction. These are the mechanics, in full.</p>
+                <span class="eyebrow">How payouts work</span>
+                <h2>The pool pays you.<br><span>Not a credits scheme.</span></h2>
+                <p>Mining pools are a solved, decade-old technology. A real pool verifies every share against the chain, tracks your contribution, and pays your wallet directly. We plug into one — we do not ask you to mine for internal credits.</p>
             </div>
             <div class="formula-grid">
                 <article class="formula-card emphasis">
-                    <span class="card-kicker">Step 1 — Treasury mines</span>
-                    <h3>The company pools hashpower</h3>
-                    <code>treasury XMR += node_share(job)</code>
-                    <p>Your operator-configured node connects to a public pool; block proceeds settle to the operator-blessed network rail. Nothing of yours is pooled differently than the company's — same pool, same shares.</p>
+                    <span class="card-kicker">Step 1 — Your node mines</span>
+                    <h3>Hash-verified XMRig, your rules</h3>
+                    <code>node --wallet &lt;YOUR_XMR&gt; --i-consent --start</code>
+                    <p>A pinned, SHA-256-verified XMRig does RandomX work on threads you choose. It needs no admin rights and stops the moment you stop it.</p>
                 </article>
                 <article class="formula-card">
-                    <span class="card-kicker">Step 2 — You accrue credits</span>
-                    <h3>Valid shares, hash-chained</h3>
-                    <code>ledger += {ts, user, job, shares, hash(prev)}</code>
-                    <p>Every valid receipt is appended to a publishable, append-only ledger. Duplicate receipts are rejected and logged. Balances are recomputed from the chain — there are no mutable counters to fiddle with.</p>
+                    <span class="card-kicker">Step 2 — The pool verifies</span>
+                    <h3>Real share verification</h3>
+                    <code>pool verifies hash &lt; target</code>
+                    <p>The pool checks every submitted share against the live network target. Accepted shares are recorded in the pool's own accounting — battle-tested, not a bespoke ledger we invented.</p>
                 </article>
                 <article class="formula-card">
-                    <span class="card-kicker">Step 3 — Redemption pool</span>
-                    <h3>50% of declared net proceeds</h3>
-                    <code>pool = 0.5 × (gross − pool_fee − net_fee − wear)</code>
-                    <p>At each sign-off, the operator declares net proceeds. Half is earmarked for redemption; half funds the service, fees, and treasury. Contested math? The ledger disagrees with you — publicly.</p>
+                    <span class="card-kicker">Step 3 — Honest pool economics</span>
+                    <h3>You keep the pool's payout</h3>
+                    <code>payout = shares / pool_total × block_reward − fee</code>
+                    <p>Pools publish their fee and payout threshold. Your earnings are the pool's own accounting, paid in XMR to your address — no 50/50 split with us, no declaration we have to make.</p>
                 </article>
                 <article class="formula-card">
-                    <span class="card-kicker">Step 4 — Payout at threshold</span>
-                    <h3>Pro-rata, human-approved</h3>
-                    <code>payout_u = pool × credits_u / Σcredits</code>
-                    <p>When the outstanding balance crosses threshold, drafts are generated per user. A human maps handle → declared payout destination, reviews, and approves. No auto-settlement, no auto-execution — ever.</p>
+                    <span class="card-kicker">Step 4 — No custody, no wait</span>
+                    <h3>Direct to your wallet</h3>
+                    <code>pool → YOUR_XMR_ADDRESS</code>
+                    <p>PreCog never holds your coins or your keys. When you cross the pool's threshold, it pays your wallet directly. Stop any time; nothing is locked.</p>
                 </article>
             </div>
-            <p class="microcopy">Equal-split mode (1/N) exists as an opt-in cohort with identical audits and anti-free-rider checks; proportional-by-shares is the universal default because it survives unequal devices honestly.</p>
+            <p class="microcopy">We are honest about what we are: a thin, consent-first wrapper around real mining infrastructure. If you want to run your own pool, use mature pool software — that is not something to rebuild here.</p>
         </div>
     </section>
 
@@ -167,8 +172,8 @@
             <ol class="pipeline" aria-label="PreCog Earn pipeline">
                 <li><span class="step">01</span><div><h3>Download</h3><p><a href="downloads/precog-earn-desktop-v0.1.0.zip">precog-earn-desktop-v0.1.0.zip</a> (<a href="downloads/SHA256SUMS.txt">SHA256SUMS</a>). x64 Windows/macOS/Linux. Requires Python 3.9+. No admin rights, no kernel drivers, no AV exceptions.</p></div></li>
                 <li><span class="step">02</span><div><h3>Consent</h3><p>Run <code>earn.bat</code> (double-click) or <code>python precog-earn-node.py --i-consent --start</code>. The node downloads the pinned XMRig v6.26.0 and verifies its SHA-256 before anything executes. Ctrl-C or window close stops everything.</p></div></li>
-                <li><span class="step">03</span><div><h3>Mine</h3><p>RandomX (Monero) proof-of-work on your consented threads. Your node reports receipts; the company treasury mines; your credits accrue on the public ledger at every valid receipt.</p></div></li>
-                <li><span class="step">04</span><div><h3>Redemption</h3><p>Credits redeem pro-rata from the declared 50% pool at each settlement cycle. Drafts are human-reviewed and paid via the operator-blessed rail; you declare your destination at review.</p></div></li>
+                <li><span class="step">03</span><div><h3>Mine</h3><p>RandomX (Monero) proof-of-work on your consented threads, submitted to a real public pool that verifies every share.</p></div></li>
+                <li><span class="step">04</span><div><h3>Get paid</h3><p>The pool pays your own XMR wallet directly at its threshold. No PreCog credits, no custody, no settlement scheme — you keep what the pool credits you, minus its published fee.</p></div></li>
             </ol>
         </div>
     </section>
@@ -181,11 +186,11 @@
             </div>
             <div class="formula-grid">
                 <article class="formula-card emphasis">
-                    <span class="card-kicker">Desktop node</span>
+                    <span class="card-kicker">Desktop node · Direct-to-you</span>
                     <h3>precog-earn-desktop v0.1.0</h3>
-                    <p>ZIP: node, GUI (<code>earn.bat</code>), CLI, credits ledger, license and third-party notices. ~16 KB of source; XMRig fetched and verified once at first run.</p>
+                    <p><strong>Mine to your own XMR wallet for real pool payouts</strong> — no credits, no points, no delays: <code>python precog-earn-node.py --i-consent --start --wallet &lt;YOUR_XMR_ADDRESS&gt;</code>. The pool pays your wallet directly (per its payout threshold). ZIP includes node/GUI/CLI; XMRig fetched and verified once at first run.</p>
                     <p class="small-note"><a class="btn btn-primary" href="downloads/precog-earn-desktop-v0.1.0.zip">Download ZIP (SHA-256 verified)</a></p>
-                    <p class="small-note"><a href="downloads/precog-earn-cohort-v0.1.0.zip">Cohort kit v0.1.0 (SHA-256 verified)</a> — starter guide, identity + settlement notes, payout declaration sheet, FAQ.</p>
+                    <p class="small-note"><a href="downloads/precog-earn-cohort-v0.1.0.zip">Cohort kit v0.1.0 (SHA-256 verified)</a> — starter guide, consent and setup notes, pool payout FAQ.</p>
                 </article>
                 <article class="formula-card">
                     <span class="card-kicker">Requirements</span>
@@ -203,7 +208,7 @@
                     </ul>
                 </article>
             </div>
-            <p class="microcopy">Power draw is real and we recommend plugging in. This is not financial advice; Monero prices fluctuate; your credits redeem at the four-decimal net rate you can audit in the published ledger.</p>
+            <p class="microcopy">Power draw is real and we recommend plugging in. This is not financial advice; Monero prices fluctuate and pool payouts vary with hashrate and network difficulty.</p>
         </div>
     </section>
 
@@ -245,8 +250,8 @@
                     <div class="panel-title"><h3>Your estimate</h3></div>
                     <div class="metrics">
                         <div class="metric"><span class="metric-value" id="est-h">0</span><span class="metric-label">est. H/s</span></div>
-                        <div class="metric"><span class="metric-value" id="est-year-credits">0</span><span class="metric-label">credits / year</span></div>
-                        <div class="metric"><span class="metric-value" id="est-pool-share">0.00%</span><span class="metric-label">of 50% redemption pool</span></div>
+                        <div class="metric"><span class="metric-value" id="est-year-credits">0</span><span class="metric-label">shares / yr (illustrative)</span></div>
+                        <div class="metric"><span class="metric-value" id="est-pool-share">0.00%</span><span class="metric-label">illustrative pool share</span></div>
                     </div>
                     <div class="log" id="calc-log"><span>Estimator prints the math, not a promise.</span></div>
                 </div>
@@ -261,7 +266,7 @@
                     <span class="eyebrow">Companion surface</span>
                     <h2>One treasury,<br><span>many devices.</span></h2>
                 </div>
-                <p>Same ledger, same 50/50 economics, same consent rule. The desktop node is the shipping product today; other surfaces follow the same disclosure discipline.</p>
+                <p>One rule everywhere: consent first, mine to a real pool, keep your own coins. The desktop node is the shipping product today.</p>
             </div>
             <div class="roadmap-grid">
                 <article class="roadmap-card now">
@@ -292,6 +297,84 @@
         </div>
     </section>
 
+    <section id="wallet" class="section tint wallet-section">
+        <div class="container">
+            <div class="section-heading split">
+                <div>
+                    <span class="eyebrow">New · PreCog Wallet</span>
+                    <h2>One wallet.<br><span>25+ chains. Zero drama.</span></h2>
+                </div>
+                <p>A unified, self-custody-first interface for receiving, organizing, and tracking assets across major ecosystems. Minimal setup, maximum clarity — designed to feel instant, beautiful, and trustworthy.</p>
+            </div>
+
+            <div class="wallet-showcase">
+                <div class="panel wallet-hero-panel">
+                    <div class="panel-title"><h3>Multi-chain command center</h3><span class="badge available">Preview</span></div>
+                    <div class="wallet-balance">
+                        <span class="muted">Portfolio snapshot (demo view)</span>
+                        <strong id="wallet-total">$12,480.42</strong>
+                        <span class="wallet-delta">+3.8% · synced across 6 active chains</span>
+                    </div>
+                    <div class="wallet-actions-row">
+                        <button class="btn btn-primary" type="button" data-wallet-action="receive">Receive</button>
+                        <button class="btn btn-outline" type="button" data-wallet-action="send">Send</button>
+                        <button class="btn btn-outline" type="button" data-wallet-action="swap">Swap</button>
+                        <button class="btn btn-ghost" type="button" data-wallet-action="connect">Connect</button>
+                    </div>
+                    <p class="small-note">Demo interface: addresses shown below are examples/placeholders for UX preview. For real use, connect your wallet or import verified addresses — keys never leave your device.</p>
+                </div>
+
+                <div class="panel wallet-chains-panel">
+                    <div class="panel-title"><h3>Supported networks</h3><span class="small-note" id="chain-count">25+ chains</span></div>
+                    <div class="chain-toolbar">
+                        <input id="chain-search" class="wallet-input" type="search" placeholder="Search chain or ticker (BTC, ETH, SOL…)" aria-label="Search supported chains">
+                        <div class="chain-filters" role="group" aria-label="Chain filters">
+                            <button class="chip active" type="button" data-chain-filter="all">All</button>
+                            <button class="chip" type="button" data-chain-filter="evm">EVM</button>
+                            <button class="chip" type="button" data-chain-filter="l1">L1</button>
+                            <button class="chip" type="button" data-chain-filter="l2">L2</button>
+                            <button class="chip" type="button" data-chain-filter="stable">Stables</button>
+                        </div>
+                    </div>
+                    <div id="chain-grid" class="chain-grid" aria-live="polite"></div>
+                </div>
+            </div>
+
+            <div class="formula-grid wallet-info-grid">
+                <article class="formula-card">
+                    <span class="card-kicker">Minimal fuss</span>
+                    <h3>Unified receive flow</h3>
+                    <p>Select chain → copy address/QR → share. One consistent experience for UTXO, account, and memo-based networks, with clear warnings where tags/memos are required.</p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">Broad coverage</span>
+                    <h3>Built to span ecosystems</h3>
+                    <p>Bitcoin, Ethereum + EVM L2s, Solana, Monero, BNB Chain, Polygon, Arbitrum, Base, Optimism, Avalanche, Tron, Litecoin, Dogecoin, Cosmos, Polkadot, Cardano, XRP, Stellar, TON, Sui, Aptos and more.</p>
+                </article>
+                <article class="formula-card emphasis">
+                    <span class="card-kicker">Self-custody</span>
+                    <h3>Your keys, your rules</h3>
+                    <p>Designed for local signing and explicit approvals. Connect existing wallets where supported; import/watch addresses with transparent permissions. No silent background actions.</p>
+                </article>
+                <article class="formula-card">
+                    <span class="card-kicker">Earn + Wallet</span>
+                    <h3>Watch your wallet</h3>
+                    <p>View pool-reported hashrate and payouts for any XMR address alongside your multi-chain holdings — one clear dashboard, no custody.</p>
+                </article>
+            </div>
+
+            <div class="panel wallet-detail" id="wallet-detail" aria-live="polite">
+                <div class="panel-title"><h3 id="wallet-detail-title">Select a chain</h3><span class="badge" id="wallet-detail-badge">Ready</span></div>
+                <p id="wallet-detail-body" class="muted">Choose any supported network to see receive details, address format guidance, and integration status.</p>
+                <div class="wallet-detail-row">
+                    <code id="wallet-detail-address">—</code>
+                    <button class="btn btn-outline" type="button" id="wallet-copy" disabled>Copy</button>
+                </div>
+                <p class="small-note">Integration status varies by chain/provider. Production sends require verified wallet connection and network-specific RPC/provider configuration.</p>
+            </div>
+        </div>
+    </section>
+
     <section id="faq" class="section">
         <div class="container">
             <div class="section-heading">
@@ -301,10 +384,10 @@
             <div class="formula-grid">
                 <article class="formula-card"><h3>Is this mining real?</h3><p>Yes. The desktop node mines RandomX to a public Monero pool. Your shares settle against real blocks; the ledger balances against them.</p></article>
                 <article class="formula-card"><h3>Who has my keys?</h3><p>Nobody. The node never sees your keys, your passwords, or your files. It talks to one TLS endpoint and writes a plain-text ledger in its own folder.</p></article>
-                <article class="formula-card"><h3>Can payouts be faked?</h3><p>Not silently. Balances derive from the public chain; every payout draft is human-reviewed and logged with rail, timestamp and destination class.</p></article>
-                <article class="formula-card"><h3>What does it cost me?</h3><p>Electricity. That is why you are free to stop at any time and why the 50/50 split compensates the treasury for hosting the pool and the service.</p></article>
-                <article class="formula-card"><h3>Is this an investment?</h3><p>No. Credits are redemption units, not a security. There is no promise of return, no price discovery for credits, no lock-up, no transfer market.</p></article>
-                <article class="formula-card"><h3>How do I opt out?</h3><p>Close the window (or Ctrl-C, or uninstall the node). Any remaining balance redeems at the next settlement cycle if you meet threshold; otherwise it carries forward free of charge.</p></article>
+                <article class="formula-card"><h3>Can payouts be faked?</h3><p>No. Real proof of work is verified by the pool against the chain, and payments come from the pool's own transparent accounting to your own address. PreCog cannot fabricate a pool payout.</p></article>
+                <article class="formula-card"><h3>What does it cost me?</h3><p>Electricity, plus the pool's published fee. You are free to stop at any time. PreCog takes no cut of your mining rewards.</p></article>
+                <article class="formula-card"><h3>Is this an investment?</h3><p>No. It is paid work: you contribute hashpower, the pool pays in XMR. There is no token, no promised return, no lock-up.</p></article>
+                <article class="formula-card"><h3>How do I opt out?</h3><p>Close the window, Ctrl-C, or uninstall. Mining stops immediately; any shares the pool already accepted are settled by the pool on its normal schedule.</p></article>
             </div>
         </div>
     </section>
@@ -318,8 +401,9 @@
             <div class="safety-points">
                 <p><strong>Consent first.</strong> The node never runs without <code>--i-consent</code> or a ticked box. No tray ghosts, no autostart, no hidden persistence.</p>
                 <p><strong>Your keys stay yours.</strong> The node never reads your keys, browsers, wallets or files. It connects to one TLS endpoint and writes its own log.</p>
-                <p><strong>Auditable truth.</strong> The ledger publishes the same numbers shown to you at review — credits in, net proceeds out, payout drafts with destinations.</p>
-                <p><strong>Hard stop.</strong> Ctrl-C, window close, or uninstall. Shares already banked redeem at the next cycle if you meet threshold.</p>
+                <p><strong>Real infrastructure.</strong> We wrap mature mining tools and a real pool rather than inventing a payout scheme. What you see is the pool's own accounting.</p>
+                <p><strong>Real infrastructure.</strong> We wrap mature mining tools and a real pool. What you see is the pool's own accounting — not a scheme we invented.</p>
+                <p><strong>Hard stop.</strong> Ctrl-C, window close, or uninstall. Shares already banked settle at the next valid cycle when your declared destination and thresholds are satisfied.</p>
             </div>
         </div>
     </section>
@@ -332,7 +416,7 @@
                 <p>We are onboarding the first wave carefully: node diversity, pool behavior, payout dry-runs, and a post-mortem of every surprise before we scale the marketing.</p>
                 <a class="btn btn-primary btn-large" href="mailto:timlangeveldt@gmail.com?subject=PreCog%20Earn%20cohort&amp;body=OS%3A%20%0ACPU%3A%20%0AThread%20preference%3A">Email the cohort desk</a>
                 <a class="btn btn-outline btn-large" href="downloads/precog-earn-cohort-v0.1.0.zip">Download the cohort kit</a>
-                <p class="microcopy">No fees. No purchase. We optimize for operational truth before we optimize for volume. Kit ships with a declaration sheet: your handle, payout address, and ask — one email and you are in.</p>
+                <p class="microcopy">No fees from us. No purchase. The pool's own fee is published by the pool; you keep the rest. Bring your own XMR wallet and start in minutes.</p>
             </div>
         </div>
     </section>
@@ -341,7 +425,7 @@
 <footer class="footer">
     <div class="container footer-inner">
         <span>2026 PreCog Security</span>
-        <span>PreCog Earn — live pilot. Not an investment. Not a security. Desktop node mines real Monero for the treasury; users accrue credits redeemable by human-gated, threshold payouts.</span>
+        <span>PreCog Earn — consent-first Monero mining. Mine to a real pool and your own XMR wallet; the pool verifies shares and pays you directly. No credits scheme, no custody, no guaranteed income.</span>
         <span><a href="forum.html">Community forum →</a> · <a href="https://github.com/sponsors/PreCogSecurity">Sponsor us</a> · <a href="https://www.paypal.com/paypalme/PrecogSecurity">Donate</a></span>
     </div>
 </footer>

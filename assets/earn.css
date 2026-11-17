@@ -208,3 +208,38 @@ select:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .is-hidden { display: none; }
 
+
+/* === PreCog Nexus enhancements: wallet, motion, delight === */
+.wallet-section .wallet-showcase { display:grid; grid-template-columns: 1.05fr 1.35fr; gap:22px; margin-bottom:22px; }
+.wallet-balance { display:flex; flex-direction:column; gap:6px; margin:8px 0 18px; }
+.wallet-balance strong { font-family:var(--font-display); font-size:2.4rem; letter-spacing:-0.04em; background:linear-gradient(100deg,var(--primary-bright),var(--primary),#58b7ff); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+.wallet-delta { color:var(--primary); font-weight:700; font-size:.9rem; }
+.wallet-actions-row { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:14px; }
+.chain-toolbar { display:flex; flex-direction:column; gap:12px; margin-bottom:14px; }
+.chain-filters { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { border:1px solid var(--line); background:rgba(255,255,255,.03); color:var(--muted); border-radius:999px; padding:7px 12px; font:inherit; font-size:.8rem; font-weight:700; cursor:pointer; transition:all .2s var(--ease); }
+.chip:hover, .chip.active { color:var(--text); border-color:rgba(54,245,190,.45); box-shadow:0 0 18px rgba(54,245,190,.12); }
+.wallet-input { width:100%; background:rgba(255,255,255,.03); border:1px solid var(--line); color:var(--text); border-radius:12px; padding:12px 14px; font:inherit; }
+.wallet-input:focus { outline:none; border-color:rgba(54,245,190,.5); box-shadow:0 0 0 3px rgba(54,245,190,.12); }
+.chain-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; max-height:360px; overflow:auto; padding-right:4px; }
+.chain-card { text-align:left; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; cursor:pointer; transition:transform .18s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease), background .2s var(--ease); color:var(--text); font:inherit; }
+.chain-card:hover { transform:translateY(-2px); border-color:rgba(54,245,190,.4); box-shadow:0 10px 30px rgba(0,0,0,.25), 0 0 20px rgba(54,245,190,.08); background:rgba(54,245,190,.04); }
+.chain-card.selected { border-color:rgba(54,245,190,.65); box-shadow:0 0 0 1px rgba(54,245,190,.2), 0 0 24px rgba(54,245,190,.12); }
+.chain-top { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:4px; }
+.chain-name { font-weight:800; font-family:var(--font-display); }
+.chain-ticker { font-family:var(--mono); font-size:.72rem; color:var(--primary); background:rgba(54,245,190,.12); padding:3px 7px; border-radius:999px; }
+.chain-meta { font-size:.78rem; color:var(--muted); }
+.wallet-info-grid { margin-top:4px; }
+.wallet-detail { margin-top:22px; }
+.wallet-detail-row { display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap; }
+.wallet-detail-row code { flex:1; min-width:220px; padding:12px 14px; border-radius:12px; border:1px solid var(--line); background:rgba(0,0,0,.22); color:var(--text); word-break:break-all; }
+.muted { color:var(--muted); }
+
+/* Scroll reveal + delight */
+.reveal { opacity:0; transform:translateY(18px) scale(.985); transition:opacity .7s var(--ease), transform .7s var(--ease); }
+.reveal.in { opacity:1; transform:none; }
+.hero::after { content:""; position:absolute; inset:-20% -10% auto auto; width:520px; height:520px; background:radial-gradient(circle, rgba(54,245,190,.12), transparent 65%); filter:blur(10px); pointer-events:none; }
+.card, .panel, .formula-card, .roadmap-card { transition:transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease); }
+.card:hover, .formula-card:hover, .roadmap-card:hover { transform:translateY(-4px); border-color:rgba(125,255,214,.28); box-shadow:0 26px 70px rgba(0,0,0,.42), 0 0 0 1px rgba(54,245,190,.08), inset 0 1px 0 rgba(255,255,255,.06); }
+@media (max-width: 980px){ .wallet-section .wallet-showcase{ grid-template-columns:1fr; } .chain-grid{ grid-template-columns:1fr 1fr; } }
+@media (max-width: 640px){ .chain-grid{ grid-template-columns:1fr; } .wallet-actions-row .btn{ flex:1 1 auto; justify-content:center; } }

@@ -66,6 +66,44 @@ const walletOk = (addr) => typeof addr === "string" && /^[48A-Za-z0-9]{95}$/.tes
 
 const cents = (xmr) => Math.round(Number(xmr) * 1e12) / 1e12;
 
+/**
+ * Bound the damage a compromised/LLM-hallucinating node can do with its HMAC key.
+ * Receipts are signed *claims*, not verified proof of work, so without a cap a
+ * single node could mint unlimited credits and dilute the redemption pool.
+ * A real miner accepts only a few shares per flush window (tens, not millions),
+ * so a generous default of 100k per receipt is safe and blunts runaway claims.
+ * Returns null when acceptable, otherwise a client-facing reason string.
+ */
+export function validateReceiptShares(shares, env) {
+  if (!Number.isFinite(shares) || shares <= 0) return "user_handle, job_id and positive shares required";
+  const cap = Number(env?.MAX_SHARES_PER_RECEIPT ?? 100000);
+  if (Number.isFinite(cap) && cap > 0 && shares > cap) {
+    return `shares exceed per-receipt cap ${cap}; split large submissions into smaller receipts`;
+  }
+  return null;
+}
+
+/**
+ * Rolling per-user accrual cap: bounds how many shares one handle can claim in
+ * a time window even when every individual receipt is under the per-receipt cap
+ * (otherwise a compromised node could submit many small inflated receipts).
+ * `currentTotal` is the D1 SUM over the window; returns null when acceptable.
+ * A non-positive/missing cap disables the control; unusable totals fail open to
+ * the already-enforced per-receipt cap, matching the worker's other fail-open
+ * safety reads (haltStatus) so a transient D1 blip cannot stop honest mining.
+ */
+export function validateWindowedShares(currentTotal, incoming, env) {
+  const cap = Number(env?.MAX_SHARES_PER_USER_WINDOW ?? 1000000);
+  if (!Number.isFinite(cap) || cap <= 0) return null; // explicitly disabled
+  if (!Number.isFinite(currentTotal) || currentTotal < 0) return null; // unusable data: fail open
+  if (currentTotal + incoming > cap) {
+    const secs = Number(env?.SHARE_WINDOW_SECONDS ?? 3600);
+    const label = Number.isFinite(secs) && secs > 0 ? `${Math.round(secs / 60)}m` : "window";
+    return `shares exceed rolling ${label} cap ${cap} for this user; slow down or correct the claim`;
+  }
+  return null;
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -204,7 +242,10 @@ export default {
         dry_run: (env.DRY_RUN ?? "1") === "1",
         halted: Boolean(halt),
         halt_source: halt,
-        max_batch_xmr: env.MAX_BATCH_XMR ?? 0
+        max_batch_xmr: env.MAX_BATCH_XMR ?? 0,
+        max_shares_per_receipt: Number(env.MAX_SHARES_PER_RECEIPT ?? 100000),
+        max_shares_per_user_window: Number(env.MAX_SHARES_PER_USER_WINDOW ?? 1000000),
+        share_window_seconds: Number(env.SHARE_WINDOW_SECONDS ?? 3600)
       });
     }
 
@@ -218,7 +259,24 @@ export default {
       const user = String(body.user_handle ?? "").slice(0, 200);
       const shares = Number(body.shares ?? 0);
       const job = String(body.job_id ?? "").slice(0, 200);
-      if (!user || !job || !Number.isFinite(shares) || shares <= 0) return err(400, "user_handle, job_id and positive shares required");
+      if (!user || !job) return err(400, "user_handle, job_id and positive shares required");
+      const shareErr = validateReceiptShares(shares, env);
+      if (shareErr) return err(400, shareErr);
+      // Rolling per-user cap: sum this handle's shares in the window before insert.
+      // Redeemed receipts still count — the control bounds accrual rate, not balance.
+      const windowSec = Number(env.SHARE_WINDOW_SECONDS ?? 3600);
+      const window = Number.isFinite(windowSec) && windowSec > 0 ? windowSec : 3600;
+      const since = Math.floor(Date.now() / 1000) - window;
+      let windowErr = null;
+      try {
+        const row = await env.LEDGER.prepare(
+          "SELECT COALESCE(SUM(shares), 0) AS total FROM receipts WHERE user_handle = ? AND ts > ?"
+        ).bind(user, since).first();
+        windowErr = validateWindowedShares(Number(row?.total ?? 0), shares, env);
+      } catch {
+        // D1 blip: fail open to the per-receipt cap; never block honest mining.
+      }
+      if (windowErr) return err(429, windowErr);
       await env.LEDGER.prepare(
         "INSERT INTO receipts(ts, node_id, user_handle, job_id, shares, receipt_id) VALUES (?,?,?,?,?,?) ON CONFLICT(receipt_id) DO NOTHING"
       ).bind(Math.floor(Date.now() / 1000), node, user, job, shares, await sha256Hex(`${node}|${user}|${job}|${shares}`)).run();
@@ -238,7 +296,9 @@ export default {
     // ---------- settlement plan (admin) ----------
     if (path === "/v1/payout-plan" && request.method === "POST") {
       if (!(await adminOk(request, env))) return err(403, "admin token required");
-      const threshold = Number((await request.json().catch(() => ({})))?.threshold_credits ?? 100);
+      const body = await request.json().catch(() => ({}));
+      const threshold = Number(body?.threshold_credits ?? 100);
+      const poolXmr = body?.pool_xmr != null ? Number(body.pool_xmr) : null;
       const min = Number(env.MIN_REDEEM_XMR ?? 0);
       const maxBatch = Number(env.MAX_BATCH_XMR ?? 0);
       if (maxBatch <= 0) return err(500, "MAX_BATCH_XMR misconfigured");
@@ -248,15 +308,26 @@ export default {
       ).bind(threshold).all();
 
       const total = rows.results?.length ? rows.results.reduce((acc, r) => acc + Number(r.credits), 0) : 0;
-      const recipients = (rows.results ?? []).map((r) => ({
-        user: r.user_handle,
-        credits: Number(r.credits),
-        address: r.address ?? null,
-        blocked: !r.address,
-        // Pass pool_xmr in the body to get XMR amounts back (proportional split).
-        amount_xmr: null
-      }));
-      return ok({ threshold_credits: threshold, recipients, total_credits: total, note: "blocked rows lack payout_addresses entries; operator must add declared destinations first" });
+      const recipients = (rows.results ?? []).map((r) => {
+        const credits = Number(r.credits);
+        const amount = (poolXmr != null && poolXmr > 0 && total > 0) ? cents((poolXmr * credits) / total) : null;
+        return {
+          user: r.user_handle,
+          credits,
+          address: r.address ?? null,
+          blocked: !r.address,
+          // Proportional split when pool_xmr is provided and > 0.
+          amount_xmr: amount,
+          below_min: amount != null ? amount < min : false,
+        };
+      });
+      return ok({
+        threshold_credits: threshold,
+        pool_xmr: poolXmr,
+        recipients,
+        total_credits: total,
+        note: "blocked rows lack payout_addresses entries; operator must add declared destinations first. amount_xmr is computed only when pool_xmr is provided.",
+      });
     }
 
     // ---------- execute (admin, HARD-gated) ----------
