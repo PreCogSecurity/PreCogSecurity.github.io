@@ -1,0 +1,7 @@
+{
+  "latest_version": "0.1.1",
+  "url": "https://precogsecurity.pages.dev/earn",
+  "critical": true,
+  "message": "Security update: replace any compromised/malware wallet destination with your own verified wallet. Never reuse seeds or addresses from untrusted extensions. Use --check-update regularly.",
+  "notes": "v0.1.1: manifest-based update checks, critical security notice, blessed destination guidance."
+}

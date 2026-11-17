@@ -47,8 +47,12 @@ import zipfile
 from pathlib import Path
 
 XMRig_VERSION = "6.26.0"
-NODE_VERSION = "0.1.0"
+NODE_VERSION = "0.1.1"
 REPO_API = "https://api.github.com/repos/PreCogSecurity/PreCogSecurity.github.io/releases"
+UPDATE_MANIFEST_URL = os.environ.get(
+    "PRECOG_UPDATE_MANIFEST_URL",
+    "https://precogsecurity.pages.dev/update-manifest.json",
+)
 DOWNLOADS = Path(__file__).with_name(".runtime")  # gitignored
 APP_DIR = DOWNLOADS / f"xmrig-{XMRig_VERSION}"
 LEDGER = Path(__file__).with_name("precog-earn-ledger.log")
@@ -380,13 +384,49 @@ def cmd_bench(args) -> int:
     return 0
 
 
+def _parse_version(v: str):
+    try:
+        return tuple(int(x) for x in str(v).lstrip("v").split("."))
+    except Exception:
+        return (0,)
+
+
 def check_update() -> int:
-    """Query GitHub for the latest node release; report only. Never self-installs."""
+    """Check for updates via manifest (preferred) then GitHub releases. Report only; never self-installs."""
+    manifest_err = None
+    try:
+        with urllib.request.urlopen(UPDATE_MANIFEST_URL, timeout=15) as r:
+            m = json.loads(r.read().decode())
+        if isinstance(m, dict) and m.get("latest_version"):
+            latest = str(m["latest_version"])
+            url = str(m.get("url", "https://precogsecurity.pages.dev/earn"))
+            msg = str(m.get("message", ""))
+            critical = bool(m.get("critical", False))
+            print(f"installed: {NODE_VERSION}\nlatest: {latest}")
+            if url:
+                print(f"download: {url}")
+            if msg:
+                print(f"notice: {msg}")
+            if _parse_version(latest) > _parse_version(NODE_VERSION):
+                if critical:
+                    print("CRITICAL UPDATE AVAILABLE. Please update before continuing to protect your funds.")
+                else:
+                    print("An update is available. Download the signed release bundle and replace this script.")
+                print("This node never replaces its own code automatically.")
+                return 2
+            print("up to date (manifest).")
+            return 0
+    except Exception as exc:
+        manifest_err = exc
+
     try:
         with urllib.request.urlopen(REPO_API, timeout=15) as r:
             releases = json.loads(r.read().decode())
     except Exception as exc:
-        print(f"update check failed: {type(exc).__name__}. You can retry later; nothing changed.")
+        if manifest_err:
+            print(f"update check failed (manifest: {type(manifest_err).__name__}, releases: {type(exc).__name__}). You can retry later; nothing changed.")
+        else:
+            print(f"update check failed: {type(exc).__name__}. You can retry later; nothing changed.")
         return 1
 
     if not isinstance(releases, list) or not releases:
