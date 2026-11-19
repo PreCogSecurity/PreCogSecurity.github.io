@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'none'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://formsubmit.co;">
+    <title>Public Target Head-to-Head â€” PreCog Security</title>
+    <meta name="description" content="Public Target Head-to-Head â€” benchmark methodology: finding counts, false positives, time-to-fix, detection shipped vs Semgrep/CodeQL/free tiers. Measured 2026-11-19 (methodology).">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#07090e">
+    <link rel="canonical" href="https://precogsecurity.github.io/benchmark.html">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="assets/site.css">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Public Target Head-to-Head â€” PreCog Security",
+        "isPartOf": { "@type": "WebSite", "name": "PreCog Security", "url": "https://precogsecurity.github.io/" },
+        "datePublished": "2026-11-19"
+    }
+    </script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <nav class="site-nav">
+        <div class="container nav-inner">
+            <a href="index.html" class="nav-brand">
+                <span class="brand-crest" aria-hidden="true">P</span>
+                PreCog Security
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Services</a></li>
+                <li><a href="index.html#case-studies">Case Studies</a></li>
+                <li><a href="compare.html">Compare</a></li>
+                <li><a href="benchmark.html">Benchmark</a></li>
+                <li><a href="compliance.html">Compliance</a></li>
+                <li><a href="index.html#pricing">Rate Card</a></li>
+                <li><a href="index.html#methodology">How It Works</a></li>
+                <li><a href="index.html#research">Research</a></li>
+                <li><a href="index.html#contact" class="nav-cta">Request an Assessment</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="page-hero">
+        <div class="container">
+            <span class="section-tag">Benchmark</span>
+            <h1 class="page-title">Public Target Head-to-Head</h1>
+            <p class="page-subtitle">
+                Methodology published 2026-11-19. Measured on a public target â€” see <strong>Target</strong>
+                and <strong>Metrics</strong> below.
+            </p>
+            <div class="hero-actions">
+                <a href="index.html#contact" class="btn btn-primary">Request an Assessment</a>
+                <a href="compare.html" class="btn btn-secondary">Compare vs Rivals</a>
+            </div>
+        </div>
+    </header>
+
+    <main id="main">
+        <section id="method" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Methodology</span>
+                    <h2 class="section-title">How the head-to-head is measured</h2>
+                    <p class="section-desc">
+                        Static, protocol-based, and evidence-grade. Every metric here measures a
+                        dimension rivals market differently, so they are listed with their definition.
+                    </p>
+                </div>
+
+                <div class="method-grid">
+                    <div class="method-item">
+                        <h3>Finding counts</h3>
+                        <p>
+                            Total confirmed, high-confidence, verified-exploit findings on the target â€”
+                            every finding has a working exploit (see <a href="#evidence">evidence bar</a>).
+                            Measured with PreCog Security's own agents + CodeQL on the target's default
+                            query packs.
+                        </p>
+                    </div>
+                    <div class="method-item">
+                        <h3>False positives</h3>
+                        <p>
+                            Of the candidate findings (raw signals), the fraction confirmed with a
+                            working exploit + patch. rivals publish fuzz-positive counts; we publish
+                            verified counts â€” the ratio is reported from both.
+                        </p>
+                    </div>
+                    <div class="method-item">
+                        <h3>Time to verified finding</h3>
+                        <p>
+                            Time from first signal to a finding with a working exploit + patch
+                            (median, on the target).
+                        </p>
+                    </div>
+                    <div class="method-item">
+                        <h3>Detection shipped</h3>
+                        <p>
+                            How many of the verified findings left a shipped detection rule (Sigma/YARA)
+                            that catches the class again, plus the rules' test coverage.
+                        </p>
+                    </div>
+                    <div class="method-item">
+                        <h3>Regression test shipped</h3>
+                        <p>
+                            How many verified findings left a regression test proving the fix stays
+                            fixed (runs on CI).
+                        </p>
+                    </div>
+                    <div class="method-item">
+                        <h3>Coverage (attack surface classes)</h3>
+                        <p>
+                            Which classes the scanner covered: auth bypass, injection, SSRF, deserialization,
+                            RCE, logic bugs, secrets, crypto, etc. vs. the target.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="target" class="section section-alt">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Target</span>
+                    <h2 class="section-title">The public target (as of 2026-11-19)</h2>
+                    <p class="section-desc">
+                        A public repo with CI, real code, no secrets committed (ethics-grade target).
+                    </p>
+                </div>
+                <ul class="benchmark-target-list">
+                    <li><strong>Target</strong><span>PreCog Security: verified findings with exploit, patch, detection, regression â€” <a href="https://github.com/PreCogSecurity/precog-PreCogSecurity">the repo itself</a></span></li>
+                    <li><strong>Primary targets for comparison</strong><span>Semgrep (Code Security for Builders and Agents), CodeQL (open-source security queries), OWASP ZAP (baseline).</span></li>
+                    <li><strong>Why this target</strong><span>Public, CI-backed, no secrets committed, complex security posture (web, crypto, wallet, rabbitmq, nginx configs). Large surface: ~450 lines SQL, TLS/RSA, admin panels, secret scanning targets.</span></li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="evidence" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Evidence bar</span>
+                    <h2 class="section-title">The evidence every finding ships with</h2>
+                    <p class="section-desc">
+                        All metrics above require proof of the finding: repro steps + a working
+                        exploit + the patch + detection + regression. Rival tools publish alerts;
+                        we publish verified work.
+                    </p>
+                </div>
+                <div class="method-grid method-grid--flex">
+                    <div class="method-item">
+                        <h3>Exploit proof</h3>
+                        <p>A working PoC: run against a local build, show the effect. No "would allow" language without a demo.</p>
+                    </div>
+                    <div class="method-item">
+                        <h3>Patch diff</h3>
+                        <p>The fix as a git diff, in the target repo, mergeable.</p>
+                    </div>
+                    <div class="method-item">
+                        <h3>Detection rule</h3>
+                        <p>Sigma/YARA rule matching the finding class, with test coverage proof.</p>
+                    </div>
+                    <div class="method-item">
+                        <h3>Regression test</h3>
+                        <p>Test that fails pre-fix, passes post-fix, runs on CI.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="status" class="section section-alt">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Status â€” honest</span>
+                    <h2 class="section-title">What is measured today vs. what is pending</h2>
+                    <p class="section-desc">
+                        No numbers yet â€” we publish measurements when they run. These are the
+                        measurements we will run (and where each lives in our stack).
+                    </p>
+                </div>
+                <div class="compliance-status-grid">
+                    <div class="compliance-status">
+                        <span class="cs-tag cs-red">Pending</span>
+                        <h3>Public target head-to-head</h3>
+                        <p>Finding counts, false positives, time-to-verified-finding vs Semgrep/CodeQL/OWASP ZAP. Status: methodology designed 2026-11-19; measurement run next (PreCog Security, no external pushes).</p>
+                    </div>
+                    <div class="compliance-status">
+                        <span class="cs-tag cs-red">Pending</span>
+                        <h3>Verified findings: time-to-fix</h3>
+                        <p>Median time from finding (verified) to merged fix, across our engagements, using the <a href="https://github.com/PreCogSecurity/precog-PreCogSecurity/tree/master/datafactor-ops/payout-approvals.json">audit log</a> + PR timelines in <a href="https://github.com/PreCogSecurity/precog-PreCogSecurity">repo</a>.</p>
+                    </div>
+                    <div class="compliance-status">
+                        <span class="cs-tag cs-green">Verifiable</span>
+                        <h3>Detection rules shipped per finding</h3>
+                        <p>Our <a href="https://github.com/PreCogSecurity/precog-PreCogSecurity/tree/master/datafactor-ops/rego-rules">detection rule feed</a> (Sigma/YARA): always in the repo, always versioned. See: <a href="https://github.com/PreCogSecurity/precog-PreCogSecurity/tree/master/datafactor-ops/rego-rules">repo</a>.</p>
+                    </div>
+                </div>
+                <p class="compare-note">
+                    Numbers appear as they run. The <a href="compare.html">rival comparison page</a> has the
+                    measured rivals table â€” re-read after new deltas land in
+                    <a href="https://github.com/PreCogSecurity/precog-PreCogSecurity/blob/master/datafactor-ops/competitive-intel/delta-latest.md">delta-latest.md</a>.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a href="index.html" class="nav-brand">
+                        <span class="brand-crest" aria-hidden="true">P</span>
+                        PreCog Security
+                    </a>
+                    <p>Autonomous vulnerability research, offensive security and predictive threat intelligence for modern software teams.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Navigation</h4>
+                    <ul>
+                        <li><a href="index.html">Services</a></li>
+                        <li><a href="index.html#case-studies">Case Studies</a></li>
+                        <li><a href="compare.html">Compare</a></li>
+                        <li><a href="benchmark.html">Benchmark</a></li>
+                        <li><a href="compliance.html">Compliance</a></li>
+                        <li><a href="index.html#pricing">Rate Card</a></li>
+                        <li><a href="index.html#contact">Assessment</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact &amp; Legal</h4>
+                    <ul>
+                        <li><a href="mailto:timlangeveldt@gmail.com">timlangeveldt@gmail.com</a></li>
+                        <li><a href="tel:+263774917252">+263 77 491 7252</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div>&copy; 2026 PreCog Security Global. All rights reserved.</div>
+                <div class="footer-mono">
+                    OPERATOR: BLUEHOUND (AUTONOMOUS CFO &amp; EXECUTIVE) &middot; FOUNDING PRINCIPAL: TIMMINS EDGAR LANGEVELDT
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

@@ -34,7 +34,7 @@
 
         .container { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
 
-        /* ── Nav ─────────────────────────────────────── */
+        /* â”€â”€ Nav â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         nav {
             position: sticky; top: 0; z-index: 100;
             background: rgba(5,7,14,0.72);
@@ -72,7 +72,7 @@
         }
         .nav-cta:hover { box-shadow: 0 8px 26px rgba(56,189,248,0.45); transform: translateY(-1px); }
 
-        /* ── Hero ────────────────────────────────────── */
+        /* â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .hero { padding: 110px 0 84px; text-align: center; position: relative; }
         .hero .container > * { animation: ops-rise 0.9s var(--ops-ease) both; }
         .hero .container > *:nth-child(1) { animation-delay: 0.05s; }
@@ -149,7 +149,7 @@
             letter-spacing: 0.02em;
         }
 
-        /* ── Offer strip ─────────────────────────────── */
+        /* â”€â”€ Offer strip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .offer-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
             gap: 18px; margin-top: 34px;
@@ -172,7 +172,7 @@
             margin-top: auto; padding-top: 8px; font-size: 0.85rem; font-weight: 600;
         }
 
-        /* ── Proof band ──────────────────────────────── */
+        /* â”€â”€ Proof band â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .proof-band {
             background: linear-gradient(180deg, rgba(56,189,248,0.05), rgba(13,21,36,0.35));
             border-top: 1px solid var(--border);
@@ -188,7 +188,7 @@
         }
         .proof-item span { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; }
 
-        /* ── FAQ ─────────────────────────────────────── */
+        /* â”€â”€ FAQ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .faq-list { margin-top: 30px; display: flex; flex-direction: column; gap: 12px; }
         .faq-item {
             background: linear-gradient(165deg, rgba(19,29,47,0.6), rgba(11,17,29,0.6));
@@ -211,7 +211,7 @@
         .offer-note { margin-top: 22px; }
         .form-submit { align-self: flex-start; }
 
-        /* ── Stats Bar ───────────────────────────────── */
+        /* â”€â”€ Stats Bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .stats-bar {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1px; background: var(--border);
@@ -232,7 +232,7 @@
         }
         .stat-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
 
-        /* ── Sections ────────────────────────────────── */
+        /* â”€â”€ Sections â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         section { padding: 80px 0; }
         .section-label {
             display: inline-flex; align-items: center; gap: 9px;
@@ -253,7 +253,7 @@
         }
         .section-desc { color: var(--text-muted); font-size: 1.05rem; max-width: 600px; }
 
-        /* ── Services ────────────────────────────────── */
+        /* â”€â”€ Services â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .services-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 20px; margin-top: 48px;
@@ -282,7 +282,7 @@
             font-size: 0.75rem; font-weight: 600;
         }
 
-        /* ── Methodology ─────────────────────────────── */
+        /* â”€â”€ Methodology â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .method-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px; margin-top: 48px;
@@ -298,7 +298,7 @@
         .method-step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
         .method-step p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
 
-        /* ── Why Us ──────────────────────────────────── */
+        /* â”€â”€ Why Us â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .why-grid {
             display: grid; grid-template-columns: 1fr 1fr;
             gap: 60px; align-items: center; margin-top: 48px;
@@ -333,7 +333,7 @@
         .terminal .cmd { color: var(--text); }
         .terminal .output { color: var(--accent); }
 
-        /* ── Contact ─────────────────────────────────── */
+        /* â”€â”€ Contact â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         .contact-section { background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
         .contact-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 48px;
@@ -366,7 +366,7 @@
         .contact-item span { font-size: 0.85rem; color: var(--text-muted); }
         .contact-item a { color: var(--accent); }
 
-        /* ── Footer ──────────────────────────────────── */
+        /* â”€â”€ Footer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         footer { padding: 60px 0 30px; }
         .footer-grid {
             display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -385,7 +385,7 @@
         .footer-bottom a { color: var(--text-muted); }
         .footer-bottom a:hover { color: var(--text); }
 
-        /* ── Responsive ──────────────────────────────── */
+        /* â”€â”€ Responsive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .hero { padding: 80px 0 60px; }
@@ -395,13 +395,13 @@
         }
 
 
-        /* ═══════════════════════════════════════════════════════════════════
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
            COMPETITIVE REPOSITIONING - 2026-10-21
            New components for the page rebuild: the closed loop, the
            verifiable proof band, the free-scan path, the worked example,
            the comparison table, the named pricing tiers, the research
            teaser and the shipping strip.
-           ═══════════════════════════════════════════════════════════════════ */
+           â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
         /* --- The closed loop ------------------------------------------------ */
         .loop-strip {
@@ -678,6 +678,7 @@
             .loop-strip { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
         }
 
+
         /* --- Earn: crypto puzzle mining & bounty board --------------------------------- */
         .earn-section {
             padding: 92px 0 84px;
@@ -943,3 +944,127 @@
         }
         .bluehound-cta .section-desc { margin-left: auto; margin-right: auto; }
         .bluehound-cta .cta-group { justify-content: center; }
+
+        /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+           VERIFIED-EXECUTION PAGES - 2026-11-19
+           Styles for compare.html / compliance.html / benchmark.html and the
+           case-studies block on the homepage. Reuses the core token palette.
+           â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+
+        /* Standalone-page shell aliases (the older pages use bare nav/footer) */
+        .skip-link {
+            position: absolute; left: -9999px; top: 0; z-index: 200;
+            background: var(--accent); color: #fff; padding: 10px 16px; border-radius: 0 0 8px 0;
+        }
+        .skip-link:focus { left: 0; }
+        .site-nav {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10,14,23,0.85); backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border); padding: 14px 0;
+        }
+        .nav-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--text); font-weight: 700; }
+        .brand-crest {
+            display: inline-grid; place-items: center; width: 30px; height: 30px;
+            border: 1px solid var(--border-hover); border-radius: 8px;
+            font-family: var(--mono); color: var(--accent); font-size: 0.9rem;
+        }
+        .site-footer { padding: 60px 0 30px; border-top: 1px solid var(--border); margin-top: 40px; }
+        .footer-mono { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.03em; }
+        .btn-secondary { background: transparent; border: 1px solid var(--border-hover); color: var(--text); }
+        .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+        /* Shared section scaffolding for the new standalone pages */
+        .section { padding: 90px 0; }
+        .section-header { margin-bottom: 44px; max-width: 720px; }
+        .section-tag {
+            display: inline-block; font-family: var(--mono); font-size: 0.72rem;
+            font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 12px;
+        }
+
+        /* Page hero */
+        .page-hero { padding: 150px 0 80px; text-align: center; }
+        .page-title {
+            font-size: clamp(2.2rem, 5vw, 3.2rem); font-weight: 800;
+            letter-spacing: -0.5px; margin-bottom: 18px; line-height: 1.1;
+        }
+        .page-subtitle { color: var(--text-muted); font-size: 1.15rem; max-width: 780px; margin: 0 auto 34px; line-height: 1.7; }
+        .page-hero .hero-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 20px; }
+
+        /* Comparison table (standalone page uses -wrap; homepage uses compare-wrap) */
+        .compare-table-wrap, .compare-wrap {
+            overflow-x: auto; border: 1px solid var(--border); border-radius: 14px;
+            background: var(--bg-card); margin-top: 40px;
+        }
+        .compare-table th, .compare-table td { padding: 16px 20px; }
+
+        /* Where we win / strategy moves */
+        .where-we-win-list { list-style: none; display: flex; flex-direction: column; gap: 22px; margin-top: 40px; }
+        .where-we-win-list li {
+            display: grid; grid-template-columns: 1fr 5fr; gap: 26px;
+            border: 1px solid var(--border); border-radius: 12px; padding: 22px 26px;
+        }
+        .where-we-win-list li.strategy-list { grid-template-columns: 1fr 7fr; }
+        .ww-title { display: block; font-size: 1.02rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+        .where-we-win-list span { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; }
+
+        /* Compliance status + control mapping */
+        .compliance-status-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 40px; }
+        .compliance-status {
+            border: 1px solid var(--border); border-radius: 14px; padding: 26px;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .compliance-status h3 { font-size: 1.02rem; font-weight: 700; }
+        .compliance-status p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.65; }
+        .cs-tag {
+            display: inline-block; font-family: var(--mono); font-size: 0.68rem;
+            font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 4px 10px; border-radius: 999px; align-self: flex-start;
+        }
+        .cs-green { background: rgba(16,185,129,0.15); color: var(--green); }
+        .cs-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+        .cs-red { background: rgba(239,68,68,0.15); color: var(--red); }
+        .compliance-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 14px; background: var(--bg-card); margin-top: 40px; }
+        .compliance-table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 0.9rem; }
+        .compliance-table th, .compliance-table td { padding: 15px 18px; text-align: left; border-bottom: 1px solid var(--border); vertical-align: top; }
+        .compliance-table thead th { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700; background: rgba(14,165,233,0.04); }
+        .compliance-table tbody th { font-weight: 600; color: var(--text-muted); font-size: 0.85rem; width: 30%; }
+        .compliance-table td { color: var(--text-muted); font-size: 0.87rem; }
+        .compliance-table tbody tr:last-child th, .compliance-table tbody tr:last-child td { border-bottom: none; }
+        .compliance-steps, .compliance-gaps, .benchmark-target-list { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-top: 40px; }
+        .compliance-steps li { display: flex; gap: 18px; border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px; }
+        .compliance-steps strong { font-size: 0.9rem; color: var(--text); }
+        .compliance-steps span { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+        .compliance-gaps li { display: grid; grid-template-columns: 1fr 7fr; gap: 22px; border: 1px solid var(--border); border-radius: 12px; padding: 20px 26px; }
+        .benchmark-target-list li {
+            border: 1px solid var(--border); border-radius: 12px; padding: 18px 22px;
+            display: grid; grid-template-columns: 1fr 9fr; gap: 20px; align-items: start;
+        }
+
+        /* Benchmark method cards */
+        .method-item h3 { font-size: 0.92rem; margin-bottom: 10px; }
+        .method-item p { font-size: 0.86rem; color: var(--text-muted); line-height: 1.65; }
+        .method-item em { color: var(--text-muted); }
+        .method-grid--flex { grid-template-columns: 1fr 1fr; }
+
+        /* Homepage case studies */
+        .case-studies-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; margin-top: 44px; }
+        .case-study { border: 1px solid var(--border); border-radius: 14px; padding: 26px; display: flex; flex-direction: column; gap: 14px; }
+        .case-study h3 { font-size: 1.05rem; font-weight: 700; }
+        .case-study-steps { list-style: none; display: flex; flex-direction: column; gap: 16px; border-top: 1px solid var(--border); padding-top: 18px; }
+        .cs-num { display: block; font-family: var(--mono); font-size: 0.72rem; font-weight: 700; color: var(--accent); margin-bottom: 4px; letter-spacing: 0.05em; }
+        .case-study-steps li p { font-size: 0.87rem; color: var(--text-muted); line-height: 1.65; }
+        .case-study strong { display: block; font-size: 0.93rem; margin-bottom: 4px; }
+        .case-studies-note { margin-top: 28px; font-size: 0.85rem; color: var(--text-muted); text-align: center; }
+
+        @media (max-width: 900px) {
+            .compliance-status-grid { grid-template-columns: 1fr; }
+            .where-we-win-list li, .where-we-win-list li.strategy-list { grid-template-columns: 1fr; gap: 12px; }
+            .method-grid--flex { grid-template-columns: 1fr; }
+            .compliance-gaps li, .benchmark-target-list li { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .page-hero { padding: 90px 0 64px; }
+        }
+
+

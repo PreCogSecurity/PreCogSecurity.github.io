@@ -102,8 +102,11 @@
         </a>
         <ul class="nav-links">
             <li><a href="#services">Services</a></li>
+            <li><a href="#case-studies">Case Studies</a></li>
             <li><a href="#pricing">Pricing</a></li>
-            <li><a href="#compare">Compare</a></li>
+            <li><a href="compare.html">Compare</a></li>
+            <li><a href="benchmark.html">Benchmark</a></li>
+            <li><a href="compliance.html">Compliance</a></li>
             <li><a href="#methodology">Method</a></li>
             <li><a href="#research">Research</a></li>
             <li><a href="earn.html">Earn</a></li>
@@ -854,6 +857,69 @@ missing
     </div>
 </section>
 
+<!-- Case studies -->
+<section id="case-studies" class="section-alt">
+    <div class="container">
+        <span class="section-label">Case studies</span>
+        <h2 class="section-title">From verified finding to merged fix</h2>
+        <p class="section-desc">
+            Anonymised shapes of real engagements: what we found, the work that proved it, and the
+            artifact the client shipped. No client names and no URLs from live systems — the steps
+            and the evidence are the point.
+        </p>
+        <div class="case-studies-grid">
+            <article class="case-study">
+                <h3>Blind SQL injection in the order handler</h3>
+                <ul class="case-study-steps">
+                    <li><span class="cs-num">01 / Finding</span>
+                        <p><strong>Critical — confirmed.</strong> Raw SQL assembled from user-controlled filters in a public checkout path. A read of the order table was reachable; a write path was plausible.</p></li>
+                    <li><span class="cs-num">02 / Work</span>
+                        <p>AST scan flagged the sink; a dynamic UNION-based read against the running flow confirmed it. No candidate reported without a working path.</p></li>
+                    <li><span class="cs-num">03 / Fix</span>
+                        <p>Patch as a diff: parameterised queries. Detection: SQLi-pattern rule over the same endpoints. Regression: the exploit replayed in CI — fails on old code, passes on patched code.</p></li>
+                </ul>
+            </article>
+            <article class="case-study">
+                <h3>IDOR on the invoice object</h3>
+                <ul class="case-study-steps">
+                    <li><span class="cs-num">01 / Finding</span>
+                        <p><strong>Medium — cross-tenant read.</strong> Invoice endpoints enumerate IDs with no ownership check: tenant A can read tenant B's invoices.</p></li>
+                    <li><span class="cs-num">02 / Work</span>
+                        <p>Reproduced over REST and GraphQL; three instances of the same missing check, documented with exact request/response pairs.</p></li>
+                    <li><span class="cs-num">03 / Fix</span>
+                        <p>Patch: tenant scoping in the resolver. Detection: IDOR class rule. Regression: e2e assertion that tenant A cannot read tenant B's invoices.</p></li>
+                </ul>
+            </article>
+            <article class="case-study">
+                <h3>Prototype pollution via config deep-merge</h3>
+                <ul class="case-study-steps">
+                    <li><span class="cs-num">01 / Finding</span>
+                        <p><strong>Critical-adjacent.</strong> Attacker-controlled key paths in a deep-merge utility could pollute <code>Object.prototype</code>, unlocking gadget chains.</p></li>
+                    <li><span class="cs-num">02 / Work</span>
+                        <p>Gadget path demonstrated and documented precisely — no standalone RCE claim. Dependencies pinned and audited alongside the sink.</p></li>
+                    <li><span class="cs-num">03 / Fix</span>
+                        <p>Patch: null-prototype map merge plus lockfile pinning. Detection: merge-gadget rule. Regression: gadget replay in CI.</p></li>
+                </ul>
+            </article>
+            <article class="case-study">
+                <h3>SSRF in the webhook receiver</h3>
+                <ul class="case-study-steps">
+                    <li><span class="cs-num">01 / Finding</span>
+                        <p><strong>High.</strong> The webhook receiver fetched arbitrary user-supplied URLs with no allowlist. Blind SSRF confirmed with an out-of-band marker.</p></li>
+                    <li><span class="cs-num">02 / Work</span>
+                        <p>Marker replayed to the sink through the webhook proxy. The metadata range was blocked by the target's own network policy — recorded as a boundary, not a finding.</p></li>
+                    <li><span class="cs-num">03 / Fix</span>
+                        <p>Patch: URL allowlist (https + approved domains, deny loopback/metadata). Detection: SSRF rule on the fetch sink. Regression: the marker path fails pre-fix, passes post-fix.</p></li>
+                </ul>
+            </article>
+        </div>
+        <p class="case-studies-note">
+            Every engagement is scoped and priced in writing before work starts. Send a repository URL to
+            <a href="mailto:timlangeveldt@gmail.com">timlangeveldt@gmail.com</a> — scoped answer within 48 hours.
+        </p>
+    </div>
+</section>
+
 <!-- Pricing -->
 <section id="pricing" class="section-alt">
     <div class="container">
@@ -1348,8 +1414,11 @@ missing
             <div class="footer-col">
                 <h4>Engagements</h4>
                 <ul>
+                    <li><a href="#case-studies">Case studies</a></li>
                     <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="#compare">How we compare</a></li>
+                    <li><a href="compare.html">How we compare</a></li>
+                    <li><a href="benchmark.html">Public benchmark</a></li>
+                    <li><a href="compliance.html">Compliance mapping</a></li>
                     <li><a href="#methodology">Method</a></li>
                     <li><a href="services.html">Full rate card</a></li>
                     <li><a href="#faq">FAQ</a></li>
